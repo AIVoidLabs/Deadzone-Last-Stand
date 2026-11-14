@@ -1,0 +1,32 @@
+# Godot 4 — motorun ürettiği önbellek
+.godot/
+
+# Dışa aktarım çıktıları
+build/
+*.exe
+*.pck
+*.x86_64
+*.zip
+
+# Geçici / yedek dosyalar
+*.tmp
+*.bak
+*~
+*.translation
+
+# Export kimlik bilgileri
+export_credentials.cfg
+
+# İşletim sistemi ve editör artıkları
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# Claude Code yerel ayarları
+.claude/settings.local.json
+
+# Ham model kaynakları (Tripo çıktısı; temizlenmiş model repoda)
+assets/models/source/
+*.blend1
