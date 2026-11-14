@@ -19,7 +19,7 @@ Zırhlı ve kasklı bir asker, kapalı bir şehir kavşağında dalga dalga gele
 ## Çekirdek döngü (Aşama 1)
 
 - **Asker:** sabit hızla yürür, ivmelenme ve sürtünme ile yumuşak durur. Canı biter → ölüm ekranı → R.
-- **Zombi:** askere doğru yürür, birbirini iter (üst üste binmez). Askere değince bekleme süreli temas hasarı verir.
+- **Zombi:** askere doğru yürür, birbirini iter (üst üste binmez). Askerin içine girmez; değince temas hasarı verir. Vurulan asker kısa süre dokunulmaz olur (yanıp söner), böylece kalabalıkta hasar okunur kalır.
 - **Silah:** menzil içindeki en yakın zombiye otomatik ateş eder. Mermi düz gider, ilk değdiği zombiye hasar verir.
 - **Doğma:** zombiler arenanın kenarından, kameranın dışından gelir; sayı zamanla artar, üst sınır kalite profilinden.
 - **Kamera:** sabit açılı (yaklaşık 55° eğik), askeri yumuşakça izler.
@@ -32,7 +32,9 @@ Zırhlı ve kasklı bir asker, kapalı bir şehir kavşağında dalga dalga gele
 | Asker canı | 100 |
 | Zombi hızı | 2.6 m/sn |
 | Zombi canı | 30 |
-| Zombi temas hasarı | 10, 0.8 sn'de bir |
+| Zombi temas hasarı | 10 |
+| Vurulunca dokunulmazlık | 0.5 sn |
+| Doğma aralığı | 1.0 sn → en az 0.12 sn; her 15 sn'de bir seferde +1 zombi |
 | Silah hasarı | 10 |
 | Atış aralığı | 0.35 sn |
 | Menzil | 12 m |
@@ -48,7 +50,15 @@ Zırhlı ve kasklı bir asker, kapalı bir şehir kavşağında dalga dalga gele
 
 ## Kalite profilleri
 
-`low / medium / high`. Zombi üst sınırı, gölge, parçacık yoğunluğu bu profillerden okunur. Platform yalnız varsayılan profili seçer.
+`low / medium / high`. Zombi üst sınırı, gölge, MSAA (ileride parçacık yoğunluğu) `scripts/data/quality_profiles.gd`'den okunur. Platform yalnız varsayılan profili seçer (masaüstü: high).
+
+| Profil | Zombi üst sınırı | Gölge | MSAA |
+| --- | --- | --- | --- |
+| low | 200 | yok | yok |
+| medium | 350 | var | 2x |
+| high | 600 | var | 4x |
+
+Aşama 1 ölçümü: kutu zombilerle 60 FPS tavanı ~1350. Sınırlar yarı payla kondu; iskeletli modeller (Aşama 5) gelince yeniden ölçülür.
 
 ## Açık sorular
 

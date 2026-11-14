@@ -154,6 +154,12 @@ docs/          GAME_DESIGN.md, PROGRESS.md, concept/
 - Çalıştırma (PowerShell): `godot --headless --path . -s res://addons/gut/gut_cmdln.gd` → "All tests passed" ve çıkış kodu 0.
 - Beklenen değerleri `Tuning`'den türet; ayar değişince testler kırılmasın.
 
+### Doğrulama araçları (yalnız debug yapı; ana sahneye argümanla eklenir)
+- Ekran görüntüsü: `godot --path . -- --capture=build/shots/x.png --capture-seconds=8 [--capture-spawn=300] [--autopilot] [--debug-panel]` → PNG'yi Read ile aç. `--autopilot`: asker ölümsüz, daire çizer.
+- Sürü ölçümü: `godot --path . -- --bench` → vsync kapalı, 50'şer zombi ekler, 60 FPS altına düşünce durur; sonuç stdout'ta `BENCH` satırları ve `user://bench_result.txt`.
+- `-s` ile çalışan SceneTree betikleri autoload'ları göremez; oyun sınıflarına dokunan araçları bu yüzden betik olarak değil, debug düğümü olarak yaz.
+- Debug tuşları: F3 panel, F4 +50 zombi, F5 ölümsüz, F6 kalite profili.
+
 ### Model hattı (Aşama 4–5)
 - Blender işleri script olarak `tools/blender/` altında saklanır; model elle değil script ile yeniden üretilebilir olmalı.
 - Akış: script → pozu sıfırla → kaydet → `.glb` dışa aktar → `godot --headless --import`.
