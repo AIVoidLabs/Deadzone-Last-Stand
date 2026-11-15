@@ -8,6 +8,7 @@ const FEATURE_CAMERA_SMOOTHING: bool = true
 const FEATURE_HIT_FLASH: bool = true
 const FEATURE_PLAYER_IFRAMES: bool = true
 const FEATURE_SPAWN_RAMP: bool = true
+const FEATURE_START_FULLSCREEN: bool = true
 
 # --- Arena ---
 const ARENA_SIZE: float = 60.0

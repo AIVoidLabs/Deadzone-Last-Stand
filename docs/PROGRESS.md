@@ -31,7 +31,7 @@ Her oturumun sonunda güncellenir. Yeni oturum buradan devam eder.
 ## Aşama 0 kontrol listesi
 
 - [x] `claude mcp list`: `godot` ve `blender` Connected
-- [ ] Claude Blender'dan sahne bilgisini okuyabiliyor (Blender kapalıydı: "Could not connect to Blender")
+- [x] Claude Blender'dan sahne bilgisini okuyabiliyor (2026-11-15: Blender 5.3.0, 3 nesne okundu; eklenti güncel değil, yukarıya bak)
 - [x] Boş Godot projesi, Forward+, `godot --headless --path . --quit` hatasız
 - [x] GUT 9.7.1 kurulu (Tower Climb'daki yerel kopyadan), örnek test geçiyor
 - [x] Windows dışa aktarımı üretildi, `--headless --quit` ile açılıp kapandı
@@ -65,6 +65,12 @@ Profil üst sınırları buna göre: low 200, medium 350, high 600. İskeletli m
 - Silah gücü düşük hissedilebilir (kalabalıkta hedef sürekli değiştiği için hasar dağılıyor). Denge Aşama 2'de.
 - Hareketsiz duran asker ~30 sn'de ölüyor (17 öldürme). Hareket eden oyuncuyla gerginlik kullanıcı testinde ayarlanacak.
 - Asker zombilerin arasından itilerek geçebiliyor (zombiler askeri iter değil, asker onları iter). Sıkışma istenirse Aşama 3'te dash ile birlikte ele alınır.
+
+## Kullanıcı geri bildirimi (Aşama 0–1)
+
+- 2026-11-15: "Pencere modunda bile küçük duruyor, oyun tam ekran olmalı." → Tam ekran açılış + F11/Alt+Enter, pencere 1600×900, `canvas_items` ölçekleme (HUD 1280×720 tasarımından ölçeklenir). Sabit: `Tuning.FEATURE_START_FULLSCREEN`. Ekran görüntüsüyle doğrulandı (1920×1080).
+- Açık soru: asker/zombiler hâlâ küçük mü geliyor? Kamera yakınlığı `Tuning.CAMERA_DISTANCE` (şu an 24) ile ayarlanır.
+- Blender: 2026-11-15 bağlandı, sahne bilgisi okunuyor (5.3.0). Eklenti protokolü 15, beklenen 16 → `uvx mcp-for-blender install-addon` ile güncellenebilir (Aşama 4'ten önce).
 
 ## Oturum günlüğü
 
