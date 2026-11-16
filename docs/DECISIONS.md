@@ -2,6 +2,11 @@
 
 Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar verilince "Açık kararlar"dan çıkarılıp tarihli bölüme yazılır.
 
+## 2026-11-16 — Aşama 3.1 asker konsepti (Taha)
+
+- Oranlar: stilize ve iri (yaklaşık 5–6 kafa boyu). Tarz: ağır zırhlı, yakın gelecek. Renk: koyu lacivert + turuncu vurgu. Ayrıntı ve Tripo metni: `concept/soldier.md`.
+- Geri bildirim: zombiler ekranda biraz küçük görünüyor; kamera yakınlığı 3.5'te ayarlanacak (Taha: "ileride ayarlanacaksa sorun değil").
+
 ## 2026-11-16 — Aşama 2.4 önizleme yorumu (Taha)
 
 - Asker koşusu: **Sprint**. Dash: **Roll** (takla).
@@ -45,7 +50,6 @@ Aşama 1 geri bildirimi (Taha): vuruş hissi yok, hareket cansız, zombiler tehd
 | Karar | Ne zaman |
 |---|---|
 | Eksik animasyonlar (ek zombi yürüyüşleri, yönlü ölümler): Claude Blender'da mı üretsin, ücretli Pro sürüm mü alınsın | 4.2 |
-| Asker konsepti ve oranları | 3.1 |
 | Zombi saldırısı: hazırlıklı vuruş mu, değince hasar mı | 4.3 (oynayarak) |
 | İçerik hedefi sayıları | 6 ve 11 |
 | Arenada engel yoğunluğu | 8.2 |

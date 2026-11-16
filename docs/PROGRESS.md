@@ -5,10 +5,11 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 
 ## Şu an
 
-- **Ana aşama:** 2 — Model ve animasyon hattı **bitti**; Taha'nın "devam"ı bekleniyor
-- **Sıradaki:** 3 — Dikey dilim: asker → 3.1 Asker modeli
+- **Ana aşama:** 3 — Dikey dilim: asker
+- **Alt aşama:** 3.1 — Asker modeli (konsept kararlaştı, **Taha'nın Tripo modeli bekleniyor**)
+- **Sıradaki iş:** model gelince penceresiz Blender scriptiyle temizle, ortak iskelete bağla, Godot'da önizle.
 - **Bekleyen (Taha'dan):**
-  - 3.1: asker konsepti ve oranları (birlikte konuşulacak), sonra Tripo'da model: A-poz, tek parça, silahsız; dosya `assets/models/source/soldier/` altına.
+  - 3.1: `docs/concept/soldier.md`'deki metinle Tripo'da asker modeli (A-poz, tek parça, silahsız, Tripo rig'i kullanılmadan), GLB olarak `assets/models/source/soldier/` altına.
   - Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
 - **Not:** Blender MCP eklentisi 2026-11-16'da güncellendi (`uvx mcp-for-blender install-addon`); Blender yeniden başlatılınca etkinleşir. Scriptler zaten penceresiz çalışıyor.
 
@@ -19,7 +20,7 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 | 0 | Kurulum ve iskelet | ✔ bitti |
 | 1 | Kutu prototip | ✔ bitti (his onayı 5.7'ye devredildi) |
 | 2 | Model ve animasyon hattı | ✔ bitti (2026-11-16) |
-| 3 | Dikey dilim: asker | sırada ("devam" bekleniyor) |
+| 3 | Dikey dilim: asker | sürüyor (3.1) |
 | 4 | Dikey dilim: zombi | — |
 | 5 | Dikey dilim: silah ve vuruş hissi | — |
 | 6 | Tur döngüsü | — |
@@ -134,7 +135,7 @@ Profil üst sınırları (2.5 ölçümüne göre, efektlere pay bırakılarak): 
 
 - Silah gücü düşük (kalabalıkta hedef sürekli değişiyor, hasar dağılıyor) → 5.x ve 6.6.
 - Asker zombilerin arasından itilerek geçebiliyor → 3.4 (dash) ve 4.4 (itme) ile ele alınır.
-- Asker ve zombiler ekranda küçük görünüyor olabilir (`Tuning.CAMERA_DISTANCE` = 24) → 3.5.
+- Zombiler (ve asker) ekranda küçük görünüyor; Taha 2026-11-16'da doğruladı (`Tuning.CAMERA_DISTANCE` = 24) → 3.5.
 
 ## Taha'nın geri bildirimi
 
