@@ -6,9 +6,9 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 ## Şu an
 
 - **Ana aşama:** 4 — Dikey dilim: zombi
-- **Alt aşama:** 4.1 model hazır ve oyunda; **Taha'nın görünüm onayı bekleniyor** (`build/shots/zombies.png`, `horde_zombie.png`)
-- **Sıradaki iş:** onaydan sonra 4.2 — zombi animasyonları (eksik klipler ücretsiz yoldan: mevcut kliplerden türetme + kod)
-- **Bekleyen (Taha'dan):** zombi görünümü onayı / değişiklik isteği. Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
+- **Alt aşama:** 4.1 bitti; sırada 4.2 — zombi animasyonları
+- **Sıradaki iş:** 4.2: eksik klipleri ücretsiz yoldan türet (2–3 yürüyüş, saldırı, sendeleme, 2–3 ölüm, yerden doğma) ve oyuna bağla
+- **Bekleyen (Taha'dan):** yok. Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
 - **Not:** Blender MCP eklentisi 2026-11-16'da güncellendi (`uvx mcp-for-blender install-addon`); Blender yeniden başlatılınca etkinleşir. Scriptler zaten penceresiz çalışıyor.
 
 ## Ana aşama durumu
@@ -48,7 +48,7 @@ Bitiş ölçütleri `ROADMAP.md`'de. Biten kutunun yanına tarih ve commit yazı
 - [x] 3.5 Kamera — kod bitti 2026-11-16 (uzaklık 24 → 17, ileri bakış, sarsıntı altyapısı; asker vurulunca sarsılır); Taha oynadı, onayladı
 
 ### 4 — Dikey dilim: zombi
-- [ ] 4.1 Yürüyen zombi modeli — model bitti 2026-11-16 (`build_zombie.py`: 4 çeşit, ~600–650 üçgen, palet dokusu, tek dosya; oyunda rastgele çeşit); Taha'nın görünüm onayı bekleniyor
+- [x] 4.1 Yürüyen zombi modeli — 2026-11-16. `build_zombie.py`: 10 gövde çeşidi × 16 renk şeması (yarısı koyu ton) = 160 görünüm, ~600–700 üçgen, tek malzeme (şema örnek başına), boyda ±%8 fark. Taha tarzı ve renkleri beğendi, çeşitliliğin artmasını istedi (yapıldı)
 - [ ] 4.2 Zombi animasyonları
 - [ ] 4.3 Durum makinesi ve saldırı
 - [ ] 4.4 İtme ve sendeleme
@@ -145,6 +145,7 @@ Profil üst sınırları (2.5 ölçümüne göre, efektlere pay bırakılarak): 
 ## Oturum günlüğü
 
 ### 2026-11-16 — Oturum 2
+- 4.1 genişletildi: Taha çok daha fazla çeşit ve koyu tonlar istedi → rol tabanlı palet (`ZombieLook`), 160 görünüm. Yeni zombi türleri (sürünen, zıplayan) 7.2'ye eklendi.
 - Aşama 3 kapandı (Taha onayladı; ölüm animasyonu `GAME_OVER_DELAY` ile düzeltildi). 4.1: `build_zombie.py` ile dört çeşitli low-poly zombi, `ModelVariants`, zombi galerisi sahnesi.
 - 3.2–3.5: `Locomotion` ve `Dash` saf kuralları (11 yeni test, toplam 42), `PlayerAnimator` animasyon ağacı, gövde yatması, takla ile dash, toz izi, HUD dash çubuğu, kamera 17 m + ileri bakış + sarsıntı. Taha animasyon önizlemesini onayladı.
 - 3.1: asker konsepti (stilize iri, ağır zırhlı, lacivert + turuncu); Tripo modeli `build_soldier.py` ile temizlendi ve iskelete bağlandı; `PlayerVisual` modeli ve animasyonu sürüyor; `inspect_model.py` eklendi.

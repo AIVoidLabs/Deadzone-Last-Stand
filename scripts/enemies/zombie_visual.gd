@@ -1,8 +1,7 @@
 class_name ZombieVisual
 extends Node3D
 ## Zombi görüntüsü: ortak iskeletli model + animasyon (Tuning.FEATURE_ZOMBIE_MODEL kapalıysa kutu).
-## Model dosyasındaki çeşitlerden biri rastgele seçilir; malzeme çeşit başına paylaşılır,
-## vuruş parlaması örnek başına.
+## Görünüm (gövde çeşidi + renk şeması) ZombieLook ile rastgele seçilir; vuruş parlaması örnek başına.
 
 const FLASH_SHADER: Shader = preload("res://assets/shaders/flash_lit.gdshader")
 const MODEL: PackedScene = preload("res://assets/models/characters/zombie_walker.glb")
@@ -12,7 +11,6 @@ const BOX_WIDTH_FACTOR: float = 1.6
 
 static var _box_meshes: Dictionary = {}
 static var _materials: Dictionary = {}
-static var _variant_materials: Dictionary = {}
 
 var _meshes: Array[MeshInstance3D] = []
 var _animation: AnimationPlayer
@@ -72,10 +70,7 @@ func _set_flash(value: float) -> void:
 func _build_model() -> void:
 	var model: Node3D = MODEL.instantiate() as Node3D
 	add_child(model)
-	var variant: int = randi() % ModelVariants.count(model)
-	var mesh: MeshInstance3D = ModelVariants.keep(model, variant)
-	mesh.material_override = _variant_material(variant, mesh)
-	_meshes.append(mesh)
+	_meshes.append(ZombieLook.apply_random(model))
 	_animation = AnimationPlayer.new()
 	model.add_child(_animation)
 	_animation.add_animation_library(ANIM_LIBRARY_NAME, ANIM_LIBRARY)
@@ -95,7 +90,8 @@ func _apply_kind(row: Dictionary) -> void:
 		box.material_override = _material_for(row)
 		box.position.y = height * 0.5
 		return
-	scale = Vector3.ONE * (height / Tuning.CHARACTER_MODEL_HEIGHT)
+	var size: float = randf_range(1.0 - Tuning.ZOMBIE_SCALE_VARIANCE, 1.0 + Tuning.ZOMBIE_SCALE_VARIANCE)
+	scale = Vector3.ONE * (size * height / Tuning.CHARACTER_MODEL_HEIGHT)
 	_walk_clip = row["anim_walk"]
 
 
@@ -107,18 +103,6 @@ func _start_walk() -> void:
 	_animation.speed_scale = randf_range(1.0 - variance, 1.0 + variance)
 	_animation.play(_walk_clip)
 	_animation.seek(randf() * _animation.current_animation_length)
-
-
-static func _variant_material(variant: int, mesh: MeshInstance3D) -> ShaderMaterial:
-	if not _variant_materials.has(variant):
-		var material: ShaderMaterial = ShaderMaterial.new()
-		material.shader = FLASH_SHADER
-		material.set_shader_parameter(&"albedo", Color.WHITE)
-		var source: BaseMaterial3D = mesh.mesh.surface_get_material(0) as BaseMaterial3D
-		if source != null:
-			material.set_shader_parameter(&"albedo_texture", source.albedo_texture)
-		_variant_materials[variant] = material
-	return _variant_materials[variant]
 
 
 static func _material_for(row: Dictionary) -> ShaderMaterial:

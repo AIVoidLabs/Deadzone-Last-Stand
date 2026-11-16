@@ -1,4 +1,4 @@
-"""Yürüyen zombi: low-poly, 25 kemikli ortak iskelette, tek dosyada birkaç çeşit.
+"""Yürüyen zombi: low-poly, 25 kemikli ortak iskelette, tek dosyada birçok gövde çeşidi.
 
 Çalıştırma (repo kökünden, Blender penceresi açılmaz):
     blender --background --python tools/blender/build_zombie.py
@@ -8,7 +8,9 @@ Girdi : assets/models/characters/mannequin.glb (iskelet ve dinlenme pozu kaynağ
         build/blender/zombie_walker.blend
 
 Gövde, kemik hizalarına dizilen halkaların birleştirilmesiyle (loft) kurulur; ağırlıklar
-halka başına elle verilir, renkler tek bir palet dokusundan gelir. Yeni çeşit = VARIANTS'a satır.
+halka başına elle verilir. Yüzler renk değil ROL taşır (ten, üst, alt ...); palet dokusunun her
+satırı bir renk şemasıdır ve oyunda örnek başına seçilir. Görünüm sayısı = çeşit x şema.
+Yeni gövde = VARIANTS'a satır, yeni renk = SCHEMES'e satır.
 """
 
 import math
@@ -25,8 +27,10 @@ OUTPUT: str = os.path.join(REPO, "assets", "models", "characters", "zombie_walke
 BLEND_OUTPUT: str = os.path.join(REPO, "build", "blender", "zombie_walker.blend")
 PALETTE_FILE: str = os.path.join(REPO, "build", "blender", "zombie_palette.png")
 
-PALETTE_CELLS: int = 8
+# Palet: sütun = rol, satır = renk şeması. Oyun tarafı (ZombieLook) aynı sütun sayısını bilir.
+PALETTE_COLUMNS: int = 16
 PALETTE_CELL_PIXELS: int = 4
+ROLES: list = ["skin", "skin_dark", "top", "bottom", "shoes", "hair", "eye", "blood", "mouth", "bone"]
 TORSO_SIDES: int = 8
 LIMB_SIDES: int = 6
 
@@ -45,35 +49,61 @@ HEAD_Z: float = 1.56
 
 BLOOD: tuple = (0.45, 0.05, 0.05)
 MOUTH: tuple = (0.12, 0.03, 0.03)
-EYE: tuple = (0.98, 0.92, 0.45)
 BONE_WHITE: tuple = (0.85, 0.82, 0.72)
+EYE_YELLOW: tuple = (0.98, 0.92, 0.45)
+EYE_RED: tuple = (0.95, 0.22, 0.12)
+EYE_PALE: tuple = (0.80, 0.96, 0.92)
+SKIN_SHADE: float = 0.8
 
-# Çeşitler. Ölçüler çarpan; renkler sRGB. arm_cut: o kolun dirsekten kopuk olduğu taraf (+1 sol, -1 sağ, 0 yok).
+# Renk şemaları (sRGB): ten, üst, alt, ayakkabı, saç/şapka, göz. İlk sekiz açık, son sekiz koyu tonlar.
+SCHEMES: list = [
+    ((0.47, 0.58, 0.42), (0.72, 0.70, 0.62), (0.20, 0.21, 0.26), (0.12, 0.10, 0.09), (0.20, 0.15, 0.10), EYE_YELLOW),
+    ((0.55, 0.60, 0.38), (0.62, 0.52, 0.22), (0.33, 0.24, 0.17), (0.15, 0.12, 0.10), (0.16, 0.12, 0.09), EYE_YELLOW),
+    ((0.56, 0.62, 0.55), (0.36, 0.40, 0.44), (0.36, 0.37, 0.36), (0.20, 0.18, 0.16), (0.22, 0.20, 0.17), EYE_YELLOW),
+    ((0.40, 0.52, 0.46), (0.42, 0.14, 0.15), (0.13, 0.13, 0.15), (0.75, 0.73, 0.68), (0.10, 0.10, 0.10), EYE_YELLOW),
+    ((0.62, 0.66, 0.50), (0.50, 0.50, 0.52), (0.22, 0.28, 0.20), (0.14, 0.12, 0.10), (0.45, 0.40, 0.30), EYE_PALE),
+    ((0.50, 0.56, 0.60), (0.18, 0.28, 0.36), (0.25, 0.25, 0.28), (0.10, 0.10, 0.10), (0.30, 0.22, 0.14), EYE_YELLOW),
+    ((0.58, 0.52, 0.50), (0.40, 0.36, 0.50), (0.16, 0.14, 0.12), (0.30, 0.26, 0.22), (0.50, 0.48, 0.44), EYE_PALE),
+    ((0.36, 0.46, 0.34), (0.55, 0.30, 0.16), (0.15, 0.17, 0.22), (0.10, 0.09, 0.08), (0.12, 0.08, 0.06), EYE_YELLOW),
+    ((0.30, 0.38, 0.30), (0.16, 0.18, 0.20), (0.10, 0.10, 0.12), (0.08, 0.08, 0.08), (0.05, 0.05, 0.05), EYE_RED),
+    ((0.34, 0.33, 0.40), (0.20, 0.14, 0.26), (0.14, 0.12, 0.16), (0.09, 0.08, 0.10), (0.08, 0.07, 0.10), EYE_PALE),
+    ((0.42, 0.36, 0.28), (0.22, 0.26, 0.18), (0.18, 0.15, 0.12), (0.10, 0.08, 0.07), (0.10, 0.08, 0.06), EYE_YELLOW),
+    ((0.48, 0.50, 0.44), (0.12, 0.12, 0.13), (0.30, 0.30, 0.34), (0.08, 0.08, 0.09), (0.06, 0.06, 0.06), EYE_RED),
+    ((0.26, 0.32, 0.34), (0.30, 0.10, 0.10), (0.09, 0.09, 0.10), (0.07, 0.07, 0.07), (0.04, 0.04, 0.05), EYE_YELLOW),
+    ((0.38, 0.42, 0.30), (0.14, 0.20, 0.16), (0.20, 0.17, 0.10), (0.09, 0.08, 0.06), (0.14, 0.10, 0.06), EYE_RED),
+    ((0.44, 0.44, 0.48), (0.24, 0.24, 0.27), (0.12, 0.13, 0.17), (0.20, 0.20, 0.22), (0.30, 0.30, 0.32), EYE_PALE),
+    ((0.33, 0.28, 0.26), (0.34, 0.24, 0.12), (0.11, 0.10, 0.09), (0.07, 0.06, 0.06), (0.05, 0.04, 0.04), EYE_YELLOW),
+]
+
+
+def variant(name: str, **overrides) -> dict:
+    """Gövde çeşidi. Ölçüler çarpan. arm_cut: dirsekten kopuk kol (+1 sol, -1 sağ, 0 yok).
+    sleeve: kol giysisi (0 kolsuz, 1 bileğe kadar). pants_end: paça (0 bilek, 1 diz).
+    headgear: None, "hair", "long_hair", "mohawk", "cap", "hood"."""
+    row: dict = {
+        "name": name, "torso": 1.0, "belly": 1.0, "limb": 1.0, "head": 1.25, "arm_cut": 0, "sleeve": 0.5,
+        "pants_end": 0.2, "bare_chest": False, "bloody_top": False, "headgear": None, "skirt": False,
+        "barefoot": False, "head_wound": False,
+    }
+    row.update(overrides)
+    return row
+
+
 VARIANTS: list = [
-    {
-        "name": "Variant_A",  # gömlekli, kel
-        "skin": (0.47, 0.58, 0.42), "shirt": (0.72, 0.70, 0.62), "pants": (0.20, 0.21, 0.26),
-        "shoes": (0.12, 0.10, 0.09), "hair": None, "torso": 1.0, "belly": 1.0, "limb": 1.0, "head": 1.25,
-        "arm_cut": 0, "sleeve": 0.55, "pants_end": 0.20, "bare_chest": False, "hood": False, "bloody_shirt": True,
-    },
-    {
-        "name": "Variant_B",  # iri, göbekli
-        "skin": (0.55, 0.60, 0.38), "shirt": (0.62, 0.52, 0.22), "pants": (0.33, 0.24, 0.17),
-        "shoes": (0.15, 0.12, 0.10), "hair": (0.16, 0.12, 0.09), "torso": 1.18, "belly": 1.45, "limb": 1.2, "head": 1.22,
-        "arm_cut": 0, "sleeve": 0.3, "pants_end": 0.32, "bare_chest": False, "hood": False, "bloody_shirt": False,
-    },
-    {
-        "name": "Variant_C",  # sıska, çıplak gövde, tek kol kopuk
-        "skin": (0.56, 0.62, 0.55), "shirt": (0.56, 0.62, 0.55), "pants": (0.36, 0.37, 0.36),
-        "shoes": (0.56, 0.62, 0.55), "hair": (0.22, 0.20, 0.17), "torso": 0.86, "belly": 0.8, "limb": 0.82, "head": 1.22,
-        "arm_cut": 1, "sleeve": 0.0, "pants_end": 0.42, "bare_chest": True, "hood": False, "bloody_shirt": False,
-    },
-    {
-        "name": "Variant_D",  # kapüşonlu
-        "skin": (0.40, 0.52, 0.46), "shirt": (0.42, 0.14, 0.15), "pants": (0.13, 0.13, 0.15),
-        "shoes": (0.75, 0.73, 0.68), "hair": None, "torso": 1.04, "belly": 1.0, "limb": 1.0, "head": 1.25,
-        "arm_cut": 0, "sleeve": 1.0, "pants_end": 0.12, "bare_chest": False, "hood": True, "bloody_shirt": False,
-    },
+    variant("Variant_A", bloody_top=True, sleeve=0.55),
+    variant("Variant_B", torso=1.18, belly=1.45, limb=1.2, head=1.22, sleeve=0.3, pants_end=0.32, headgear="hair"),
+    variant("Variant_C", torso=0.86, belly=0.8, limb=0.82, head=1.22, arm_cut=1, sleeve=0.0, pants_end=0.42,
+            bare_chest=True, barefoot=True, headgear="hair"),
+    variant("Variant_D", torso=1.04, sleeve=1.0, pants_end=0.12, headgear="hood"),
+    variant("Variant_E", torso=1.08, limb=1.1, sleeve=1.0, pants_end=0.05, headgear="cap"),
+    variant("Variant_F", torso=0.92, belly=0.9, limb=0.85, sleeve=0.2, pants_end=1.0, skirt=True, headgear="long_hair"),
+    variant("Variant_G", torso=1.16, limb=1.18, head=1.2, arm_cut=-1, sleeve=0.0, pants_end=0.95, bare_chest=True,
+            head_wound=True),
+    variant("Variant_H", torso=0.95, limb=0.92, sleeve=0.0, pants_end=0.08, headgear="mohawk"),
+    variant("Variant_I", torso=1.2, belly=1.55, limb=1.15, head=1.2, sleeve=0.0, pants_end=0.6, bare_chest=True,
+            barefoot=True),
+    variant("Variant_J", torso=0.94, limb=0.9, arm_cut=1, sleeve=0.8, pants_end=0.3, bloody_top=True,
+            headgear="long_hair", head_wound=True),
 ]
 
 
@@ -82,51 +112,48 @@ def log(message: str) -> None:
     sys.stdout.flush()
 
 
-class Palette:
-    """Kullanılan renkleri hücrelere dizer; her yüz kendi hücresinin ortasını örnekler."""
+def role_uv(role: str) -> tuple:
+    """Yüz, rolünün hücresinin ortasını ilk satırda örnekler; satırı (şemayı) oyun kaydırır."""
+    return ((ROLES.index(role) + 0.5) / PALETTE_COLUMNS, 0.5 / len(SCHEMES))
 
-    def __init__(self) -> None:
-        self.colors: list = []
 
-    def uv(self, color: tuple) -> tuple:
-        if color not in self.colors:
-            self.colors.append(color)
-        index: int = self.colors.index(color)
-        if index >= PALETTE_CELLS * PALETTE_CELLS:
-            raise RuntimeError("Palet doldu; PALETTE_CELLS büyütülmeli.")
-        return ((index % PALETTE_CELLS + 0.5) / PALETTE_CELLS, (index // PALETTE_CELLS + 0.5) / PALETTE_CELLS)
-
-    def build_image(self):
-        size: int = PALETTE_CELLS * PALETTE_CELL_PIXELS
-        image = bpy.data.images.new("zombie_palette", size, size, alpha=False)
-        pixels: list = [0.0] * (size * size * 4)
-        for y in range(size):
-            for x in range(size):
-                index: int = (y // PALETTE_CELL_PIXELS) * PALETTE_CELLS + x // PALETTE_CELL_PIXELS
-                color: tuple = self.colors[index] if index < len(self.colors) else (1.0, 0.0, 1.0)
-                offset: int = (y * size + x) * 4
-                # 8 bitlik görüntüde pikseller sRGB olarak saklanır; değerler çevrilmeden yazılır.
-                pixels[offset:offset + 4] = list(color) + [1.0]
-        image.pixels = pixels
-        os.makedirs(os.path.dirname(PALETTE_FILE), exist_ok=True)
-        image.filepath_raw = PALETTE_FILE
-        image.file_format = "PNG"
-        image.save()
-        image.pack()
-        return image
+def build_palette_image():
+    cell: int = PALETTE_CELL_PIXELS
+    width: int = PALETTE_COLUMNS * cell
+    height: int = len(SCHEMES) * cell
+    image = bpy.data.images.new("zombie_palette", width, height, alpha=False)
+    pixels: list = [0.0] * (width * height * 4)
+    for row, (skin, top, bottom, shoes, hair, eye) in enumerate(SCHEMES):
+        colors: dict = {
+            "skin": skin, "skin_dark": tuple(c * SKIN_SHADE for c in skin), "top": top, "bottom": bottom,
+            "shoes": shoes, "hair": hair, "eye": eye, "blood": BLOOD, "mouth": MOUTH, "bone": BONE_WHITE,
+        }
+        for column in range(PALETTE_COLUMNS):
+            color: tuple = colors[ROLES[column]] if column < len(ROLES) else (1.0, 0.0, 1.0)
+            for y in range(row * cell, (row + 1) * cell):
+                for x in range(column * cell, (column + 1) * cell):
+                    offset: int = (y * width + x) * 4
+                    # 8 bitlik görüntüde pikseller sRGB olarak saklanır; değerler çevrilmeden yazılır.
+                    pixels[offset:offset + 4] = list(color) + [1.0]
+    image.pixels = pixels
+    os.makedirs(os.path.dirname(PALETTE_FILE), exist_ok=True)
+    image.filepath_raw = PALETTE_FILE
+    image.file_format = "PNG"
+    image.save()
+    image.pack()
+    return image
 
 
 class Body:
-    """Bir çeşidin ağı: halkalardan gövde parçaları, köşe başına kemik ağırlığı, yüz başına renk."""
+    """Bir çeşidin ağı: halkalardan gövde parçaları, köşe başına kemik ağırlığı, yüz başına rol."""
 
-    def __init__(self, palette: Palette) -> None:
+    def __init__(self) -> None:
         self.mesh = bmesh.new()
         self.uv_layer = self.mesh.loops.layers.uv.new("UVMap")
-        self.palette: Palette = palette
         self.weights: dict = {}
 
     def loft(self, rings: list, bands: list, sides: int, cap_start=None, cap_end=None) -> None:
-        """rings: (merkez, u, v, {kemik: ağırlık}); bands: ardışık halkalar arasındaki yüzlerin rengi."""
+        """rings: (merkez, u, v, {kemik: ağırlık}); bands: ardışık halkalar arasındaki yüzlerin rolü."""
         rows: list = []
         phase: float = math.pi / sides
         for center, u, v, weights in rings:
@@ -146,7 +173,7 @@ class Body:
         faces.append(self._face(rows[-1], cap_end or bands[-1]))
         bmesh.ops.recalc_face_normals(self.mesh, faces=faces)
 
-    def box(self, center: tuple, half: tuple, color: tuple, weights: dict) -> None:
+    def box(self, center: tuple, half: tuple, role: str, weights: dict) -> None:
         """Eksenlere hizalı küçük kutu (göz, ağız, saç gibi ayrıntılar)."""
         cx, cy, cz = center
         hx, hy, hz = half
@@ -154,11 +181,11 @@ class Body:
         self.loft(
             [((cx, cy - hy, cz), (hx * diagonal, 0, 0), (0, 0, hz * diagonal), weights),
              ((cx, cy + hy, cz), (hx * diagonal, 0, 0), (0, 0, hz * diagonal), weights)],
-            [color], 4)
+            [role], 4)
 
-    def _face(self, verts: list, color: tuple):
+    def _face(self, verts: list, role: str):
         face = self.mesh.faces.new(verts)
-        uv: tuple = self.palette.uv(color)
+        uv: tuple = role_uv(role)
         for loop in face.loops:
             loop[self.uv_layer].uv = uv
         return face
@@ -185,68 +212,83 @@ class Body:
         return obj
 
 
+def top_role(v: dict) -> str:
+    return "skin" if v["bare_chest"] else "top"
+
+
 def build_torso(body: Body, v: dict) -> None:
     wide: float = v["torso"]
     belly: float = v["belly"]
-    shirt: tuple = v["shirt"]
-    lower_shirt: tuple = BLOOD if v["bloody_shirt"] else shirt
-    ribs: tuple = tuple(c * 0.8 for c in v["skin"]) if v["bare_chest"] else shirt
+    top: str = top_role(v)
+    lower_top: str = "blood" if v["bloody_top"] else top
+    ribs: str = "skin_dark" if v["bare_chest"] else top
+    hips: str = top if v["skirt"] else "bottom"
 
     def ring(z: float, rx: float, ry: float, weights: dict, y: float = 0.01) -> tuple:
         return ((0.0, y, z), (rx * wide, 0, 0), (0, ry * wide, 0), weights)
 
-    body.loft(
-        [
-            ring(0.85, 0.13, 0.10, {"pelvis": 1.0}),
-            ring(0.95, 0.185, 0.125, {"pelvis": 1.0}),
-            ring(1.05, 0.17 * belly, 0.12 * belly, {"pelvis": 0.5, "spine_01": 0.5}, 0.01 - 0.03 * (belly - 1.0)),
-            ring(1.17, 0.17 * belly, 0.12 * belly, {"spine_01": 0.5, "spine_02": 0.5}, 0.01 - 0.04 * (belly - 1.0)),
-            ring(1.32, 0.20, 0.135, {"spine_02": 0.5, "spine_03": 0.5}),
-            ring(1.45, 0.21, 0.125, {"spine_03": 1.0}),
-            ring(NECK_Z, 0.09, 0.08, {"spine_03": 0.6, "neck_01": 0.4}),
-        ],
-        [v["pants"], v["pants"], lower_shirt, ribs, shirt, shirt], TORSO_SIDES)
+    rings: list = [
+        ring(0.85, 0.13, 0.10, {"pelvis": 1.0}),
+        ring(0.95, 0.185, 0.125, {"pelvis": 1.0}),
+        ring(1.05, 0.17 * belly, 0.12 * belly, {"pelvis": 0.5, "spine_01": 0.5}, 0.01 - 0.03 * (belly - 1.0)),
+        ring(1.17, 0.17 * belly, 0.12 * belly, {"spine_01": 0.5, "spine_02": 0.5}, 0.01 - 0.04 * (belly - 1.0)),
+        ring(1.32, 0.20, 0.135, {"spine_02": 0.5, "spine_03": 0.5}),
+        ring(1.45, 0.21, 0.125, {"spine_03": 1.0}),
+        ring(NECK_Z, 0.09, 0.08, {"spine_03": 0.6, "neck_01": 0.4}),
+    ]
+    if v["skirt"]:
+        # Etek: kalçadan dize doğru genişleyen, kalçaya bağlı çan.
+        rings[0] = ring(0.62, 0.25, 0.20, {"pelvis": 1.0})
+    body.loft(rings, [hips, hips, lower_top, ribs, top, top], TORSO_SIDES)
 
 
 def build_head(body: Body, v: dict) -> None:
     s: float = v["head"]
-    skin: tuple = v["skin"]
-    top: tuple = v["shirt"] if v["hood"] else (v["hair"] or skin)
+    gear = v["headgear"]
+    top: str = "blood" if v["head_wound"] else "skin"
+    if gear in ("hair", "long_hair"):
+        top = "hair"
     head: dict = {"Head": 1.0}
     y: float = -0.015
     body.loft(
         [((0.0, 0.0, NECK_Z - 0.03), (0.055, 0, 0), (0, 0.055, 0), {"neck_01": 1.0}),
          ((0.0, y, HEAD_Z + 0.02), (0.055, 0, 0), (0, 0.055, 0), {"neck_01": 0.4, "Head": 0.6})],
-        [skin], LIMB_SIDES)
+        ["skin"], LIMB_SIDES)
 
     def ring(height: float, rx: float, ry: float) -> tuple:
         return ((0.0, y, HEAD_Z + height * s), (rx * s, 0, 0), (0, ry * s, 0), head)
 
     body.loft(
         [ring(0.0, 0.07, 0.08), ring(0.07, 0.10, 0.108), ring(0.17, 0.105, 0.112), ring(0.25, 0.07, 0.08)],
-        [skin, skin, top], TORSO_SIDES, cap_end=top)
+        ["skin", "skin", top], TORSO_SIDES, cap_end=top)
     front: float = y - 0.108 * s * math.cos(math.pi / TORSO_SIDES)
     for side in (1.0, -1.0):
-        body.box((side * 0.043 * s, front, HEAD_Z + 0.135 * s), (0.02 * s, 0.012, 0.016 * s), EYE, head)
-    body.box((0.0, front + 0.004, HEAD_Z + 0.055 * s), (0.04 * s, 0.014, 0.018 * s), MOUTH, head)
-    if v["hair"] is not None:
-        body.box((0.0, y + 0.065 * s, HEAD_Z + 0.15 * s), (0.098 * s, 0.05 * s, 0.085 * s), v["hair"], head)
-    if v["hood"]:
-        body.box((0.0, y + 0.03 * s, HEAD_Z + 0.15 * s), (0.112 * s, 0.085 * s, 0.108 * s), v["shirt"], head)
-        body.box((0.0, 0.07, NECK_Z - 0.01), (0.10, 0.05, 0.06), v["shirt"], {"spine_03": 1.0})
+        body.box((side * 0.043 * s, front, HEAD_Z + 0.135 * s), (0.02 * s, 0.012, 0.016 * s), "eye", head)
+    body.box((0.0, front + 0.004, HEAD_Z + 0.055 * s), (0.04 * s, 0.014, 0.018 * s), "mouth", head)
+    if gear in ("hair", "long_hair"):
+        body.box((0.0, y + 0.065 * s, HEAD_Z + 0.15 * s), (0.098 * s, 0.05 * s, 0.085 * s), "hair", head)
+    if gear == "long_hair":
+        body.box((0.0, y + 0.10 * s, HEAD_Z + 0.02 * s), (0.085 * s, 0.03 * s, 0.11 * s), "hair", head)
+    if gear == "mohawk":
+        body.box((0.0, y + 0.01 * s, HEAD_Z + 0.25 * s), (0.014 * s, 0.085 * s, 0.045 * s), "hair", head)
+    if gear == "cap":
+        body.box((0.0, y, HEAD_Z + 0.235 * s), (0.10 * s, 0.105 * s, 0.03 * s), "hair", head)
+        body.box((0.0, y - 0.14 * s, HEAD_Z + 0.215 * s), (0.075 * s, 0.05 * s, 0.01 * s), "hair", head)
+    if gear == "hood":
+        body.box((0.0, y + 0.03 * s, HEAD_Z + 0.15 * s), (0.112 * s, 0.085 * s, 0.108 * s), "top", head)
+        body.box((0.0, 0.07, NECK_Z - 0.01), (0.10, 0.05, 0.06), "top", {"spine_03": 1.0})
 
 
 def build_arm(body: Body, v: dict, side: float) -> None:
     suffix: str = "_l" if side > 0.0 else "_r"
     upper, lower, hand = "upperarm" + suffix, "lowerarm" + suffix, "hand" + suffix
     thick: float = v["limb"]
-    skin: tuple = v["skin"]
-    cloth: tuple = v["shirt"]
+    cloth: str = top_role(v)
     # Kol boyunca giysinin bittiği yer (0: kolsuz, 1: bileğe kadar).
     sleeve_x: float = SHOULDER_X + (WRIST_X - SHOULDER_X) * v["sleeve"]
 
-    def color(x_from: float, x_to: float) -> tuple:
-        return cloth if (x_from + x_to) * 0.5 < sleeve_x else skin
+    def role(x_from: float, x_to: float) -> str:
+        return cloth if (x_from + x_to) * 0.5 < sleeve_x else "skin"
 
     def ring(x: float, radius: float, weights: dict) -> tuple:
         r: float = radius * thick
@@ -261,23 +303,23 @@ def build_arm(body: Body, v: dict, side: float) -> None:
     if v["arm_cut"] == side:
         stations.append((ELBOW_X + 0.07, 0.04, {lower: 1.0}))
         rings: list = [ring(*s) for s in stations]
-        bands: list = [color(stations[i][0], stations[i + 1][0]) for i in range(len(stations) - 2)] + [BLOOD]
-        body.loft(rings, bands, LIMB_SIDES, cap_start=bands[0], cap_end=BLOOD)
-        body.box((side * (ELBOW_X + 0.09), ARM_Y, ARM_Z), (0.03, 0.012, 0.012), BONE_WHITE, {lower: 1.0})
+        bands: list = [role(stations[i][0], stations[i + 1][0]) for i in range(len(stations) - 2)] + ["blood"]
+        body.loft(rings, bands, LIMB_SIDES, cap_start=bands[0], cap_end="blood")
+        body.box((side * (ELBOW_X + 0.09), ARM_Y, ARM_Z), (0.03, 0.012, 0.012), "bone", {lower: 1.0})
         return
     stations += [
         (0.60, 0.047, {lower: 1.0}),
         (WRIST_X, 0.038, {lower: 0.5, hand: 0.5}),
     ]
     rings = [ring(*s) for s in stations]
-    bands = [color(stations[i][0], stations[i + 1][0]) for i in range(len(stations) - 1)]
+    bands = [role(stations[i][0], stations[i + 1][0]) for i in range(len(stations) - 1)]
     body.loft(rings, bands, LIMB_SIDES)
     hand_weights: dict = {hand: 1.0}
     body.loft(
         [((side * (WRIST_X - 0.01), ARM_Y, ARM_Z), (0, 0.045 * thick, 0), (0, 0, 0.028), hand_weights),
          ((side * (WRIST_X + 0.09), ARM_Y, ARM_Z), (0, 0.06 * thick, 0), (0, 0, 0.03), hand_weights),
          ((side * (WRIST_X + 0.17), ARM_Y, ARM_Z), (0, 0.04 * thick, 0), (0, 0, 0.018), hand_weights)],
-        [skin, BLOOD], LIMB_SIDES)
+        ["skin", "blood"], LIMB_SIDES)
 
 
 def build_leg(body: Body, v: dict, side: float) -> None:
@@ -288,8 +330,8 @@ def build_leg(body: Body, v: dict, side: float) -> None:
     # Paçanın bittiği yükseklik (bilek ile diz arası oran).
     pants_z: float = ANKLE_Z + (KNEE_Z - ANKLE_Z) * v["pants_end"]
 
-    def color(z_from: float, z_to: float) -> tuple:
-        return v["pants"] if (z_from + z_to) * 0.5 > pants_z else v["skin"]
+    def role(z_from: float, z_to: float) -> str:
+        return "bottom" if (z_from + z_to) * 0.5 > pants_z and not v["skirt"] else "skin"
 
     stations: list = [
         (HIP_Z + 0.02, 0.085, {"pelvis": 0.5, thigh: 0.5}),
@@ -300,18 +342,18 @@ def build_leg(body: Body, v: dict, side: float) -> None:
         (ANKLE_Z, 0.044, {calf: 0.5, foot: 0.5}),
     ]
     rings: list = [((x, 0.01 + (0.025 if z < KNEE_Z else 0.0), z), (r * thick, 0, 0), (0, r * thick, 0), w) for z, r, w in stations]
-    bands: list = [color(stations[i][0], stations[i + 1][0]) for i in range(len(stations) - 1)]
+    bands: list = [role(stations[i][0], stations[i + 1][0]) for i in range(len(stations) - 1)]
     body.loft(rings, bands, LIMB_SIDES)
     width: float = 0.052 * thick
     body.loft(
         [((x, 0.10, 0.055), (width, 0, 0), (0, 0, 0.055), {foot: 1.0}),
          ((x, -0.09, 0.05), (width * 1.1, 0, 0), (0, 0, 0.05), {foot: 0.5, ball: 0.5}),
          ((x, -0.21, 0.035), (width, 0, 0), (0, 0, 0.035), {ball: 1.0})],
-        [v["shoes"], v["shoes"]], LIMB_SIDES)
+        ["skin" if v["barefoot"] else "shoes"] * 2, LIMB_SIDES)
 
 
-def build_variant(v: dict, palette: Palette, armature, material):
-    body: Body = Body(palette)
+def build_variant(v: dict, armature, material):
+    body: Body = Body()
     build_torso(body, v)
     build_head(body, v)
     for side in (1.0, -1.0):
@@ -366,10 +408,9 @@ def main() -> None:
     bpy.ops.wm.read_factory_settings(use_empty=True)
     armature = load_skeleton()
     material, texture = build_material()
-    palette: Palette = Palette()
-    objects: list = [build_variant(v, palette, armature, material) for v in VARIANTS]
-    texture.image = palette.build_image()
-    log("palet: %d renk" % len(palette.colors))
+    objects: list = [build_variant(v, armature, material) for v in VARIANTS]
+    texture.image = build_palette_image()
+    log("%d çeşit x %d şema = %d görünüm" % (len(VARIANTS), len(SCHEMES), len(VARIANTS) * len(SCHEMES)))
     export(objects, armature)
     log("bitti")
 

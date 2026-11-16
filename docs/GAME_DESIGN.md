@@ -49,6 +49,7 @@ Zırhlı ve kasklı bir asker, kapalı bir şehir kavşağında dalga dalga gele
 - **Zombi tepkisi:** vurulunca geriye itilir ve kısa süre sendeler; ağırlık türe göre.
 - **Zombi saldırısı:** kısa hazırlıklı vuruş (kaçılabilir); "değince hasar" tek sabitle geri açılabilir. Hangisinin kalacağı 4.3'te oynanarak seçilir.
 - **Ölüm:** vuruş yönüne doğru ölüm animasyonu, ardından solarak silinme.
+- **Zombi türleri:** yürüyen (temel), koşan, tank, sürünen, zıplayan; her tür siluet ve hareketle ayırt edilir ve kendi içinde çok sayıda görünüme sahiptir (gövde çeşidi × renk şeması). Aşama 7.2.
 - **Uzaktan saldıran zombiler:** bazı türler asit tükürür ya da taş gibi şeyler fırlatır. Atışlar görülebilir ve kaçılabilir olmalı (yavaşça gelen mermi ya da düşeceği yeri gösteren işaret). Aşama 7.3.
 - **Asker animasyonları:** koşu `ual1/Sprint`, dash `ual1/Roll` (takla).
 - **Patlama:** alan hasarı çevredeki zombilere de işler (patlayan zombi dahil).

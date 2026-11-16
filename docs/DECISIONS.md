@@ -2,6 +2,12 @@
 
 Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar verilince "Açık kararlar"dan çıkarılıp tarihli bölüme yazılır.
 
+## 2026-11-16 — Aşama 4.1 zombi görünümü (Taha)
+
+- Köşeli low-poly tarz ve renkler beğenildi. Çeşitlilik çok artırılacak (ekranda çok sayıda zombi olacak); koyu tonlar da eklenecek → 10 gövde × 16 renk şeması.
+- Yeni zombi türleri istendi: yalnız yürüyen değil **sürünen, koşan, zıplayan**; görünümleri de farklı. Koşan zaten 7.2'deydi; sürünen ve zıplayan 7.2'ye eklendi. Kütüphanede koşu ve zıplama klipleri var; sürünme klibi yok, türetilecek.
+- Tripo lisansı ayrıca doğrulandı (yukarıda, 3.1 notu).
+
 ## 2026-11-16 — Aşama 3.1 asker konsepti (Taha)
 
 - Tripo modeli (`armored-soldier-3d-model.glb`) beğenildi; bu model üzerinden devam.

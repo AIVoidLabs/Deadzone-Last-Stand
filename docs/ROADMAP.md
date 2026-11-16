@@ -74,7 +74,7 @@ Arayüz bu aşamada işlevsel ve sade; son görünüm Aşama 9'da. Taha her alt 
 | # | Alt aşama | Bitti sayılır, eğer… | Taha |
 |---|---|---|---|
 | 7.1 | Silah davranış seti | Veri satırından seçilen davranışlar: tek mermi, saçılma, delip geçme, patlama (alan hasarı), yakın dövüş savurma, yanma | Oynayıp yorum |
-| 7.2 | Koşan ve tank | Blender'dan; siluet ve hareketle uzaktan ayırt ediliyor | Görünüm onayı |
+| 7.2 | Koşan, tank, sürünen ve zıplayan | Blender'dan; her tür siluet ve hareketle uzaktan ayırt ediliyor. Koşan hızlı ve kırılgan; tank yavaş ve dayanıklı; sürünen alçak ve zor fark edilir; zıplayan kısa hazırlıktan sonra askerin üstüne atlar (düşeceği yer belli, kaçılabilir). Her türün kendi gövde çeşitleri ve renk şemaları var | Görünüm onayı |
 | 7.3 | Uzaktan saldıranlar ve patlayan | Asit tüküren ve taş fırlatan zombiler uzaktan atış yapar; atışlar görülüp kaçılabilir (yavaş mermi ya da düşüş işareti). Patlayan ölünce alan hasarı verir ve çevresindeki zombilere de zarar verir | Tripo'da özel zombi modelleri |
 | 7.4 | Boss | Kendi saldırı düzenleri, can çubuğu, boss dalgası | Tripo'da boss modeli |
 | 7.5 | Yeniden ölçüm | Karışık türlerle sürü ölçümü; profil sınırları güncel | — |

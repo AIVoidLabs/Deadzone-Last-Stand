@@ -7,9 +7,11 @@ uniform sampler2D albedo_texture : source_color, hint_default_white, filter_line
 uniform float roughness : hint_range(0.0, 1.0) = 0.85;
 uniform vec4 flash_color : source_color = vec4(1.0, 1.0, 1.0, 1.0);
 instance uniform float flash = 0.0;
+// Palet dokulu modellerde renk şeması: UV örnek başına dikeyde kaydırılır.
+instance uniform float palette_offset = 0.0;
 
 void fragment() {
-	vec3 base = albedo.rgb * texture(albedo_texture, UV).rgb;
+	vec3 base = albedo.rgb * texture(albedo_texture, UV + vec2(0.0, palette_offset)).rgb;
 	ALBEDO = mix(base, flash_color.rgb, flash);
 	EMISSION = flash_color.rgb * flash * 0.6;
 	ROUGHNESS = roughness;

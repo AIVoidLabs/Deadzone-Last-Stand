@@ -79,6 +79,8 @@ const ENEMY_MAX_SPEED_FACTOR: float = 1.6
 const CHARACTER_MODEL_HEIGHT: float = 1.83
 ## Zombiler aynı adımda yürümesin diye animasyon hızına eklenen rastgele pay (±).
 const ZOMBIE_ANIM_SPEED_VARIANCE: float = 0.15
+## Zombi boyuna eklenen rastgele pay (±); yalnız görüntü, çarpışma değişmez. 0 = kapalı.
+const ZOMBIE_SCALE_VARIANCE: float = 0.08
 
 # --- Doğma ---
 const SPAWN_INTERVAL_START: float = 1.0

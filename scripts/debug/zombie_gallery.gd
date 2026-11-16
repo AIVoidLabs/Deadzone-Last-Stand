@@ -1,5 +1,6 @@
 extends Node3D
-## Zombi çeşitleri galerisi: her çeşit önden (bekleme) ve çaprazdan (yürüyüş). Yalnız debug yapıda.
+## Zombi galerisi: önde her gövde çeşidi (bekleme), arkada aynıları başka renk şemasıyla (yürüyüş).
+## Yalnız debug yapıda.
 ## Aç: godot --path . res://scenes/debug/zombie_gallery.tscn [-- --capture=build/shots/zombies.png]
 ## Tuşlar: Esc çıkış.
 
@@ -8,12 +9,13 @@ const LIBRARY_NAME: StringName = &"ual2"
 const LIBRARY: AnimationLibrary = preload("res://assets/models/anim/ual2.glb")
 const FRONT_CLIP: StringName = &"ual2/Zombie_Idle"
 const BACK_CLIP: StringName = &"ual2/Zombie_Walk_Fwd"
-const SPACING: float = 1.35
+const SPACING: float = 1.3
+const BACK_ROW_Z: float = -3.0
 const BACK_ROW_YAW_DEG: float = 50.0
 const GROUND_COLOR: Color = Color(0.3, 0.32, 0.36)
 const CAMERA_FOV: float = 35.0
-const CAMERA_POSITION: Vector3 = Vector3(0.0, 3.1, 10.5)
-const CAMERA_PITCH_DEG: float = 14.0
+const CAMERA_POSITION: Vector3 = Vector3(0.0, 4.6, 11.5)
+const CAMERA_PITCH_DEG: float = 22.0
 const DEFAULT_CAPTURE_SECONDS: float = 1.0
 
 var _capture_path: String = ""
@@ -31,13 +33,13 @@ func _ready() -> void:
 		elif arg.begins_with("--capture-seconds="):
 			_capture_seconds = arg.trim_prefix("--capture-seconds=").to_float()
 	var probe: Node3D = MODEL.instantiate() as Node3D
-	var variants: int = ModelVariants.count(probe)
+	var variants: int = ZombieLook.variant_count(probe)
 	probe.free()
 	for i: int in variants:
-		# Solda önden bekleme, sağda çaprazdan yürüyüş.
-		var x: float = (i + 0.5) * SPACING
-		_add_zombie(i, Vector3(x - variants * SPACING, 0.0, 0.0), 0.0, FRONT_CLIP)
-		_add_zombie(i, Vector3(x, 0.0, 0.0), BACK_ROW_YAW_DEG, BACK_CLIP)
+		var x: float = (i - (variants - 1) * 0.5) * SPACING
+		_add_zombie(i, i, Vector3(x, 0.0, 0.0), 0.0, FRONT_CLIP)
+		# Arka sıra: aynı gövdeler, paletin öbür yarısındaki (koyu) şemalarla.
+		_add_zombie(i, i + 8, Vector3(x, 0.0, BACK_ROW_Z), BACK_ROW_YAW_DEG, BACK_CLIP)
 	_add_environment()
 
 
@@ -59,9 +61,9 @@ func _unhandled_input(input_event: InputEvent) -> void:
 		get_tree().quit()
 
 
-func _add_zombie(variant: int, at: Vector3, yaw_deg: float, clip: StringName) -> void:
+func _add_zombie(variant: int, scheme: int, at: Vector3, yaw_deg: float, clip: StringName) -> void:
 	var model: Node3D = MODEL.instantiate() as Node3D
-	ModelVariants.keep(model, variant)
+	ZombieLook.apply(model, variant, scheme)
 	model.position = at
 	model.rotation_degrees.y = yaw_deg
 	add_child(model)
