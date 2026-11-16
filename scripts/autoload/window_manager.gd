@@ -26,5 +26,6 @@ func set_fullscreen(value: bool) -> void:
 	DisplayServer.window_set_mode(mode)
 
 
+## Başsız çalışmada ve editörün içine gömülü oyun penceresinde pencere kipi değiştirilemez.
 func _has_real_window() -> bool:
-	return DisplayServer.get_name() != "headless"
+	return DisplayServer.get_name() != "headless" and not Engine.is_embedded_in_editor()

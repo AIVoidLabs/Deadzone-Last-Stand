@@ -46,7 +46,7 @@ const FEATURE_HIT_STOP: bool = false
 const FEATURE_KILL_SHAKE: bool = true
 ## Asker vurulunca (5.4): ekran kenarı kızarması (can azken nabız) ve vuruştan uzağa kısa itilme.
 const FEATURE_HURT_VIGNETTE: bool = true
-const FEATURE_PLAYER_KNOCKBACK: bool = true
+const FEATURE_PLAYER_KNOCKBACK: bool = false
 ## Asker gövdesinin hıza ve dönüşe göre yatması.
 const FEATURE_PLAYER_LEAN: bool = true
 

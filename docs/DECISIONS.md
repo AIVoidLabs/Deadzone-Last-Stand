@@ -2,6 +2,10 @@
 
 Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar verilince "Açık kararlar"dan çıkarılıp tarihli bölüme yazılır.
 
+## 2026-11-16 — Aşama 5.4 asker vurulunca (Taha)
+
+- **Askerin vurulunca itilmesi iptal:** "çok uzağa alakasız itiliyoruz". `Tuning.FEATURE_PLAYER_KNOCKBACK = false`; kızarma, sarsıntı ve yanıp sönme kaldı.
+
 ## 2026-11-16 — Aşama 5.3 vuruş geri bildirimi (Taha)
 
 - Kan sıçraması, lekeler ve hasar sayıları beğenildi ("kanlar vs iyi").
