@@ -5,10 +5,9 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 
 ## Şu an
 
-- **Ana aşama:** 4 — Dikey dilim: zombi
-- **Alt aşama:** 4.3–4.5 kod olarak bitti; **Taha'nın oyun testi bekleniyor** (onay gelince Aşama 4 kapanır)
-- **Sıradaki iş:** Taha'nın yorumuna göre ayar (saldırı hazırlık süresi ve erişimi, itme gücü, sendeleme süresi, ceset süresi); saldırı biçimi kararı (hazırlıklı vuruş / değince hasar); sonra 🚩 ve Aşama 5.
-- **Bekleyen (Taha'dan):** `godot --path .` ile oynamak: zombilerin doğması, saldırıdan kaçma, vurunca itilme ve sendeleme, ölüm ve solma. Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
+- **Ana aşama:** 4 — Dikey dilim: zombi **bitti** (2026-11-16); 🚩 bildirimi yapıldı, Taha'nın "devam"ı bekleniyor
+- **Sıradaki iş:** Aşama 5.1 — süzülen silah yuvaları (6 yuva askerin çevresinde, silah modelleri Blender'dan)
+- **Bekleyen (Taha'dan):** "devam". Oynarken saldırı, itme, ölüm hakkında yorumu olursa 5'te ayarlanır. Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
 - **Not:** Blender MCP eklentisi 2026-11-16'da güncellendi (`uvx mcp-for-blender install-addon`); Blender yeniden başlatılınca etkinleşir. Scriptler zaten penceresiz çalışıyor.
 
 ## Ana aşama durumu
@@ -19,7 +18,7 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 | 1 | Kutu prototip | ✔ bitti (his onayı 5.7'ye devredildi) |
 | 2 | Model ve animasyon hattı | ✔ bitti (2026-11-16) |
 | 3 | Dikey dilim: asker | ✔ bitti (2026-11-16) |
-| 4 | Dikey dilim: zombi | sürüyor (4.3–4.5 test bekliyor) |
+| 4 | Dikey dilim: zombi | ✔ bitti (2026-11-16) |
 | 5 | Dikey dilim: silah ve vuruş hissi | — |
 | 6 | Tur döngüsü | — |
 | 7 | Silah ve zombi çeşitliliği | — |
@@ -50,9 +49,9 @@ Bitiş ölçütleri `ROADMAP.md`'de. Biten kutunun yanına tarih ve commit yazı
 ### 4 — Dikey dilim: zombi
 - [x] 4.1 Yürüyen zombi modeli — 2026-11-16. `build_zombie.py`: 10 gövde çeşidi × 16 renk şeması (yarısı koyu ton) = 160 görünüm, ~600–700 üçgen, tek malzeme (şema örnek başına), boyda ±%8 fark. Taha tarzı ve renkleri beğendi, çeşitliliğin artmasını istedi (yapıldı)
 - [x] 4.2 Zombi animasyonları — 2026-11-16. `ZombieClipData`: 3 yürüyüş, bekleme, saldırı, sendeleme, 3 ölüm, yerden doğma; eksikler koddan türetildi (`AnimDerive` + 6 test). Taha baktı, "devam" dedi
-- [ ] 4.3 Durum makinesi ve saldırı — kod bitti 2026-11-16 (`ZombieRules` + 7 test: doğma → kovalama → hazırlık → vuruş → toparlanma; hazırlıkta yön kilitli, kaçılabilir; `FEATURE_ZOMBIE_WINDUP_ATTACK` kapatılınca eski değince hasar). Taha iki biçimi deneyip seçecek
-- [ ] 4.4 İtme ve sendeleme — kod bitti 2026-11-16 (`Knockback` + 4 test; silah satırında `knockback`, zombi satırında `weight` ve `stagger_time`; sendeleme saldırı hazırlığını bozar). Taha'nın yorumu bekleniyor
-- [ ] 4.5 Ölüm — kod bitti 2026-11-16 (`CorpseList`: vuruş yönüne düşer ve kayar, 3 ölüm klibinden biri, noktalı solma, havuza dönüş). Taha'nın yorumu bekleniyor
+- [x] 4.3 Durum makinesi ve saldırı — kod bitti 2026-11-16 (`ZombieRules` + 7 test: doğma → kovalama → hazırlık → vuruş → toparlanma; hazırlıkta yön kilitli, kaçılabilir; `FEATURE_ZOMBIE_WINDUP_ATTACK` kapatılınca eski değince hasar). Taha yorum yapmadan "devam" dedi; hazırlıklı vuruş varsayılan kaldı
+- [x] 4.4 İtme ve sendeleme — kod bitti 2026-11-16 (`Knockback` + 4 test; silah satırında `knockback`, zombi satırında `weight` ve `stagger_time`; sendeleme saldırı hazırlığını bozar). Taha "devam" dedi
+- [x] 4.5 Ölüm — kod bitti 2026-11-16 (`CorpseList`: vuruş yönüne düşer ve kayar, 3 ölüm klibinden biri, noktalı solma, havuza dönüş). Taha "devam" dedi
 
 ### 5 — Dikey dilim: silah ve vuruş hissi
 - [ ] 5.1 Süzülen silah yuvaları

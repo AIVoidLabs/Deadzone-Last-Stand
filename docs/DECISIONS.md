@@ -2,6 +2,10 @@
 
 Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar verilince "Açık kararlar"dan çıkarılıp tarihli bölüme yazılır.
 
+## 2026-11-16 — Aşama 4 kapanışı (Taha)
+
+- Zombi saldırısı: **hazırlıklı vuruş** (kaçılabilir) varsayılan. Taha ayrıca seçim yapmadan "devam" dedi; "değince hasar" `Tuning.FEATURE_ZOMBIE_WINDUP_ATTACK = false` ile hâlâ geri açılabilir. Oynarken fikri değişirse 5.7 dilim onayında yeniden bakılır.
+
 ## 2026-11-16 — Zombi türleri listesi (Taha; Codex ile konuşup getirdi)
 
 - Her tür oyuncuya ayrı bir karar çıkarmalı. Kabul edilen liste: sürü zombisi, koşucu (hazırlıklı atılma), çığlıkçı (zombi çağırır), zırhlı (önden dayanıklı, yandan/arkadan zayıf), tükürücü (yerde kalan asit alanı), patlayıcı (uyarı + patlama, zombilere de hasar). Önceki isteklerle birleşti: zıplayan, sürünen, tank, taş fırlatan. Tam tablo `GAME_DESIGN.md`, uygulama Aşama 7.2–7.3.
@@ -63,7 +67,6 @@ Aşama 1 geri bildirimi (Taha): vuruş hissi yok, hareket cansız, zombiler tehd
 | Karar | Ne zaman |
 |---|---|
 | Eksik animasyonlar (ek zombi yürüyüşleri, yönlü ölümler): Claude Blender'da mı üretsin, ücretli Pro sürüm mü alınsın | 4.2 |
-| Zombi saldırısı: hazırlıklı vuruş mu, değince hasar mı | 4.3 (oynayarak) |
 | İçerik hedefi sayıları | 6 ve 11 |
 | Arenada engel yoğunluğu | 8.2 |
 | Müzik | 8.5 |
