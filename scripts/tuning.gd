@@ -27,6 +27,8 @@ const FEATURE_ZOMBIE_SPAWN_RISE: bool = true
 const FEATURE_KNOCKBACK: bool = true
 ## Vurulan zombi kısa süre sendeler (saldırı hazırlığı bozulur).
 const FEATURE_STAGGER: bool = true
+## Ölen zombi ölüm animasyonu oynar ve solarak silinir; kapalıyken anında kaybolur.
+const FEATURE_ZOMBIE_DEATH_ANIM: bool = true
 ## Asker gövdesinin hıza ve dönüşe göre yatması.
 const FEATURE_PLAYER_LEAN: bool = true
 
@@ -91,6 +93,13 @@ const ZOMBIE_ANIM_SPEED_VARIANCE: float = 0.15
 const ZOMBIE_SCALE_VARIANCE: float = 0.08
 ## İtilme hızının sönme katsayısı (1/sn); büyüdükçe itme kısa ve sert olur.
 const KNOCKBACK_DAMPING: float = 12.0
+## Öldüren vuruşun itmesi bu kadar katlanır (ceset vuruş yönünde savrulur).
+const ZOMBIE_DEATH_KNOCKBACK_FACTOR: float = 1.6
+## Ölüm klibinin oynatma hızı.
+const ZOMBIE_DEATH_ANIM_SPEED: float = 1.5
+## Cesedin solmaya başlamadan önce yerde kaldığı süre ve solma süresi (sn).
+const ZOMBIE_CORPSE_TIME: float = 1.5
+const ZOMBIE_FADE_TIME: float = 0.5
 ## Zombi klipleri arası geçiş süresi (sn).
 const ZOMBIE_ANIM_BLEND: float = 0.12
 

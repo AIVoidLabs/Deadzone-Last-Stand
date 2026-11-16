@@ -9,8 +9,16 @@ uniform vec4 flash_color : source_color = vec4(1.0, 1.0, 1.0, 1.0);
 instance uniform float flash = 0.0;
 // Palet dokulu modellerde renk şeması: UV örnek başına dikeyde kaydırılır.
 instance uniform float palette_offset = 0.0;
+// Solarak silinme (0 görünür, 1 yok): saydamlık yerine noktalı eleme, böylece malzeme opak kalır.
+instance uniform float fade = 0.0;
 
 void fragment() {
+	if (fade > 0.0) {
+		float noise = fract(52.9829189 * fract(dot(FRAGCOORD.xy, vec2(0.06711056, 0.00583715))));
+		if (noise < fade) {
+			discard;
+		}
+	}
 	vec3 base = albedo.rgb * texture(albedo_texture, UV + vec2(0.0, palette_offset)).rgb;
 	ALBEDO = mix(base, flash_color.rgb, flash);
 	EMISSION = flash_color.rgb * flash * 0.6;

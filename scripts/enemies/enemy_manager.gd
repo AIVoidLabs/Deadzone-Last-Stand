@@ -38,6 +38,7 @@ var _knock: PackedVector2Array = PackedVector2Array()
 var _nodes: Array[Zombie] = []
 var _pool: Array[Zombie] = []
 var _dead_count: int = 0
+var _corpses: CorpseList = CorpseList.new()
 
 
 func _ready() -> void:
@@ -52,6 +53,9 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	_compact()
+	for node: Zombie in _corpses.tick(delta):
+		node.deactivate()
+		_pool.append(node)
 	elapsed += delta
 	_tick_spawning(delta)
 	_grid.rebuild(_pos)
@@ -63,7 +67,7 @@ func active_count() -> int:
 
 
 func pool_size() -> int:
-	return _nodes.size() + _pool.size()
+	return _nodes.size() + _pool.size() + _corpses.count()
 
 
 func enemy_position(index: int) -> Vector2:
@@ -99,10 +103,10 @@ func damage(index: int, amount: float, direction: Vector2 = Vector2.ZERO, knockb
 		return
 	_hp[index] -= amount
 	_nodes[index].notify_hit(amount)
-	if _hp[index] <= 0.0:
-		_kill(index)
-		return
 	var row: Dictionary = _rows[index]
+	if _hp[index] <= 0.0:
+		_kill(index, Knockback.impulse(direction, knockback * Tuning.ZOMBIE_DEATH_KNOCKBACK_FACTOR, row["weight"]))
+		return
 	if Tuning.FEATURE_KNOCKBACK:
 		_knock[index] += Knockback.impulse(direction, knockback, row["weight"])
 	if Tuning.FEATURE_STAGGER and ZombieRules.can_stagger(state):
@@ -237,13 +241,22 @@ static func _yaw_towards(from: Vector2, to: Vector2) -> float:
 	return atan2(dir.x, dir.y)
 
 
-func _kill(index: int) -> void:
+## push: öldüren vuruşun itmesi; ceset bu yöne düşer ve kayar.
+func _kill(index: int, push: Vector2 = Vector2.ZERO) -> void:
 	_alive[index] = 0
 	_dead_count += 1
 	kills += 1
 	var node: Zombie = _nodes[index]
 	enemy_killed.emit(node.position)
-	node.deactivate()
+	if not Tuning.FEATURE_ZOMBIE_DEATH_ANIM:
+		node.deactivate()
+		return
+	# Ölüm klipleri arkaya düşer: yüzü vuruşun geldiği yöne çevir, sırtüstü vuruş yönüne düşsün.
+	if push != Vector2.ZERO:
+		node.rotation.y = atan2(-push.x, -push.y)
+	var duration: float = Tuning.ZOMBIE_CORPSE_TIME + Tuning.ZOMBIE_FADE_TIME
+	node.enter_state(ZombieRules.State.DYING, duration)
+	_corpses.add(node, push if Tuning.FEATURE_KNOCKBACK else Vector2.ZERO, duration)
 
 
 ## Ölenleri sondan takasla çıkarır. Sondan başa gidildiği için takaslanan hep canlıdır.
@@ -254,7 +267,9 @@ func _compact() -> void:
 	while i >= 0:
 		if _alive[i] == 0:
 			var last: int = _nodes.size() - 1
-			_pool.append(_nodes[i])
+			# Ölüm animasyonundaki düğüm CorpseList'te; havuza oradan döner.
+			if _nodes[i].state == ZombieRules.State.INACTIVE:
+				_pool.append(_nodes[i])
 			if i != last:
 				_pos[i] = _pos[last]
 				_hp[i] = _hp[last]

@@ -15,6 +15,8 @@ var _animation: AnimationPlayer
 var _row: Dictionary = {}
 var _body: Zombie
 var _flash_left: float = 0.0
+var _dying: bool = false
+var _death_left: float = 0.0
 
 
 func _init() -> void:
@@ -32,9 +34,15 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	_flash_left -= delta
-	if _flash_left <= 0.0:
-		_set_flash(0.0)
+	if _flash_left > 0.0:
+		_flash_left -= delta
+		if _flash_left <= 0.0:
+			_set_flash(0.0)
+	if _dying:
+		# Sürenin son ZOMBIE_FADE_TIME saniyesinde solar.
+		_death_left -= delta
+		_set_fade(1.0 - clampf(_death_left / Tuning.ZOMBIE_FADE_TIME, 0.0, 1.0))
+	elif _flash_left <= 0.0:
 		set_process(false)
 
 
@@ -50,7 +58,19 @@ func _on_event(event_name: StringName, data: Dictionary) -> void:
 
 
 func _on_state_changed(new_state: int, _old_state: int) -> void:
+	if _dying and new_state != ZombieRules.State.DYING:
+		_dying = false
+		_set_fade(0.0)
 	match new_state:
+		ZombieRules.State.DYING:
+			_dying = true
+			_death_left = _body.state_duration
+			set_process(true)
+			var clip: StringName = _pick_clip(&"anim_death")
+			if clip != &"":
+				_animation.speed_scale = Tuning.ZOMBIE_DEATH_ANIM_SPEED
+				_animation.play(clip, Tuning.ZOMBIE_ANIM_BLEND)
+				_animation.seek(0.0)
 		ZombieRules.State.SPAWN:
 			_play_timed(&"anim_spawn", 0.0, _body.state_duration)
 		ZombieRules.State.CHASE:
@@ -71,6 +91,11 @@ func _on_state_changed(new_state: int, _old_state: int) -> void:
 			# Havuzdaki (görünmeyen) zombi animasyon hesaplamasın.
 			if _animation != null:
 				_animation.stop()
+
+
+func _set_fade(value: float) -> void:
+	for mesh: MeshInstance3D in _meshes:
+		mesh.set_instance_shader_parameter(&"fade", value)
 
 
 func _set_flash(value: float) -> void:
