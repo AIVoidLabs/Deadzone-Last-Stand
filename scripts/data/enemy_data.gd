@@ -13,7 +13,12 @@ const TABLE: Dictionary = {
 		"radius": 0.45,
 		"height": 1.6,
 		"color": Color(0.42, 0.6, 0.32),
-		"anim_walk": &"ual2/Zombie_Walk_Fwd",
+		# Klip adları ZombieClipData tablosundan; birden çok varsa zombi başına rastgele biri.
+		"anim_walk": [&"walk_a", &"walk_b", &"walk_c"],
+		"anim_attack": [&"attack"],
+		"anim_stagger": [&"stagger"],
+		"anim_death": [&"death_a", &"death_b", &"death_c"],
+		"anim_spawn": [&"spawn"],
 	},
 }
 

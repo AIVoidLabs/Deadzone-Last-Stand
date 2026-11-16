@@ -6,9 +6,9 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 ## Şu an
 
 - **Ana aşama:** 4 — Dikey dilim: zombi
-- **Alt aşama:** 4.1 bitti; sırada 4.2 — zombi animasyonları
-- **Sıradaki iş:** 4.2: eksik klipleri ücretsiz yoldan türet (2–3 yürüyüş, saldırı, sendeleme, 2–3 ölüm, yerden doğma) ve oyuna bağla
-- **Bekleyen (Taha'dan):** yok. Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
+- **Alt aşama:** 4.2 klip seti hazır, yürüyüş çeşitleri oyunda; **Taha'nın yorumu bekleniyor**
+- **Sıradaki iş:** 4.3 — durum makinesi ve saldırı (doğma → kovalama → saldırı → sendeleme → ölme); saldırı, sendeleme, ölüm ve doğma klipleri orada oyuna bağlanır
+- **Bekleyen (Taha'dan):** klip setine bakmak (`godot --path . res://scenes/debug/zombie_gallery.tscn -- --clips`) ve oyunda yürüyüşleri görmek. Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
 - **Not:** Blender MCP eklentisi 2026-11-16'da güncellendi (`uvx mcp-for-blender install-addon`); Blender yeniden başlatılınca etkinleşir. Scriptler zaten penceresiz çalışıyor.
 
 ## Ana aşama durumu
@@ -19,7 +19,7 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 | 1 | Kutu prototip | ✔ bitti (his onayı 5.7'ye devredildi) |
 | 2 | Model ve animasyon hattı | ✔ bitti (2026-11-16) |
 | 3 | Dikey dilim: asker | ✔ bitti (2026-11-16) |
-| 4 | Dikey dilim: zombi | sürüyor (4.1) |
+| 4 | Dikey dilim: zombi | sürüyor (4.2) |
 | 5 | Dikey dilim: silah ve vuruş hissi | — |
 | 6 | Tur döngüsü | — |
 | 7 | Silah ve zombi çeşitliliği | — |
@@ -49,7 +49,7 @@ Bitiş ölçütleri `ROADMAP.md`'de. Biten kutunun yanına tarih ve commit yazı
 
 ### 4 — Dikey dilim: zombi
 - [x] 4.1 Yürüyen zombi modeli — 2026-11-16. `build_zombie.py`: 10 gövde çeşidi × 16 renk şeması (yarısı koyu ton) = 160 görünüm, ~600–700 üçgen, tek malzeme (şema örnek başına), boyda ±%8 fark. Taha tarzı ve renkleri beğendi, çeşitliliğin artmasını istedi (yapıldı)
-- [ ] 4.2 Zombi animasyonları
+- [ ] 4.2 Zombi animasyonları — klip seti bitti 2026-11-16 (`ZombieClipData`: 3 yürüyüş, bekleme, saldırı, sendeleme, 3 ölüm, yerden doğma; eksikler koddan türetildi: ayna + model uzayında ek dönüş, `AnimDerive` + 6 test). Yürüyüşler oyunda rastgele; öbür klipler 4.3–4.5'te bağlanacak. Taha'nın yorumu bekleniyor
 - [ ] 4.3 Durum makinesi ve saldırı
 - [ ] 4.4 İtme ve sendeleme
 - [ ] 4.5 Ölüm
@@ -145,6 +145,7 @@ Profil üst sınırları (2.5 ölçümüne göre, efektlere pay bırakılarak): 
 ## Oturum günlüğü
 
 ### 2026-11-16 — Oturum 2
+- Zombi türleri listesi (Taha + Codex önerisi) `GAME_DESIGN.md` ve 7.2–7.3'e işlendi. 4.2: `AnimDerive`, `ZombieClips`, `ZombieClipData`; toplam 48 test.
 - 4.1 genişletildi: Taha çok daha fazla çeşit ve koyu tonlar istedi → rol tabanlı palet (`ZombieLook`), 160 görünüm. Yeni zombi türleri (sürünen, zıplayan) 7.2'ye eklendi.
 - Aşama 3 kapandı (Taha onayladı; ölüm animasyonu `GAME_OVER_DELAY` ile düzeltildi). 4.1: `build_zombie.py` ile dört çeşitli low-poly zombi, `ModelVariants`, zombi galerisi sahnesi.
 - 3.2–3.5: `Locomotion` ve `Dash` saf kuralları (11 yeni test, toplam 42), `PlayerAnimator` animasyon ağacı, gövde yatması, takla ile dash, toz izi, HUD dash çubuğu, kamera 17 m + ileri bakış + sarsıntı. Taha animasyon önizlemesini onayladı.

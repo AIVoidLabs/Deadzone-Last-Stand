@@ -5,8 +5,6 @@ extends Node3D
 
 const FLASH_SHADER: Shader = preload("res://assets/shaders/flash_lit.gdshader")
 const MODEL: PackedScene = preload("res://assets/models/characters/zombie_walker.glb")
-const ANIM_LIBRARY_NAME: StringName = &"ual2"
-const ANIM_LIBRARY: AnimationLibrary = preload("res://assets/models/anim/ual2.glb")
 const BOX_WIDTH_FACTOR: float = 1.6
 
 static var _box_meshes: Dictionary = {}
@@ -14,7 +12,7 @@ static var _materials: Dictionary = {}
 
 var _meshes: Array[MeshInstance3D] = []
 var _animation: AnimationPlayer
-var _walk_clip: StringName
+var _walk_clips: Array = []
 var _flash_left: float = 0.0
 
 
@@ -73,7 +71,8 @@ func _build_model() -> void:
 	_meshes.append(ZombieLook.apply_random(model))
 	_animation = AnimationPlayer.new()
 	model.add_child(_animation)
-	_animation.add_animation_library(ANIM_LIBRARY_NAME, ANIM_LIBRARY)
+	var skeleton: Skeleton3D = model.find_child("GeneralSkeleton", true, false) as Skeleton3D
+	_animation.add_animation_library(ZombieClips.LIBRARY_NAME, ZombieClips.library(skeleton))
 
 
 func _build_box() -> void:
@@ -92,16 +91,16 @@ func _apply_kind(row: Dictionary) -> void:
 		return
 	var size: float = randf_range(1.0 - Tuning.ZOMBIE_SCALE_VARIANCE, 1.0 + Tuning.ZOMBIE_SCALE_VARIANCE)
 	scale = Vector3.ONE * (size * height / Tuning.CHARACTER_MODEL_HEIGHT)
-	_walk_clip = row["anim_walk"]
+	_walk_clips = row["anim_walk"]
 
 
 ## Yürüyüşü rastgele bir kareden ve biraz farklı hızda başlatır; sürü aynı adımda yürümez.
 func _start_walk() -> void:
-	if _animation == null or _walk_clip == &"":
+	if _animation == null or _walk_clips.is_empty():
 		return
 	var variance: float = Tuning.ZOMBIE_ANIM_SPEED_VARIANCE
 	_animation.speed_scale = randf_range(1.0 - variance, 1.0 + variance)
-	_animation.play(_walk_clip)
+	_animation.play(ZombieClips.full_name(_walk_clips.pick_random()))
 	_animation.seek(randf() * _animation.current_animation_length)
 
 

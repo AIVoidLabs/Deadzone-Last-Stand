@@ -2,13 +2,15 @@ extends Node3D
 ## Zombi galerisi: önde her gövde çeşidi (bekleme), arkada aynıları başka renk şemasıyla (yürüyüş).
 ## Yalnız debug yapıda.
 ## Aç: godot --path . res://scenes/debug/zombie_gallery.tscn [-- --capture=build/shots/zombies.png]
+## Klip seti: ... -- --clips → ZombieClipData tablosundaki her klip bir zombide, adıyla.
 ## Tuşlar: Esc çıkış.
 
 const MODEL: PackedScene = preload("res://assets/models/characters/zombie_walker.glb")
-const LIBRARY_NAME: StringName = &"ual2"
-const LIBRARY: AnimationLibrary = preload("res://assets/models/anim/ual2.glb")
-const FRONT_CLIP: StringName = &"ual2/Zombie_Idle"
-const BACK_CLIP: StringName = &"ual2/Zombie_Walk_Fwd"
+const FRONT_CLIP: StringName = &"idle"
+const BACK_CLIP: StringName = &"walk_a"
+const CLIPS_YAW_DEG: float = 30.0
+const LABEL_OFFSET: Vector3 = Vector3(0.0, 0.1, 1.1)
+const LABEL_PIXEL_SIZE: float = 0.006
 const SPACING: float = 1.3
 const BACK_ROW_Z: float = -3.0
 const BACK_ROW_YAW_DEG: float = 50.0
@@ -21,6 +23,7 @@ const DEFAULT_CAPTURE_SECONDS: float = 1.0
 var _capture_path: String = ""
 var _capture_seconds: float = DEFAULT_CAPTURE_SECONDS
 var _time: float = 0.0
+var _show_clips: bool = false
 
 
 func _ready() -> void:
@@ -32,6 +35,12 @@ func _ready() -> void:
 			_capture_path = arg.trim_prefix("--capture=")
 		elif arg.begins_with("--capture-seconds="):
 			_capture_seconds = arg.trim_prefix("--capture-seconds=").to_float()
+		elif arg == "--clips":
+			_show_clips = true
+	_add_environment()
+	if _show_clips:
+		_add_clip_row()
+		return
 	var probe: Node3D = MODEL.instantiate() as Node3D
 	var variants: int = ZombieLook.variant_count(probe)
 	probe.free()
@@ -40,7 +49,20 @@ func _ready() -> void:
 		_add_zombie(i, i, Vector3(x, 0.0, 0.0), 0.0, FRONT_CLIP)
 		# Arka sıra: aynı gövdeler, paletin öbür yarısındaki (koyu) şemalarla.
 		_add_zombie(i, i + 8, Vector3(x, 0.0, BACK_ROW_Z), BACK_ROW_YAW_DEG, BACK_CLIP)
-	_add_environment()
+
+
+func _add_clip_row() -> void:
+	var clips: Array = ZombieClipData.TABLE.keys()
+	for i: int in clips.size():
+		var at: Vector3 = Vector3((i - (clips.size() - 1) * 0.5) * SPACING, 0.0, 0.0)
+		_add_zombie(i, i * 3, at, CLIPS_YAW_DEG, clips[i])
+		var label: Label3D = Label3D.new()
+		label.text = String(clips[i])
+		label.pixel_size = LABEL_PIXEL_SIZE
+		label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+		label.no_depth_test = true
+		label.position = at + LABEL_OFFSET
+		add_child(label)
 
 
 func _process(delta: float) -> void:
@@ -69,9 +91,14 @@ func _add_zombie(variant: int, scheme: int, at: Vector3, yaw_deg: float, clip: S
 	add_child(model)
 	var player: AnimationPlayer = AnimationPlayer.new()
 	model.add_child(player)
-	player.add_animation_library(LIBRARY_NAME, LIBRARY)
-	player.play(clip)
-	player.seek(variant * 0.37)
+	var skeleton: Skeleton3D = model.find_child("GeneralSkeleton", true, false) as Skeleton3D
+	player.add_animation_library(ZombieClips.LIBRARY_NAME, ZombieClips.library(skeleton))
+	var full: StringName = ZombieClips.full_name(clip)
+	player.play(full)
+	# Döngüsüz klipler bitince baştan oynasın ki önizlemede hep hareket olsun.
+	player.animation_finished.connect(func(_finished: StringName) -> void: player.play(full))
+	if not _show_clips:
+		player.seek(variant * 0.37)
 
 
 func _add_environment() -> void:

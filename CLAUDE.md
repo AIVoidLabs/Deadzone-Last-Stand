@@ -169,7 +169,7 @@ docs/          GAME_DESIGN.md, PROGRESS.md, concept/
 - `-s` ile çalışan SceneTree betikleri autoload'ları göremez; oyun sınıflarına dokunan araçları bu yüzden betik olarak değil, debug düğümü olarak yaz.
 - Animasyon önizleme: `godot --path . res://scenes/debug/anim_preview.tscn [-- --model=soldier] [--capture=build/shots/anim.png]` → her klip bir modelde.
 - Model inceleme: `blender --background --python tools/blender/inspect_model.py -- <model> build/shots/<ad>` → üç yönden görüntü + ölçüler.
-- Zombi galerisi: `godot --path . res://scenes/debug/zombie_gallery.tscn [-- --capture=build/shots/zombies.png]` → her çeşit önden ve çaprazdan.
+- Zombi galerisi: `godot --path . res://scenes/debug/zombie_gallery.tscn [-- --clips] [--capture=build/shots/zombies.png]` → gövde çeşitleri ve renk şemaları; `--clips` ile zombi klip seti (her klip adıyla).
 - `--import` çıktısındaki `ERROR` satırlarını süzmeden oku; doku ve model hataları yalnız orada görünür.
 - Debug tuşları: F3 panel, F4 +50 zombi, F5 ölümsüz, F6 kalite profili.
 
