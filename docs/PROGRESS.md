@@ -5,9 +5,10 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 
 ## Şu an
 
-- **Ana aşama:** 4 — Dikey dilim: zombi **bitti** (2026-11-16); 🚩 bildirimi yapıldı, Taha'nın "devam"ı bekleniyor
-- **Sıradaki iş:** Aşama 5.1 — süzülen silah yuvaları (6 yuva askerin çevresinde, silah modelleri Blender'dan)
-- **Bekleyen (Taha'dan):** "devam". Oynarken saldırı, itme, ölüm hakkında yorumu olursa 5'te ayarlanır. Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
+- **Ana aşama:** 5 — Dikey dilim: silah ve vuruş hissi (Taha 2026-11-16'da iki kez "devam" dedi; Aşama 4 kapandı)
+- **Alt aşama:** 5.1 kod bitti; **Taha'nın yorumu bekleniyor**
+- **Sıradaki iş:** 5.2 — atış görseli (namlu parlaması, mermi izi, isabet kıvılcımı)
+- **Bekleyen (Taha'dan):** süzülen silahlara bakmak (F7 ile silah ekle, en çok 6). Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
 - **Not:** Blender MCP eklentisi 2026-11-16'da güncellendi (`uvx mcp-for-blender install-addon`); Blender yeniden başlatılınca etkinleşir. Scriptler zaten penceresiz çalışıyor.
 
 ## Ana aşama durumu
@@ -19,7 +20,7 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 | 2 | Model ve animasyon hattı | ✔ bitti (2026-11-16) |
 | 3 | Dikey dilim: asker | ✔ bitti (2026-11-16) |
 | 4 | Dikey dilim: zombi | ✔ bitti (2026-11-16) |
-| 5 | Dikey dilim: silah ve vuruş hissi | — |
+| 5 | Dikey dilim: silah ve vuruş hissi | sürüyor (5.1) |
 | 6 | Tur döngüsü | — |
 | 7 | Silah ve zombi çeşitliliği | — |
 | 8 | Arena, atmosfer, ses | — |
@@ -54,7 +55,7 @@ Bitiş ölçütleri `ROADMAP.md`'de. Biten kutunun yanına tarih ve commit yazı
 - [x] 4.5 Ölüm — kod bitti 2026-11-16 (`CorpseList`: vuruş yönüne düşer ve kayar, 3 ölüm klibinden biri, noktalı solma, havuza dönüş). Taha "devam" dedi
 
 ### 5 — Dikey dilim: silah ve vuruş hissi
-- [ ] 5.1 Süzülen silah yuvaları
+- [ ] 5.1 Süzülen silah yuvaları — kod bitti 2026-11-16 (`WeaponRig` + `WeaponSlots` 5 test; 6 yuva çemberde, askeri geriden izler, her silah kendi en yakın hedefine döner ve kendi namlusundan ateş eder, geri tepme + salınım; `build_weapons.py`: tabanca ve pompalı modelleri). Taha'nın yorumu bekleniyor
 - [ ] 5.2 Atış görseli
 - [ ] 5.3 Vuruş geri bildirimi
 - [ ] 5.4 Asker vurulunca
@@ -144,6 +145,7 @@ Profil üst sınırları (2.5 ölçümüne göre, efektlere pay bırakılarak): 
 ## Oturum günlüğü
 
 ### 2026-11-16 — Oturum 2
+- Aşama 4 kapandı; 5.1: süzülen silahlar (`WeaponRig`, `WeaponVisual`, `WeaponSlots`), silah modelleri Blender scriptinden, F7 debug silahı. Toplam 64 test.
 - 4.3–4.5: `ZombieRules`, `Knockback`, `CorpseList`; zombi durumları, hazırlıklı saldırı, itme, sendeleme, ölüm animasyonu ve solma. Toplam 59 test. Not: itme yüzünden tabanca hedef değiştiriyor, hasar sürüye yayılıyor (denge 5.6 ve 6.6'da).
 - Zombi türleri listesi (Taha + Codex önerisi) `GAME_DESIGN.md` ve 7.2–7.3'e işlendi. 4.2: `AnimDerive`, `ZombieClips`, `ZombieClipData`; toplam 48 test.
 - 4.1 genişletildi: Taha çok daha fazla çeşit ve koyu tonlar istedi → rol tabanlı palet (`ZombieLook`), 160 görünüm. Yeni zombi türleri (sürünen, zıplayan) 7.2'ye eklendi.

@@ -16,9 +16,12 @@ func _ready() -> void:
 	projectiles.enemies = enemies
 	add_child(projectiles)
 
-	var weapon: Weapon = Weapon.new()
-	weapon.setup(WeaponData.PISTOL, enemies, projectiles)
-	player.add_child(weapon)
+	var weapons: WeaponRig = WeaponRig.new()
+	weapons.player = player
+	weapons.enemies = enemies
+	weapons.projectiles = projectiles
+	add_child(weapons)
+	weapons.add_weapon(WeaponData.PISTOL)
 
 	var camera: FollowCamera = FollowCamera.new()
 	camera.target = player
@@ -36,14 +39,15 @@ func _ready() -> void:
 	Quality.apply_to_viewport(get_viewport())
 
 	if OS.is_debug_build():
-		_add_debug_tools(player, enemies, projectiles, camera)
+		_add_debug_tools(player, enemies, projectiles, camera, weapons)
 
 
-func _add_debug_tools(player: Player, enemies: EnemyManager, projectiles: ProjectilePool, camera: FollowCamera) -> void:
+func _add_debug_tools(player: Player, enemies: EnemyManager, projectiles: ProjectilePool, camera: FollowCamera, weapons: WeaponRig) -> void:
 	var panel: DebugPanel = DebugPanel.new()
 	panel.player = player
 	panel.enemies = enemies
 	panel.projectiles = projectiles
+	panel.weapons = weapons
 	add_child(panel)
 	if Benchmark.requested():
 		var bench: Benchmark = Benchmark.new()
@@ -56,4 +60,5 @@ func _add_debug_tools(player: Player, enemies: EnemyManager, projectiles: Projec
 		capture.enemies = enemies
 		capture.debug_panel = panel
 		capture.camera = camera
+		capture.weapons = weapons
 		add_child(capture)

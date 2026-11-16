@@ -164,14 +164,14 @@ docs/          GAME_DESIGN.md, PROGRESS.md, concept/
 - Beklenen değerleri `Tuning`'den türet; ayar değişince testler kırılmasın.
 
 ### Doğrulama araçları (yalnız debug yapı; ana sahneye argümanla eklenir)
-- Ekran görüntüsü: `godot --path . -- --capture=build/shots/x.png --capture-seconds=8 [--capture-spawn=300] [--autopilot] [--god] [--capture-dash=S] [--capture-kill=S] [--camera-distance=M] [--debug-panel]` → PNG'yi Read ile aç. `--autopilot`: asker ölümsüz, daire çizer. `--god`: asker ölümsüz, yerinde durur (zombi saldırısını görmek için).
+- Ekran görüntüsü: `godot --path . -- --capture=build/shots/x.png --capture-seconds=8 [--capture-spawn=300] [--autopilot] [--god] [--capture-dash=S] [--capture-kill=S] [--camera-distance=M] [--weapons=N] [--debug-panel]` → PNG'yi Read ile aç. `--autopilot`: asker ölümsüz, daire çizer. `--god`: asker ölümsüz, yerinde durur (zombi saldırısını görmek için).
 - Sürü ölçümü: `godot --path . -- --bench` → vsync kapalı, 50'şer zombi ekler, 60 FPS altına düşünce durur; sonuç stdout'ta `BENCH` satırları ve `user://bench_result.txt`.
 - `-s` ile çalışan SceneTree betikleri autoload'ları göremez; oyun sınıflarına dokunan araçları bu yüzden betik olarak değil, debug düğümü olarak yaz.
 - Animasyon önizleme: `godot --path . res://scenes/debug/anim_preview.tscn [-- --model=soldier] [--capture=build/shots/anim.png]` → her klip bir modelde.
 - Model inceleme: `blender --background --python tools/blender/inspect_model.py -- <model> build/shots/<ad>` → üç yönden görüntü + ölçüler.
 - Zombi galerisi: `godot --path . res://scenes/debug/zombie_gallery.tscn [-- --clips] [--capture=build/shots/zombies.png]` → gövde çeşitleri ve renk şemaları; `--clips` ile zombi klip seti (her klip adıyla).
 - `--import` çıktısındaki `ERROR` satırlarını süzmeden oku; doku ve model hataları yalnız orada görünür.
-- Debug tuşları: F3 panel, F4 +50 zombi, F5 ölümsüz, F6 kalite profili.
+- Debug tuşları: F3 panel, F4 +50 zombi, F5 ölümsüz, F6 kalite profili, F7 +silah (en çok 6).
 
 ### Model hattı (Aşama 2–4, 7)
 - Blender işleri script olarak `tools/blender/` altında saklanır; model elle değil script ile yeniden üretilebilir olmalı.

@@ -29,6 +29,9 @@ const FEATURE_KNOCKBACK: bool = true
 const FEATURE_STAGGER: bool = true
 ## Ölen zombi ölüm animasyonu oynar ve solarak silinir; kapalıyken anında kaybolur.
 const FEATURE_ZOMBIE_DEATH_ANIM: bool = true
+## Silahlar askerin çevresinde süzülür, görünür ve kendi konumundan ateş eder; kapalıyken görünmez,
+## askerin ortasından ateş eder.
+const FEATURE_FLOATING_WEAPONS: bool = true
 ## Asker gövdesinin hıza ve dönüşe göre yatması.
 const FEATURE_PLAYER_LEAN: bool = true
 
@@ -116,7 +119,25 @@ const SPAWN_TRIES: int = 8
 # --- Mermi ---
 const PROJECTILE_POOL_SIZE: int = 128
 const PROJECTILE_RADIUS: float = 0.12
-const PROJECTILE_HEIGHT: float = 1.0
+const PROJECTILE_HEIGHT: float = 1.1
+
+# --- Süzülen silahlar ---
+const WEAPON_SLOTS: int = 6
+## Silah çemberinin yarıçapı (m) ve yerden yüksekliği.
+const WEAPON_ORBIT_RADIUS: float = 1.0
+const WEAPON_HOVER_HEIGHT: float = 1.1
+## İlk silahın açısı (derece; 0 = ekranda askerin sağı, dünya +X).
+const WEAPON_START_ANGLE_DEG: float = 0.0
+## Silahların askeri izleme keskinliği; küçüldükçe daha çok geride kalır (süzülme).
+const WEAPON_FOLLOW_SHARPNESS: float = 12.0
+const WEAPON_AIM_SHARPNESS: float = 22.0
+## Geri tepmenin toparlanma hızı ve namlunun kalkma açısı.
+const WEAPON_RECOIL_RECOVER: float = 14.0
+const WEAPON_RECOIL_PITCH_DEG: float = 14.0
+const WEAPON_BOB_HEIGHT: float = 0.05
+const WEAPON_BOB_SPEED: float = 2.4
+## Debug: F7 ile eklenen silah.
+const DEBUG_WEAPON: StringName = &"pistol"
 const PROJECTILE_LENGTH: float = 0.6
 const PROJECTILE_THICKNESS: float = 0.1
 const PROJECTILE_LIFETIME_MARGIN: float = 1.15

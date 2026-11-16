@@ -9,6 +9,7 @@ const FONT_SIZE: int = 15
 var player: Player
 var enemies: EnemyManager
 var projectiles: ProjectilePool
+var weapons: WeaponRig
 
 var _panel: PanelContainer
 var _label: Label
@@ -42,6 +43,8 @@ func _unhandled_input(input_event: InputEvent) -> void:
 		player.god_mode = not player.god_mode
 	elif input_event.is_action_pressed(&"debug_quality"):
 		Quality.cycle()
+	elif input_event.is_action_pressed(&"debug_weapon"):
+		weapons.add_weapon(Tuning.DEBUG_WEAPON)
 
 
 func _process(delta: float) -> void:
@@ -61,9 +64,9 @@ func _build_text() -> String:
 	var lines: PackedStringArray = PackedStringArray([
 		"FPS %d   işlem %.2f ms   fizik %.2f ms" % [Engine.get_frames_per_second(), frame_ms, physics_ms],
 		"Zombi %d / %d (havuz %d)" % [enemies.active_count(), Quality.max_enemies(), enemies.pool_size()],
-		"Mermi %d   draw call %d" % [projectiles.active_count(), draw_calls],
+		"Mermi %d   draw call %d   silah %d / %d" % [projectiles.active_count(), draw_calls, weapons.count(), Tuning.WEAPON_SLOTS],
 		"Can %.0f / %.0f   ölümsüz %s" % [player.health.current, player.health.maximum, "AÇIK" if player.god_mode else "kapalı"],
 		"Profil %s" % Quality.current,
-		"F4 +%d zombi · F5 ölümsüz · F6 profil" % Tuning.DEBUG_SPAWN_BATCH,
+		"F4 +%d zombi · F5 ölümsüz · F6 profil · F7 +silah" % Tuning.DEBUG_SPAWN_BATCH,
 	])
 	return "\n".join(lines)

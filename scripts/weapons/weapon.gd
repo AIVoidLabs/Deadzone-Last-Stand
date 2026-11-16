@@ -1,56 +1,59 @@
 class_name Weapon
 extends Node3D
-## Otomatik silah: menzildeki en yakın zombiye kendisi nişan alıp ateş eder.
-## Değerler WeaponData tablosundan.
+## Otomatik silah: kendi konumuna en yakın zombiye döner ve ateş eder. Değerler WeaponData tablosundan.
+## Konumunu WeaponRig verir (askerin çevresinde süzülür); görüntü WeaponVisual'da, sinyalle haber alır.
 
 signal fired(direction: Vector2)
 
-const PHYSICS_PRIORITY: int = 0
-
 var weapon_id: StringName
+var row: Dictionary
 var enemies: EnemyManager
 var projectiles: ProjectilePool
+## XZ düzleminde nişan yönü; hedef yokken askerin baktığı yön.
+var aim: Vector2 = Vector2(0.0, 1.0)
+var has_target: bool = false
 
 var _player: Player
-var _damage: float
-var _interval: float
-var _range: float
-var _projectile_speed: float
-var _knockback: float
 var _cooldown: float = 0.0
 
 
-func setup(id: StringName, p_enemies: EnemyManager, p_projectiles: ProjectilePool) -> void:
+func setup(id: StringName, player: Player, p_enemies: EnemyManager, p_projectiles: ProjectilePool) -> void:
 	weapon_id = id
+	row = WeaponData.get_row(id)
+	_player = player
 	enemies = p_enemies
 	projectiles = p_projectiles
-	var row: Dictionary = WeaponData.get_row(id)
-	_damage = row["damage"]
-	_interval = row["fire_interval"]
-	_range = row["max_range"]
-	_projectile_speed = row["projectile_speed"]
-	_knockback = row["knockback"]
+	name = "Weapon_%s" % id
+	if Tuning.FEATURE_FLOATING_WEAPONS:
+		var visual: WeaponVisual = WeaponVisual.new()
+		visual.name = "Visual"
+		add_child(visual)
 
 
-func _ready() -> void:
-	name = "Weapon_%s" % weapon_id
-	process_physics_priority = PHYSICS_PRIORITY
-	_player = get_parent() as Player
+func position_2d() -> Vector2:
+	return Vector2(global_position.x, global_position.z)
 
 
-func _physics_process(delta: float) -> void:
-	if _player.state == Player.State.DEAD:
-		return
+## WeaponRig konumu güncelledikten sonra çağırır.
+func tick(delta: float) -> void:
 	_cooldown = maxf(0.0, _cooldown - delta)
-	if _cooldown > 0.0:
+	if _player.state == Player.State.DEAD:
+		has_target = false
 		return
-	var origin: Vector2 = _player.position_2d()
-	var target: int = enemies.nearest_enemy(origin, _range)
-	if target < 0:
+	var origin: Vector2 = position_2d()
+	var max_range: float = row["max_range"]
+	var target: int = enemies.nearest_enemy(origin, max_range)
+	has_target = target >= 0
+	if not has_target:
+		aim = _player.facing
 		return
 	var direction: Vector2 = Steering.seek(origin, enemies.enemy_position(target))
 	if direction == Vector2.ZERO:
 		return
-	projectiles.fire(origin, direction, _projectile_speed, _damage, _range, _knockback)
-	_cooldown = _interval
+	aim = direction
+	if _cooldown > 0.0:
+		return
+	var muzzle: Vector2 = origin + direction * float(row["muzzle_offset"])
+	projectiles.fire(muzzle, direction, row["projectile_speed"], row["damage"], max_range, row["knockback"])
+	_cooldown = row["fire_interval"]
 	fired.emit(direction)
