@@ -9,6 +9,8 @@ const FEATURE_HIT_FLASH: bool = true
 const FEATURE_PLAYER_IFRAMES: bool = true
 const FEATURE_SPAWN_RAMP: bool = true
 const FEATURE_START_FULLSCREEN: bool = true
+## Kapalıyken asker Aşama 1'deki kapsülle çizilir.
+const FEATURE_PLAYER_MODEL: bool = true
 ## Kapalıyken zombiler Aşama 1'deki kutularla çizilir.
 const FEATURE_ZOMBIE_MODEL: bool = true
 
@@ -28,6 +30,10 @@ const PLAYER_RADIUS: float = 0.4
 const PLAYER_HEIGHT: float = 1.8
 const PLAYER_HIT_IFRAMES: float = 0.5
 const PLAYER_TURN_SHARPNESS: float = 18.0
+
+# --- Asker görüntüsü ---
+## Animasyonlar arası geçiş süresi (sn).
+const PLAYER_ANIM_BLEND: float = 0.15
 
 # --- Hasar ---
 const MIN_DAMAGE_AFTER_ARMOR: float = 1.0

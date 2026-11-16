@@ -6,10 +6,11 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 ## Şu an
 
 - **Ana aşama:** 3 — Dikey dilim: asker
-- **Alt aşama:** 3.1 — Asker modeli (konsept kararlaştı, **Taha'nın Tripo modeli bekleniyor**)
-- **Sıradaki iş:** model gelince penceresiz Blender scriptiyle temizle, ortak iskelete bağla, Godot'da önizle.
+- **Alt aşama:** 3.2 — Hareket modeli (sırada); 3.1 bitti, Taha'nın oyunda bakması isteniyor
+- **Sıradaki iş:** ivme, duruş, dönüş ayarı; gövdenin harekete yatması; hız değerlerinin oynanarak seçilmesi.
 - **Bekleyen (Taha'dan):**
-  - 3.1: `docs/concept/soldier.md`'deki metinle Tripo'da asker modeli (A-poz, tek parça, silahsız, Tripo rig'i kullanılmadan), GLB olarak `assets/models/source/soldier/` altına.
+  - 3.1: `godot --path .` ile askere oyunda bakmak ve `-- --model=soldier` önizlemesinde bozuk görünen klip var mı söylemek.
+  - Tripo planının lisansını kontrol etmek (repo public; ayrıntı `DECISIONS.md` açık kararlar).
   - Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
 - **Not:** Blender MCP eklentisi 2026-11-16'da güncellendi (`uvx mcp-for-blender install-addon`); Blender yeniden başlatılınca etkinleşir. Scriptler zaten penceresiz çalışıyor.
 
@@ -43,7 +44,7 @@ Bitiş ölçütleri `ROADMAP.md`'de. Biten kutunun yanına tarih ve commit yazı
 - [x] 2.5 Sürü performans ölçümü — 2026-11-16. Zombiler animasyonlu mankenle çiziliyor (`Tuning.FEATURE_ZOMBIE_MODEL`); 60 FPS tavanı ~500, seyreltmeye gerek kalmadı
 
 ### 3 — Dikey dilim: asker
-- [ ] 3.1 Asker modeli
+- [x] 3.1 Asker modeli — 2026-11-16. Tripo modeli 6 bin üçgen, 25 kemik, 1.85 m; 25 klip önizlemede ve oyunda (bekleme / Sprint / ölüm) çalışıyor (`Tuning.FEATURE_PLAYER_MODEL`)
 - [ ] 3.2 Hareket modeli
 - [ ] 3.3 Asker animasyonları
 - [ ] 3.4 Dash
@@ -145,6 +146,7 @@ Profil üst sınırları (2.5 ölçümüne göre, efektlere pay bırakılarak): 
 ## Oturum günlüğü
 
 ### 2026-11-16 — Oturum 2
+- 3.1: asker konsepti (stilize iri, ağır zırhlı, lacivert + turuncu); Tripo modeli `build_soldier.py` ile temizlendi ve iskelete bağlandı; `PlayerVisual` modeli ve animasyonu sürüyor; `inspect_model.py` eklendi.
 - Ortam kontrolü temiz (Godot 4.7.2, git, Node, `godot` + `blender` MCP bağlı, headless hatasız).
 - 2.5: zombiler animasyonlu mankenle çizildi, ölçüm ~500 zombi / 60 FPS; profil sınırları 150 / 250 / 350. Taha: koşu Sprint, dash Roll, uzaktan saldıran zombiler istendi (7.3).
 - 2.1–2.4: Quaternius UAL 1 + 2 seçildi (CC0, repo public kararıyla uyumlu). `tools/blender/build_anim_library.py` (penceresiz Blender) → 25 kemikli iskelet, 25 klip, manken. Godot'da kemik eşlemeli içe aktarım, denetim scripti, `anim_preview` sahnesi.

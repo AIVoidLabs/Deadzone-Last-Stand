@@ -4,6 +4,7 @@ Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar v
 
 ## 2026-11-16 — Aşama 3.1 asker konsepti (Taha)
 
+- Tripo modeli (`armored-soldier-3d-model.glb`) beğenildi; bu model üzerinden devam.
 - Oranlar: stilize ve iri (yaklaşık 5–6 kafa boyu). Tarz: ağır zırhlı, yakın gelecek. Renk: koyu lacivert + turuncu vurgu. Ayrıntı ve Tripo metni: `concept/soldier.md`.
 - Geri bildirim: zombiler ekranda biraz küçük görünüyor; kamera yakınlığı 3.5'te ayarlanacak (Taha: "ileride ayarlanacaksa sorun değil").
 
@@ -49,6 +50,7 @@ Aşama 1 geri bildirimi (Taha): vuruş hissi yok, hareket cansız, zombiler tehd
 
 | Karar | Ne zaman |
 |---|---|
+| Tripo çıktılarının lisansı: Taha'nın planı ticari kullanıma ve açık repoda dağıtıma izin veriyor mu (ücretsiz planda çıktılar atıf şartlı ya da herkese açık olabilir; Claude doğrulamadı) | Yayından önce, tercihen şimdi |
 | Eksik animasyonlar (ek zombi yürüyüşleri, yönlü ölümler): Claude Blender'da mı üretsin, ücretli Pro sürüm mü alınsın | 4.2 |
 | Zombi saldırısı: hazırlıklı vuruş mu, değince hasar mı | 4.3 (oynayarak) |
 | İçerik hedefi sayıları | 6 ve 11 |

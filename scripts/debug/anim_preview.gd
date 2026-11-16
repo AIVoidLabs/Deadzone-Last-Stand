@@ -2,9 +2,14 @@ extends Node3D
 ## Animasyon önizleme: her klip için bir manken, yan yana. Yalnız debug yapıda çalışır.
 ## Aç: godot --path . res://scenes/debug/anim_preview.tscn
 ## Ekran görüntüsü: ... -- --capture=build/shots/anim.png [--capture-seconds=1.0]
+## Model seçimi: ... -- --model=soldier (varsayılan: mannequin)
 ## Tuşlar: Esc çıkış.
 
-const MANNEQUIN: PackedScene = preload("res://assets/models/characters/mannequin.glb")
+const MODELS: Dictionary = {
+	"mannequin": preload("res://assets/models/characters/mannequin.glb"),
+	"soldier": preload("res://assets/models/characters/soldier.glb"),
+}
+const DEFAULT_MODEL: String = "mannequin"
 const LIBRARIES: Dictionary = {
 	&"ual1": preload("res://assets/models/anim/ual1.glb"),
 	&"ual2": preload("res://assets/models/anim/ual2.glb"),
@@ -23,6 +28,7 @@ const DEFAULT_CAPTURE_SECONDS: float = 1.0
 
 var _capture_path: String = ""
 var _capture_seconds: float = DEFAULT_CAPTURE_SECONDS
+var _model: PackedScene = MODELS[DEFAULT_MODEL]
 var _time: float = 0.0
 
 
@@ -62,6 +68,8 @@ func _read_args() -> void:
 			_capture_path = arg.trim_prefix("--capture=")
 		elif arg.begins_with("--capture-seconds="):
 			_capture_seconds = arg.trim_prefix("--capture-seconds=").to_float()
+		elif arg.begins_with("--model="):
+			_model = MODELS.get(arg.trim_prefix("--model="), _model)
 
 
 ## "kütüphane/klip" adları, kütüphane sırasıyla.
@@ -84,7 +92,7 @@ func _slot_position(index: int, rows: int) -> Vector3:
 
 
 func _add_mannequin(clip: StringName, at: Vector3) -> void:
-	var model: Node3D = MANNEQUIN.instantiate() as Node3D
+	var model: Node3D = _model.instantiate() as Node3D
 	model.position = at
 	add_child(model)
 	var player: AnimationPlayer = AnimationPlayer.new()

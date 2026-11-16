@@ -167,7 +167,9 @@ docs/          GAME_DESIGN.md, PROGRESS.md, concept/
 - Ekran görüntüsü: `godot --path . -- --capture=build/shots/x.png --capture-seconds=8 [--capture-spawn=300] [--autopilot] [--debug-panel]` → PNG'yi Read ile aç. `--autopilot`: asker ölümsüz, daire çizer.
 - Sürü ölçümü: `godot --path . -- --bench` → vsync kapalı, 50'şer zombi ekler, 60 FPS altına düşünce durur; sonuç stdout'ta `BENCH` satırları ve `user://bench_result.txt`.
 - `-s` ile çalışan SceneTree betikleri autoload'ları göremez; oyun sınıflarına dokunan araçları bu yüzden betik olarak değil, debug düğümü olarak yaz.
-- Animasyon önizleme: `godot --path . res://scenes/debug/anim_preview.tscn [-- --capture=build/shots/anim.png]` → her klip bir mankende.
+- Animasyon önizleme: `godot --path . res://scenes/debug/anim_preview.tscn [-- --model=soldier] [--capture=build/shots/anim.png]` → her klip bir modelde.
+- Model inceleme: `blender --background --python tools/blender/inspect_model.py -- <model> build/shots/<ad>` → üç yönden görüntü + ölçüler.
+- `--import` çıktısındaki `ERROR` satırlarını süzmeden oku; doku ve model hataları yalnız orada görünür.
 - Debug tuşları: F3 panel, F4 +50 zombi, F5 ölümsüz, F6 kalite profili.
 
 ### Model hattı (Aşama 2–4, 7)

@@ -97,6 +97,21 @@ godot --path . res://scenes/debug/anim_preview.tscn
 
 `make_bone_map.gd` yalnız eşleme değişirse yeniden çalıştırılır.
 
+### Asker (Aşama 3.1)
+
+```
+blender --background --python tools/blender/build_soldier.py
+godot --headless --path . --import
+godot --path . res://scenes/debug/anim_preview.tscn -- --model=soldier
+```
+
+`build_soldier.py` ham Tripo modelini (355 bin üçgen, 2048 doku) alır: 1.83 m'ye ölçekler, ~6 bin üçgene indirir, yalnız renk dokusunu 1024 olarak bırakır, iskeleti scriptin başındaki eklem tablosuna (`CENTER_JOINTS`, `SIDE_JOINTS`) göre oturtur, otomatik ağırlık verir ve modeli kütüphanenin dinlenme pozuna (T-poz) getirir. Kontrol görüntüleri: `build/shots/soldier_fit_joints_*.png` (eklemler), `soldier_fit_rest_*.png` (son poz). Blender'da bakmak için: `build/blender/soldier.blend`.
+
+Öğrenilenler:
+- **Dinlenme pozu T-poz.** Kütüphanenin iskeleti T-pozda durur; yeni karakter hangi pozda gelirse gelsin script kolları ve bacakları kütüphanenin yönlerine çevirip bunu yeni dinlenme pozu yapar. Bu yapılmazsa animasyonlarda uzuvlar kayık durur.
+- **Doku PNG olmalı.** Godot, Blender'ın yazdığı JPEG'i çözemedi (doku boş, model beyaz); hata yalnız `--import` çıktısında görünür.
+- **Herhangi bir modeli ölçmek ve görmek için:** `blender --background --python tools/blender/inspect_model.py -- <model> build/shots/<ad>` (önden, yandan, arkadan görüntü + ölçüler).
+
 ## Ölçümler
 
 Sürü ölçümleri `PROGRESS.md` ölçüm tablosunda.
