@@ -6,10 +6,11 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 ## Şu an
 
 - **Ana aşama:** 2 — Model ve animasyon hattı
-- **Alt aşama:** 2.1 — Animasyon kütüphanesi seçimi (başlamadı)
-- **Sıradaki iş:** CC0 adayları (önce Quaternius Universal Animation Library; yedek Mixamo) lisans ve içerik yönünden karşılaştır, Taha'ya öner.
+- **Alt aşama:** 2.1 — Animasyon kütüphanesi seçimi (araştırma yapıldı, **Taha'nın onayı ve indirmesi bekleniyor**)
+- **Öneri (2026-11-16):** Quaternius **Universal Animation Library 1 + 2**, ücretsiz Standard sürümleri. İkisi de CC0 (atıf ve kısıt yok, açık repoya girebilir), tek evrensel insansı iskelet, glTF/FBX. UAL1: 8 yönlü hareket, koşu, sprint, ölüm, silah ve dövüş hareketleri (120+). UAL2: zombi yürüyüşü, yakın dövüş kombinasyonları (130+). Ücretsiz sürüm paketin ~%60–70'i; tek tek klip listesi ancak indirilince görülür. Mixamo elendi: oyunda kullanımı serbest ama ham animasyon dosyalarını açık repoda dağıtmak gri alan.
+- **Sıradaki iş:** indirilen dosyalardaki klip listesini çıkar; eksik kalanları (vurulma, sendeleme, yerden doğma gibi) belirle; `CREDITS.md`'ye yaz; 2.2'ye geç.
 - **Bekleyen (Taha'dan):**
-  - 2.1: kütüphane seçimini onaylamak ve dosyaları indirmek; repo herkese açık mı kalacak (asset lisansını etkiler).
+  - 2.1: öneriyi onaylamak; iki paketin Standard zip'ini indirip `assets/models/source/animations/` altına açmak (bu klasör git'e girmez).
   - 2.3'ten önce: Blender açık + N → BlenderMCP → Connect to Claude; eklenti protokolü 15, beklenen 16 → `uvx mcp-for-blender install-addon` ile güncelle.
   - Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
 
