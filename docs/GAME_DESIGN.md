@@ -11,10 +11,10 @@ Zırhlı ve kasklı bir asker, kapalı bir şehir kavşağında dalga dalga gele
 | Tuş | İş |
 | --- | --- |
 | WASD / ok tuşları | Hareket (XZ düzleminde, kameraya göre) |
-| Space | Dash (Aşama 3) |
+| Space | Dash (Aşama 3.4) |
 | F11 / Alt+Enter | Tam ekran ↔ pencere (oyun tam ekran açılır) |
 | R | Öldükten sonra yeniden başlat |
-| Esc | Duraklat (Aşama 7) |
+| Esc | Duraklat (Aşama 9.1) |
 | F3 | Debug paneli (yalnız debug yapı) |
 
 ## Çekirdek döngü (Aşama 1)
@@ -42,7 +42,19 @@ Zırhlı ve kasklı bir asker, kapalı bir şehir kavşağında dalga dalga gele
 | Mermi hızı | 30 m/sn |
 | Arena | 60 × 60 m |
 
-## Tur yapısı (Aşama 2, taslak)
+## His ve görünüm (Aşama 3–5, karar: 2026-11-16)
+
+- **Anlayış:** gerçekçilik değil, Brotato / Vampire Survivors okunaklılığı. Fizik elle yazılır; ragdoll yok.
+- **Silahlar:** 6 silahın hepsi askerin etrafında süzülür; her biri kendi hedefine döner ve ateşte geri teper. Asker hareket yönüne bakar.
+- **Zombi tepkisi:** vurulunca geriye itilir ve kısa süre sendeler; ağırlık türe göre.
+- **Zombi saldırısı:** kısa hazırlıklı vuruş (kaçılabilir); "değince hasar" tek sabitle geri açılabilir. Hangisinin kalacağı 4.3'te oynanarak seçilir.
+- **Ölüm:** vuruş yönüne doğru ölüm animasyonu, ardından solarak silinme.
+- **Patlama:** alan hasarı çevredeki zombilere de işler (patlayan zombi dahil).
+- **Kan:** stilize; sıçrama parçacıkları ve yerde bir süre kalıp solan lekeler. Uzuv kopması yok.
+- **Sürü:** ekranda 150–300 zombi, hepsi iskeletli ve animasyonlu.
+- **Modeller:** asker(ler), boss ve özel zombiler Tripo'dan (Taha); sıradan zombiler, silahlar ve arena Blender'dan (Claude). Animasyonlar ücretsiz, lisansı sorunsuz hazır kütüphaneden + Blender ve kod cilası.
+
+## Tur yapısı (Aşama 6, taslak)
 
 - Dalga süresi 30–90 sn; dalga bitince mağaza. Ölen zombi XP ve para bırakır.
 - Seviye atlayınca 3 karttan biri (istatistik artışı).
@@ -63,4 +75,4 @@ Aşama 1 ölçümü: kutu zombilerle 60 FPS tavanı ~1350. Sınırlar yarı payl
 
 ## Açık sorular
 
-`CLAUDE.md` bölüm 7'deki liste geçerli.
+`DECISIONS.md` içindeki "Açık kararlar" tablosu geçerli.

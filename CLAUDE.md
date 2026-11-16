@@ -5,9 +5,12 @@
 - **Motor:** Godot 4.7.2 (Standard sürüm, .NET DEĞİL) — **Dil:** GDScript
 - **Renderer:** Forward+
 - **Hedef:** masaüstü (Windows + Linux). Web en sonda denenir ve hiçbir kararı sınırlamaz (bölüm 1, kural 6).
-- **Tasarım:** `docs/GAME_DESIGN.md` (mekanikler ve başlangıç ayar değerleri; Aşama 0'da yazılır)
-- **Durum:** `docs/PROGRESS.md` (hangi aşamadayız, ne bitti, sırada ne var; Aşama 0'da yazılır)
-- **Yol haritası:** https://claude.ai/artifact/7sYmrAtEEhywsxCcwPpkjy
+- **Yol haritası:** `docs/ROADMAP.md` (ana ve alt aşamalar, bitiş ölçütleri; yalnız kararla değişir)
+- **Durum:** `docs/PROGRESS.md` (güncel alt aşama, kontrol listesi, ölçümler, oturum günlüğü)
+- **Kararlar:** `docs/DECISIONS.md` (tarihli kararlar + açık kararlar)
+- **Teknik yapı:** `docs/TECH.md` (teknoloji, iskelet standardı, model bütçeleri, model hattı)
+- **Tasarım:** `docs/GAME_DESIGN.md` (mekanikler ve başlangıç ayar değerleri)
+- Eski yol haritası sayfası (2026-11-15, artık güncel değil): https://claude.ai/artifact/7sYmrAtEEhywsxCcwPpkjy
 
 Kullanıcıyla Türkçe konuş.
 
@@ -24,9 +27,9 @@ Sırayla kontrol et ve sonucu tablo olarak raporla (araç | sürüm | durum):
 5. Proje varsa: `godot --headless --path . --quit` hatasız bitmeli.
 
 1, 2 veya 5 başarısızsa **kod yazma**: eksik olanı ve nasıl kurulacağını söyle, dur.
-Aşamaya özel ön koşullar (Blender, blender-mcp, Tripo) bölüm 2'deki tabloda; onları yalnız o aşamaya gelince kontrol et.
+Aşamaya özel ön koşullar (Blender, blender-mcp, Tripo, indirilecek dosyalar) `docs/ROADMAP.md`'deki "Taha" sütununda; onları yalnız o alt aşamaya gelince kontrol et.
 
-Ardından `docs/PROGRESS.md`'yi oku ve kullanıcıya tek cümleyle hangi aşamada olduğumuzu ve sıradaki işi söyle.
+Ardından `docs/PROGRESS.md`'yi ve `docs/ROADMAP.md`'de güncel alt aşamanın satırını oku; kullanıcıya tek cümleyle hangi alt aşamada olduğumuzu ve sıradaki işi söyle.
 
 ### MCP sunucuları (klasöre özel kaydedilir; bu klasörde bir kez eklenir)
 
@@ -54,21 +57,27 @@ Blender tarafı: Blender açık olmalı, 3D görünümde N → BlenderMCP sekmes
 
 ## 2. Aşamalar ve geçiş kuralı
 
-| # | Aşama | Bitti sayılır, eğer… | Bu aşama için kullanıcının yapması gerekenler |
-|---|---|---|---|
-| 0 | **Kurulum ve iskelet** | `claude mcp list`'te `godot` ve `blender` bağlı; Claude Blender'dan sahne bilgisini okuyabiliyor; boş proje (Forward+) headless hatasız; GUT kurulu ve örnek test geçiyor; boş sahne Windows ve Linux'a dışa aktarılıyor; `docs/GAME_DESIGN.md`, `docs/PROGRESS.md`, `.gitignore`, ilk commit hazır. | İki `claude mcp add` komutu, Blender'da Connect |
-| 1 | **Çekirdek prototip** (kutularla) | Kapsül asker yürüyor; kutu zombiler üst üste binmeden onu sarıyor; tek silah en yakın hedefe kendisi ateş ediyor; can, hasar, ölüm, yeniden başlat; izleyen kamera; F3 debug paneli. 30 saniyelik çatışma kutularla bile gergin ve okunaklı. Masaüstünde kaç zombiyle 60 FPS kaldığı ölçülüp `PROGRESS.md`'ye yazıldı. | Yok |
-| 2 | **Tur döngüsü** | Dalga sayacı ve süresi; XP ve para düşmesi; seviye atlayınca 3 karttan biri; dalga arası mağaza; 6 silah yuvası ve birleştirme; temel istatistikler. 5–6 dalga, 3–4 silah, ~10 eşya ile baştan sona bir tur oynanıyor; kazanma ve kaybetme var. | Yok |
-| 3 | **Dash ve his** | Dash (kısa dokunulmazlık, bekleme süresi), vuruş geri bildirimi, hasar sayıları, sarsıntı, hit-stop, namlu parlaması, mermi izi, ölüm parçacıkları, para çekimi. Efektler belirgin ama kalabalık değil. | Oynayıp efekt dozunu onaylamak |
-| 4 | **Asker** | Tripo modeli Blender'da temizlendi, riglendi, animasyonları (bekleme, koşu, dash, vurulma, ölüm) yapıldı ve görüntü katmanına takıldı; silah modelleri görünüyor. | Konsept görseli, **Tripo**'da model (A-poz, tek parça, silahsız), **Blender** açık ve bağlı |
-| 5 | **Zombiler** | Tek ortak iskelet ve animasyon seti; parça/renk karışımıyla görsel çeşitlilik; türler (yürüyen, koşan, tank, tüküren, patlayan, boss) uzaktan ayırt ediliyor; sürü Aşama 1'de ölçülen sayıda akıcı. | **Blender** açık ve bağlı; varyasyon onayı |
-| 6 | **Arena, atmosfer, ses** | Şehir sokağı (yol, kaldırım, binalar, barikatlar, engeller), ışık ve sis; ses efektleri kodla sentezlendi. Asker ve zombiler zeminden net ayrışıyor. | Sesleri dinleyip onay; müzik kararı |
-| 7 | **Arayüz ve akış** | Ana menü, duraklatma, ayarlar (ses, tam ekran, kalite profili), HUD, mağaza ve kart ekranlarının son hali, tur sonu özeti, kayıt dosyası. | Yok |
-| 8 | **Kalıcı ilerleme** | Turlardan kazanılan kalıcı para; bununla açılan başlangıç silahları, asker sınıfları, kalıcı yükseltmeler. Gerçek para yok. | Kapsam onayı |
-| 9 | **İçerik ve denge** | Silah, eşya, dalga sayısı hedefe çıktı; zorluk eğrisi, fiyatlar, düşme oranları ayarlandı; en az üç farklı kurulum işe yarıyor. | Oynayış geri bildirimi |
-| 10 | **Yayın** | Windows ve Linux çıktıları temiz makinede oynanıyor; README, CREDITS, ekran görüntüleri hazır. Web en son, düşük profil + yalnız web çıktısına özel Compatibility ile denendi; yayınla ya da bırak kararı verildi. | Yayın onayı, itch.io sayfası |
+Tam plan `docs/ROADMAP.md`'de: her ana aşama alt aşamalara (2.1, 2.2 …) bölünür, her alt aşamanın bitiş ölçütü ve kullanıcının işi orada yazılıdır. Sıra ilkesi: **önce dikey dilim** (Aşama 2–5), sistemler ve içerik sonra.
 
-İlk sürüm içerik hedefi (öneri, Aşama 2 ve 9'da kullanıcıyla kesinleşir): 20 dalga, 12 silah × 4 kademe, ~30 eşya, 6 zombi türü + 1 boss, 3 asker sınıfı, 1 arena.
+| # | Ana aşama | Özet |
+|---|---|---|
+| 0 | Kurulum ve iskelet | ✔ bitti |
+| 1 | Kutu prototip | ✔ bitti |
+| 2 | Model ve animasyon hattı | Animasyon kütüphanesi, ortak iskelet, deneme mankeni, animasyonlu sürü ölçümü |
+| 3 | Dikey dilim: asker | Tripo modeli, hareket modeli, animasyonlar, dash, kamera |
+| 4 | Dikey dilim: zombi | Blender zombisi, animasyonlar, durum makinesi ve saldırı, itme ve sendeleme, ölüm |
+| 5 | Dikey dilim: silah ve vuruş hissi | Süzülen silahlar, atış görseli, vuruş geri bildirimi, ilk sesler, pompalı, **dikey dilim onayı** |
+| 6 | Tur döngüsü | Dalgalar, düşenler, istatistik ve kartlar, yuvalar ve birleştirme, mağaza, tam tur |
+| 7 | Silah ve zombi çeşitliliği | Silah davranış seti, koşan, tank, tüküren, patlayan, boss |
+| 8 | Arena, atmosfer, ses | Şehir sokağı, engeller, ışık ve sis, tam ses seti, müzik |
+| 9 | Arayüz ve akış | Menü, duraklatma, ayarlar, HUD, son ekranlar, kayıt |
+| 10 | Kalıcı ilerleme | Kalıcı para, asker sınıfları, açılımlar, yükseltmeler |
+| 11 | İçerik ve denge | Sayılar hedefe, zorluk eğrisi, üç farklı kurulum |
+| 12 | Yayın | Windows + Linux, itch.io, en son web denemesi |
+
+**Alt aşama bitince:** doğrula (GUT + ekran görüntüsü) → commit → `PROGRESS.md`'de kutuyu işaretle (tarih + commit) ve "Şu an" bölümünü güncelle → kullanıcıya nasıl test edeceğini söyle. Kullanıcının testi ya da işi gereken alt aşamada onu bekle; gerekmiyorsa aynı ana aşama içinde sıradaki alt aşamaya geç.
+
+**Ana aşama bitince:** aşağıdaki bildirimi yap ve "devam" bekle.
 
 ### Aşama bittiğinde kullanıcıya TAM OLARAK bu formatta bildir, sonra dur:
 
@@ -82,7 +91,7 @@ Blender tarafı: Blender açık olmalı, 3D görünümde N → BlenderMCP sekmes
 - ... (hangi tuşlar, neye bakmalı)
 
 ➡️ Sıradaki aşama: <no> — <ad>
-🔧 Senin yapman gerekenler: <bölüm 2 tablosundaki liste, yoksa "Yok">
+🔧 Senin yapman gerekenler: <ROADMAP'teki "Taha" sütunu, yoksa "Yok">
 
 Hazır olduğunda "devam" yaz.
 ```
@@ -101,7 +110,7 @@ Sıradaki aşamanın ön koşulu varsa, kullanıcı "devam" dedikten sonra önce
 ```
 Player (CharacterBody3D)      ← hareket, çarpışma, durum
  ├─ CollisionShape3D          ← sabit kapsül; modele göre büyütülmez
- └─ Visual (Node3D)           ← yalnız görüntü ve efekt (şimdi kapsül, Aşama 4'te model)
+ └─ Visual (Node3D)           ← yalnız görüntü ve efekt (şimdi kapsül, Aşama 3.1'de model)
 ```
 - Hareket kodu `Visual`'ın çocuklarına **hiçbir zaman** doğrudan dokunmaz; `state_changed(new_state, old_state)` ve `event(name: StringName, data: Dictionary)` sinyalleriyle haber verir. Aynı ayrım zombiler için de geçerli.
 - `RigidBody3D` ya da hazır fizik davranışı kullanılmaz; hareket elle yazılır.
@@ -160,7 +169,7 @@ docs/          GAME_DESIGN.md, PROGRESS.md, concept/
 - `-s` ile çalışan SceneTree betikleri autoload'ları göremez; oyun sınıflarına dokunan araçları bu yüzden betik olarak değil, debug düğümü olarak yaz.
 - Debug tuşları: F3 panel, F4 +50 zombi, F5 ölümsüz, F6 kalite profili.
 
-### Model hattı (Aşama 4–5)
+### Model hattı (Aşama 2–4, 7)
 - Blender işleri script olarak `tools/blender/` altında saklanır; model elle değil script ile yeniden üretilebilir olmalı.
 - Akış: script → pozu sıfırla → kaydet → `.glb` dışa aktar → `godot --headless --import`.
 - Ham Tripo dosyası git'e girmez.
@@ -184,10 +193,4 @@ docs/          GAME_DESIGN.md, PROGRESS.md, concept/
 
 ## 7. Henüz kararlaştırılmamış konular
 
-İlgili aşamaya gelince kullanıcıya sor; kendi başına karar verip ilerleme.
-
-- Silahlar askerin etrafında mı süzülsün, yalnız eldeki mi görünsün? (Aşama 2)
-- Kan ve şiddet dozu. (Aşama 3)
-- Asker konsepti ve oranları. (Aşama 4)
-- Gamepad desteği, oyun dili. (Aşama 7)
-- Kalıcı ilerlemenin kapsamı. (Aşama 8)
+Liste `docs/DECISIONS.md` içindeki "Açık kararlar" tablosunda, hangi alt aşamada sorulacağıyla birlikte. İlgili alt aşamaya gelince kullanıcıya sor; kendi başına karar verip ilerleme. Verilen karar aynı dosyaya tarihle yazılır.

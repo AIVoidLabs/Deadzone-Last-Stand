@@ -1,282 +1,103 @@
-Plan · 15 Kasım 2026 · kod yazılmadı
+# Deadzone Last Stand — Yol Haritası
 
-# Deadzone Last Stand
+Ana ve alt aşamalar, bitiş ölçütleri, Taha'nın işleri. **Yalnız kararla değişir**; değişiklik `DECISIONS.md`'ye tarihle yazılır.
+Güncel durum: `PROGRESS.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md` · Tasarım: `GAME_DESIGN.md`
 
-3D low-poly, dalga tabanlı hayatta kalma oyunu. Zırhlı bir asker, kapalı bir şehir arenasında zombi sürülerine karşı otomatik ateş eden silahlarla ve dash ile ayakta kalmaya çalışır. Godot ile, baştan sona Claude Code ile geliştirilecek.
-
-## Verilen kararlar
-
-| Konu | Karar | Plana etkisi |
-| --- | --- | --- |
-| Tur yapısı | Dalga + mağaza (Brotato usulü) | Dalga arasında seviye atlama kartı ve mağaza ekranı. Dengeleme dalga dalga yapılır. |
-| Kontrol | Otomatik ateş + dash | WASD hareket, silahlar en yakın zombiye kendisi nişan alır, Space ile bekleme süreli dash. |
-| Platform | Masaüstü öncelikli (Windows + Linux); web en sonda | Oyun masaüstü için tasarlanır: Forward+ renderer, gölge ve efektler serbest. Web hiçbir kararı sınırlamaz; en sonda, düşük kalite profiliyle denenir. |
-| Modeller | Asker Tripo, zombiler Blender | Askeri sen Tripo'da üretirsin, rig ve animasyon bende. Zombiler tek ortak iskeletten kodla çeşitlenir. |
-| Silahlar | Çoklu silah yuvası | 6 yuvaya kadar silah, aynı silahtan iki tane birleşip üst kademeye çıkar. |
-| Harita | Kapalı şehir arenası | Tek sokak/kavşak, kenarlar barikatlı, zombiler kenarlardan girer. Kamera askeri izler. |
-| Satın alma | Yalnız oyunda kazanılan parayla | Gerçek para yok. Böyle anladım: tur içi mağaza ve turlar arası kalıcı açılımlar oyun parasıyla. Yanlışsa düzelt. |
-| Çalışma biçimi | Tower Climb kuralları | Tek seferde tek özellik, aşama sonunda durup "devam" beklerim, GUT testleri, sayılar tek `Tuning` dosyasında, sesler kodla. |
-
-Aşama 0
-
-## Kurulum: bu makinede ne var, ne eksik
-
-Makineyi taradım. Araçların hepsi Tower Climb'dan kalma kurulu duruyor. Eksik olan tek şey, iki MCP sunucusunun yalnız Tower-Climb klasörüne kayıtlı olması. Aşağıdaki iki komutu Deadzone klasöründe çalıştırman yeterli.
-
-| Araç | Bulunan | Durum | Ne işe yarar |
-| --- | --- | --- | --- |
-| Godot | 4.7.2 Standard, `C:\Tools\Godot` | kurulu | Oyun motoru. `godot` komutu PATH'te. |
-| Export şablonları | 4.7.2.stable | kurulu | Windows, Linux ve web çıktısı almak için. |
-| Git + GitHub CLI | Kurulu, `gh` girişli | kurulu | Sürüm kontrolü. Repo: `AIVoidLabs/Deadzone-Last-Stand`, henüz commit yok. |
-| Node.js | v26.13.0 | kurulu | godot-mcp sunucusu `npx` ile çalışır. |
-| uv | 0.13.7 | kurulu | blender-mcp sunucusu `uvx` ile çalışır. |
-| Blender | 5.3.0 | kurulu | Modelleme, rig, animasyon. |
-| Blender eklentisi | `addon.py` eklenti klasöründe | doğrulanacak | Dosya yerinde. Etkin mi ve bağlanıyor mu, Blender açıkken bakılır. |
-| godot-mcp | Yalnız Tower-Climb'da kayıtlı | eklenecek | Claude'un oyunu çalıştırıp hata çıktısını okuması. |
-| blender-mcp | Yalnız Tower-Climb'da kayıtlı | eklenecek | Claude'un Blender'ı kodla sürmesi. |
-| Tripo hesabı | Tower Climb'da kullanıldı | sende | Asker modeli. Ücretsiz planda web sitesinden, H2.5 ile üretip dışa aktarırsın. |
-| GUT 9.7.x | Projeye özel | eklenecek | Test çatısı. Proje açılınca `addons/gut` altına kurulur. |
-
-### Şimdi yapman gerekenler
-
-1. Bir terminalde Deadzone klasörüne geç ve Godot MCP'yi ekle: cd C:\\Users\\pekta\\projeler\\Deadzone-Last-Stand claude mcp add godot -e GODOT_PATH="C:\\Tools\\Godot\\Godot_v4.7.2-stable_win64_console.exe" -- cmd /c npx @coding-solo/godot-mcp
-2. Aynı klasörde Blender MCP'yi ekle: claude mcp add blender -- uvx blender-mcp
-3. Kontrol et. Listede `godot` ve `blender` "Connected" görünmeli: claude mcp list
-4. Blender'ı aç, **Edit → Preferences → Add-ons** içinde "Blender MCP" işaretli mi bak. 3D görünümde **N** tuşu → **BlenderMCP** sekmesi → **Connect to Claude**. Bu bağlantı Blender her açıldığında yeniden yapılır.
-5. Tripo'ya giriş yapabildiğini doğrula (tripo3d.ai). Model üretimi Aşama 4'te.
-
-MCP sunucuları klasöre özel kaydedilir. Bu yüzden her yeni oyun klasöründe 1. ve 2. adım tekrarlanır; başka hiçbir şeyi yeniden kurman gerekmez.
-
-Sıfır bir bilgisayarda baştan kurulum
-
-1. **Godot:** godotengine.org'dan "Windows 64-bit, Standard" (.NET olmayan) zip'i indir, `C:\Tools\Godot` içine aç. Aynı klasöre `godot.cmd` adında, içinde şu satır olan bir dosya koy ve klasörü kullanıcı PATH'ine ekle: @"%\~dp0Godot_v4.7.2-stable_win64_console.exe" %\*
-2. **Export şablonları:** Godot editöründe **Editor → Manage Export Templates → Download and Install**.
-3. **Git, GitHub CLI, Node, uv, Blender:** winget install Git.Git winget install GitHub.cli winget install OpenJS.NodeJS.LTS winget install astral-sh.uv winget install BlenderFoundation.Blender Sonra yeni bir terminal aç ve `gh auth login` ile giriş yap.
-4. **Blender eklentisi:** `addon.py` dosyasının bir kopyası `Tower-Climb\tools\blender\addon.py` yolunda duruyor (kaynağı: github.com/ahujasid/blender-mcp). Blender'da **Edit → Preferences → Add-ons → Install from Disk** ile seç, kutusunu işaretle.
-5. **MCP sunucuları:** yukarıdaki 1–3. adımlar.
-
-### Aşama 0 bitti sayılır, eğer
-
-- `claude mcp list` Deadzone klasöründe `godot` ve `blender` için "Connected" gösteriyorsa.
-- Claude, Blender'a bağlanıp sahne bilgisini okuyabiliyorsa (eklenti durumu sorgusu).
-- Boş Godot projesi açıldıysa: Forward+ renderer, `godot --headless --path . --quit` hatasız.
-- GUT kurulu ve tek bir örnek test geçiyorsa.
-- Boş sahne Windows ve Linux için dışa aktarılabildiyse (duman testi; sorun en başta çıksın). Web burada denenmez.
-- Proje iskeleti hazırsa: `CLAUDE.md`, `docs/GAME_DESIGN.md`, `docs/PROGRESS.md`, `.gitignore`, ilk commit.
+Onay: 2026-11-16 (Taha). Sıra ilkesi: **önce dikey dilim** (Aşama 2–5: tek asker + tek zombi + iki silah gerçek model, animasyon, ses ve vuruş hissiyle keyifli 60 saniye); sistemler ve içerik bunun üstüne kurulur.
+Önceki plan (2026-11-15, sıfır makine kurulum adımları dahil): `archive/ROADMAP-2026-11-15.md`.
 
 ## Aşamalar
 
-Her aşama oynanabilir bir şey bırakır. Görseller sona yakın gelir: önce gri kutularla oyun eğlenceli mi diye bakılır, sonra giydirilir.
-
-0
-
-### Kurulum ve proje iskeleti
-
-sırada
-
-Yukarıdaki bölüm. Araçlar bağlı, boş proje Windows ve Linux'a çıktı veriyor.
-
-1
-
-### Çekirdek prototip (kutularla)
-
-Kapsül asker düz bir zeminde yürür, kutu zombiler ona yürür, tek silah en yakın hedefe kendisi ateş eder. Can, hasar, ölüm, yeniden başlat. Sabit açılı izleyen kamera. F3 debug paneli.
-
-Bitti
-
-30 saniyelik bir çatışma kutularla bile gergin ve okunaklı. Zombiler üst üste binmeden askeri sarıyor.
-
-Ölçüm
-
-Masaüstünde kaç zombiyle 60 FPS kalıyor? Dalga tasarımının tavanını bu belirler. Zombi üst sınırı koda gömülmez, kalite profilinden okunur.
-
-Senden
-
-Yok.
-
-2
-
-### Tur döngüsü
-
-Dalga sayacı ve süresi, zombilerden düşen XP ve para, seviye atlayınca 3 karttan biri, dalga arasında mağaza, 6 silah yuvası ve birleştirme, temel istatistikler (can, hasar, atış hızı, menzil, hız, zırh, şans).
-
-Bitti
-
-Baştan sona bir tur oynanıyor: 5–6 dalga, 3–4 silah, 10 kadar eşya ile. Kazanma ve kaybetme var.
-
-Senden
-
-Yok.
-
-3
-
-### Dash ve his
-
-Dash (kısa dokunulmazlık, bekleme süresi), vuruş geri bildirimi, hasar sayıları, ekran sarsıntısı, hit-stop, namlu parlaması, mermi izi, ölüm parçacıkları, para toplama çekimi.
-
-Bitti
-
-Kutularla oynarken her vuruş ve her kaçış hissediliyor. Efektler belirgin ama kalabalık değil.
-
-Senden
-
-Oynayıp yorum; efektlerin dozunu sen onaylarsın.
-
-4
-
-### Asker
-
-Tripo modeli → Blender'da temizlik, rig, animasyonlar (bekleme, koşu, dash, vurulma, ölüm) → Godot. Fizik gövdesi ile görüntü ayrı kalır; model yalnız görüntü katmanına takılır. Silah modelleri ayrı ve basit, Blender'da kodla.
-
-Bitti
-
-Kapsülün yerinde animasyonlu asker var, silahlar görünüyor ve ateş ederken tepki veriyor.
-
-Senden
-
-Konsept görseli ve Tripo'da model üretimi (A-poz, tek parça, silahsız). Blender açık ve bağlı olmalı.
-
-5
-
-### Zombiler
-
-Tek ortak iskelet ve ortak animasyon seti. Gövde, kafa, kıyafet ve renk parçaları karıştırılarak görseldeki çeşitlilik elde edilir. Davranış türleri: yürüyen, koşan, tank, tüküren (menzilli), patlayan, dalga sonu boss.
-
-Bitti
-
-Her türün silueti ve davranışı uzaktan ayırt ediliyor. Sürü, Aşama 1'de ölçülen sayıda akıcı çalışıyor.
-
-Risk
-
-Yüzlerce iskeletli model masaüstünde de pahalılaşabilir. Gerekirse uzak zombiler için animasyonu dokuya pişirme yöntemine geçilir.
-
-Senden
-
-Blender açık ve bağlı. Varyasyonları galeri görseliyle onaylarsın.
-
-6
-
-### Arena, atmosfer, ses
-
-Şehir sokağı: yol, kaldırım, binalar, barikatlar, direkler, ağaçlar, terk edilmiş araçlar. Bazıları engel olur. Işık ve sis, zemin izleri. Ses efektleri kodla sentezlenir.
-
-Bitti
-
-Ekran görüntüsü örnek görseldeki havayı veriyor; asker ve zombiler zeminden net ayrışıyor.
-
-Senden
-
-Sesleri dinleyip onay (ben duyamam). Müzik kararı.
-
-7
-
-### Arayüz ve akış
-
-Ana menü, duraklatma, ayarlar (ses, tam ekran, dil), HUD (can, XP, dalga süresi, para, dash), mağaza ve kart ekranlarının son hali, tur sonu özeti, kayıt dosyası.
-
-Bitti
-
-Oyun menüden açılıp tur bitince menüye dönüyor; ayarlar ve rekorlar kalıcı.
-
-Senden
-
-Yok.
-
-8
-
-### Kalıcı ilerleme
-
-Turlardan kazanılan kalıcı para. Bununla açılan başlangıç silahları, asker sınıfları ve kalıcı yükseltmeler. Gerçek para yok.
-
-Bitti
-
-Kaybedilen tur bile ilerleme bırakıyor; açılacak bir sonraki şey hep görünür.
-
-Senden
-
-Kapsam onayı: kaç sınıf, kaç yükseltme.
-
-9
-
-### İçerik ve denge
-
-Silah, eşya ve dalga sayısını hedefe çıkarma. Zorluk eğrisi, fiyatlar, düşme oranları. Zorluk seviyeleri. Başarımlar isteğe bağlı.
-
-Bitti
-
-20 dalgalık tur ilk denemede kazanılmıyor ama haksız da hissettirmiyor; en az üç farklı kurulum işe yarıyor.
-
-Senden
-
-Oynayış geri bildirimi. Bu aşama en çok senin oynamana bağlı.
-
-10
-
-### Yayın
-
-Windows ve Linux çıktıları. README, CREDITS, ekran görüntüleri, simge. itch.io sayfası ve GitHub Release. Web en son denenir: düşük kalite profili ve yalnız web çıktısına özel Compatibility renderer ile. Olmazsa masaüstü sürümü bundan etkilenmez.
-
-Bitti
-
-Windows ve Linux çıktıları temiz bir makinede açılıp oynanıyor. Web sürümü için ayrı karar verilmiş: yayınla ya da bırak.
-
-Senden
-
-Yayın onayı ve itch.io sayfası. Linux çıktısını deneyecek bir ortam.
-
-## İlk sürüm için içerik hedefi
-
-Bu benim önerim; sayılar Aşama 2 ve 9'da seninle kesinleşir.
-
-| Kalem | Hedef | Not |
-| --- | --- | --- |
-| Dalga | 20 | Her biri 30–90 sn, son dalga boss. |
-| Silah | 12, her biri 4 kademe | Tabanca, pompalı, hafif makineli, tüfek, keskin nişancı, alev makinesi, el bombası, mayın, taret, bıçak, tel örgü, roketatar. |
-| Eşya | 30 kadar | İstatistik değiştiren pasifler; bir kısmı bedelli (bir şey verir, bir şey alır). |
-| Zombi türü | 6 + 1 boss | Görsel çeşitlilik bundan bağımsız, parça karışımından gelir. |
-| Asker sınıfı | 3 | Farklı başlangıç silahı ve istatistik. Kalıcı parayla açılır. |
-| Arena | 1 | İkinci arena sürüm sonrasına. |
-
-## Baştan konacak mimari kurallar
-
-### Motor
-
-Godot 4.7.2 Standard, GDScript, statik tipleme. Forward+ renderer. Oynanış XZ düzleminde, yükseklik yok.
-
-### Kalite profilleri
-
-Zombi üst sınırı, gölge, parçacık yoğunluğu, ışık ve efektler tek bir profil dosyasından okunur (düşük, orta, yüksek). Ayarlardan değişir; web ileride yalnızca düşük profili seçer, oyun koduna dokunulmaz.
-
-### Fizik ve görüntü ayrı
-
-Asker ve zombinin hareket kodu modele dokunmaz; sinyalle haber verir. Model sonradan değişse oynanış bozulmaz.
-
-### Sayılar tek yerde
-
-Tüm oynanış değerleri `Tuning` içinde. Silah, eşya, zombi ve dalgalar veri tablosu; yeni içerik bir satır eklemektir.
-
-### Kurallar saf, testli
-
-Hasar, birleştirme, mağaza, dalga üretimi sahneden bağımsız sınıflarda ve GUT testiyle.
-
-### Sürü bütçesi
-
-Zombi ve mermiler havuzdan gelir, yok edilip yeniden yaratılmaz. Yol bulma yerine basit yönelme ve itişme.
-
-### Kapatılabilir özellik
-
-Her yeni özellik tek sabitle kapanır. Beğenmezsen anında çıkar.
-
-## Başlamadan netleşmesi iyi olacaklar
-
-Hiçbiri Aşama 0'ı durdurmaz; ilgili aşamaya gelince sorarım. Şimdiden fikrin varsa yaz.
-
-| Konu | Soru | Ne zaman |
-| --- | --- | --- |
-| Silahların görünümü | 6 silah askerin etrafında mı süzülsün (Brotato gibi, önerim bu), yoksa yalnız eldeki mi görünsün? | Aşama 2 |
-| Şiddet dozu | Kan olacak mı? Önerim: low-poly'ye uygun, yeşilimsi sıçrama ve parça, gerçekçi kan yok. | Aşama 3 |
-| Asker konsepti | Tower Climb'daki gibi konsept görselini sen mi hazırlarsın? Oranlar: gerçekçi mi, hafif chibi mi? | Aşama 4 |
-| Linux testi | Linux çıktısını deneyebileceğin bir makine ya da WSL var mı? Yoksa çıktı alınır ama denenmemiş kalır. | Aşama 0 |
-| Gamepad | Klavye yanında kol desteği istenir mi? Otomatik ateş sayesinde ucuz. | Aşama 7 |
-| Dil | Oyun içi metinler Türkçe mi, İngilizce mi, ikisi mi? | Aşama 7 |
-| Lisans | Repo AIVoidLabs altında. Tower Climb gibi MIT ve açık kaynak mı? | Aşama 0 |
+Çalışma düzeni: her **alt aşama** tek özelliktir → doğrula (GUT + ekran görüntüsü) → commit → `PROGRESS.md` güncelle → Taha'ya nasıl test edeceğini söyle. Her **ana aşama** sonunda 🚩 bildirimi yapılır ve "devam" beklenir. "Taha" sütunu o adımda Taha'nın yapacağı iştir.
+
+### 0 — Kurulum ve iskelet ✔ bitti
+### 1 — Kutu prototip ✔ bitti (his onayı Aşama 5 sonuna devredildi)
+
+### 2 — Model ve animasyon hattı
+Amaç: gerçek karakter üretmeden önce hattın ve performansın kanıtlanması.
+
+| # | Alt aşama | Bitti sayılır, eğer… | Taha |
+|---|---|---|---|
+| 2.1 | Animasyon kütüphanesi seçimi | Adaylar (önce CC0: Quaternius Universal Animation Library; yedek: Mixamo) lisansı ve içeriğiyle karşılaştırıldı, seçim yapıldı, `CREDITS.md`'ye yazıldı | Seçimi onaylar, dosyaları indirir |
+| 2.2 | Ortak iskelet standardı | Kemik adları, ölçek, yön, dinlenme pozu `docs/TECH.md`'de yazılı; Godot içe aktarım ayarı (kemik eşleme) çalışıyor | — |
+| 2.3 | Deneme mankeni | Claude'un Blender scriptiyle ürettiği low-poly manken ortak iskelette; script → `.glb` → Godot akışı tek komutla yineleniyor | Blender açık ve bağlı |
+| 2.4 | Animasyon aktarımı | Manken Godot'da kütüphaneden yürüme, koşu, vurulma, ölüm oynuyor; döngüler temiz | Ekran görüntüsü/kısa test |
+| 2.5 | Sürü performans ölçümü | 150 / 300 / 450 animasyonlu manken ölçüldü; profil sınırları ve seyreltme ayarı belirlendi; 300'de 60 FPS tutuyor ya da çözüm kararı verildi | Sonuca göre karar |
+
+### 3 — Dikey dilim: asker (koşma ve kaçma hissi)
+
+| # | Alt aşama | Bitti sayılır, eğer… | Taha |
+|---|---|---|---|
+| 3.1 | Asker modeli | Tripo modeli Blender'da temizlendi (üçgen bütçesi, malzeme), ortak iskelete bağlandı, Godot'da duruyor | Konsept onayı, Tripo'da model (A-poz, tek parça, silahsız) |
+| 3.2 | Hareket modeli | İvme, duruş, dönüş yeniden ayarlandı; gövde harekete doğru hafif yatıyor; hız değerleri oynanarak seçildi | Oynayıp yorum |
+| 3.3 | Asker animasyonları | Bekleme, koşu (hıza bağlı), vurulma, ölüm `AnimationTree` ile akıcı geçiyor; ayak kaymıyor | Oynayıp yorum |
+| 3.4 | Dash | Kısa dokunulmazlık, bekleme süresi, zombilerin arasından geçiş, iz efekti, HUD göstergesi | Oynayıp yorum |
+| 3.5 | Kamera | Yakınlık ve açı yeniden seçildi (karakterler küçük görünmüyor); hafif ileri bakış; sarsıntı altyapısı | Yakınlık onayı |
+
+### 4 — Dikey dilim: zombi (tehdit hissi)
+
+| # | Alt aşama | Bitti sayılır, eğer… | Taha |
+|---|---|---|---|
+| 4.1 | Yürüyen zombi modeli | Claude'un Blender'da ürettiği low-poly zombi ortak iskelette; 3–4 parça/renk çeşidi | Görünüm onayı (galeri görseli) |
+| 4.2 | Zombi animasyonları | 2–3 sürünme/yürüyüş çeşidi, saldırı, sendeleme, 2–3 ölüm, yerden doğma; zombiler aynı adımda yürümüyor | Oynayıp yorum |
+| 4.3 | Durum makinesi ve saldırı | Doğma → kovalama → saldırı → sendeleme → ölme. Saldırı kısa hazırlıkla vurur (kaçılabilir); eski "değince hasar" tek sabitle geri açılabilir | İki saldırı biçimini deneyip seçer |
+| 4.4 | İtme ve sendeleme | Vurulan zombi geriye itilir ve kısa süre sendeler; ağırlık türe göre; itişme korunur | Oynayıp yorum |
+| 4.5 | Ölüm | Vuruş yönüne doğru ölüm animasyonu, ardından solarak silinme ve havuza dönüş | Oynayıp yorum |
+
+### 5 — Dikey dilim: silah ve vuruş hissi
+
+| # | Alt aşama | Bitti sayılır, eğer… | Taha |
+|---|---|---|---|
+| 5.1 | Süzülen silah yuvaları | 6 yuva askerin çevresinde; her silah kendi hedefine döner, ateşte geri teper; silah modelleri Blender'dan | Oynayıp yorum |
+| 5.2 | Atış görseli | Namlu parlaması, mermi izi, isabet kıvılcımı | Oynayıp yorum |
+| 5.3 | Vuruş geri bildirimi | Parlama, kan sıçraması, yerde solan lekeler, hasar sayıları, öldürmede küçük hit-stop ve sarsıntı; hepsi havuzlu, yoğunluk kalite profilinden | Efekt dozunu onaylar |
+| 5.4 | Asker vurulunca | Ekran kenarı kızarması, sarsıntı, kısa geri itilme, yanıp sönme | Oynayıp yorum |
+| 5.5 | İlk sesler | Atış, isabet, zombi ölümü, adım, dash, asker vurulma sesleri kodla sentezlendi | Dinleyip onaylar |
+| 5.6 | İkinci silah: pompalı | Saçılan atış ve güçlü itme; iki silah belirgin farklı hissediyor | Oynayıp yorum |
+| 5.7 | Dilim cilası ve onay | Zemin ve ışık karakterleri net gösteriyor; 60 saniyelik çatışma oynaması keyifli | **Dikey dilim onayı** |
+
+### 6 — Tur döngüsü
+
+| # | Alt aşama | Bitti sayılır, eğer… |
+|---|---|---|
+| 6.1 | Dalgalar | Dalga tablosu, sayaç ve süre; dalga bitince kalan zombiler solarak ölür; kazanma ve kaybetme |
+| 6.2 | Düşenler | XP ve para havuzdan düşer, askere çekilir, dalga sonunda otomatik toplanır |
+| 6.3 | İstatistikler ve kartlar | Can, hasar, atış hızı, menzil, hız, zırh, şans çarpanlarla; seviye atlayınca 3 karttan biri |
+| 6.4 | Silah yuvaları ve birleştirme | 6 yuva, aynı silah + aynı kademe → üst kademe (en çok 4) |
+| 6.5 | Mağaza ve eşyalar | Dalga arası mağaza, yenileme, ~10 eşya |
+| 6.6 | Tam tur | 5–6 dalga, 3–4 silah ile baştan sona oynanıyor; ilk denge |
+
+Arayüz bu aşamada işlevsel ve sade; son görünüm Aşama 9'da. Taha her alt aşamayı oynar.
+
+### 7 — Silah ve zombi çeşitliliği
+
+| # | Alt aşama | Bitti sayılır, eğer… | Taha |
+|---|---|---|---|
+| 7.1 | Silah davranış seti | Veri satırından seçilen davranışlar: tek mermi, saçılma, delip geçme, patlama (alan hasarı), yakın dövüş savurma, yanma | Oynayıp yorum |
+| 7.2 | Koşan ve tank | Blender'dan; siluet ve hareketle uzaktan ayırt ediliyor | Görünüm onayı |
+| 7.3 | Tüküren ve patlayan | Tüküren uzaktan mermi atar; patlayan ölünce alan hasarı verir ve çevresindeki zombilere de zarar verir | Tripo'da özel zombi modelleri |
+| 7.4 | Boss | Kendi saldırı düzenleri, can çubuğu, boss dalgası | Tripo'da boss modeli |
+| 7.5 | Yeniden ölçüm | Karışık türlerle sürü ölçümü; profil sınırları güncel | — |
+
+### 8 — Arena, atmosfer, ses
+8.1 Şehir sokağı parçaları (yol, kaldırım, binalar, barikat, enkaz; Blender) · 8.2 Engeller ve zombilerin engel çevresinden dolaşması (yol bulma yok, basit kaçınma) · 8.3 Işık, sis, ekran efektleri; karakterler zeminden net ayrışıyor · 8.4 Tam ses seti · 8.5 Müzik kararı. — Taha: görünüm ve ses onayı, müzik kararı.
+
+### 9 — Arayüz ve akış
+9.1 Ana menü ve duraklatma · 9.2 Ayarlar (ses, tam ekran, kalite profili) · 9.3 HUD son hali · 9.4 Mağaza ve kart ekranları son hali · 9.5 Tur sonu özeti · 9.6 Kayıt dosyası · 9.7 Gamepad ve oyun dili (karara göre). — Taha: gamepad ve dil kararı.
+
+### 10 — Kalıcı ilerleme
+10.1 Kalıcı para ve kayıt · 10.2 Asker sınıfları (Tripo modelleri) · 10.3 Başlangıç silahı açılımları · 10.4 Kalıcı yükseltmeler. Gerçek para yok. — Taha: kapsam onayı, diğer asker modelleri.
+
+### 11 — İçerik ve denge
+11.1 Silah ve eşya sayısı hedefe · 11.2 Dalga sayısı ve zorluk eğrisi · 11.3 Fiyatlar ve düşme oranları · 11.4 En az üç farklı kurulum işe yarıyor. İçerik hedefi (öneri, bu aşamada kesinleşir): 20 dalga, 12 silah × 4 kademe, ~30 eşya, 6 zombi türü + 1 boss, 3 asker sınıfı, 1 arena. — Taha: oynayış geri bildirimi.
+
+### 12 — Yayın
+12.1 Windows ve Linux çıktıları temiz makinede · 12.2 README, CREDITS, ekran görüntüleri · 12.3 itch.io sayfası · 12.4 Web denemesi (düşük profil + Compatibility; yayınla ya da bırak). — Taha: yayın onayı.
+
+
+## Doğrulama
+
+- **Her alt aşama:** GUT "All tests passed"; `godot --path . -- --capture=build/shots/<ad>.png --capture-seconds=8 --autopilot` ile ekran görüntüsü Read ile incelenir; Taha `godot --path .` ile oynar.
+- **Performans (2.5, 7.5):** `godot --path . -- --bench` animasyonlu zombilerle; sonuç `PROGRESS.md` ölçüm tablosuna yazılır.
+- **Model hattı:** `tools/blender/` scripti baştan çalıştırılınca aynı `.glb` üretilir; `godot --headless --import` hatasız.
+- **Sesler:** Taha dinleyip onaylar (Claude duyamaz).

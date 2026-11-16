@@ -1,55 +1,124 @@
 # İlerleme
 
-Her oturumun sonunda güncellenir. Yeni oturum buradan devam eder.
+Her alt aşama bitince ve her oturumun sonunda güncellenir. Yeni oturum buradan devam eder.
+Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 
 ## Şu an
 
-- **Aşama:** 1 — Çekirdek prototip: kod bitti, **kullanıcı oyun testi bekleniyor** ("30 sn çatışma gergin ve okunaklı mı?")
-- **Sıradaki iş:** Kullanıcı onayı → Aşama 2 — Tur döngüsü. Aşama 2 başında sorulacak: silahlar askerin etrafında mı süzülsün, yalnız eldeki mi görünsün?
-- **Bekleyen (kullanıcıdan):**
-  - Aşama 1'i oynayıp yorum (hız, zombi sıklığı, silah gücü).
-  - Blender'ı açıp 3D görünümde N → BlenderMCP → Connect to Claude (Aşama 0'ın son maddesi; Aşama 4'e kadar şart değil).
-  - Linux deneme ortamı var mı (makine / WSL)?
-  - Kod lisansı: MIT ve açık kaynak mı?
+- **Ana aşama:** 2 — Model ve animasyon hattı
+- **Alt aşama:** 2.1 — Animasyon kütüphanesi seçimi (başlamadı)
+- **Sıradaki iş:** CC0 adayları (önce Quaternius Universal Animation Library; yedek Mixamo) lisans ve içerik yönünden karşılaştır, Taha'ya öner.
+- **Bekleyen (Taha'dan):**
+  - 2.1: kütüphane seçimini onaylamak ve dosyaları indirmek; repo herkese açık mı kalacak (asset lisansını etkiler).
+  - 2.3'ten önce: Blender açık + N → BlenderMCP → Connect to Claude; eklenti protokolü 15, beklenen 16 → `uvx mcp-for-blender install-addon` ile güncelle.
+  - Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
 
-## Aşama durumu
+## Ana aşama durumu
 
 | # | Aşama | Durum |
 |---|---|---|
-| 0 | Kurulum ve iskelet | Blender bağlantı doğrulaması dışında bitti |
-| 1 | Çekirdek prototip | kod bitti, oyun testi bekleniyor |
-| 2 | Tur döngüsü | — |
-| 3 | Dash ve his | — |
-| 4 | Asker | — |
-| 5 | Zombiler | — |
-| 6 | Arena, atmosfer, ses | — |
-| 7 | Arayüz ve akış | — |
-| 8 | Kalıcı ilerleme | — |
-| 9 | İçerik ve denge | — |
-| 10 | Yayın | — |
+| 0 | Kurulum ve iskelet | ✔ bitti |
+| 1 | Kutu prototip | ✔ bitti (his onayı 5.7'ye devredildi) |
+| 2 | Model ve animasyon hattı | sırada |
+| 3 | Dikey dilim: asker | — |
+| 4 | Dikey dilim: zombi | — |
+| 5 | Dikey dilim: silah ve vuruş hissi | — |
+| 6 | Tur döngüsü | — |
+| 7 | Silah ve zombi çeşitliliği | — |
+| 8 | Arena, atmosfer, ses | — |
+| 9 | Arayüz ve akış | — |
+| 10 | Kalıcı ilerleme | — |
+| 11 | İçerik ve denge | — |
+| 12 | Yayın | — |
 
-## Aşama 0 kontrol listesi
+## Alt aşama kontrol listesi
 
-- [x] `claude mcp list`: `godot` ve `blender` Connected
-- [x] Claude Blender'dan sahne bilgisini okuyabiliyor (2026-11-15: Blender 5.3.0, 3 nesne okundu; eklenti güncel değil, yukarıya bak)
-- [x] Boş Godot projesi, Forward+, `godot --headless --path . --quit` hatasız
-- [x] GUT 9.7.1 kurulu (Tower Climb'daki yerel kopyadan), örnek test geçiyor
-- [x] Windows dışa aktarımı üretildi, `--headless --quit` ile açılıp kapandı
-- [x] Linux dışa aktarımı üretildi (denenmedi; Linux ortamı yok)
-- [x] `CLAUDE.md`, `docs/GAME_DESIGN.md`, `docs/PROGRESS.md`, `.gitignore`, `CREDITS.md`, ilk commit
+Bitiş ölçütleri `ROADMAP.md`'de. Biten kutunun yanına tarih ve commit yazılır.
 
-## Aşama 1 kontrol listesi
+### 2 — Model ve animasyon hattı
+- [ ] 2.1 Animasyon kütüphanesi seçimi
+- [ ] 2.2 Ortak iskelet standardı
+- [ ] 2.3 Deneme mankeni
+- [ ] 2.4 Animasyon aktarımı
+- [ ] 2.5 Sürü performans ölçümü
 
-- [x] Kapsül asker WASD/oklarla yürüyor (ivmelenme + sürtünme), arena duvarlarından çıkamıyor
-- [x] Kutu zombiler kenardan, askerden ≥18 m uzakta doğuyor; doğma sıklığı zamanla artıyor
-- [x] Zombiler üst üste binmeden askeri sarıyor (ızgaralı itişme; ekran görüntüsüyle doğrulandı)
-- [x] Tabanca menzildeki en yakın zombiye kendisi ateş ediyor; mermiler havuzdan, kare başına doğru parçası çarpışması
-- [x] Can, temas hasarı, vurulunca 0.5 sn dokunulmazlık (yanıp sönme), ölüm ekranı, R ile yeniden başlat
-- [x] Sabit açılı (55°) yumuşak izleyen kamera, fizik enterpolasyonu açık
-- [x] F3 debug paneli (FPS, zombi/üst sınır, mermi, draw call, profil); F4/F5/F6 debug tuşları; yalnız debug yapıda
-- [x] Kalite profilleri (low/medium/high) tek tablodan; zombi üst sınırı koda gömülü değil
-- [x] Sürü ölçümü yapıldı ve aşağıya yazıldı
-- [ ] Kullanıcı: "30 sn çatışma gergin ve okunaklı" onayı
+### 3 — Dikey dilim: asker
+- [ ] 3.1 Asker modeli
+- [ ] 3.2 Hareket modeli
+- [ ] 3.3 Asker animasyonları
+- [ ] 3.4 Dash
+- [ ] 3.5 Kamera
+
+### 4 — Dikey dilim: zombi
+- [ ] 4.1 Yürüyen zombi modeli
+- [ ] 4.2 Zombi animasyonları
+- [ ] 4.3 Durum makinesi ve saldırı
+- [ ] 4.4 İtme ve sendeleme
+- [ ] 4.5 Ölüm
+
+### 5 — Dikey dilim: silah ve vuruş hissi
+- [ ] 5.1 Süzülen silah yuvaları
+- [ ] 5.2 Atış görseli
+- [ ] 5.3 Vuruş geri bildirimi
+- [ ] 5.4 Asker vurulunca
+- [ ] 5.5 İlk sesler
+- [ ] 5.6 İkinci silah: pompalı
+- [ ] 5.7 Dilim cilası ve **dikey dilim onayı**
+
+### 6 — Tur döngüsü
+- [ ] 6.1 Dalgalar
+- [ ] 6.2 Düşenler
+- [ ] 6.3 İstatistikler ve kartlar
+- [ ] 6.4 Silah yuvaları ve birleştirme
+- [ ] 6.5 Mağaza ve eşyalar
+- [ ] 6.6 Tam tur
+
+### 7 — Silah ve zombi çeşitliliği
+- [ ] 7.1 Silah davranış seti
+- [ ] 7.2 Koşan ve tank
+- [ ] 7.3 Tüküren ve patlayan
+- [ ] 7.4 Boss
+- [ ] 7.5 Yeniden ölçüm
+
+### 8 — Arena, atmosfer, ses
+- [ ] 8.1 Şehir sokağı parçaları
+- [ ] 8.2 Engeller ve kaçınma
+- [ ] 8.3 Işık, sis, ekran efektleri
+- [ ] 8.4 Tam ses seti
+- [ ] 8.5 Müzik kararı
+
+### 9 — Arayüz ve akış
+- [ ] 9.1 Ana menü ve duraklatma
+- [ ] 9.2 Ayarlar
+- [ ] 9.3 HUD son hali
+- [ ] 9.4 Mağaza ve kart ekranları son hali
+- [ ] 9.5 Tur sonu özeti
+- [ ] 9.6 Kayıt dosyası
+- [ ] 9.7 Gamepad ve oyun dili
+
+### 10 — Kalıcı ilerleme
+- [ ] 10.1 Kalıcı para ve kayıt
+- [ ] 10.2 Asker sınıfları
+- [ ] 10.3 Başlangıç silahı açılımları
+- [ ] 10.4 Kalıcı yükseltmeler
+
+### 11 — İçerik ve denge
+- [ ] 11.1 Silah ve eşya sayısı
+- [ ] 11.2 Dalga sayısı ve zorluk eğrisi
+- [ ] 11.3 Fiyatlar ve düşme oranları
+- [ ] 11.4 Üç farklı kurulum
+
+### 12 — Yayın
+- [ ] 12.1 Windows ve Linux çıktıları
+- [ ] 12.2 README, CREDITS, ekran görüntüleri
+- [ ] 12.3 itch.io sayfası
+- [ ] 12.4 Web denemesi
+
+## Biten aşamalar (özet)
+
+**0 — Kurulum ve iskelet** (commit `a8efcd7`): MCP sunucuları bağlı, Blender'dan sahne okundu (5.3.0), Forward+ proje, GUT 9.7.1, Windows + Linux dışa aktarımı (Linux denenmedi), belgeler.
+
+**1 — Kutu prototip** (commit `2f778dc`, `1d031b9`): kapsül asker (ivme + sürtünme), kenardan doğan ve itişen kutu zombiler (veri odaklı `EnemyManager` + `SpatialGrid`), otomatik tabanca ve mermi havuzu, can / temas hasarı / dokunulmazlık / ölüm / R, 55° izleyen kamera, F3 paneli ve F4–F6 tuşları, kalite profilleri, `--bench` ve `--capture` araçları, 31 GUT testi, tam ekran açılış.
 
 ## Ölçümler
 
@@ -58,23 +127,26 @@ Her oturumun sonunda güncellenir. Yeni oturum buradan devam eder.
 | 60 FPS'te en çok zombi (kutu zombi, high profil, gölge + 4x MSAA, vsync kapalı) | **~1350** (1350: 66–68 FPS, 1400: 44–52 FPS; iki çalıştırma) | RTX 3050 Ti Laptop, i7-11800H, Vulkan Forward+ | 2026-11-15 |
 | 300 zombide | ~850 FPS (1.2 ms/kare) | aynı | 2026-11-15 |
 
-Profil üst sınırları buna göre: low 200, medium 350, high 600. İskeletli modellerle (Aşama 5) yeniden ölçülecek.
+Profil üst sınırları şimdilik: low 200, medium 350, high 600 (kutu ölçümüne göre). **Animasyonlu modellerle 2.5'te yeniden ölçülecek**; hedef 150–300.
 
 ## Bilinen notlar / sonraya kalanlar
 
-- Silah gücü düşük hissedilebilir (kalabalıkta hedef sürekli değiştiği için hasar dağılıyor). Denge Aşama 2'de.
-- Hareketsiz duran asker ~30 sn'de ölüyor (17 öldürme). Hareket eden oyuncuyla gerginlik kullanıcı testinde ayarlanacak.
-- Asker zombilerin arasından itilerek geçebiliyor (zombiler askeri iter değil, asker onları iter). Sıkışma istenirse Aşama 3'te dash ile birlikte ele alınır.
+- Silah gücü düşük (kalabalıkta hedef sürekli değişiyor, hasar dağılıyor) → 5.x ve 6.6.
+- Asker zombilerin arasından itilerek geçebiliyor → 3.4 (dash) ve 4.4 (itme) ile ele alınır.
+- Asker ve zombiler ekranda küçük görünüyor olabilir (`Tuning.CAMERA_DISTANCE` = 24) → 3.5.
 
-## Kullanıcı geri bildirimi (Aşama 0–1)
+## Taha'nın geri bildirimi
 
-- 2026-11-15: "Pencere modunda bile küçük duruyor, oyun tam ekran olmalı." → Tam ekran açılış + F11/Alt+Enter, pencere 1600×900, `canvas_items` ölçekleme (HUD 1280×720 tasarımından ölçeklenir). Sabit: `Tuning.FEATURE_START_FULLSCREEN`. Ekran görüntüsüyle doğrulandı (1920×1080).
-- Açık soru: asker/zombiler hâlâ küçük mü geliyor? Kamera yakınlığı `Tuning.CAMERA_DISTANCE` (şu an 24) ile ayarlanır.
-- Blender: 2026-11-15 bağlandı, sahne bilgisi okunuyor (5.3.0). Eklenti protokolü 15, beklenen 16 → `uvx mcp-for-blender install-addon` ile güncellenebilir (Aşama 4'ten önce).
+- 2026-11-16: Aşama 1 hissi zayıf: vuruş hissi yok, hareket ve koşu cansız, zombiler tehditsiz; "animasyon ve modellerle düzelebilir". Belgeler eksik ve ilerleme rastgele hissettiriyor → ana plan yeniden yazıldı (`ROADMAP.md`).
+- 2026-11-15: "Pencere modunda bile küçük duruyor, oyun tam ekran olmalı." → tam ekran açılış + F11/Alt+Enter (`Tuning.FEATURE_START_FULLSCREEN`).
 
 ## Oturum günlüğü
 
+### 2026-11-16 — Oturum 2
+- Ortam kontrolü temiz (Godot 4.7.2, git, Node, `godot` + `blender` MCP bağlı, headless hatasız).
+- Plan modu: Taha ile sekiz karar alındı, ana plan yeniden yapılandırıldı (önce dikey dilim). `ROADMAP.md`, `DECISIONS.md`, `TECH.md` yazıldı; `PROGRESS.md`, `GAME_DESIGN.md`, `CLAUDE.md` güncellendi. Kod değişmedi.
+
 ### 2026-11-15 — Oturum 1
-- Ortam kontrolü: Godot 4.7.2 (mono değil), git 2.56, Node 26.13, godot-mcp ve blender-mcp bağlı. Blender açık değildi.
+- Ortam kontrolü: Godot 4.7.2 (mono değil), git 2.56, Node 26.13, godot-mcp ve blender-mcp bağlı.
 - Aşama 0: `project.godot` (Forward+), GUT, duman testi, Windows + Linux export, belgeler, `.gitattributes` (LF). Commit `a8efcd7`.
-- Aşama 1: saf kurallar (`SpatialGrid`, `Steering`, `CombatMath`, `Health`, `SpawnRules`) + 31 GUT testi; asker, veri odaklı `EnemyManager`, mermi havuzu, otomatik silah, arena, kamera, HUD, debug paneli, `--bench` ve `--capture` debug araçları. Ölçüm ~1350 zombi.
+- Aşama 1: saf kurallar (`SpatialGrid`, `Steering`, `CombatMath`, `Health`, `SpawnRules`) + 31 GUT testi; asker, `EnemyManager`, mermi havuzu, otomatik silah, arena, kamera, HUD, debug paneli, `--bench` ve `--capture`. Ölçüm ~1350 zombi.
