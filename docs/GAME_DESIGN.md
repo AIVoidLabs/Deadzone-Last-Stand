@@ -49,6 +49,8 @@ Zırhlı ve kasklı bir asker, kapalı bir şehir kavşağında dalga dalga gele
 - **Zombi tepkisi:** vurulunca geriye itilir ve kısa süre sendeler; ağırlık türe göre.
 - **Zombi saldırısı:** kısa hazırlıklı vuruş (kaçılabilir); "değince hasar" tek sabitle geri açılabilir. Hangisinin kalacağı 4.3'te oynanarak seçilir.
 - **Ölüm:** vuruş yönüne doğru ölüm animasyonu, ardından solarak silinme.
+- **Uzaktan saldıran zombiler:** bazı türler asit tükürür ya da taş gibi şeyler fırlatır. Atışlar görülebilir ve kaçılabilir olmalı (yavaşça gelen mermi ya da düşeceği yeri gösteren işaret). Aşama 7.3.
+- **Asker animasyonları:** koşu `ual1/Sprint`, dash `ual1/Roll` (takla).
 - **Patlama:** alan hasarı çevredeki zombilere de işler (patlayan zombi dahil).
 - **Kan:** stilize; sıçrama parçacıkları ve yerde bir süre kalıp solan lekeler. Uzuv kopması yok.
 - **Sürü:** ekranda 150–300 zombi, hepsi iskeletli ve animasyonlu.
@@ -67,11 +69,11 @@ Zırhlı ve kasklı bir asker, kapalı bir şehir kavşağında dalga dalga gele
 
 | Profil | Zombi üst sınırı | Gölge | MSAA |
 | --- | --- | --- | --- |
-| low | 200 | yok | yok |
-| medium | 350 | var | 2x |
-| high | 600 | var | 4x |
+| low | 150 | yok | yok |
+| medium | 250 | var | 2x |
+| high | 350 | var | 4x |
 
-Aşama 1 ölçümü: kutu zombilerle 60 FPS tavanı ~1350. Sınırlar yarı payla kondu; iskeletli modeller (Aşama 5) gelince yeniden ölçülür.
+Aşama 2.5 ölçümü: animasyonlu, iskeletli mankenle 60 FPS tavanı ~500; 300'de ~120 FPS. Sınırlar efektlere pay bırakılarak kondu; karışık türlerle Aşama 7.5'te yeniden ölçülür.
 
 ## Açık sorular
 

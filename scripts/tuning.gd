@@ -9,6 +9,8 @@ const FEATURE_HIT_FLASH: bool = true
 const FEATURE_PLAYER_IFRAMES: bool = true
 const FEATURE_SPAWN_RAMP: bool = true
 const FEATURE_START_FULLSCREEN: bool = true
+## Kapalıyken zombiler Aşama 1'deki kutularla çizilir.
+const FEATURE_ZOMBIE_MODEL: bool = true
 
 # --- Arena ---
 const ARENA_SIZE: float = 60.0
@@ -33,6 +35,12 @@ const MIN_DAMAGE_AFTER_ARMOR: float = 1.0
 # --- Zombi sürüsü ---
 const ENEMY_SEPARATION_STRENGTH: float = 7.0
 const ENEMY_MAX_SPEED_FACTOR: float = 1.6
+
+# --- Zombi görüntüsü ---
+## Ortak iskeletli modelin dinlenme pozundaki boyu; tür boyu buna oranlanır.
+const CHARACTER_MODEL_HEIGHT: float = 1.83
+## Zombiler aynı adımda yürümesin diye animasyon hızına eklenen rastgele pay (±).
+const ZOMBIE_ANIM_SPEED_VARIANCE: float = 0.15
 
 # --- Doğma ---
 const SPAWN_INTERVAL_START: float = 1.0

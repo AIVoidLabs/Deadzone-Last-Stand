@@ -6,6 +6,7 @@
 Girdi  : assets/models/source/animations/UAL1|UAL2/... (ham paketler, git'e girmez)
 Çıktı  : assets/models/anim/ual1.glb, ual2.glb   -> Godot'da AnimationLibrary
          assets/models/characters/mannequin.glb  -> deneme mankeni (klipsiz)
+         build/blender/ual1.blend, ual2.blend    -> Blender'da elle bakmak için (git'e girmez)
 """
 
 import os
@@ -17,6 +18,7 @@ REPO: str = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 SOURCE_DIR: str = os.path.join(REPO, "assets", "models", "source", "animations")
 ANIM_DIR: str = os.path.join(REPO, "assets", "models", "anim")
 CHARACTER_DIR: str = os.path.join(REPO, "assets", "models", "characters")
+BLEND_DIR: str = os.path.join(REPO, "build", "blender")
 
 # Kök hareketsiz dosyalar kullanılır; oyun hareketi kodla yürütür.
 PACKS: dict = {
@@ -151,6 +153,14 @@ def export_glb(path: str, with_animations: bool) -> None:
     log("yazıldı: %s (%.0f KB)" % (os.path.relpath(path, REPO), os.path.getsize(path) / 1024.0))
 
 
+def save_blend(name: str) -> None:
+    """İnceleme kopyası: Blender'da File > Open ile açılır, klipler Action listesinde."""
+    os.makedirs(BLEND_DIR, exist_ok=True)
+    path: str = os.path.join(BLEND_DIR, name + ".blend")
+    bpy.ops.wm.save_as_mainfile(filepath=path)
+    log("yazıldı: " + os.path.relpath(path, REPO))
+
+
 def prepare(pack: dict) -> tuple:
     armature, meshes = load_pack(pack["path"])
     for mesh in meshes:
@@ -166,6 +176,7 @@ def main() -> None:
         armature, _meshes = prepare(pack)
         keep_clips(armature, pack["clips"])
         export_glb(os.path.join(ANIM_DIR, name + ".glb"), True)
+        save_blend(name)
     armature, _meshes = prepare(PACKS["ual1"])
     drop_all_clips(armature)
     export_glb(os.path.join(CHARACTER_DIR, "mannequin.glb"), False)

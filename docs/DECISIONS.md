@@ -2,6 +2,12 @@
 
 Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar verilince "Açık kararlar"dan çıkarılıp tarihli bölüme yazılır.
 
+## 2026-11-16 — Aşama 2.4 önizleme yorumu (Taha)
+
+- Asker koşusu: **Sprint**. Dash: **Roll** (takla).
+- Zombi yürüyüşü, bekleme ve saldırı (`Zombie_Walk_Fwd`, `Zombie_Idle`, `Zombie_Scratch`) beğenildi; vurulma ve ölüm klipleri "güzel".
+- **Uzaktan saldıran zombiler gerekli:** asit, taş gibi şeyler fırlatıp hasar verenler; oyuncu bunlardan kaçabilmeli. Yol haritasında 7.3 buna göre genişletildi.
+
 ## 2026-11-16 — Aşama 2.1 (Taha)
 
 - **Repo herkese açık olacak** (GitHub'da public). Sonuç: repoya giren her asset açık dağıtıma izin veren lisansta olmalı (CC0 ya da benzeri); Mixamo gibi ham dosya dağıtımı kısıtlı kaynaklar kullanılmaz.

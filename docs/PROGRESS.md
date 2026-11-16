@@ -5,13 +5,12 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 
 ## Şu an
 
-- **Ana aşama:** 2 — Model ve animasyon hattı
-- **Alt aşama:** 2.4 — Animasyon aktarımı (kod bitti, **Taha'nın gözle onayı bekleniyor**); sonra 2.5 — Sürü performans ölçümü
-- **Sıradaki iş:** Taha önizlemeye bakıp yorum yapar → 2.5: animasyonlu mankenle 150 / 300 / 450 ölçümü (`EnemyManager` + `ZombieVisual` mankeni kullanacak, `--bench` yinelenecek).
+- **Ana aşama:** 2 — Model ve animasyon hattı **bitti**; Taha'nın "devam"ı bekleniyor
+- **Sıradaki:** 3 — Dikey dilim: asker → 3.1 Asker modeli
 - **Bekleyen (Taha'dan):**
-  - 2.4: `godot --path . res://scenes/debug/anim_preview.tscn` ile 25 klibe bakmak (Esc çıkış): döngüler temiz mi, hangi koşu / dash / zombi yürüyüşü hoşuna gidiyor, hangisi kötü?
-  - Blender'ı açıp bağlamak gerekmiyor; scriptler penceresiz çalışıyor.
+  - 3.1: asker konsepti ve oranları (birlikte konuşulacak), sonra Tripo'da model: A-poz, tek parça, silahsız; dosya `assets/models/source/soldier/` altına.
   - Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
+- **Not:** Blender MCP eklentisi 2026-11-16'da güncellendi (`uvx mcp-for-blender install-addon`); Blender yeniden başlatılınca etkinleşir. Scriptler zaten penceresiz çalışıyor.
 
 ## Ana aşama durumu
 
@@ -19,8 +18,8 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 |---|---|---|
 | 0 | Kurulum ve iskelet | ✔ bitti |
 | 1 | Kutu prototip | ✔ bitti (his onayı 5.7'ye devredildi) |
-| 2 | Model ve animasyon hattı | sırada |
-| 3 | Dikey dilim: asker | — |
+| 2 | Model ve animasyon hattı | ✔ bitti (2026-11-16) |
+| 3 | Dikey dilim: asker | sırada ("devam" bekleniyor) |
 | 4 | Dikey dilim: zombi | — |
 | 5 | Dikey dilim: silah ve vuruş hissi | — |
 | 6 | Tur döngüsü | — |
@@ -39,8 +38,8 @@ Bitiş ölçütleri `ROADMAP.md`'de. Biten kutunun yanına tarih ve commit yazı
 - [x] 2.1 Animasyon kütüphanesi seçimi — 2026-11-16. Quaternius UAL 1 + 2 Standard (CC0), 86 klip; klip eşlemesi ve eksikler `TECH.md`'de
 - [x] 2.2 Ortak iskelet standardı — 2026-11-16. 25 kemik, Godot insansı profil eşlemesi, `check_anim_import.gd` temiz
 - [x] 2.3 Deneme mankeni — 2026-11-16. Quaternius mankeni 2.5 bin üçgene indirildi (sıfırdan modellemek yerine; aynı işi görüyor), akış dört komutla yineleniyor (`TECH.md`)
-- [ ] 2.4 Animasyon aktarımı — kod bitti (25 klip önizleme sahnesinde oynuyor, ekran görüntüsüyle doğrulandı); Taha'nın hareketli gözle onayı bekleniyor
-- [ ] 2.5 Sürü performans ölçümü
+- [x] 2.4 Animasyon aktarımı — 2026-11-16. 25 klip önizleme sahnesinde oynuyor; Taha baktı ve beğendi (koşu Sprint, dash Roll)
+- [x] 2.5 Sürü performans ölçümü — 2026-11-16. Zombiler animasyonlu mankenle çiziliyor (`Tuning.FEATURE_ZOMBIE_MODEL`); 60 FPS tavanı ~500, seyreltmeye gerek kalmadı
 
 ### 3 — Dikey dilim: asker
 - [ ] 3.1 Asker modeli
@@ -126,8 +125,10 @@ Bitiş ölçütleri `ROADMAP.md`'de. Biten kutunun yanına tarih ve commit yazı
 |---|---|---|---|
 | 60 FPS'te en çok zombi (kutu zombi, high profil, gölge + 4x MSAA, vsync kapalı) | **~1350** (1350: 66–68 FPS, 1400: 44–52 FPS; iki çalıştırma) | RTX 3050 Ti Laptop, i7-11800H, Vulkan Forward+ | 2026-11-15 |
 | 300 zombide | ~850 FPS (1.2 ms/kare) | aynı | 2026-11-15 |
+| **Animasyonlu manken** (2.5 bin üçgen, 25 kemik, zombi başına AnimationPlayer, seyreltme yok), high profil, vsync kapalı: 60 FPS'te en çok zombi | **~500** (500: 62.7 FPS, 550: 53.2 FPS) | aynı | 2026-11-16 |
+| Animasyonlu manken: 150 / 300 / 450 zombide | 241 / 120 / 70 FPS (4.2 / 8.4 / 14.3 ms) | aynı | 2026-11-16 |
 
-Profil üst sınırları şimdilik: low 200, medium 350, high 600 (kutu ölçümüne göre). **Animasyonlu modellerle 2.5'te yeniden ölçülecek**; hedef 150–300.
+Profil üst sınırları (2.5 ölçümüne göre, efektlere pay bırakılarak): low 150, medium 250, high 350. Animasyon güncelleme seyreltmesi gerekmedi; ileride efektler bütçeyi zorlarsa eklenir. Karışık türlerle 7.5'te yeniden ölçülecek.
 
 ## Bilinen notlar / sonraya kalanlar
 
@@ -144,6 +145,7 @@ Profil üst sınırları şimdilik: low 200, medium 350, high 600 (kutu ölçüm
 
 ### 2026-11-16 — Oturum 2
 - Ortam kontrolü temiz (Godot 4.7.2, git, Node, `godot` + `blender` MCP bağlı, headless hatasız).
+- 2.5: zombiler animasyonlu mankenle çizildi, ölçüm ~500 zombi / 60 FPS; profil sınırları 150 / 250 / 350. Taha: koşu Sprint, dash Roll, uzaktan saldıran zombiler istendi (7.3).
 - 2.1–2.4: Quaternius UAL 1 + 2 seçildi (CC0, repo public kararıyla uyumlu). `tools/blender/build_anim_library.py` (penceresiz Blender) → 25 kemikli iskelet, 25 klip, manken. Godot'da kemik eşlemeli içe aktarım, denetim scripti, `anim_preview` sahnesi.
 - Plan modu: Taha ile sekiz karar alındı, ana plan yeniden yapılandırıldı (önce dikey dilim). `ROADMAP.md`, `DECISIONS.md`, `TECH.md` yazıldı; `PROGRESS.md`, `GAME_DESIGN.md`, `CLAUDE.md` güncellendi. Kod değişmedi.
 

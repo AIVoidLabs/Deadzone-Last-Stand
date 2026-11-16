@@ -13,6 +13,7 @@ const TABLE: Dictionary = {
 		"radius": 0.45,
 		"height": 1.6,
 		"color": Color(0.42, 0.6, 0.32),
+		"anim_walk": &"ual2/Zombie_Walk_Fwd",
 	},
 }
 

@@ -1,21 +1,29 @@
 class_name ZombieVisual
 extends Node3D
-## Zombi görüntüsü (şimdilik kutu). Aşama 5'te ortak iskeletli model buraya takılır.
-## Malzeme ve mesh türe göre paylaşılır; vuruş parlaması örnek başına.
+## Zombi görüntüsü: ortak iskeletli model + animasyon (Tuning.FEATURE_ZOMBIE_MODEL kapalıysa kutu).
+## Şimdilik deneme mankeni; Aşama 4.1'de zombi modeli buraya takılır.
+## Malzeme türe göre paylaşılır; vuruş parlaması örnek başına.
 
 const FLASH_SHADER: Shader = preload("res://assets/shaders/flash_lit.gdshader")
-const WIDTH_FACTOR: float = 1.6
+const MODEL: PackedScene = preload("res://assets/models/characters/mannequin.glb")
+const ANIM_LIBRARY_NAME: StringName = &"ual2"
+const ANIM_LIBRARY: AnimationLibrary = preload("res://assets/models/anim/ual2.glb")
+const BOX_WIDTH_FACTOR: float = 1.6
 
-static var _meshes: Dictionary = {}
+static var _box_meshes: Dictionary = {}
 static var _materials: Dictionary = {}
 
-var _mesh_instance: MeshInstance3D
+var _meshes: Array[MeshInstance3D] = []
+var _animation: AnimationPlayer
+var _walk_clip: StringName
 var _flash_left: float = 0.0
 
 
 func _init() -> void:
-	_mesh_instance = MeshInstance3D.new()
-	add_child(_mesh_instance)
+	if Tuning.FEATURE_ZOMBIE_MODEL:
+		_build_model()
+	else:
+		_build_box()
 	set_process(false)
 
 
@@ -44,28 +52,78 @@ func _on_event(event_name: StringName, data: Dictionary) -> void:
 
 
 func _on_state_changed(new_state: int, _old_state: int) -> void:
-	if new_state != Zombie.State.CHASE:
-		_flash_left = 0.0
-		_set_flash(0.0)
-		set_process(false)
+	if new_state == Zombie.State.CHASE:
+		_start_walk()
+		return
+	_flash_left = 0.0
+	_set_flash(0.0)
+	set_process(false)
+	# Havuzdaki (görünmeyen) zombi animasyon hesaplamasın.
+	if _animation != null:
+		_animation.stop()
 
 
 func _set_flash(value: float) -> void:
-	_mesh_instance.set_instance_shader_parameter(&"flash", value)
+	for mesh: MeshInstance3D in _meshes:
+		mesh.set_instance_shader_parameter(&"flash", value)
+
+
+func _build_model() -> void:
+	var model: Node3D = MODEL.instantiate() as Node3D
+	add_child(model)
+	for node: Node in model.find_children("*", "MeshInstance3D", true, false):
+		_meshes.append(node as MeshInstance3D)
+	_animation = AnimationPlayer.new()
+	model.add_child(_animation)
+	_animation.add_animation_library(ANIM_LIBRARY_NAME, ANIM_LIBRARY)
+
+
+func _build_box() -> void:
+	var mesh: MeshInstance3D = MeshInstance3D.new()
+	add_child(mesh)
+	_meshes.append(mesh)
 
 
 func _apply_kind(row: Dictionary) -> void:
-	var id: StringName = row["id"]
+	var material: ShaderMaterial = _material_for(row)
 	var height: float = row["height"]
-	if not _meshes.has(id):
+	if _animation == null:
+		var box: MeshInstance3D = _meshes[0]
+		box.mesh = _box_mesh_for(row)
+		box.material_override = material
+		box.position.y = height * 0.5
+		return
+	for mesh: MeshInstance3D in _meshes:
+		mesh.material_override = material
+	scale = Vector3.ONE * (height / Tuning.CHARACTER_MODEL_HEIGHT)
+	_walk_clip = row["anim_walk"]
+
+
+## Yürüyüşü rastgele bir kareden ve biraz farklı hızda başlatır; sürü aynı adımda yürümez.
+func _start_walk() -> void:
+	if _animation == null or _walk_clip == &"":
+		return
+	var variance: float = Tuning.ZOMBIE_ANIM_SPEED_VARIANCE
+	_animation.speed_scale = randf_range(1.0 - variance, 1.0 + variance)
+	_animation.play(_walk_clip)
+	_animation.seek(randf() * _animation.current_animation_length)
+
+
+static func _material_for(row: Dictionary) -> ShaderMaterial:
+	var id: StringName = row["id"]
+	if not _materials.has(id):
+		var material: ShaderMaterial = ShaderMaterial.new()
+		material.shader = FLASH_SHADER
+		material.set_shader_parameter(&"albedo", row["color"])
+		_materials[id] = material
+	return _materials[id]
+
+
+static func _box_mesh_for(row: Dictionary) -> BoxMesh:
+	var id: StringName = row["id"]
+	if not _box_meshes.has(id):
 		var radius: float = row["radius"]
 		var box: BoxMesh = BoxMesh.new()
-		box.size = Vector3(radius * WIDTH_FACTOR, height, radius * WIDTH_FACTOR)
-		_meshes[id] = box
-		var mat: ShaderMaterial = ShaderMaterial.new()
-		mat.shader = FLASH_SHADER
-		mat.set_shader_parameter(&"albedo", row["color"])
-		_materials[id] = mat
-	_mesh_instance.mesh = _meshes[id]
-	_mesh_instance.material_override = _materials[id]
-	_mesh_instance.position.y = height * 0.5
+		box.size = Vector3(radius * BOX_WIDTH_FACTOR, row["height"], radius * BOX_WIDTH_FACTOR)
+		_box_meshes[id] = box
+	return _box_meshes[id]
