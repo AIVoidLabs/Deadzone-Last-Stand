@@ -9,4 +9,7 @@
 
 ## Görseller, modeller, ses
 
-Henüz dış kaynaklı görsel, model ya da ses yok.
+| Ne | Kaynak | Lisans | Nerede |
+|---|---|---|---|
+| Universal Animation Library (Standard) | https://quaternius.com/packs/universalanimationlibrary.html (Quaternius) | CC0 1.0 | Ham dosya `assets/models/source/animations/UAL1/` (git'e girmez); seçilen klipler `assets/models/` altında |
+| Universal Animation Library 2 (Standard) | https://quaternius.com/packs/universalanimationlibrary2.html (Quaternius) | CC0 1.0 | Ham dosya `assets/models/source/animations/UAL2/` (git'e girmez); seçilen klipler `assets/models/` altında |

@@ -34,7 +34,28 @@ Teknoloji, kod yapısı, iskelet standardı, model bütçeleri ve model hattı. 
 
 ## İskelet standardı
 
-Aşama 2.2'de yazılır: kemik adları, ölçek, yön, dinlenme pozu, Godot içe aktarım (kemik eşleme) ayarı.
+Kaynak: Quaternius Universal Animation Library iskeleti (65 kemik, Unreal mankeni adlandırması). Ayrıntı (ölçek, yön, dinlenme pozu, Godot kemik eşlemesi) Aşama 2.2'de yazılır.
+
+- **Oyun iskeleti (25 kemik):** `root, pelvis, spine_01, spine_02, spine_03, neck_01, Head` + her kol için `clavicle, upperarm, lowerarm, hand` + her bacak için `thigh, calf, foot, ball, ball_leaf` (`_l` / `_r`).
+- **Atılanlar:** 40 parmak kemiği (el başına 20). Parmak ağırlıkları `hand` kemiğine aktarılır.
+
+## Animasyon kütüphanesi (Aşama 2.1, 2026-11-16)
+
+Ücretsiz Standard sürümlerde toplam 86 klip (her pakette 43). Dosyalar `_RM` (kök hareketli) ve kök hareketsiz olarak gelir; oyun hareketi kodla yürüttüğü için **kök hareketsiz** olan kullanılır.
+
+| İhtiyaç | Klip | Paket |
+|---|---|---|
+| Asker bekleme / yürüme / koşu / sprint | `Idle_Loop`, `Walk_Loop`, `Jog_Fwd_Loop`, `Sprint_Loop` | 1 |
+| Asker dash adayları | `Roll`, `Slide_Start/Loop/Exit`, `Shield_Dash` | 1, 2 |
+| Vurulma | `Hit_Chest`, `Hit_Head`, `Hit_Knockback` | 1, 2 |
+| Ölüm | `Death01` (tek çeşit) | 1 |
+| Zombi bekleme / yürüyüş | `Zombie_Idle_Loop`, `Zombie_Walk_Fwd_Loop` (tek çeşit) | 2 |
+| Zombi saldırısı | `Zombie_Scratch`, `Melee_Hook`, `Punch_Cross`, `Punch_Jab` | 1, 2 |
+| Yerden doğma | `LayToIdle` | 2 |
+| Sürünen / koşan zombi adayı | `Crouch_Fwd_Loop`, `Sprint_Loop` | 1 |
+| Tüküren / fırlatan adayı | `OverhandThrow` | 2 |
+
+**Eksikler:** ikinci ve üçüncü zombi yürüyüşü, yönlü ölümler (2–3 çeşit), zombi koşusu. Standard sürümde 8 yönlü hareket yok; asker hareket yönüne baktığı için gerekmiyor. Eksikler Aşama 4.2'de mevcut kliplerden türetilerek Blender'da üretilir (ya da karar verilirse ücretli Pro sürümden alınır).
 
 ## Model hattı
 

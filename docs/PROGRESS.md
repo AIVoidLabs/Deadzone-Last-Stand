@@ -6,12 +6,10 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 ## Şu an
 
 - **Ana aşama:** 2 — Model ve animasyon hattı
-- **Alt aşama:** 2.1 — Animasyon kütüphanesi seçimi (araştırma yapıldı, **Taha'nın onayı ve indirmesi bekleniyor**)
-- **Öneri (2026-11-16):** Quaternius **Universal Animation Library 1 + 2**, ücretsiz Standard sürümleri. İkisi de CC0 (atıf ve kısıt yok, açık repoya girebilir), tek evrensel insansı iskelet, glTF/FBX. UAL1: 8 yönlü hareket, koşu, sprint, ölüm, silah ve dövüş hareketleri (120+). UAL2: zombi yürüyüşü, yakın dövüş kombinasyonları (130+). Ücretsiz sürüm paketin ~%60–70'i; tek tek klip listesi ancak indirilince görülür. Mixamo elendi: oyunda kullanımı serbest ama ham animasyon dosyalarını açık repoda dağıtmak gri alan.
-- **Sıradaki iş:** indirilen dosyalardaki klip listesini çıkar; eksik kalanları (vurulma, sendeleme, yerden doğma gibi) belirle; `CREDITS.md`'ye yaz; 2.2'ye geç.
+- **Alt aşama:** 2.2 — Ortak iskelet standardı (başlıyor)
+- **Sıradaki iş:** penceresiz Blender scriptiyle kütüphaneden seçilen klipleri 25 kemikli oyun iskeletine indirip `.glb` üret; Godot'da kemik eşlemeli içe aktarımı çalıştır; standardı `TECH.md`'ye yaz.
 - **Bekleyen (Taha'dan):**
-  - 2.1: öneriyi onaylamak; iki paketin Standard zip'ini indirip `assets/models/source/animations/` altına açmak (bu klasör git'e girmez).
-  - 2.3'ten önce: Blender açık + N → BlenderMCP → Connect to Claude; eklenti protokolü 15, beklenen 16 → `uvx mcp-for-blender install-addon` ile güncelle.
+  - Şimdilik yok. Blender işleri penceresiz çalışıyor; Blender'ı açıp bağlamak gerekmiyor.
   - Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
 
 ## Ana aşama durumu
@@ -37,7 +35,7 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 Bitiş ölçütleri `ROADMAP.md`'de. Biten kutunun yanına tarih ve commit yazılır.
 
 ### 2 — Model ve animasyon hattı
-- [ ] 2.1 Animasyon kütüphanesi seçimi
+- [x] 2.1 Animasyon kütüphanesi seçimi — 2026-11-16. Quaternius UAL 1 + 2 Standard (CC0), 86 klip; klip eşlemesi ve eksikler `TECH.md`'de
 - [ ] 2.2 Ortak iskelet standardı
 - [ ] 2.3 Deneme mankeni
 - [ ] 2.4 Animasyon aktarımı

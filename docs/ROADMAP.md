@@ -20,7 +20,7 @@ Amaç: gerçek karakter üretmeden önce hattın ve performansın kanıtlanması
 |---|---|---|---|
 | 2.1 | Animasyon kütüphanesi seçimi | Adaylar (önce CC0: Quaternius Universal Animation Library; yedek: Mixamo) lisansı ve içeriğiyle karşılaştırıldı, seçim yapıldı, `CREDITS.md`'ye yazıldı | Seçimi onaylar, dosyaları indirir |
 | 2.2 | Ortak iskelet standardı | Kemik adları, ölçek, yön, dinlenme pozu `docs/TECH.md`'de yazılı; Godot içe aktarım ayarı (kemik eşleme) çalışıyor | — |
-| 2.3 | Deneme mankeni | Claude'un Blender scriptiyle ürettiği low-poly manken ortak iskelette; script → `.glb` → Godot akışı tek komutla yineleniyor | Blender açık ve bağlı |
+| 2.3 | Deneme mankeni | Claude'un Blender scriptiyle ürettiği low-poly manken ortak iskelette; script → `.glb` → Godot akışı tek komutla yineleniyor (Blender penceresiz çalışır) | — |
 | 2.4 | Animasyon aktarımı | Manken Godot'da kütüphaneden yürüme, koşu, vurulma, ölüm oynuyor; döngüler temiz | Ekran görüntüsü/kısa test |
 | 2.5 | Sürü performans ölçümü | 150 / 300 / 450 animasyonlu manken ölçüldü; profil sınırları ve seyreltme ayarı belirlendi; 300'de 60 FPS tutuyor ya da çözüm kararı verildi | Sonuca göre karar |
 
