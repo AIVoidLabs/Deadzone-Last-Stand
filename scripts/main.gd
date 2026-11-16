@@ -35,6 +35,8 @@ func _ready() -> void:
 		if event_name == &"hit":
 			camera.add_trauma(Tuning.CAMERA_SHAKE_ON_PLAYER_HIT))
 
+	_add_hit_feedback(enemies, camera)
+
 	var hud: Hud = Hud.new()
 	hud.setup(player, enemies)
 	add_child(hud)
@@ -44,6 +46,24 @@ func _ready() -> void:
 
 	if OS.is_debug_build():
 		_add_debug_tools(player, enemies, projectiles, camera, weapons)
+
+
+## Vuruş geri bildirimi: kan, lekeler, hasar sayıları, öldürmede duraksama ve sarsıntı.
+func _add_hit_feedback(enemies: EnemyManager, camera: FollowCamera) -> void:
+	if Tuning.FEATURE_BLOOD:
+		var blood: BloodFx = BloodFx.new()
+		add_child(blood)
+		enemies.enemy_damaged.connect(blood.on_enemy_damaged)
+	if Tuning.FEATURE_DAMAGE_NUMBERS:
+		var numbers: DamageNumbers = DamageNumbers.new()
+		add_child(numbers)
+		enemies.enemy_damaged.connect(numbers.on_enemy_damaged)
+	enemies.enemy_damaged.connect(func(_at: Vector3, _dir: Vector2, _amount: float, killed: bool) -> void:
+		if not killed:
+			return
+		GameFlow.hit_stop(Tuning.HIT_STOP_KILL_TIME)
+		if Tuning.FEATURE_KILL_SHAKE:
+			camera.add_trauma(Tuning.CAMERA_SHAKE_ON_KILL))
 
 
 func _add_debug_tools(player: Player, enemies: EnemyManager, projectiles: ProjectilePool, camera: FollowCamera, weapons: WeaponRig) -> void:

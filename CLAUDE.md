@@ -133,7 +133,7 @@ Player (CharacterBody3D)      ← hareket, çarpışma, durum
 - Hasar hesabı, silah birleştirme, mağaza, dalga üretimi, kart seçimi gibi kurallar sahneden bağımsız saf sınıflarda; hepsi GUT testli. Saf sınıflar autoload'a dokunmaz, değer parametreyle gelir.
 
 ### Akış ve arayüz
-- Duraklatma ve oyun akışı tek yerden yönetilir (`GameFlow` autoload); `get_tree().paused`'a başka yerden dokunma. `Engine.time_scale`'e dokunan her şey hit-stop ile uyumlu olmalı.
+- Duraklatma ve oyun akışı tek yerden yönetilir (`GameFlow` autoload); `get_tree().paused`'a başka yerden dokunma. `Engine.time_scale`'e yalnız `GameFlow.hit_stop` dokunur; süreler gerçek zamanla ölçülür.
 - Arayüz anchor/container ile kurulur, her pencere boyutunda çalışır. Oyun içi yazılar minimal.
 - Debug tuşları ve paneli yalnız debug yapıda çalışır (`OS.is_debug_build()`); yayın sürümünde yok.
 

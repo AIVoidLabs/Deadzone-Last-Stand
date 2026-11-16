@@ -38,6 +38,12 @@ const FEATURE_ENERGY_RING: bool = true
 const FEATURE_TRACERS: bool = true
 const FEATURE_MUZZLE_FLASH: bool = true
 const FEATURE_IMPACT_SPARKS: bool = true
+## Vuruş geri bildirimi (5.3): kan sıçraması, yerde lekeler, hasar sayıları, öldürmede duraksama ve sarsıntı.
+const FEATURE_BLOOD: bool = true
+const FEATURE_BLOOD_DECALS: bool = true
+const FEATURE_DAMAGE_NUMBERS: bool = true
+const FEATURE_HIT_STOP: bool = true
+const FEATURE_KILL_SHAKE: bool = true
 ## Asker gövdesinin hıza ve dönüşe göre yatması.
 const FEATURE_PLAYER_LEAN: bool = true
 
@@ -143,6 +149,16 @@ const WEAPON_BOB_SPEED: float = 2.4
 ## Enerji çemberinin rengi ve silahların altındaki yüksekliği (m).
 const ENERGY_RING_COLOR: Color = Color(1.0, 0.55, 0.15)
 const ENERGY_RING_DROP: float = 0.14
+## Kan: isabette yere leke düşme olasılığı, ölümde sıçrama çarpanı, lekenin yaşam ve solma süresi (sn).
+const BLOOD_DECAL_CHANCE_HIT: float = 0.3
+const BLOOD_KILL_MULTIPLIER: int = 3
+const BLOOD_DECAL_LIFETIME: float = 12.0
+const BLOOD_DECAL_FADE_TIME: float = 3.0
+## Öldürmede duraksama: süre (gerçek sn), oyun hızı ve iki duraksama arası bekleme.
+const HIT_STOP_KILL_TIME: float = 0.045
+const HIT_STOP_TIME_SCALE: float = 0.08
+const HIT_STOP_COOLDOWN: float = 0.3
+const CAMERA_SHAKE_ON_KILL: float = 0.12
 ## Debug: F7 ile eklenen silah.
 const DEBUG_WEAPON: StringName = &"pistol"
 const PROJECTILE_LENGTH: float = 0.6

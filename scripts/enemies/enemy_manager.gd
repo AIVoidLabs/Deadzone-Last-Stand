@@ -6,6 +6,8 @@ extends Node3D
 ## (böylece aynı kare içinde indeksler kaymaz).
 
 signal enemy_killed(at: Vector3)
+## Her isabette (öldüren dahil). at: zombinin yerdeki konumu; direction: vuruş yönü.
+signal enemy_damaged(at: Vector3, direction: Vector2, amount: float, killed: bool)
 
 const PHYSICS_PRIORITY: int = -10
 const HIT_QUERY_MARGIN: float = 1.0
@@ -108,6 +110,8 @@ func damage(index: int, amount: float, direction: Vector2 = Vector2.ZERO, knockb
 	_hp[index] -= amount
 	_nodes[index].notify_hit(amount)
 	var row: Dictionary = _rows[index]
+	var at: Vector3 = Vector3(_pos[index].x, 0.0, _pos[index].y)
+	enemy_damaged.emit(at, direction, amount, _hp[index] <= 0.0)
 	if _hp[index] <= 0.0:
 		_kill(index, Knockback.impulse(direction, knockback * Tuning.ZOMBIE_DEATH_KNOCKBACK_FACTOR, row["weight"]))
 		return
