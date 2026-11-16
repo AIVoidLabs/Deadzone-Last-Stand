@@ -6,10 +6,10 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 ## Şu an
 
 - **Ana aşama:** 3 — Dikey dilim: asker
-- **Alt aşama:** 3.2 — Hareket modeli (sırada); 3.1 bitti, Taha'nın oyunda bakması isteniyor
-- **Sıradaki iş:** ivme, duruş, dönüş ayarı; gövdenin harekete yatması; hız değerlerinin oynanarak seçilmesi.
+- **Alt aşama:** 3.2–3.5 kod olarak bitti; **Taha'nın oyun testi bekleniyor** (onay gelince Aşama 3 kapanır)
+- **Sıradaki iş:** Taha'nın yorumuna göre ayar (hız, ivme, dash mesafesi ve bekleme süresi, kamera yakınlığı); sonra 🚩 ve Aşama 4.
 - **Bekleyen (Taha'dan):**
-  - 3.1: `godot --path .` ile askere oyunda bakmak ve `-- --model=soldier` önizlemesinde bozuk görünen klip var mı söylemek.
+  - `godot --path .` ile oynamak: koşu, dönüş, Space ile dash, vurulma, ölüm; kamera yakınlığı (17) uygun mu?
   - Tripo planının lisansını kontrol etmek (repo public; ayrıntı `DECISIONS.md` açık kararlar).
   - Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
 - **Not:** Blender MCP eklentisi 2026-11-16'da güncellendi (`uvx mcp-for-blender install-addon`); Blender yeniden başlatılınca etkinleşir. Scriptler zaten penceresiz çalışıyor.
@@ -45,10 +45,10 @@ Bitiş ölçütleri `ROADMAP.md`'de. Biten kutunun yanına tarih ve commit yazı
 
 ### 3 — Dikey dilim: asker
 - [x] 3.1 Asker modeli — 2026-11-16. Tripo modeli 6 bin üçgen, 25 kemik, 1.85 m; 25 klip önizlemede ve oyunda (bekleme / Sprint / ölüm) çalışıyor (`Tuning.FEATURE_PLAYER_MODEL`)
-- [ ] 3.2 Hareket modeli
-- [ ] 3.3 Asker animasyonları
-- [ ] 3.4 Dash
-- [ ] 3.5 Kamera
+- [ ] 3.2 Hareket modeli — kod bitti 2026-11-16 (`Locomotion` + 6 test, gövde yatması); Taha'nın oynayıp yorumu bekleniyor
+- [ ] 3.3 Asker animasyonları — kod bitti 2026-11-16 (animasyon ağacı: bekleme↔Sprint, üst gövdede vurulma, ölüm); Taha'nın yorumu bekleniyor
+- [ ] 3.4 Dash — kod bitti 2026-11-16 (`Dash` + 5 test, takla, dokunulmazlık, zombilerin içinden geçiş, toz izi, HUD çubuğu); Taha'nın yorumu bekleniyor
+- [ ] 3.5 Kamera — kod bitti 2026-11-16 (uzaklık 24 → 17, ileri bakış, sarsıntı altyapısı; asker vurulunca sarsılır); Taha'nın yakınlık onayı bekleniyor (`build/shots/cam_14.png`, `cam_17.png`, `cam_20.png`)
 
 ### 4 — Dikey dilim: zombi
 - [ ] 4.1 Yürüyen zombi modeli
@@ -136,6 +136,8 @@ Profil üst sınırları (2.5 ölçümüne göre, efektlere pay bırakılarak): 
 
 - Silah gücü düşük (kalabalıkta hedef sürekli değişiyor, hasar dağılıyor) → 5.x ve 6.6.
 - Asker zombilerin arasından itilerek geçebiliyor → 3.4 (dash) ve 4.4 (itme) ile ele alınır.
+- Renkler oyunda Blender'dakinden açık (lacivert zırh soluk mavi görünüyor): ışık pozlaması yüksek → 5.7 ışık ayarı.
+- Dash toz izi kare parçacıklardan oluşuyor (yer tutucu) → 5.2/5.3 efekt işinde yumuşatılır.
 - Zombiler (ve asker) ekranda küçük görünüyor; Taha 2026-11-16'da doğruladı (`Tuning.CAMERA_DISTANCE` = 24) → 3.5.
 
 ## Taha'nın geri bildirimi
@@ -146,6 +148,7 @@ Profil üst sınırları (2.5 ölçümüne göre, efektlere pay bırakılarak): 
 ## Oturum günlüğü
 
 ### 2026-11-16 — Oturum 2
+- 3.2–3.5: `Locomotion` ve `Dash` saf kuralları (11 yeni test, toplam 42), `PlayerAnimator` animasyon ağacı, gövde yatması, takla ile dash, toz izi, HUD dash çubuğu, kamera 17 m + ileri bakış + sarsıntı. Taha animasyon önizlemesini onayladı.
 - 3.1: asker konsepti (stilize iri, ağır zırhlı, lacivert + turuncu); Tripo modeli `build_soldier.py` ile temizlendi ve iskelete bağlandı; `PlayerVisual` modeli ve animasyonu sürüyor; `inspect_model.py` eklendi.
 - Ortam kontrolü temiz (Godot 4.7.2, git, Node, `godot` + `blender` MCP bağlı, headless hatasız).
 - 2.5: zombiler animasyonlu mankenle çizildi, ölçüm ~500 zombi / 60 FPS; profil sınırları 150 / 250 / 350. Taha: koşu Sprint, dash Roll, uzaktan saldıran zombiler istendi (7.3).

@@ -11,7 +11,7 @@ Zırhlı ve kasklı bir asker, kapalı bir şehir kavşağında dalga dalga gele
 | Tuş | İş |
 | --- | --- |
 | WASD / ok tuşları | Hareket (XZ düzleminde, kameraya göre) |
-| Space | Dash (Aşama 3.4) |
+| Space | Dash: hareket yönüne (duruyorsa baktığı yöne) takla; süresince hasar almaz ve zombilerin içinden geçer |
 | F11 / Alt+Enter | Tam ekran ↔ pencere (oyun tam ekran açılır) |
 | R | Öldükten sonra yeniden başlat |
 | Esc | Duraklat (Aşama 9.1) |

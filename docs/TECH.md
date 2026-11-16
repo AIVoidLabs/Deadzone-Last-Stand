@@ -57,6 +57,15 @@ Kaynak: Quaternius Universal Animation Library iskeleti (65 kemik, Unreal manken
 - **Oyun iskeleti (25 kemik):** `root, pelvis, spine_01, spine_02, spine_03, neck_01, Head` + her kol için `clavicle, upperarm, lowerarm, hand` + her bacak için `thigh, calf, foot, ball, ball_leaf` (`_l` / `_r`).
 - **Atılanlar:** 40 parmak kemiği (el başına 20). Parmak ağırlıkları `hand` kemiğine aktarılır.
 
+## Asker animasyon ağacı (Aşama 3.3)
+
+`scripts/player/player_animator.gd` ağacı kodla kurar: bekleme↔koşu harmanı → koşu hızı → vurulma (yalnız üst gövde kemikleri; bacaklar koşmayı sürdürür) → takla → hayatta/ölü geçişi. `PlayerVisual` yalnız dört çağrı yapar: `set_locomotion`, `play_hit`, `play_roll`, `set_dead`.
+
+Öğrenilenler:
+- `AnimationTree` kütüphaneyi kendisi taşır (`add_animation_library`); ayrı `AnimationPlayer` bağlamak kodla kurulumda kütüphaneyi boş bıraktı.
+- `AnimationNodeTransition` kendiliğinden bir girişle başlamaz; ilk durum açıkça istenmezse ağaç poz üretmez ve model T-pozda kalır.
+- Koşu klibinin hızı gerçek hıza oranlanır (`Tuning.PLAYER_RUN_ANIM_SPEED`); ayak kayarsa bu sayı ayarlanır.
+
 ## Animasyon kütüphanesi (Aşama 2.1, 2026-11-16)
 
 Ücretsiz Standard sürümlerde toplam 86 klip (her pakette 43). Dosyalar `_RM` (kök hareketli) ve kök hareketsiz olarak gelir; oyun hareketi kodla yürüttüğü için **kök hareketsiz** olan kullanılır.
@@ -105,11 +114,11 @@ godot --headless --path . --import
 godot --path . res://scenes/debug/anim_preview.tscn -- --model=soldier
 ```
 
-`build_soldier.py` ham Tripo modelini (355 bin üçgen, 2048 doku) alır: 1.83 m'ye ölçekler, ~6 bin üçgene indirir, yalnız renk dokusunu 1024 olarak bırakır, iskeleti scriptin başındaki eklem tablosuna (`CENTER_JOINTS`, `SIDE_JOINTS`) göre oturtur, otomatik ağırlık verir ve modeli kütüphanenin dinlenme pozuna (T-poz) getirir. Kontrol görüntüleri: `build/shots/soldier_fit_joints_*.png` (eklemler), `soldier_fit_rest_*.png` (son poz). Blender'da bakmak için: `build/blender/soldier.blend`.
+`build_soldier.py` ham Tripo modelini (355 bin üçgen, 2048 doku) alır: 1.83 m'ye ölçekler, ~6 bin üçgene indirir, yalnız renk dokusunu bırakır, iskeleti scriptin başındaki eklem tablosuna (`CENTER_JOINTS`, `SIDE_JOINTS`) göre oturtur, otomatik ağırlık verir ve modeli kütüphanenin dinlenme pozuna (T-poz) getirir. Kontrol görüntüleri: `build/shots/soldier_fit_joints_*.png` (eklemler), `soldier_fit_rest_*.png` (son poz). Blender'da bakmak için: `build/blender/soldier.blend`.
 
 Öğrenilenler:
 - **Dinlenme pozu T-poz.** Kütüphanenin iskeleti T-pozda durur; yeni karakter hangi pozda gelirse gelsin script kolları ve bacakları kütüphanenin yönlerine çevirip bunu yeni dinlenme pozu yapar. Bu yapılmazsa animasyonlarda uzuvlar kayık durur.
-- **Doku PNG olmalı.** Godot, Blender'ın yazdığı JPEG'i çözemedi (doku boş, model beyaz); hata yalnız `--import` çıktısında görünür.
+- **Dokuya Blender'da dokunma.** Görüntüyü Blender'da ölçekleyince Godot'nun çözemediği bir JPEG çıktı (doku boş, model beyaz; hata yalnız `--import` çıktısında görünür), PNG'ye çevirince de renkler soldu. Çözüm: ham doku olduğu gibi geçer, boyutu Godot sınırlar (`soldier_albedo.jpg.import` içinde `process/size_limit=1024`).
 - **Herhangi bir modeli ölçmek ve görmek için:** `blender --background --python tools/blender/inspect_model.py -- <model> build/shots/<ad>` (önden, yandan, arkadan görüntü + ölçüler).
 
 ## Ölçümler

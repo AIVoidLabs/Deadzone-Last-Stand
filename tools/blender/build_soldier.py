@@ -29,7 +29,6 @@ CHECK_PREFIX: str = os.path.join(REPO, "build", "shots", "soldier_fit")
 
 TARGET_HEIGHT: float = 1.83
 TARGET_TRIS: int = 6000
-TEXTURE_SIZE: int = 1024
 MERGE_DISTANCE: float = 0.00001
 SMOOTH_ANGLE_DEG: float = 35.0
 
@@ -148,7 +147,7 @@ def upstream_image_node(socket):
 
 
 def simplify_material(mesh) -> None:
-    """Yalnız renk dokusu kalır (küçültülmüş); normal ve pürüz haritaları atılır."""
+    """Yalnız renk dokusu kalır; normal ve pürüz haritaları atılır."""
     for material in [m for m in mesh.data.materials if m is not None and m.node_tree is not None]:
         tree = material.node_tree
         shader = next(n for n in tree.nodes if n.type == "BSDF_PRINCIPLED")
@@ -161,9 +160,8 @@ def simplify_material(mesh) -> None:
         if color_node is None:
             raise RuntimeError("Renk dokusu bulunamadı: " + material.name)
         tree.links.new(color_node.outputs["Color"], shader.inputs["Base Color"])
-        color_node.image.scale(TEXTURE_SIZE, TEXTURE_SIZE)
-        # PNG: Godot, Blender'ın yazdığı JPEG'i çözemiyor (içe aktarımda doku boş kalıyor).
-        color_node.image.file_format = "PNG"
+        # Görüntüye Blender'da dokunulmaz: ölçeklemek renkleri soldurdu ve Godot'nun çözemediği
+        # bir JPEG üretti. Ham doku olduğu gibi geçer; boyutu Godot içe aktarımı sınırlar.
         color_node.image.name = "albedo"
         color_node.image.pack()
         material.name = "SoldierMaterial"

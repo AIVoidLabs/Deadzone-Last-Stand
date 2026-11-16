@@ -5,6 +5,8 @@ extends RefCounted
 # --- Özellik anahtarları (her özellik tek sabitle kapanır) ---
 const FEATURE_SEPARATION: bool = true
 const FEATURE_CAMERA_SMOOTHING: bool = true
+const FEATURE_CAMERA_LOOK_AHEAD: bool = true
+const FEATURE_CAMERA_SHAKE: bool = true
 const FEATURE_HIT_FLASH: bool = true
 const FEATURE_PLAYER_IFRAMES: bool = true
 const FEATURE_SPAWN_RAMP: bool = true
@@ -96,9 +98,17 @@ const PROJECTILE_LIFETIME_MARGIN: float = 1.15
 
 # --- Kamera ---
 const CAMERA_PITCH_DEG: float = 55.0
-const CAMERA_DISTANCE: float = 24.0
+const CAMERA_DISTANCE: float = 17.0
 const CAMERA_FOV: float = 45.0
 const CAMERA_FOLLOW_SHARPNESS: float = 8.0
+## İleri bakış: kamera, askerin bu kadar saniye sonra olacağı yere doğru kayar.
+const CAMERA_LOOK_AHEAD_TIME: float = 0.25
+const CAMERA_LOOK_AHEAD_SHARPNESS: float = 3.0
+## Sarsıntı: en çok kayma (m), gürültü hızı, sönme hızı (1/sn) ve asker vurulunca eklenen pay.
+const CAMERA_SHAKE_MAX_OFFSET: float = 0.6
+const CAMERA_SHAKE_FREQUENCY: float = 6.0
+const CAMERA_SHAKE_DECAY: float = 2.2
+const CAMERA_SHAKE_ON_PLAYER_HIT: float = 0.45
 
 # --- Uzay ızgarası ---
 const GRID_CELL_SIZE: float = 1.5

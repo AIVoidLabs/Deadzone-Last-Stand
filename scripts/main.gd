@@ -22,7 +22,11 @@ func _ready() -> void:
 
 	var camera: FollowCamera = FollowCamera.new()
 	camera.target = player
+	camera.velocity_source = player.get_real_velocity
 	add_child(camera)
+	player.event.connect(func(event_name: StringName, _data: Dictionary) -> void:
+		if event_name == &"hit":
+			camera.add_trauma(Tuning.CAMERA_SHAKE_ON_PLAYER_HIT))
 
 	var hud: Hud = Hud.new()
 	hud.setup(player, enemies)
@@ -32,10 +36,10 @@ func _ready() -> void:
 	Quality.apply_to_viewport(get_viewport())
 
 	if OS.is_debug_build():
-		_add_debug_tools(player, enemies, projectiles)
+		_add_debug_tools(player, enemies, projectiles, camera)
 
 
-func _add_debug_tools(player: Player, enemies: EnemyManager, projectiles: ProjectilePool) -> void:
+func _add_debug_tools(player: Player, enemies: EnemyManager, projectiles: ProjectilePool, camera: FollowCamera) -> void:
 	var panel: DebugPanel = DebugPanel.new()
 	panel.player = player
 	panel.enemies = enemies
@@ -51,4 +55,5 @@ func _add_debug_tools(player: Player, enemies: EnemyManager, projectiles: Projec
 		capture.player = player
 		capture.enemies = enemies
 		capture.debug_panel = panel
+		capture.camera = camera
 		add_child(capture)

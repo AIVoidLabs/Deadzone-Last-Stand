@@ -3,11 +3,13 @@ extends Node
 ## Ekran görüntüsü: `godot --path . -- --capture=build/shots/a.png [--capture-seconds=8]
 ## [--capture-spawn=150] [--autopilot] [--debug-panel] [--capture-dash=0.15]`. Yalnız debug yapıda eklenir.
 ## --capture-dash=S: görüntüden S saniye önce dash attırır.
+## --camera-distance=M: kamera uzaklığını dener (karşılaştırma görüntüleri için).
 ## --autopilot: asker ölümsüz, daire çizerek yürür.
 
 var player: Player
 var enemies: EnemyManager
 var debug_panel: DebugPanel
+var camera: FollowCamera
 
 var _out: String = ""
 var _seconds: float = 6.0
@@ -38,6 +40,8 @@ func _ready() -> void:
 			_spawn = arg.trim_prefix("--capture-spawn=").to_int()
 		elif arg.begins_with("--capture-dash="):
 			_dash_lead = arg.trim_prefix("--capture-dash=").to_float()
+		elif arg.begins_with("--camera-distance=") and camera != null:
+			camera.set_distance(arg.trim_prefix("--camera-distance=").to_float())
 		elif arg == "--autopilot":
 			_autopilot = true
 		elif arg == "--debug-panel":
