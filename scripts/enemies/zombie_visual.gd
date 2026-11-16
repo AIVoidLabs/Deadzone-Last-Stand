@@ -58,6 +58,8 @@ func _on_state_changed(new_state: int, _old_state: int) -> void:
 		ZombieRules.State.WINDUP:
 			# Klipteki vuruş anı hazırlığın sonuna denk gelsin.
 			_play_timed(&"anim_attack", _row.get("attack_anim_hit_time", 0.0), _body.state_duration)
+		ZombieRules.State.STAGGER:
+			_play_timed(&"anim_stagger", 0.0, _body.state_duration)
 		ZombieRules.State.RECOVER:
 			# Saldırı klibi kendi hızında tamamlanır.
 			if _animation != null:

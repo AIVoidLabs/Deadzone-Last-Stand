@@ -23,6 +23,10 @@ const FEATURE_ZOMBIE_MODEL: bool = true
 const FEATURE_ZOMBIE_WINDUP_ATTACK: bool = true
 ## Zombiler yerden doğrularak doğar; kapalıyken doğrudan yürümeye başlar.
 const FEATURE_ZOMBIE_SPAWN_RISE: bool = true
+## Vurulan zombi geriye itilir.
+const FEATURE_KNOCKBACK: bool = true
+## Vurulan zombi kısa süre sendeler (saldırı hazırlığı bozulur).
+const FEATURE_STAGGER: bool = true
 ## Asker gövdesinin hıza ve dönüşe göre yatması.
 const FEATURE_PLAYER_LEAN: bool = true
 
@@ -85,6 +89,8 @@ const CHARACTER_MODEL_HEIGHT: float = 1.83
 const ZOMBIE_ANIM_SPEED_VARIANCE: float = 0.15
 ## Zombi boyuna eklenen rastgele pay (±); yalnız görüntü, çarpışma değişmez. 0 = kapalı.
 const ZOMBIE_SCALE_VARIANCE: float = 0.08
+## İtilme hızının sönme katsayısı (1/sn); büyüdükçe itme kısa ve sert olur.
+const KNOCKBACK_DAMPING: float = 12.0
 ## Zombi klipleri arası geçiş süresi (sn).
 const ZOMBIE_ANIM_BLEND: float = 0.12
 

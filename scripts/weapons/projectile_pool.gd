@@ -14,6 +14,7 @@ var _pos: PackedVector2Array = PackedVector2Array()
 var _dir: PackedVector2Array = PackedVector2Array()
 var _speed: PackedFloat32Array = PackedFloat32Array()
 var _damage: PackedFloat32Array = PackedFloat32Array()
+var _knockback: PackedFloat32Array = PackedFloat32Array()
 var _life: PackedFloat32Array = PackedFloat32Array()
 var _active: PackedByteArray = PackedByteArray()
 var _active_count: int = 0
@@ -39,7 +40,7 @@ func active_count() -> int:
 	return _active_count
 
 
-func fire(origin: Vector2, direction: Vector2, speed: float, dmg: float, max_range: float) -> void:
+func fire(origin: Vector2, direction: Vector2, speed: float, dmg: float, max_range: float, knockback: float = 0.0) -> void:
 	var slot: int = _active.find(0)
 	if slot < 0:
 		slot = _nodes.size()
@@ -48,6 +49,7 @@ func fire(origin: Vector2, direction: Vector2, speed: float, dmg: float, max_ran
 	_dir[slot] = direction
 	_speed[slot] = speed
 	_damage[slot] = dmg
+	_knockback[slot] = knockback
 	_life[slot] = max_range / speed * Tuning.PROJECTILE_LIFETIME_MARGIN
 	_active[slot] = 1
 	_active_count += 1
@@ -66,7 +68,7 @@ func _physics_process(delta: float) -> void:
 		var b: Vector2 = a + _dir[i] * _speed[i] * delta
 		var hit: int = enemies.find_segment_hit(a, b, Tuning.PROJECTILE_RADIUS)
 		if hit >= 0:
-			enemies.damage(hit, _damage[i])
+			enemies.damage(hit, _damage[i], _dir[i], _knockback[i])
 			_release(i)
 			continue
 		_life[i] -= delta
@@ -96,5 +98,6 @@ func _grow(count: int) -> void:
 		_dir.append(Vector2.ZERO)
 		_speed.append(0.0)
 		_damage.append(0.0)
+		_knockback.append(0.0)
 		_life.append(0.0)
 		_active.append(0)

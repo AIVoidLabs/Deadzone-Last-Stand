@@ -20,6 +20,9 @@ const TABLE: Dictionary = {
 		# Saldırı klibinde vuruşun indiği an (sn); klip hızı hazırlık süresine göre ayarlanır.
 		"attack_anim_hit_time": 0.7,
 		"spawn_time": 0.9,
+		# İtilmeye direnç (büyük = az itilir) ve vurulunca sendeleme süresi (sn).
+		"weight": 1.0,
+		"stagger_time": 0.22,
 		"height": 1.6,
 		"color": Color(0.42, 0.6, 0.32),
 		# Klip adları ZombieClipData tablosundan; birden çok varsa zombi başına rastgele biri.

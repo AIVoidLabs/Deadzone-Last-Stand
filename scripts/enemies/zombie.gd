@@ -28,9 +28,10 @@ func activate(at: Vector3) -> void:
 	reset_physics_interpolation()
 
 
-func enter_state(new_state: ZombieRules.State, duration: float = 0.0) -> void:
+## restart: aynı duruma yeniden girişte de haber ver (üst üste sendeleme gibi).
+func enter_state(new_state: ZombieRules.State, duration: float = 0.0, restart: bool = false) -> void:
 	state_duration = duration
-	if new_state == state:
+	if new_state == state and not restart:
 		return
 	var old: ZombieRules.State = state
 	state = new_state

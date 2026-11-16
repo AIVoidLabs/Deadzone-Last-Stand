@@ -9,6 +9,8 @@ signal enemy_killed(at: Vector3)
 
 const PHYSICS_PRIORITY: int = -10
 const HIT_QUERY_MARGIN: float = 1.0
+## Bu hızın (karesi) altındaki itme sıfırlanır.
+const KNOCK_REST_SQ: float = 0.0025
 
 var player: Player
 var spawning_enabled: bool = true
@@ -31,6 +33,8 @@ var _state: PackedByteArray = PackedByteArray()
 ## Süreli durumda kalan süre (sn).
 var _timer: PackedFloat32Array = PackedFloat32Array()
 var _rows: Array[Dictionary] = []
+## İtilme hızı (m/sn); kendiliğinden söner.
+var _knock: PackedVector2Array = PackedVector2Array()
 var _nodes: Array[Zombie] = []
 var _pool: Array[Zombie] = []
 var _dead_count: int = 0
@@ -88,13 +92,21 @@ func find_segment_hit(a: Vector2, b: Vector2, radius: float) -> int:
 	return best
 
 
-func damage(index: int, amount: float) -> void:
-	if _alive[index] == 0 or not ZombieRules.can_take_damage(_state[index] as ZombieRules.State):
+## direction: vuruşun geldiği yön (itme bu yöne). knockback: ağırlığı 1 olana verilen ilk hız.
+func damage(index: int, amount: float, direction: Vector2 = Vector2.ZERO, knockback: float = 0.0) -> void:
+	var state: ZombieRules.State = _state[index] as ZombieRules.State
+	if _alive[index] == 0 or not ZombieRules.can_take_damage(state):
 		return
 	_hp[index] -= amount
 	_nodes[index].notify_hit(amount)
 	if _hp[index] <= 0.0:
 		_kill(index)
+		return
+	var row: Dictionary = _rows[index]
+	if Tuning.FEATURE_KNOCKBACK:
+		_knock[index] += Knockback.impulse(direction, knockback, row["weight"])
+	if Tuning.FEATURE_STAGGER and ZombieRules.can_stagger(state):
+		_enter(index, ZombieRules.State.STAGGER, row["stagger_time"], true)
 
 
 func spawn(kind: StringName, at: Vector2) -> void:
@@ -114,6 +126,7 @@ func spawn(kind: StringName, at: Vector2) -> void:
 	_state.append(ZombieRules.State.INACTIVE)
 	_timer.append(0.0)
 	_rows.append(row)
+	_knock.append(Vector2.ZERO)
 	_nodes.append(z)
 	z.activate(Vector3(at.x, 0.0, at.y))
 	var index: int = _nodes.size() - 1
@@ -170,6 +183,11 @@ func _move(delta: float) -> void:
 			if Tuning.FEATURE_SEPARATION:
 				vel += Steering.separation(i, _pos, _grid, _radius[i] * 2.0) * Tuning.ENEMY_SEPARATION_STRENGTH
 			p += vel.limit_length(speed * Tuning.ENEMY_MAX_SPEED_FACTOR) * delta
+		var knock: Vector2 = _knock[i]
+		if knock != Vector2.ZERO:
+			p += knock * delta
+			knock = Knockback.decay(knock, Tuning.KNOCKBACK_DAMPING, delta)
+			_knock[i] = knock if knock.length_squared() > KNOCK_REST_SQ else Vector2.ZERO
 		# Askerle temas: içine girmez.
 		var reach: float = Tuning.PLAYER_RADIUS + _radius[i]
 		var away: Vector2 = p - target
@@ -208,10 +226,10 @@ func _on_timer(index: int, state: ZombieRules.State, target: Vector2) -> ZombieR
 	return next
 
 
-func _enter(index: int, state: ZombieRules.State, duration: float) -> void:
+func _enter(index: int, state: ZombieRules.State, duration: float, restart: bool = false) -> void:
 	_state[index] = state
 	_timer[index] = duration
-	_nodes[index].enter_state(state, duration)
+	_nodes[index].enter_state(state, duration, restart)
 
 
 static func _yaw_towards(from: Vector2, to: Vector2) -> float:
@@ -247,6 +265,7 @@ func _compact() -> void:
 				_state[i] = _state[last]
 				_timer[i] = _timer[last]
 				_rows[i] = _rows[last]
+				_knock[i] = _knock[last]
 				_nodes[i] = _nodes[last]
 			_pos.resize(last)
 			_hp.resize(last)
@@ -257,6 +276,7 @@ func _compact() -> void:
 			_state.resize(last)
 			_timer.resize(last)
 			_rows.resize(last)
+			_knock.resize(last)
 			_nodes.resize(last)
 		i -= 1
 	_dead_count = 0

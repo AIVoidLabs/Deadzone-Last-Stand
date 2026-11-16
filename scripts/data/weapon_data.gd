@@ -11,6 +11,8 @@ const TABLE: Dictionary = {
 		"fire_interval": 0.35,
 		"max_range": 12.0,
 		"projectile_speed": 30.0,
+		# Ağırlığı 1 olan zombiye verilen ilk itme hızı (m/sn).
+		"knockback": 5.0,
 	},
 }
 

@@ -16,6 +16,7 @@ var _damage: float
 var _interval: float
 var _range: float
 var _projectile_speed: float
+var _knockback: float
 var _cooldown: float = 0.0
 
 
@@ -28,6 +29,7 @@ func setup(id: StringName, p_enemies: EnemyManager, p_projectiles: ProjectilePoo
 	_interval = row["fire_interval"]
 	_range = row["max_range"]
 	_projectile_speed = row["projectile_speed"]
+	_knockback = row["knockback"]
 
 
 func _ready() -> void:
@@ -49,6 +51,6 @@ func _physics_process(delta: float) -> void:
 	var direction: Vector2 = Steering.seek(origin, enemies.enemy_position(target))
 	if direction == Vector2.ZERO:
 		return
-	projectiles.fire(origin, direction, _projectile_speed, _damage, _range)
+	projectiles.fire(origin, direction, _projectile_speed, _damage, _range, _knockback)
 	_cooldown = _interval
 	fired.emit(direction)
