@@ -68,5 +68,6 @@ func _build_text() -> String:
 		"Can %.0f / %.0f   ölümsüz %s" % [player.health.current, player.health.maximum, "AÇIK" if player.god_mode else "kapalı"],
 		"Profil %s" % Quality.current,
 		"F4 +%d zombi · F5 ölümsüz · F6 profil · F7 +silah" % Tuning.DEBUG_SPAWN_BATCH,
+		"(Fn gerekmeden: Ctrl+3 … Ctrl+7 aynı sırayla)",
 	])
 	return "\n".join(lines)
