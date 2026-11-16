@@ -55,6 +55,8 @@ const DASH_DUST_LIFETIME: float = 0.45
 const PLAYER_ANIM_BLEND: float = 0.15
 ## Vurulma klibinin girip çıkma süresi (sn).
 const PLAYER_ANIM_HIT_FADE: float = 0.06
+## Asker ölünce "öldün" ekranından önce ölüm animasyonuna tanınan süre (sn); 0 = beklemeden duraklat.
+const GAME_OVER_DELAY: float = 1.8
 ## Koşu klibinin 1.0 hızda oynadığı yer hızı (m/sn); gerçek hız buna oranlanır (ayak kaymasın).
 const PLAYER_RUN_ANIM_SPEED: float = 5.0
 ## Bekleme<->koşu harmanının hıza yetişme keskinliği.

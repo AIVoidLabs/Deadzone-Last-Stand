@@ -3,6 +3,7 @@ extends Node
 ## Ekran görüntüsü: `godot --path . -- --capture=build/shots/a.png [--capture-seconds=8]
 ## [--capture-spawn=150] [--autopilot] [--debug-panel] [--capture-dash=0.15]`. Yalnız debug yapıda eklenir.
 ## --capture-dash=S: görüntüden S saniye önce dash attırır.
+## --capture-kill=S: görüntüden S saniye önce askeri öldürür (ölüm animasyonu denetimi).
 ## --camera-distance=M: kamera uzaklığını dener (karşılaştırma görüntüleri için).
 ## --autopilot: asker ölümsüz, daire çizerek yürür.
 
@@ -17,6 +18,7 @@ var _spawn: int = 0
 var _autopilot: bool = false
 var _show_panel: bool = false
 var _dash_lead: float = -1.0
+var _kill_lead: float = -1.0
 var _time: float = 0.0
 var _angle: float = 0.0
 
@@ -40,6 +42,8 @@ func _ready() -> void:
 			_spawn = arg.trim_prefix("--capture-spawn=").to_int()
 		elif arg.begins_with("--capture-dash="):
 			_dash_lead = arg.trim_prefix("--capture-dash=").to_float()
+		elif arg.begins_with("--capture-kill="):
+			_kill_lead = arg.trim_prefix("--capture-kill=").to_float()
 		elif arg.begins_with("--camera-distance=") and camera != null:
 			camera.set_distance(arg.trim_prefix("--camera-distance=").to_float())
 		elif arg == "--autopilot":
@@ -63,6 +67,9 @@ func _process(delta: float) -> void:
 	if _dash_lead >= 0.0 and _time >= _seconds - _dash_lead:
 		_dash_lead = -1.0
 		player.request_dash()
+	if _kill_lead >= 0.0 and _time >= _seconds - _kill_lead:
+		_kill_lead = -1.0
+		player.take_hit(Tuning.PLAYER_MAX_HP * 1000.0)
 	if _time < _seconds:
 		return
 	var path: String = ProjectSettings.globalize_path("res://").path_join(_out)

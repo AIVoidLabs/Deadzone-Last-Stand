@@ -5,13 +5,9 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 
 ## Şu an
 
-- **Ana aşama:** 3 — Dikey dilim: asker
-- **Alt aşama:** 3.2–3.5 kod olarak bitti; **Taha'nın oyun testi bekleniyor** (onay gelince Aşama 3 kapanır)
-- **Sıradaki iş:** Taha'nın yorumuna göre ayar (hız, ivme, dash mesafesi ve bekleme süresi, kamera yakınlığı); sonra 🚩 ve Aşama 4.
-- **Bekleyen (Taha'dan):**
-  - `godot --path .` ile oynamak: koşu, dönüş, Space ile dash, vurulma, ölüm; kamera yakınlığı (17) uygun mu?
-  - Tripo planının lisansını kontrol etmek (repo public; ayrıntı `DECISIONS.md` açık kararlar).
-  - Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
+- **Ana aşama:** 3 — Dikey dilim: asker **bitti** (2026-11-16); 🚩 bildirimi yapıldı, Taha'nın "devam"ı bekleniyor
+- **Sıradaki iş:** Aşama 4.1 — yürüyen zombi modeli (Blender, galeri görseliyle görünüm onayı)
+- **Bekleyen (Taha'dan):** "devam". Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
 - **Not:** Blender MCP eklentisi 2026-11-16'da güncellendi (`uvx mcp-for-blender install-addon`); Blender yeniden başlatılınca etkinleşir. Scriptler zaten penceresiz çalışıyor.
 
 ## Ana aşama durumu
@@ -21,7 +17,7 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 | 0 | Kurulum ve iskelet | ✔ bitti |
 | 1 | Kutu prototip | ✔ bitti (his onayı 5.7'ye devredildi) |
 | 2 | Model ve animasyon hattı | ✔ bitti (2026-11-16) |
-| 3 | Dikey dilim: asker | sürüyor (3.1) |
+| 3 | Dikey dilim: asker | ✔ bitti (2026-11-16) |
 | 4 | Dikey dilim: zombi | — |
 | 5 | Dikey dilim: silah ve vuruş hissi | — |
 | 6 | Tur döngüsü | — |
@@ -45,10 +41,10 @@ Bitiş ölçütleri `ROADMAP.md`'de. Biten kutunun yanına tarih ve commit yazı
 
 ### 3 — Dikey dilim: asker
 - [x] 3.1 Asker modeli — 2026-11-16. Tripo modeli 6 bin üçgen, 25 kemik, 1.85 m; 25 klip önizlemede ve oyunda (bekleme / Sprint / ölüm) çalışıyor (`Tuning.FEATURE_PLAYER_MODEL`)
-- [ ] 3.2 Hareket modeli — kod bitti 2026-11-16 (`Locomotion` + 6 test, gövde yatması); Taha'nın oynayıp yorumu bekleniyor
-- [ ] 3.3 Asker animasyonları — kod bitti 2026-11-16 (animasyon ağacı: bekleme↔Sprint, üst gövdede vurulma, ölüm); Taha'nın yorumu bekleniyor
-- [ ] 3.4 Dash — kod bitti 2026-11-16 (`Dash` + 5 test, takla, dokunulmazlık, zombilerin içinden geçiş, toz izi, HUD çubuğu); Taha'nın yorumu bekleniyor
-- [ ] 3.5 Kamera — kod bitti 2026-11-16 (uzaklık 24 → 17, ileri bakış, sarsıntı altyapısı; asker vurulunca sarsılır); Taha'nın yakınlık onayı bekleniyor (`build/shots/cam_14.png`, `cam_17.png`, `cam_20.png`)
+- [x] 3.2 Hareket modeli — kod bitti 2026-11-16 (`Locomotion` + 6 test, gövde yatması); Taha oynadı, onayladı
+- [x] 3.3 Asker animasyonları — kod bitti 2026-11-16 (animasyon ağacı: bekleme↔Sprint, üst gövdede vurulma, ölüm); Taha oynadı. Ölüm animasyonu oynamıyordu (oyun anında duraklıyordu) → `Tuning.GAME_OVER_DELAY` ile düzeltildi
+- [x] 3.4 Dash — kod bitti 2026-11-16 (`Dash` + 5 test, takla, dokunulmazlık, zombilerin içinden geçiş, toz izi, HUD çubuğu); Taha oynadı, onayladı. Toz izi "dandik" bulundu → efekt cilasında (5.2/5.3) yeniden yapılacak
+- [x] 3.5 Kamera — kod bitti 2026-11-16 (uzaklık 24 → 17, ileri bakış, sarsıntı altyapısı; asker vurulunca sarsılır); Taha oynadı, onayladı
 
 ### 4 — Dikey dilim: zombi
 - [ ] 4.1 Yürüyen zombi modeli
