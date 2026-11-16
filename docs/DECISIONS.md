@@ -2,6 +2,11 @@
 
 Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar verilince "Açık kararlar"dan çıkarılıp tarihli bölüme yazılır.
 
+## 2026-11-16 — Zombi türleri listesi (Taha; Codex ile konuşup getirdi)
+
+- Her tür oyuncuya ayrı bir karar çıkarmalı. Kabul edilen liste: sürü zombisi, koşucu (hazırlıklı atılma), çığlıkçı (zombi çağırır), zırhlı (önden dayanıklı, yandan/arkadan zayıf), tükürücü (yerde kalan asit alanı), patlayıcı (uyarı + patlama, zombilere de hasar). Önceki isteklerle birleşti: zıplayan, sürünen, tank, taş fırlatan. Tam tablo `GAME_DESIGN.md`, uygulama Aşama 7.2–7.3.
+- Not (Claude): silahlar kendisi nişan aldığı için zırhlıda "açı değiştirmek" oyuncunun konumlanmasıyla olur; 7.3'te denenip ayarlanacak.
+
 ## 2026-11-16 — Aşama 4.1 zombi görünümü (Taha)
 
 - Köşeli low-poly tarz ve renkler beğenildi. Çeşitlilik çok artırılacak (ekranda çok sayıda zombi olacak); koyu tonlar da eklenecek → 10 gövde × 16 renk şeması.

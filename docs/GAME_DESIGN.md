@@ -49,7 +49,20 @@ Zırhlı ve kasklı bir asker, kapalı bir şehir kavşağında dalga dalga gele
 - **Zombi tepkisi:** vurulunca geriye itilir ve kısa süre sendeler; ağırlık türe göre.
 - **Zombi saldırısı:** kısa hazırlıklı vuruş (kaçılabilir); "değince hasar" tek sabitle geri açılabilir. Hangisinin kalacağı 4.3'te oynanarak seçilir.
 - **Ölüm:** vuruş yönüne doğru ölüm animasyonu, ardından solarak silinme.
-- **Zombi türleri:** yürüyen (temel), koşan, tank, sürünen, zıplayan; her tür siluet ve hareketle ayırt edilir ve kendi içinde çok sayıda görünüme sahiptir (gövde çeşidi × renk şeması). Aşama 7.2.
+- **Zombi türleri:** her tür oyuncuya ayrı bir karar çıkarır, siluet ve hareketle uzaktan ayırt edilir ve kendi içinde çok sayıda görünüme sahiptir (gövde çeşidi × renk şeması). Hedef liste (Aşama 7.2–7.3; Taha, 2026-11-16):
+
+  | Tür | Davranış | Oyuncuya çıkardığı karar |
+  |---|---|---|
+  | Sürü zombisi (yürüyen) | Yavaş, yakın dövüş; kalabalık baskısını oluşturur | Sürekli hareket et, sürüden sıyrıl |
+  | Koşucu | Kısa süre hızlanıp atılır; öncesinde belirgin hazırlık animasyonu | Zamanında dash at ya da rotasını boz |
+  | Zıplayan | Kısa hazırlıktan sonra askerin üstüne atlar; düşeceği yer belli | İşareti gör, alandan çık |
+  | Sürünen | Alçak, kalabalıkta zor fark edilir | Yere de bak; ayak altını temizle |
+  | Tank | Yavaş, çok dayanıklı, ağır vurur | Ateşi ona yoğunlaştır ya da uzak dur |
+  | Zırhlı | Önden dayanıklı; yandan ve arkadan daha çok hasar alır | Yalnız kaçma, açını değiştir |
+  | Çığlıkçı | Uzakta durur; aralıklarla yeni zombi çağıran ses dalgası çıkarır | Kalabalık büyümeden bul, öncelikli hedef yap |
+  | Tükürücü | Yerde bir süre kalan asit/çamur atar; alanı geçici kapatır | Güvenli koridora yönel, sıkışmadan rota değiştir |
+  | Taş fırlatan | Uzaktan görülebilir, kaçılabilir atış yapar | Atışı gör, yana çekil |
+  | Patlayıcı | Yaklaşınca kısa uyarı verir ve patlar; yakındaki zombilere de zarar verir | Mesafeyi koru, onu sürünün yanına çekip fırsata çevir |
 - **Uzaktan saldıran zombiler:** bazı türler asit tükürür ya da taş gibi şeyler fırlatır. Atışlar görülebilir ve kaçılabilir olmalı (yavaşça gelen mermi ya da düşeceği yeri gösteren işaret). Aşama 7.3.
 - **Asker animasyonları:** koşu `ual1/Sprint`, dash `ual1/Roll` (takla).
 - **Patlama:** alan hasarı çevredeki zombilere de işler (patlayan zombi dahil).
