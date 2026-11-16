@@ -1,0 +1,112 @@
+class_name PlayerAnimator
+extends RefCounted
+## Askerin animasyon ağacını kodla kurar ve sürer:
+## bekleme<->koşu harmanı -> koşu hızı -> vurulma (yalnız üst gövde) -> takla -> hayatta/ölü.
+
+const LIBRARY_NAME: StringName = &"ual1"
+const LIBRARY: AnimationLibrary = preload("res://assets/models/anim/ual1.glb")
+const CLIP_IDLE: StringName = &"ual1/Idle"
+const CLIP_RUN: StringName = &"ual1/Sprint"
+const CLIP_HIT: StringName = &"ual1/Hit_Chest"
+const CLIP_ROLL: StringName = &"ual1/Roll"
+const CLIP_DEATH: StringName = &"ual1/Death01"
+const SKELETON_PATH: String = "%GeneralSkeleton"
+## Vurulma klibi yalnız bu kemikleri oynatır; bacaklar koşmayı sürdürür.
+const UPPER_BODY: Array[String] = [
+	"Spine", "Chest", "UpperChest", "Neck", "Head",
+	"LeftShoulder", "LeftUpperArm", "LeftLowerArm", "LeftHand",
+	"RightShoulder", "RightUpperArm", "RightLowerArm", "RightHand",
+]
+const LIFE_ALIVE: String = "alive"
+const LIFE_DEAD: String = "dead"
+
+var _tree: AnimationTree
+
+
+func _init(model: Node3D) -> void:
+	# AnimationTree kendi kütüphanesini taşır; ayrı bir AnimationPlayer gerekmez.
+	_tree = AnimationTree.new()
+	_tree.name = "AnimationTree"
+	_tree.add_animation_library(LIBRARY_NAME, LIBRARY)
+	_tree.tree_root = _build_graph()
+	model.add_child(_tree)
+	_tree.active = true
+	# Geçiş düğümü kendiliğinden bir girişle başlamaz; ilk durumu açıkça iste.
+	set_dead(false)
+
+
+## blend: 0 bekleme, 1 koşu. run_scale: koşu klibinin oynatma hızı.
+func set_locomotion(blend: float, run_scale: float) -> void:
+	_tree.set(&"parameters/move/blend_position", blend)
+	_tree.set(&"parameters/run_scale/scale", run_scale)
+
+
+func play_hit() -> void:
+	_tree.set(&"parameters/hit/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_FIRE)
+
+
+func play_roll() -> void:
+	_tree.set(&"parameters/roll/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_FIRE)
+
+
+func set_dead(dead: bool) -> void:
+	_tree.set(&"parameters/life/transition_request", LIFE_DEAD if dead else LIFE_ALIVE)
+
+
+func _build_graph() -> AnimationNodeBlendTree:
+	var graph: AnimationNodeBlendTree = AnimationNodeBlendTree.new()
+
+	var move: AnimationNodeBlendSpace1D = AnimationNodeBlendSpace1D.new()
+	move.min_space = 0.0
+	move.max_space = 1.0
+	move.add_blend_point(_clip(CLIP_IDLE), 0.0, -1, &"idle")
+	move.add_blend_point(_clip(CLIP_RUN), 1.0, -1, &"run")
+	graph.add_node(&"move", move)
+	graph.add_node(&"run_scale", AnimationNodeTimeScale.new())
+	graph.connect_node(&"run_scale", 0, &"move")
+
+	var hit: AnimationNodeOneShot = _one_shot(Tuning.PLAYER_ANIM_HIT_FADE)
+	hit.filter_enabled = true
+	for bone: String in UPPER_BODY:
+		hit.set_filter_path(NodePath("%s:%s" % [SKELETON_PATH, bone]), true)
+	graph.add_node(&"hit_clip", _clip(CLIP_HIT))
+	graph.add_node(&"hit", hit)
+	graph.connect_node(&"hit", 0, &"run_scale")
+	graph.connect_node(&"hit", 1, &"hit_clip")
+
+	graph.add_node(&"roll_clip", _clip(CLIP_ROLL))
+	graph.add_node(&"roll_scale", AnimationNodeTimeScale.new())
+	graph.connect_node(&"roll_scale", 0, &"roll_clip")
+	graph.add_node(&"roll", _one_shot(Tuning.PLAYER_ANIM_BLEND))
+	graph.connect_node(&"roll", 0, &"hit")
+	graph.connect_node(&"roll", 1, &"roll_scale")
+
+	var life: AnimationNodeTransition = AnimationNodeTransition.new()
+	life.xfade_time = Tuning.PLAYER_ANIM_BLEND
+	life.add_input(LIFE_ALIVE)
+	life.add_input(LIFE_DEAD)
+	graph.add_node(&"death_clip", _clip(CLIP_DEATH))
+	graph.add_node(&"life", life)
+	graph.connect_node(&"life", 0, &"roll")
+	graph.connect_node(&"life", 1, &"death_clip")
+	graph.connect_node(&"output", 0, &"life")
+	return graph
+
+
+## Takla klibini verilen süreye sığdırır (dash süresi Tuning'den gelir).
+func set_roll_duration(seconds: float) -> void:
+	var clip_length: float = LIBRARY.get_animation(String(CLIP_ROLL).get_slice("/", 1)).length
+	_tree.set(&"parameters/roll_scale/scale", clip_length / maxf(seconds, 0.01))
+
+
+static func _clip(clip: StringName) -> AnimationNodeAnimation:
+	var node: AnimationNodeAnimation = AnimationNodeAnimation.new()
+	node.animation = clip
+	return node
+
+
+static func _one_shot(fade: float) -> AnimationNodeOneShot:
+	var node: AnimationNodeOneShot = AnimationNodeOneShot.new()
+	node.fadein_time = fade
+	node.fadeout_time = fade
+	return node

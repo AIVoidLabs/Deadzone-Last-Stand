@@ -13,6 +13,8 @@ const FEATURE_START_FULLSCREEN: bool = true
 const FEATURE_PLAYER_MODEL: bool = true
 ## Kapalıyken zombiler Aşama 1'deki kutularla çizilir.
 const FEATURE_ZOMBIE_MODEL: bool = true
+## Asker gövdesinin hıza ve dönüşe göre yatması.
+const FEATURE_PLAYER_LEAN: bool = true
 
 # --- Arena ---
 const ARENA_SIZE: float = 60.0
@@ -22,18 +24,29 @@ const ARENA_GROUND_MARGIN: float = 30.0
 
 # --- Asker ---
 const PLAYER_SPEED: float = 6.0
-const PLAYER_ACCEL: float = 60.0
-const PLAYER_FRICTION: float = 45.0
+const PLAYER_ACCEL: float = 55.0
+const PLAYER_FRICTION: float = 50.0
 const PLAYER_MAX_HP: float = 100.0
 const PLAYER_ARMOR: float = 0.0
 const PLAYER_RADIUS: float = 0.4
 const PLAYER_HEIGHT: float = 1.8
 const PLAYER_HIT_IFRAMES: float = 0.5
-const PLAYER_TURN_SHARPNESS: float = 18.0
+const PLAYER_TURN_SHARPNESS: float = 14.0
 
 # --- Asker görüntüsü ---
 ## Animasyonlar arası geçiş süresi (sn).
 const PLAYER_ANIM_BLEND: float = 0.15
+## Vurulma klibinin girip çıkma süresi (sn).
+const PLAYER_ANIM_HIT_FADE: float = 0.06
+## Koşu klibinin 1.0 hızda oynadığı yer hızı (m/sn); gerçek hız buna oranlanır (ayak kaymasın).
+const PLAYER_RUN_ANIM_SPEED: float = 5.0
+## Bekleme<->koşu harmanının hıza yetişme keskinliği.
+const PLAYER_ANIM_MOVE_SHARPNESS: float = 14.0
+## Yatma: tam hızda öne, dönüşte yana (derece) ve yumuşatma keskinliği.
+const PLAYER_LEAN_FORWARD_DEG: float = 7.0
+const PLAYER_LEAN_TURN_DEG: float = 14.0
+const PLAYER_LEAN_TURN_GAIN: float = 0.35
+const PLAYER_LEAN_SHARPNESS: float = 10.0
 
 # --- Hasar ---
 const MIN_DAMAGE_AFTER_ARMOR: float = 1.0

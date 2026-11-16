@@ -41,15 +41,18 @@ func _physics_process(delta: float) -> void:
 		return
 	_iframes_left = maxf(0.0, _iframes_left - delta)
 	var input: Vector2 = _read_input()
-	var planar: Vector2 = Vector2(velocity.x, velocity.z)
-	var rate: float = Tuning.PLAYER_ACCEL if input != Vector2.ZERO else Tuning.PLAYER_FRICTION
-	planar = planar.move_toward(input * Tuning.PLAYER_SPEED, rate * delta)
+	var planar: Vector2 = Locomotion.step(
+		Vector2(velocity.x, velocity.z), input, Tuning.PLAYER_SPEED, Tuning.PLAYER_ACCEL, Tuning.PLAYER_FRICTION, delta)
 	velocity = Vector3(planar.x, 0.0, planar.y)
 	move_and_slide()
 	global_position.y = 0.0
 	if input != Vector2.ZERO:
 		facing = input.normalized()
 	_set_state(State.MOVE if planar.length_squared() > 0.01 else State.IDLE)
+
+
+func planar_speed() -> float:
+	return Vector2(velocity.x, velocity.z).length()
 
 
 func position_2d() -> Vector2:

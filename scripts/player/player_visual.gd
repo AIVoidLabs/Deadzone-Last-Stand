@@ -5,40 +5,39 @@ extends Node3D
 
 const FLASH_SHADER: Shader = preload("res://assets/shaders/flash_lit.gdshader")
 const MODEL: PackedScene = preload("res://assets/models/characters/soldier.glb")
-const ANIM_LIBRARY_NAME: StringName = &"ual1"
-const ANIM_LIBRARY: AnimationLibrary = preload("res://assets/models/anim/ual1.glb")
-## Durum -> klip. Koşu klibinin hızı gerçek hıza oranlanır (ayak kaymasın).
-const STATE_CLIPS: Dictionary = {
-	Player.State.IDLE: &"ual1/Idle",
-	Player.State.MOVE: &"ual1/Sprint",
-	Player.State.DEAD: &"ual1/Death01",
-}
 const BODY_COLOR: Color = Color(0.25, 0.42, 0.7)
 const VISOR_COLOR: Color = Color(0.95, 0.75, 0.25)
 const HURT_COLOR: Color = Color(1.0, 0.25, 0.2)
 const DEAD_SQUASH: float = 0.25
 
 var _player: Player
+## Yatma bu düğüme uygulanır; yön (yaw) bu sınıfın kendisinde.
+var _pivot: Node3D
 var _meshes: Array[MeshInstance3D] = []
-var _animation: AnimationPlayer
+var _animator: PlayerAnimator
+var _move_blend: float = 0.0
 var _blink_left: float = 0.0
 
 
 func _ready() -> void:
 	_player = get_parent() as Player
+	_pivot = Node3D.new()
+	_pivot.name = "Pivot"
+	add_child(_pivot)
 	if Tuning.FEATURE_PLAYER_MODEL:
 		_build_model()
 	else:
 		_build_capsule()
 	_player.event.connect(_on_event)
 	_player.state_changed.connect(_on_state_changed)
-	_play_state(_player.state)
 
 
 func _process(delta: float) -> void:
 	var target_yaw: float = atan2(_player.facing.x, _player.facing.y)
+	var yaw_error: float = angle_difference(rotation.y, target_yaw)
 	rotation.y = lerp_angle(rotation.y, target_yaw, 1.0 - exp(-Tuning.PLAYER_TURN_SHARPNESS * delta))
-	_sync_run_speed()
+	_update_lean(yaw_error, delta)
+	_update_locomotion(delta)
 	if _blink_left > 0.0:
 		_blink_left -= delta
 		var on: bool = fmod(_blink_left * Tuning.PLAYER_BLINK_RATE, 2.0) > 1.0
@@ -46,33 +45,47 @@ func _process(delta: float) -> void:
 
 
 func _on_event(event_name: StringName, data: Dictionary) -> void:
-	if event_name == &"hit" and Tuning.FEATURE_HIT_FLASH:
+	if event_name != &"hit":
+		return
+	if _animator != null:
+		_animator.play_hit()
+	if Tuning.FEATURE_HIT_FLASH:
 		var iframes: float = data.get("iframes", Tuning.HIT_FLASH_TIME)
 		_blink_left = maxf(iframes, Tuning.HIT_FLASH_TIME)
 		_set_flash(1.0)
 
 
 func _on_state_changed(new_state: int, _old_state: int) -> void:
-	_play_state(new_state)
-	if new_state == Player.State.DEAD:
-		_blink_left = 0.0
-		_set_flash(0.0 if _animation != null else 1.0)
-		if _animation == null:
-			scale = Vector3(1.0, DEAD_SQUASH, 1.0)
-
-
-func _play_state(state: int) -> void:
-	if _animation == null or not STATE_CLIPS.has(state):
+	if new_state != Player.State.DEAD:
 		return
-	_animation.speed_scale = 1.0
-	_animation.play(STATE_CLIPS[state], Tuning.PLAYER_ANIM_BLEND)
+	_blink_left = 0.0
+	if _animator != null:
+		_animator.set_dead(true)
+		_set_flash(0.0)
+	else:
+		_set_flash(1.0)
+		scale = Vector3(1.0, DEAD_SQUASH, 1.0)
 
 
-func _sync_run_speed() -> void:
-	if _animation == null or _player.state != Player.State.MOVE:
+func _update_locomotion(delta: float) -> void:
+	if _animator == null:
 		return
-	var planar_speed: float = Vector2(_player.velocity.x, _player.velocity.z).length()
-	_animation.speed_scale = planar_speed / Tuning.PLAYER_SPEED
+	var speed: float = _player.planar_speed() if _player.state != Player.State.DEAD else 0.0
+	var target: float = clampf(speed / Tuning.PLAYER_SPEED, 0.0, 1.0)
+	_move_blend = lerpf(_move_blend, target, 1.0 - exp(-Tuning.PLAYER_ANIM_MOVE_SHARPNESS * delta))
+	_animator.set_locomotion(_move_blend, speed / Tuning.PLAYER_RUN_ANIM_SPEED)
+
+
+func _update_lean(yaw_error: float, delta: float) -> void:
+	var forward: float = 0.0
+	var side: float = 0.0
+	if Tuning.FEATURE_PLAYER_LEAN and _player.state != Player.State.DEAD:
+		forward = Locomotion.forward_lean(_player.planar_speed(), Tuning.PLAYER_SPEED, deg_to_rad(Tuning.PLAYER_LEAN_FORWARD_DEG))
+		side = Locomotion.turn_lean(yaw_error, Tuning.PLAYER_LEAN_TURN_GAIN, deg_to_rad(Tuning.PLAYER_LEAN_TURN_DEG))
+	var weight: float = 1.0 - exp(-Tuning.PLAYER_LEAN_SHARPNESS * delta)
+	# Model +Z'ye bakar: +X ekseninde dönüş öne yatırır; sola dönüşte (yaw artar) sola yatmak için -Z.
+	_pivot.rotation.x = lerpf(_pivot.rotation.x, forward, weight)
+	_pivot.rotation.z = lerpf(_pivot.rotation.z, -side, weight)
 
 
 func _set_flash(value: float) -> void:
@@ -82,14 +95,12 @@ func _set_flash(value: float) -> void:
 
 func _build_model() -> void:
 	var model: Node3D = MODEL.instantiate() as Node3D
-	add_child(model)
+	_pivot.add_child(model)
 	for node: Node in model.find_children("*", "MeshInstance3D", true, false):
 		var mesh: MeshInstance3D = node as MeshInstance3D
 		mesh.material_override = _flash_material(Color.WHITE, _albedo_texture_of(mesh))
 		_meshes.append(mesh)
-	_animation = AnimationPlayer.new()
-	model.add_child(_animation)
-	_animation.add_animation_library(ANIM_LIBRARY_NAME, ANIM_LIBRARY)
+	_animator = PlayerAnimator.new(model)
 
 
 func _build_capsule() -> void:
@@ -109,7 +120,7 @@ func _add_mesh(mesh: Mesh, color: Color) -> MeshInstance3D:
 	var instance: MeshInstance3D = MeshInstance3D.new()
 	instance.mesh = mesh
 	instance.material_override = _flash_material(color, null)
-	add_child(instance)
+	_pivot.add_child(instance)
 	return instance
 
 
