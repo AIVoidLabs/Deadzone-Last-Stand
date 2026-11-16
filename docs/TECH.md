@@ -84,6 +84,8 @@ Kaynak: Quaternius Universal Animation Library iskeleti (65 kemik, Unreal manken
 
 **Eksikler:** ikinci ve üçüncü zombi yürüyüşü, yönlü ölümler (2–3 çeşit), zombi koşusu, sürünme. Standard sürümde 8 yönlü hareket yok; asker hareket yönüne baktığı için gerekmiyor.
 
+**Zombi durumları (4.3–4.5):** geçiş kuralları saf sınıfta (`scripts/game/zombie_rules.gd`), süreler ve menziller `EnemyData` satırında; `EnemyManager` durumu ve kalan süreyi paralel dizilerde tutar, `Zombie.enter_state(durum, süre)` ile görüntüye haber verir. Görüntü klibi süreye uydurur (`_play_timed`: saldırı klibindeki vuruş anı hazırlığın sonuna denk gelir). Ölen zombi oyun dizilerinden hemen çıkar; düğümü `CorpseList` ölüm animasyonu ve solma bitene kadar tutar, sonra havuza verir. Solma saydamlıkla değil, shader'da noktalı elemeyle yapılır (malzeme opak kalır, sıralama derdi olmaz).
+
 **Türetme (4.2):** eksik klipler Blender'da değil, oyun açılırken koddan türetilir. `scripts/data/zombie_clip_data.gd` tablosundaki her satır bir kaynak klip + isteğe bağlı `mirror` (sağ-sol ayna), `offsets` (kemik başına model uzayında ek dönüş, derece) ve `reverse` (ters oynatma) içerir; `ZombieClips.library()` bunlardan paylaşılan "zombie" kütüphanesini bir kez üretir. Hesaplar saf sınıfta (`scripts/game/anim_derive.gd`, testli). Yeni yürüyüş ya da ölüm çeşidi = tabloya bir satır. Klip setini görmek için: `godot --path . res://scenes/debug/zombie_gallery.tscn -- --clips`. Kütüphanede ayrıca koşu (`Sprint`), zıplama (`Jump_*`, `NinjaJump_*`) ve fırlatma (`OverhandThrow`) klipleri var; Aşama 7 türleri bunlardan türetilecek.
 
 ## Model hattı

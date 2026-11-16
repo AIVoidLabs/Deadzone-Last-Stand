@@ -46,8 +46,9 @@ Zırhlı ve kasklı bir asker, kapalı bir şehir kavşağında dalga dalga gele
 
 - **Anlayış:** gerçekçilik değil, Brotato / Vampire Survivors okunaklılığı. Fizik elle yazılır; ragdoll yok.
 - **Silahlar:** 6 silahın hepsi askerin etrafında süzülür; her biri kendi hedefine döner ve ateşte geri teper. Asker hareket yönüne bakar.
-- **Zombi tepkisi:** vurulunca geriye itilir ve kısa süre sendeler; ağırlık türe göre.
-- **Zombi saldırısı:** kısa hazırlıklı vuruş (kaçılabilir); "değince hasar" tek sabitle geri açılabilir. Hangisinin kalacağı 4.3'te oynanarak seçilir.
+- **Zombi tepkisi:** vurulunca vuruş yönünde geriye itilir (silahın `knockback` değeri / zombinin `weight` değeri; tabanca ≈ 0.4 m) ve kısa süre sendeler (yürüyen: 0.22 sn); sendeleme saldırı hazırlığını bozar.
+- **Zombi saldırısı:** askere yaklaşınca durur, 0.5 sn hazırlanır (yönü kilitlenir), sonra vurur; asker o an erişimin (temas + 0.9 m) dışındaysa ıskalar. Ardından 0.6 sn toparlanır. "Değince hasar" `Tuning.FEATURE_ZOMBIE_WINDUP_ATTACK = false` ile geri açılır; hangisinin kalacağını Taha oynayarak seçer (4.3).
+- **Zombi doğması ve ölümü:** yerden doğrularak doğar (0.9 sn). Ölünce vuruş yönüne düşer ve biraz kayar, 1.5 sn yerde kalır, 0.5 sn'de solarak silinir; ceset hedef alınmaz ve çarpışmaz.
 - **Ölüm:** vuruş yönüne doğru ölüm animasyonu, ardından solarak silinme.
 - **Zombi türleri:** her tür oyuncuya ayrı bir karar çıkarır, siluet ve hareketle uzaktan ayırt edilir ve kendi içinde çok sayıda görünüme sahiptir (gövde çeşidi × renk şeması). Hedef liste (Aşama 7.2–7.3; Taha, 2026-11-16):
 
