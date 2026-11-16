@@ -19,6 +19,10 @@ const FEATURE_DASH_DUST: bool = true
 const FEATURE_PLAYER_MODEL: bool = true
 ## Kapalıyken zombiler Aşama 1'deki kutularla çizilir.
 const FEATURE_ZOMBIE_MODEL: bool = true
+## Zombi saldırısı: açıkken kısa hazırlıktan sonra vurur (kaçılabilir); kapalıyken eski "değince hasar".
+const FEATURE_ZOMBIE_WINDUP_ATTACK: bool = true
+## Zombiler yerden doğrularak doğar; kapalıyken doğrudan yürümeye başlar.
+const FEATURE_ZOMBIE_SPAWN_RISE: bool = true
 ## Asker gövdesinin hıza ve dönüşe göre yatması.
 const FEATURE_PLAYER_LEAN: bool = true
 
@@ -81,6 +85,8 @@ const CHARACTER_MODEL_HEIGHT: float = 1.83
 const ZOMBIE_ANIM_SPEED_VARIANCE: float = 0.15
 ## Zombi boyuna eklenen rastgele pay (±); yalnız görüntü, çarpışma değişmez. 0 = kapalı.
 const ZOMBIE_SCALE_VARIANCE: float = 0.08
+## Zombi klipleri arası geçiş süresi (sn).
+const ZOMBIE_ANIM_BLEND: float = 0.12
 
 # --- Doğma ---
 const SPAWN_INTERVAL_START: float = 1.0

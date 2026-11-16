@@ -1,14 +1,14 @@
 class_name Zombie
 extends Node3D
-## Zombi gövdesi: yalnız konum ve yön. Can ve hareket EnemyManager'da;
-## görüntü sinyalle haber alır.
+## Zombi gövdesi: yalnız konum, yön ve durum bildirimi. Can, hareket ve durum geçişleri
+## EnemyManager'da; görüntü sinyalle haber alır.
 
 signal state_changed(new_state: int, old_state: int)
 signal event(event_name: StringName, data: Dictionary)
 
-enum State { INACTIVE, CHASE, DEAD }
-
-var state: State = State.INACTIVE
+var state: ZombieRules.State = ZombieRules.State.INACTIVE
+## Girilen durumun süresi (sn); görüntü animasyonu buna uydurur. Süresiz durumda 0.
+var state_duration: float = 0.0
 
 
 func _init() -> void:
@@ -26,21 +26,22 @@ func activate(at: Vector3) -> void:
 	position = at
 	visible = true
 	reset_physics_interpolation()
-	_set_state(State.CHASE)
+
+
+func enter_state(new_state: ZombieRules.State, duration: float = 0.0) -> void:
+	state_duration = duration
+	if new_state == state:
+		return
+	var old: ZombieRules.State = state
+	state = new_state
+	state_changed.emit(new_state, old)
 
 
 func notify_hit(amount: float) -> void:
 	event.emit(&"hit", {"amount": amount})
 
 
-func kill() -> void:
+## Havuza dönüş: görünmez ve durgun.
+func deactivate() -> void:
 	visible = false
-	_set_state(State.DEAD)
-
-
-func _set_state(new_state: State) -> void:
-	if new_state == state:
-		return
-	var old: State = state
-	state = new_state
-	state_changed.emit(new_state, old)
+	enter_state(ZombieRules.State.INACTIVE)

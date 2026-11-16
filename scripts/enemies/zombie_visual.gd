@@ -12,7 +12,8 @@ static var _materials: Dictionary = {}
 
 var _meshes: Array[MeshInstance3D] = []
 var _animation: AnimationPlayer
-var _walk_clips: Array = []
+var _row: Dictionary = {}
+var _body: Zombie
 var _flash_left: float = 0.0
 
 
@@ -25,9 +26,9 @@ func _init() -> void:
 
 
 func _ready() -> void:
-	var body: Zombie = get_parent() as Zombie
-	body.event.connect(_on_event)
-	body.state_changed.connect(_on_state_changed)
+	_body = get_parent() as Zombie
+	_body.event.connect(_on_event)
+	_body.state_changed.connect(_on_state_changed)
 
 
 func _process(delta: float) -> void:
@@ -49,15 +50,25 @@ func _on_event(event_name: StringName, data: Dictionary) -> void:
 
 
 func _on_state_changed(new_state: int, _old_state: int) -> void:
-	if new_state == Zombie.State.CHASE:
-		_start_walk()
-		return
-	_flash_left = 0.0
-	_set_flash(0.0)
-	set_process(false)
-	# Havuzdaki (görünmeyen) zombi animasyon hesaplamasın.
-	if _animation != null:
-		_animation.stop()
+	match new_state:
+		ZombieRules.State.SPAWN:
+			_play_timed(&"anim_spawn", 0.0, _body.state_duration)
+		ZombieRules.State.CHASE:
+			_start_walk()
+		ZombieRules.State.WINDUP:
+			# Klipteki vuruş anı hazırlığın sonuna denk gelsin.
+			_play_timed(&"anim_attack", _row.get("attack_anim_hit_time", 0.0), _body.state_duration)
+		ZombieRules.State.RECOVER:
+			# Saldırı klibi kendi hızında tamamlanır.
+			if _animation != null:
+				_animation.speed_scale = 1.0
+		ZombieRules.State.INACTIVE:
+			_flash_left = 0.0
+			_set_flash(0.0)
+			set_process(false)
+			# Havuzdaki (görünmeyen) zombi animasyon hesaplamasın.
+			if _animation != null:
+				_animation.stop()
 
 
 func _set_flash(value: float) -> void:
@@ -82,6 +93,7 @@ func _build_box() -> void:
 
 
 func _apply_kind(row: Dictionary) -> void:
+	_row = row
 	var height: float = row["height"]
 	if _animation == null:
 		var box: MeshInstance3D = _meshes[0]
@@ -91,17 +103,37 @@ func _apply_kind(row: Dictionary) -> void:
 		return
 	var size: float = randf_range(1.0 - Tuning.ZOMBIE_SCALE_VARIANCE, 1.0 + Tuning.ZOMBIE_SCALE_VARIANCE)
 	scale = Vector3.ONE * (size * height / Tuning.CHARACTER_MODEL_HEIGHT)
-	_walk_clips = row["anim_walk"]
 
 
 ## Yürüyüşü rastgele bir kareden ve biraz farklı hızda başlatır; sürü aynı adımda yürümez.
 func _start_walk() -> void:
-	if _animation == null or _walk_clips.is_empty():
+	var clip: StringName = _pick_clip(&"anim_walk")
+	if clip == &"":
 		return
 	var variance: float = Tuning.ZOMBIE_ANIM_SPEED_VARIANCE
 	_animation.speed_scale = randf_range(1.0 - variance, 1.0 + variance)
-	_animation.play(ZombieClips.full_name(_walk_clips.pick_random()))
+	_animation.play(clip, Tuning.ZOMBIE_ANIM_BLEND)
 	_animation.seek(randf() * _animation.current_animation_length)
+
+
+## Klibi baştan oynatır; marker_time (0 ise klibin sonu) tam duration saniyede gelecek hızda.
+func _play_timed(row_key: StringName, marker_time: float, duration: float) -> void:
+	var clip: StringName = _pick_clip(row_key)
+	if clip == &"":
+		return
+	var span: float = marker_time if marker_time > 0.0 else _animation.get_animation(clip).length
+	_animation.speed_scale = span / maxf(duration, 0.01)
+	_animation.play(clip, Tuning.ZOMBIE_ANIM_BLEND)
+	_animation.seek(0.0)
+
+
+func _pick_clip(row_key: StringName) -> StringName:
+	if _animation == null:
+		return &""
+	var clips: Array = _row.get(row_key, [])
+	if clips.is_empty():
+		return &""
+	return ZombieClips.full_name(clips.pick_random())
 
 
 static func _material_for(row: Dictionary) -> ShaderMaterial:

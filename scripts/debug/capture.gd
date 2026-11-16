@@ -5,7 +5,7 @@ extends Node
 ## --capture-dash=S: görüntüden S saniye önce dash attırır.
 ## --capture-kill=S: görüntüden S saniye önce askeri öldürür (ölüm animasyonu denetimi).
 ## --camera-distance=M: kamera uzaklığını dener (karşılaştırma görüntüleri için).
-## --autopilot: asker ölümsüz, daire çizerek yürür.
+## --autopilot: asker ölümsüz, daire çizerek yürür. --god: asker ölümsüz ama yerinde durur.
 
 var player: Player
 var enemies: EnemyManager
@@ -48,6 +48,8 @@ func _ready() -> void:
 			camera.set_distance(arg.trim_prefix("--camera-distance=").to_float())
 		elif arg == "--autopilot":
 			_autopilot = true
+		elif arg == "--god":
+			player.god_mode = true
 		elif arg == "--debug-panel":
 			_show_panel = true
 	if _autopilot:
