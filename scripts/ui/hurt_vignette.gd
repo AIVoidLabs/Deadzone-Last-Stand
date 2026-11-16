@@ -4,7 +4,8 @@ extends CanvasLayer
 ## Yalnız görüntü; askerin event sinyalini dinler.
 
 const SHADER: Shader = preload("res://assets/shaders/hurt_vignette.gdshader")
-const LAYER: int = 5
+## HUD (katman 1) kızarmanın üstünde kalsın.
+const LAYER: int = 0
 
 var _player: Player
 var _rect: ColorRect
