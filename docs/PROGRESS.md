@@ -5,9 +5,10 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 
 ## Şu an
 
-- **Ana aşama:** 3 — Dikey dilim: asker **bitti** (2026-11-16); 🚩 bildirimi yapıldı, Taha'nın "devam"ı bekleniyor
-- **Sıradaki iş:** Aşama 4.1 — yürüyen zombi modeli (Blender, galeri görseliyle görünüm onayı)
-- **Bekleyen (Taha'dan):** "devam". Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
+- **Ana aşama:** 4 — Dikey dilim: zombi
+- **Alt aşama:** 4.1 model hazır ve oyunda; **Taha'nın görünüm onayı bekleniyor** (`build/shots/zombies.png`, `horde_zombie.png`)
+- **Sıradaki iş:** onaydan sonra 4.2 — zombi animasyonları (eksik klipler ücretsiz yoldan: mevcut kliplerden türetme + kod)
+- **Bekleyen (Taha'dan):** zombi görünümü onayı / değişiklik isteği. Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
 - **Not:** Blender MCP eklentisi 2026-11-16'da güncellendi (`uvx mcp-for-blender install-addon`); Blender yeniden başlatılınca etkinleşir. Scriptler zaten penceresiz çalışıyor.
 
 ## Ana aşama durumu
@@ -18,7 +19,7 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 | 1 | Kutu prototip | ✔ bitti (his onayı 5.7'ye devredildi) |
 | 2 | Model ve animasyon hattı | ✔ bitti (2026-11-16) |
 | 3 | Dikey dilim: asker | ✔ bitti (2026-11-16) |
-| 4 | Dikey dilim: zombi | — |
+| 4 | Dikey dilim: zombi | sürüyor (4.1) |
 | 5 | Dikey dilim: silah ve vuruş hissi | — |
 | 6 | Tur döngüsü | — |
 | 7 | Silah ve zombi çeşitliliği | — |
@@ -47,7 +48,7 @@ Bitiş ölçütleri `ROADMAP.md`'de. Biten kutunun yanına tarih ve commit yazı
 - [x] 3.5 Kamera — kod bitti 2026-11-16 (uzaklık 24 → 17, ileri bakış, sarsıntı altyapısı; asker vurulunca sarsılır); Taha oynadı, onayladı
 
 ### 4 — Dikey dilim: zombi
-- [ ] 4.1 Yürüyen zombi modeli
+- [ ] 4.1 Yürüyen zombi modeli — model bitti 2026-11-16 (`build_zombie.py`: 4 çeşit, ~600–650 üçgen, palet dokusu, tek dosya; oyunda rastgele çeşit); Taha'nın görünüm onayı bekleniyor
 - [ ] 4.2 Zombi animasyonları
 - [ ] 4.3 Durum makinesi ve saldırı
 - [ ] 4.4 İtme ve sendeleme
@@ -144,6 +145,7 @@ Profil üst sınırları (2.5 ölçümüne göre, efektlere pay bırakılarak): 
 ## Oturum günlüğü
 
 ### 2026-11-16 — Oturum 2
+- Aşama 3 kapandı (Taha onayladı; ölüm animasyonu `GAME_OVER_DELAY` ile düzeltildi). 4.1: `build_zombie.py` ile dört çeşitli low-poly zombi, `ModelVariants`, zombi galerisi sahnesi.
 - 3.2–3.5: `Locomotion` ve `Dash` saf kuralları (11 yeni test, toplam 42), `PlayerAnimator` animasyon ağacı, gövde yatması, takla ile dash, toz izi, HUD dash çubuğu, kamera 17 m + ileri bakış + sarsıntı. Taha animasyon önizlemesini onayladı.
 - 3.1: asker konsepti (stilize iri, ağır zırhlı, lacivert + turuncu); Tripo modeli `build_soldier.py` ile temizlendi ve iskelete bağlandı; `PlayerVisual` modeli ve animasyonu sürüyor; `inspect_model.py` eklendi.
 - Ortam kontrolü temiz (Godot 4.7.2, git, Node, `godot` + `blender` MCP bağlı, headless hatasız).

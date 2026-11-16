@@ -120,6 +120,7 @@ godot --path . res://scenes/debug/anim_preview.tscn -- --model=soldier
 - **Dinlenme pozu T-poz.** Kütüphanenin iskeleti T-pozda durur; yeni karakter hangi pozda gelirse gelsin script kolları ve bacakları kütüphanenin yönlerine çevirip bunu yeni dinlenme pozu yapar. Bu yapılmazsa animasyonlarda uzuvlar kayık durur.
 - **Dokuya Blender'da dokunma.** Görüntüyü Blender'da ölçekleyince Godot'nun çözemediği bir JPEG çıktı (doku boş, model beyaz; hata yalnız `--import` çıktısında görünür), PNG'ye çevirince de renkler soldu. Çözüm: ham doku olduğu gibi geçer, boyutu Godot sınırlar (`soldier_albedo.jpg.import` içinde `process/size_limit=1024`).
 - **Herhangi bir modeli ölçmek ve görmek için:** `blender --background --python tools/blender/inspect_model.py -- <model> build/shots/<ad>` (önden, yandan, arkadan görüntü + ölçüler).
+- **Zombi (4.1):** `blender --background --python tools/blender/build_zombie.py` → `assets/models/characters/zombie_walker.glb`. Model elle çizilmez: gövde, kemik hizalarına dizilen halkalardan (loft) kurulur, ağırlık halka başına verilir, renkler tek palet dokusundan gelir (yüz başına tek hücre; UV sabit olduğu için mipmap renk karıştırmaz). Çeşitler (`VARIANTS` tablosu) aynı dosyada ayrı ağlardır; oyunda `ModelVariants.keep` birini bırakır. Yeni `.glb` ilk içe aktarımdan sonra `.import` dosyasına kemik eşlemesi (`_subresources`) eklenip yeniden içe aktarılır. Galeri: `godot --path . res://scenes/debug/zombie_gallery.tscn [-- --capture=build/shots/zombies.png]`.
 
 ## Ölçümler
 
