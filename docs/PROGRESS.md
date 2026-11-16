@@ -6,10 +6,11 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 ## Şu an
 
 - **Ana aşama:** 2 — Model ve animasyon hattı
-- **Alt aşama:** 2.2 — Ortak iskelet standardı (başlıyor)
-- **Sıradaki iş:** penceresiz Blender scriptiyle kütüphaneden seçilen klipleri 25 kemikli oyun iskeletine indirip `.glb` üret; Godot'da kemik eşlemeli içe aktarımı çalıştır; standardı `TECH.md`'ye yaz.
+- **Alt aşama:** 2.4 — Animasyon aktarımı (kod bitti, **Taha'nın gözle onayı bekleniyor**); sonra 2.5 — Sürü performans ölçümü
+- **Sıradaki iş:** Taha önizlemeye bakıp yorum yapar → 2.5: animasyonlu mankenle 150 / 300 / 450 ölçümü (`EnemyManager` + `ZombieVisual` mankeni kullanacak, `--bench` yinelenecek).
 - **Bekleyen (Taha'dan):**
-  - Şimdilik yok. Blender işleri penceresiz çalışıyor; Blender'ı açıp bağlamak gerekmiyor.
+  - 2.4: `godot --path . res://scenes/debug/anim_preview.tscn` ile 25 klibe bakmak (Esc çıkış): döngüler temiz mi, hangi koşu / dash / zombi yürüyüşü hoşuna gidiyor, hangisi kötü?
+  - Blender'ı açıp bağlamak gerekmiyor; scriptler penceresiz çalışıyor.
   - Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
 
 ## Ana aşama durumu
@@ -36,9 +37,9 @@ Bitiş ölçütleri `ROADMAP.md`'de. Biten kutunun yanına tarih ve commit yazı
 
 ### 2 — Model ve animasyon hattı
 - [x] 2.1 Animasyon kütüphanesi seçimi — 2026-11-16. Quaternius UAL 1 + 2 Standard (CC0), 86 klip; klip eşlemesi ve eksikler `TECH.md`'de
-- [ ] 2.2 Ortak iskelet standardı
-- [ ] 2.3 Deneme mankeni
-- [ ] 2.4 Animasyon aktarımı
+- [x] 2.2 Ortak iskelet standardı — 2026-11-16. 25 kemik, Godot insansı profil eşlemesi, `check_anim_import.gd` temiz
+- [x] 2.3 Deneme mankeni — 2026-11-16. Quaternius mankeni 2.5 bin üçgene indirildi (sıfırdan modellemek yerine; aynı işi görüyor), akış dört komutla yineleniyor (`TECH.md`)
+- [ ] 2.4 Animasyon aktarımı — kod bitti (25 klip önizleme sahnesinde oynuyor, ekran görüntüsüyle doğrulandı); Taha'nın hareketli gözle onayı bekleniyor
 - [ ] 2.5 Sürü performans ölçümü
 
 ### 3 — Dikey dilim: asker
@@ -143,6 +144,7 @@ Profil üst sınırları şimdilik: low 200, medium 350, high 600 (kutu ölçüm
 
 ### 2026-11-16 — Oturum 2
 - Ortam kontrolü temiz (Godot 4.7.2, git, Node, `godot` + `blender` MCP bağlı, headless hatasız).
+- 2.1–2.4: Quaternius UAL 1 + 2 seçildi (CC0, repo public kararıyla uyumlu). `tools/blender/build_anim_library.py` (penceresiz Blender) → 25 kemikli iskelet, 25 klip, manken. Godot'da kemik eşlemeli içe aktarım, denetim scripti, `anim_preview` sahnesi.
 - Plan modu: Taha ile sekiz karar alındı, ana plan yeniden yapılandırıldı (önce dikey dilim). `ROADMAP.md`, `DECISIONS.md`, `TECH.md` yazıldı; `PROGRESS.md`, `GAME_DESIGN.md`, `CLAUDE.md` güncellendi. Kod değişmedi.
 
 ### 2026-11-15 — Oturum 1

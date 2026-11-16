@@ -34,7 +34,25 @@ Teknoloji, kod yapısı, iskelet standardı, model bütçeleri ve model hattı. 
 
 ## İskelet standardı
 
-Kaynak: Quaternius Universal Animation Library iskeleti (65 kemik, Unreal mankeni adlandırması). Ayrıntı (ölçek, yön, dinlenme pozu, Godot kemik eşlemesi) Aşama 2.2'de yazılır.
+Kaynak: Quaternius Universal Animation Library iskeleti (65 kemik, Unreal mankeni adlandırması). Aşama 2.2'de (2026-11-16) kuruldu ve doğrulandı.
+
+- **Ölçü ve yön:** 1 birim = 1 metre; manken 1.83 m (asker kapsülü 1.8 m ile uyumlu); Y yukarı, karakter +Z'ye bakar; dinlenme pozu A-poz.
+- **Godot tarafı:** içe aktarımda kemikler Godot insansı profiline yeniden adlandırılır ve iskelet düğümü sahne içinde benzersiz `%GeneralSkeleton` olur. Animasyon izleri `%GeneralSkeleton:<kemik>` yolunu kullandığı için aynı klip, bu kurala uyan her karakterde çalışır.
+- **Eşleme** (`assets/models/humanoid_bone_map.tres`, üreten: `tools/godot/make_bone_map.gd`):
+
+| Blender (UAL) | Godot | Blender (UAL) | Godot |
+|---|---|---|---|
+| `root` | `Root` | `clavicle_l/r` | `Left/RightShoulder` |
+| `pelvis` | `Hips` | `upperarm_l/r` | `Left/RightUpperArm` |
+| `spine_01` | `Spine` | `lowerarm_l/r` | `Left/RightLowerArm` |
+| `spine_02` | `Chest` | `hand_l/r` | `Left/RightHand` |
+| `spine_03` | `UpperChest` | `thigh_l/r` | `Left/RightUpperLeg` |
+| `neck_01` | `Neck` | `calf_l/r` | `Left/RightLowerLeg` |
+| `Head` | `Head` | `foot_l/r` | `Left/RightFoot` |
+| `ball_leaf_l/r` | (eşlenmez, adı kalır) | `ball_l/r` | `Left/RightToes` |
+
+- **Yeni karakter kuralı:** Blender'da bu 25 kemiğe, aynı adlarla ve A-pozda bağlanır; `.glb.import` dosyasında `_subresources` altına aynı kemik eşlemesi yazılır (örnek: `assets/models/characters/mannequin.glb.import`).
+- **Klip adları:** Godot içe aktarımda `_Loop` ekini atar ve klibi döngü olarak işaretler (`Idle_Loop` → `Idle`). Kodda kütüphane adıyla çağrılır: `ual1/Idle`, `ual2/Zombie_Walk_Fwd`.
 
 - **Oyun iskeleti (25 kemik):** `root, pelvis, spine_01, spine_02, spine_03, neck_01, Head` + her kol için `clavicle, upperarm, lowerarm, hand` + her bacak için `thigh, calf, foot, ball, ball_leaf` (`_l` / `_r`).
 - **Atılanlar:** 40 parmak kemiği (el başına 20). Parmak ağırlıkları `hand` kemiğine aktarılır.
@@ -59,7 +77,25 @@ Kaynak: Quaternius Universal Animation Library iskeleti (65 kemik, Unreal manken
 
 ## Model hattı
 
-Script (`tools/blender/`) → pozu sıfırla → kaydet → `.glb` dışa aktar → `godot --headless --import`. Ham Tripo dosyası ve ham kütüphane indirmeleri git'e girmez. Ayrıntı Aşama 2.3–2.4'te yazılır.
+Ham Tripo dosyası ve ham kütüphane indirmeleri `assets/models/source/` altında durur; bu klasör git'e girmez ve içindeki `.gdignore` sayesinde Godot da taramaz. Blender **penceresiz** çalışır; Blender'ı elle açmak ya da bağlamak gerekmez.
+
+Baştan üretim (repo kökünden, PowerShell):
+
+```
+blender --background --python tools/blender/build_anim_library.py
+godot --headless --path . --import
+godot --headless --path . -s res://tools/godot/check_anim_import.gd
+godot --path . res://scenes/debug/anim_preview.tscn
+```
+
+| Adım | Ne yapar |
+|---|---|
+| `build_anim_library.py` | Ham paketleri açar, parmak kemiklerini atıp ağırlıklarını ele aktarır, mankeni ~2.5 bin üçgene indirir, seçilen klipleri yazar → `assets/models/anim/ual1.glb`, `ual2.glb`, `assets/models/characters/mannequin.glb`. Klip listesi scriptin başındaki `PACKS` tablosunda; yeni klip = listeye bir ad |
+| `--import` | `.glb` dosyalarını içe aktarır (`anim/` altındakiler animasyon kütüphanesi, `characters/` altındakiler sahne olarak) |
+| `check_anim_import.gd` | Kemik adları ve iz yolları standarda uyuyor mu denetler; `SONUC: tamam` ve çıkış kodu 0 beklenir |
+| `anim_preview.tscn` | Her klibi bir mankende yan yana oynatır (Esc ile çıkış); `-- --capture=build/shots/anim.png` ile ekran görüntüsü alır |
+
+`make_bone_map.gd` yalnız eşleme değişirse yeniden çalıştırılır.
 
 ## Ölçümler
 
