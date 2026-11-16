@@ -5,11 +5,18 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 
 ## Şu an
 
-- **Ana aşama:** 5 — Dikey dilim: silah ve vuruş hissi (Taha 2026-11-16'da iki kez "devam" dedi; Aşama 4 kapandı)
-- **Alt aşama:** 5.4 kod bitti; **Taha'nın yorumu bekleniyor**
-- **Sıradaki iş:** 5.5 — ilk sesler (atış, isabet, zombi ölümü, adım, dash, asker vurulma; kodla sentez, Taha dinleyip onaylar)
-- **Bekleyen (Taha'dan):** asker vurulunca hissine bakmak; editörde "Embed Game on Next Play" kapatılıp F tuşlarının yeniden denenmesi. Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
-- **Not:** Blender MCP eklentisi 2026-11-16'da güncellendi (`uvx mcp-for-blender install-addon`); Blender yeniden başlatılınca etkinleşir. Scriptler zaten penceresiz çalışıyor.
+Oturum 2 sonu (2026-11-16, Taha "burada kalalım" dedi). Çalışma ağacı temiz, push yok.
+
+- **Ana aşama:** 5 — Dikey dilim: silah ve vuruş hissi
+- **Alt aşama:** 5.1, 5.2, 5.3 bitti. **5.4 kod bitti, açık:** askerin itilmesi Taha'nın isteğiyle kapatıldı; kalan kızarma (ekran kenarı + düşük canda nabız) için Taha'nın yorumu bekleniyor.
+- **Yeni oturumda ilk iş:**
+  1. Ortam kontrolü (CLAUDE.md bölüm 0).
+  2. Taha'ya sor: (a) "Embed Game on Next Play" kapatınca F7/F11 çalıştı mı? (b) 5.4 kızarma tamam mı? Onay gelirse 5.4'ü işaretle.
+  3. **5.5 — ilk sesler:** atış, isabet, zombi ölümü, adım, dash, asker vurulma. Kodla sentez (`tools/sfx/`, harici dosya indirme yok), ses havuzu `scripts/autoload/audio.gd` (planlandı, yok), her ses tek `Tuning` sabitiyle kapanır, çok ses aynı anda çalınca sınır ve hafif perde çeşitlemesi. Claude duyamaz: her sesi Taha dinleyip onaylar.
+  4. Sonra 5.6 (pompalı: modeli `weapons.glb` içinde hazır, veri satırı ve saçılma kuralı eksik), 5.7 (ışık ve dilim onayı; 🚩 Aşama 5 bildirimi).
+- **Bekleyen (Taha'dan):** yukarıdaki iki soru. Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
+- **Taha oyunu Godot editöründen (Play) açıyor.** Editör oyunu varsayılan olarak Game sekmesine gömer: gömülü pencerede tam ekran yok ve F tuşları oyuna ulaşmayabilir. Gömme: Game sekmesi araç çubuğunun en sağındaki ⋮ → "Embed Game on Next Play". Debug tuşlarının yedekleri Ctrl+3 … Ctrl+7.
+- **Not:** Blender MCP eklentisi 2026-11-16'da güncellendi; Blender scriptleri zaten penceresiz çalışıyor, Taha'nın Blender açması gerekmiyor.
 
 ## Ana aşama durumu
 
@@ -131,20 +138,28 @@ Profil üst sınırları (2.5 ölçümüne göre, efektlere pay bırakılarak): 
 
 ## Bilinen notlar / sonraya kalanlar
 
-- Silah gücü düşük (kalabalıkta hedef sürekli değişiyor, hasar dağılıyor) → 5.x ve 6.6.
-- Asker zombilerin arasından itilerek geçebiliyor → 3.4 (dash) ve 4.4 (itme) ile ele alınır.
-- Renkler oyunda Blender'dakinden açık (lacivert zırh soluk mavi görünüyor): ışık pozlaması yüksek → 5.7 ışık ayarı.
-- Dash toz izi kare parçacıklardan oluşuyor (yer tutucu) → 5.2/5.3 efekt işinde yumuşatılır.
-- Zombiler (ve asker) ekranda küçük görünüyor; Taha 2026-11-16'da doğruladı (`Tuning.CAMERA_DISTANCE` = 24) → 3.5.
+- Silah gücü düşük: zombi itilince tabanca başka hedefe dönüyor, hasar sürüye dağılıyor → 5.6 (pompalı) ve 6.6 dengesi.
+- Renkler oyunda Blender'dakinden açık (lacivert zırh soluk): ışık pozlaması yüksek → 5.7 ışık ayarı.
+- Dash toz izi kare parçacıklar, Taha "dandik" buldu → efekt cilası (5.7 ya da 8.3).
+- Zombi doğması (yerden kalkma) kamera dışında oluyor, oyunda pek görünmüyor → 6.1 dalgalarda doğma yerleri.
+- Silahlar 1.1 m'de, sürüde zombi başlarının arasına gömülebiliyor; Taha şimdilik itiraz etmedi.
+- Kapalı ama kodu duran özellikler: öldürmede duraksama (`FEATURE_HIT_STOP`, kalabalıkta takılma hissi), askerin vurulunca itilmesi (`FEATURE_PLAYER_KNOCKBACK`, "alakasız itiliyoruz"). Yeniden açmadan önce Taha'ya sor.
+- Hasar sayıları kalabalıkta çok; Taha şimdilik "iyi" dedi. 9.3 HUD'da ayarla birlikte gözden geçirilebilir.
+- İleride (Taha'nın fikirleri): enerji çemberinde yakın dövüş silahları, ışın kılıcı (7.1); zombi türleri tablosu `GAME_DESIGN.md` (7.2–7.3).
 
 ## Taha'nın geri bildirimi
 
+- 2026-11-16 (5.x): silah sola koşarken geride kalıyor, sağa koşarken gövdeye giriyor → yuvalar askere sabitlendi; zırhın enerji çemberi fikri (eklendi), "harika olmuş". Kanlar iyi; öldürmede duraksama takılma gibi → kapatıldı. Vurulunca itilme "çok kötü" → kapatıldı. Editörden oynarken F tuşları çalışmadı → gömülü pencere (yukarıda).
+- 2026-11-16 (4.x): zombi tarzı ve renkleri beğenildi, çok daha fazla çeşit ve koyu tonlar istendi (160 görünüm yapıldı); yeni türler: sürünen, koşan, zıplayan; Codex'le konuşup getirdiği tür listesi (çığlıkçı, zırhlı, tükürücü, patlayıcı) plana işlendi.
+- 2026-11-16 (3.x): Tripo lisansı sorunsuz; dash toz izi dandik; ölüm animasyonu oynamıyordu (düzeltildi).
 - 2026-11-16: Aşama 1 hissi zayıf: vuruş hissi yok, hareket ve koşu cansız, zombiler tehditsiz; "animasyon ve modellerle düzelebilir". Belgeler eksik ve ilerleme rastgele hissettiriyor → ana plan yeniden yazıldı (`ROADMAP.md`).
 - 2026-11-15: "Pencere modunda bile küçük duruyor, oyun tam ekran olmalı." → tam ekran açılış + F11/Alt+Enter (`Tuning.FEATURE_START_FULLSCREEN`).
 
 ## Oturum günlüğü
 
 ### 2026-11-16 — Oturum 2
+- **Oturum sonu özeti:** Aşama 3 ve 4 kapandı; Aşama 5'te 5.1–5.3 bitti, 5.4 yorum bekliyor. 69 GUT testi geçiyor. Bu oturumun son commit'leri: `9767e2a` (itilme kapalı, gömülü pencerede tam ekran denenmiyor), `bc18079`, `41b3ce8` (5.4), `c42e2c3` (duraksama kapalı), `996a2d7` (Ctrl yedek tuşlar), `a6facff` (5.3), `571c76e` (5.2), `57d6d23` ve `8b3ab3c` (5.1). Ölçüm: 234 zombi + 6 silah + tüm efektler, yüksek profil 128 FPS.
+- 5.2–5.4: mermi izi, namlu parlaması + ışık, isabet kıvılcımı; kan sıçraması, yerde solan lekeler (MultiMesh), hasar sayıları, `HitStop` (kapalı), öldürmede sarsıntı; ekran kenarı kızarması (`HurtVignette`), askerin itilmesi (kapalı). Debug tuşlarına Ctrl+3…7 yedekleri.
 - Aşama 4 kapandı; 5.1: süzülen silahlar (`WeaponRig`, `WeaponVisual`, `WeaponSlots`), silah modelleri Blender scriptinden, F7 debug silahı. Toplam 64 test.
 - 4.3–4.5: `ZombieRules`, `Knockback`, `CorpseList`; zombi durumları, hazırlıklı saldırı, itme, sendeleme, ölüm animasyonu ve solma. Toplam 59 test. Not: itme yüzünden tabanca hedef değiştiriyor, hasar sürüye yayılıyor (denge 5.6 ve 6.6'da).
 - Zombi türleri listesi (Taha + Codex önerisi) `GAME_DESIGN.md` ve 7.2–7.3'e işlendi. 4.2: `AnimDerive`, `ZombieClips`, `ZombieClipData`; toplam 48 test.
