@@ -15,6 +15,10 @@ func _ready() -> void:
 	var projectiles: ProjectilePool = ProjectilePool.new()
 	projectiles.enemies = enemies
 	add_child(projectiles)
+	if Tuning.FEATURE_IMPACT_SPARKS:
+		var sparks: ImpactSparks = ImpactSparks.new()
+		add_child(sparks)
+		projectiles.impact.connect(sparks.burst)
 
 	var weapons: WeaponRig = WeaponRig.new()
 	weapons.player = player

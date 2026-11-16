@@ -6,9 +6,9 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 ## Şu an
 
 - **Ana aşama:** 5 — Dikey dilim: silah ve vuruş hissi (Taha 2026-11-16'da iki kez "devam" dedi; Aşama 4 kapandı)
-- **Alt aşama:** 5.1 kod bitti; **Taha'nın yorumu bekleniyor**
-- **Sıradaki iş:** 5.2 — atış görseli (namlu parlaması, mermi izi, isabet kıvılcımı)
-- **Bekleyen (Taha'dan):** süzülen silahlara bakmak (F7 ile silah ekle, en çok 6). Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
+- **Alt aşama:** 5.1 bitti; 5.2 kod bitti, **Taha'nın yorumu bekleniyor**
+- **Sıradaki iş:** 5.3 — vuruş geri bildirimi (kan sıçraması, yerde solan lekeler, hasar sayıları, öldürmede küçük hit-stop ve sarsıntı)
+- **Bekleyen (Taha'dan):** atış görseline bakmak. Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
 - **Not:** Blender MCP eklentisi 2026-11-16'da güncellendi (`uvx mcp-for-blender install-addon`); Blender yeniden başlatılınca etkinleşir. Scriptler zaten penceresiz çalışıyor.
 
 ## Ana aşama durumu
@@ -20,7 +20,7 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 | 2 | Model ve animasyon hattı | ✔ bitti (2026-11-16) |
 | 3 | Dikey dilim: asker | ✔ bitti (2026-11-16) |
 | 4 | Dikey dilim: zombi | ✔ bitti (2026-11-16) |
-| 5 | Dikey dilim: silah ve vuruş hissi | sürüyor (5.1) |
+| 5 | Dikey dilim: silah ve vuruş hissi | sürüyor (5.2) |
 | 6 | Tur döngüsü | — |
 | 7 | Silah ve zombi çeşitliliği | — |
 | 8 | Arena, atmosfer, ses | — |
@@ -55,8 +55,8 @@ Bitiş ölçütleri `ROADMAP.md`'de. Biten kutunun yanına tarih ve commit yazı
 - [x] 4.5 Ölüm — kod bitti 2026-11-16 (`CorpseList`: vuruş yönüne düşer ve kayar, 3 ölüm klibinden biri, noktalı solma, havuza dönüş). Taha "devam" dedi
 
 ### 5 — Dikey dilim: silah ve vuruş hissi
-- [ ] 5.1 Süzülen silah yuvaları — kod bitti 2026-11-16 (`WeaponRig` + `WeaponSlots` 5 test; 6 yuva çemberde, her silah kendi en yakın hedefine döner ve kendi namlusundan ateş eder, geri tepme + salınım; `build_weapons.py`: tabanca ve pompalı). Taha: silah koşarken geride kalıyor/içe giriyor → yuvalar askere sabitlendi; enerji çemberi eklendi (`EnergyRing`, `FEATURE_ENERGY_RING`). Taha'nın yeniden bakması bekleniyor
-- [ ] 5.2 Atış görseli
+- [x] 5.1 Süzülen silah yuvaları — kod bitti 2026-11-16 (`WeaponRig` + `WeaponSlots` 5 test; 6 yuva çemberde, her silah kendi en yakın hedefine döner ve kendi namlusundan ateş eder, geri tepme + salınım; `build_weapons.py`: tabanca ve pompalı). Taha: silah koşarken geride kalıyor/içe giriyor → yuvalar askere sabitlendi; enerji çemberi eklendi (`EnergyRing`, `FEATURE_ENERGY_RING`). Taha: "harika olmuş"
+- [ ] 5.2 Atış görseli — kod bitti 2026-11-16 (mermi izi: parlak baş, sönen kuyruk; namlu parlaması: kameraya dönük yıldız + kısa nokta ışığı; isabet kıvılcımı: havuzlu, hız yönünde çizgi, sayısı kalite profilinden). Taha'nın yorumu bekleniyor
 - [ ] 5.3 Vuruş geri bildirimi
 - [ ] 5.4 Asker vurulunca
 - [ ] 5.5 İlk sesler

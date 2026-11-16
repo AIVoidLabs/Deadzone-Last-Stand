@@ -34,6 +34,10 @@ const FEATURE_ZOMBIE_DEATH_ANIM: bool = true
 const FEATURE_FLOATING_WEAPONS: bool = true
 ## Silahların durduğu, zırhın yansıttığı enerji çemberi (yalnız görüntü).
 const FEATURE_ENERGY_RING: bool = true
+## Mermi parlak, kuyruğu sönen bir iz olarak çizilir; kapalıyken eski sarı kutu.
+const FEATURE_TRACERS: bool = true
+const FEATURE_MUZZLE_FLASH: bool = true
+const FEATURE_IMPACT_SPARKS: bool = true
 ## Asker gövdesinin hıza ve dönüşe göre yatması.
 const FEATURE_PLAYER_LEAN: bool = true
 
@@ -143,6 +147,14 @@ const ENERGY_RING_DROP: float = 0.14
 const DEBUG_WEAPON: StringName = &"pistol"
 const PROJECTILE_LENGTH: float = 0.6
 const PROJECTILE_THICKNESS: float = 0.1
+## Mermi izi (FEATURE_TRACERS): uzunluk ve kalınlık (m).
+const TRACER_LENGTH: float = 1.1
+const TRACER_THICKNESS: float = 0.05
+## Namlu parlaması: süre (sn), boy (m), ışık enerjisi ve menzili.
+const MUZZLE_FLASH_TIME: float = 0.06
+const MUZZLE_FLASH_SIZE: float = 0.55
+const MUZZLE_LIGHT_ENERGY: float = 2.5
+const MUZZLE_LIGHT_RANGE: float = 3.0
 const PROJECTILE_LIFETIME_MARGIN: float = 1.15
 
 # --- Kamera ---

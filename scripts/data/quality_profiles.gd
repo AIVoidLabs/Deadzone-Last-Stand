@@ -12,9 +12,10 @@ const HIGH: StringName = &"high"
 const ORDER: Array[StringName] = [&"low", &"medium", &"high"]
 
 const TABLE: Dictionary = {
-	&"low": {"max_enemies": 150, "shadows": false, "msaa": 0},
-	&"medium": {"max_enemies": 250, "shadows": true, "msaa": 1},
-	&"high": {"max_enemies": 350, "shadows": true, "msaa": 2},
+	# spark_amount: isabet başına kıvılcım. muzzle_light: atışta kısa nokta ışığı.
+	&"low": {"max_enemies": 150, "shadows": false, "msaa": 0, "spark_amount": 4, "muzzle_light": false},
+	&"medium": {"max_enemies": 250, "shadows": true, "msaa": 1, "spark_amount": 6, "muzzle_light": true},
+	&"high": {"max_enemies": 350, "shadows": true, "msaa": 2, "spark_amount": 10, "muzzle_light": true},
 }
 
 

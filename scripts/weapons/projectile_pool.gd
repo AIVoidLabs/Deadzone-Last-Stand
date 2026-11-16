@@ -3,7 +3,10 @@ extends Node3D
 ## Mermiler: sabit havuz, elle hareket, kare başına doğru parçası çarpışması
 ## (hızlı mermi zombinin içinden geçip gitmez).
 
+signal impact(at: Vector3, direction: Vector2)
+
 const PHYSICS_PRIORITY: int = 10
+const TRACER_SHADER: Shader = preload("res://assets/shaders/tracer.gdshader")
 const COLOR: Color = Color(1.0, 0.85, 0.4)
 const EMISSION_ENERGY: float = 3.0
 
@@ -19,20 +22,28 @@ var _life: PackedFloat32Array = PackedFloat32Array()
 var _active: PackedByteArray = PackedByteArray()
 var _active_count: int = 0
 var _mesh: BoxMesh
-var _material: StandardMaterial3D
+var _material: Material
 
 
 func _ready() -> void:
 	name = "Projectiles"
 	process_physics_priority = PHYSICS_PRIORITY
 	_mesh = BoxMesh.new()
-	_mesh.size = Vector3(Tuning.PROJECTILE_THICKNESS, Tuning.PROJECTILE_THICKNESS, Tuning.PROJECTILE_LENGTH)
-	_material = StandardMaterial3D.new()
-	_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	_material.albedo_color = COLOR
-	_material.emission_enabled = true
-	_material.emission = COLOR
-	_material.emission_energy_multiplier = EMISSION_ENERGY
+	if Tuning.FEATURE_TRACERS:
+		_mesh.size = Vector3(Tuning.TRACER_THICKNESS, Tuning.TRACER_THICKNESS, Tuning.TRACER_LENGTH)
+		var tracer: ShaderMaterial = ShaderMaterial.new()
+		tracer.shader = TRACER_SHADER
+		tracer.set_shader_parameter(&"tracer_length", Tuning.TRACER_LENGTH)
+		_material = tracer
+	else:
+		_mesh.size = Vector3(Tuning.PROJECTILE_THICKNESS, Tuning.PROJECTILE_THICKNESS, Tuning.PROJECTILE_LENGTH)
+		var box: StandardMaterial3D = StandardMaterial3D.new()
+		box.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		box.albedo_color = COLOR
+		box.emission_enabled = true
+		box.emission = COLOR
+		box.emission_energy_multiplier = EMISSION_ENERGY
+		_material = box
 	_grow(Tuning.PROJECTILE_POOL_SIZE)
 
 
@@ -68,6 +79,9 @@ func _physics_process(delta: float) -> void:
 		var b: Vector2 = a + _dir[i] * _speed[i] * delta
 		var hit: int = enemies.find_segment_hit(a, b, Tuning.PROJECTILE_RADIUS)
 		if hit >= 0:
+			# Kıvılcım zombinin merminin geldiği yüzeyinde çıkar.
+			var surface: Vector2 = enemies.enemy_position(hit) - _dir[i] * enemies.enemy_radius(hit)
+			impact.emit(Vector3(surface.x, Tuning.PROJECTILE_HEIGHT, surface.y), _dir[i])
 			enemies.damage(hit, _damage[i], _dir[i], _knockback[i])
 			_release(i)
 			continue

@@ -74,6 +74,10 @@ func enemy_position(index: int) -> Vector2:
 	return _pos[index]
 
 
+func enemy_radius(index: int) -> float:
+	return _radius[index]
+
+
 ## Menzildeki en yakın canlı zombi; yoksa -1.
 func nearest_enemy(from: Vector2, max_range: float) -> int:
 	return _grid.nearest(from, max_range, _pos, _alive)
