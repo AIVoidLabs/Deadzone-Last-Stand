@@ -42,7 +42,7 @@ const FEATURE_IMPACT_SPARKS: bool = true
 const FEATURE_BLOOD: bool = true
 const FEATURE_BLOOD_DECALS: bool = true
 const FEATURE_DAMAGE_NUMBERS: bool = true
-const FEATURE_HIT_STOP: bool = true
+const FEATURE_HIT_STOP: bool = false
 const FEATURE_KILL_SHAKE: bool = true
 ## Asker gövdesinin hıza ve dönüşe göre yatması.
 const FEATURE_PLAYER_LEAN: bool = true

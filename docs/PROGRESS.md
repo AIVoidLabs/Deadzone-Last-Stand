@@ -6,9 +6,9 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 ## Şu an
 
 - **Ana aşama:** 5 — Dikey dilim: silah ve vuruş hissi (Taha 2026-11-16'da iki kez "devam" dedi; Aşama 4 kapandı)
-- **Alt aşama:** 5.2 ve 5.3 kod bitti; **Taha'nın efekt dozu onayı bekleniyor**
+- **Alt aşama:** 5.3 bitti (duraksama kapalı); 5.2 yorumu "kanlar vs iyi" ile birlikte geldi sayıldı
 - **Sıradaki iş:** 5.4 — asker vurulunca (ekran kenarı kızarması, sarsıntı, kısa geri itilme, yanıp sönme)
-- **Bekleyen (Taha'dan):** atış görseli ve vuruş geri bildirimine oynayarak bakmak. Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
+- **Bekleyen (Taha'dan):** editörde "Embed Game on Next Play" kapatılıp F tuşlarının yeniden denenmesi. Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
 - **Not:** Blender MCP eklentisi 2026-11-16'da güncellendi (`uvx mcp-for-blender install-addon`); Blender yeniden başlatılınca etkinleşir. Scriptler zaten penceresiz çalışıyor.
 
 ## Ana aşama durumu
@@ -56,8 +56,8 @@ Bitiş ölçütleri `ROADMAP.md`'de. Biten kutunun yanına tarih ve commit yazı
 
 ### 5 — Dikey dilim: silah ve vuruş hissi
 - [x] 5.1 Süzülen silah yuvaları — kod bitti 2026-11-16 (`WeaponRig` + `WeaponSlots` 5 test; 6 yuva çemberde, her silah kendi en yakın hedefine döner ve kendi namlusundan ateş eder, geri tepme + salınım; `build_weapons.py`: tabanca ve pompalı). Taha: silah koşarken geride kalıyor/içe giriyor → yuvalar askere sabitlendi; enerji çemberi eklendi (`EnergyRing`, `FEATURE_ENERGY_RING`). Taha: "harika olmuş"
-- [ ] 5.2 Atış görseli — kod bitti 2026-11-16 (mermi izi: parlak baş, sönen kuyruk; namlu parlaması: kameraya dönük yıldız + kısa nokta ışığı; isabet kıvılcımı: havuzlu, hız yönünde çizgi, sayısı kalite profilinden). Taha'nın yorumu bekleniyor
-- [ ] 5.3 Vuruş geri bildirimi — kod bitti 2026-11-16 (`BloodFx`: havuzlu kan sıçraması, ölümde 3 kat; yerde solan lekeler tek MultiMesh, en çok 48/128/256; `DamageNumbers`: yükselip sönen sayılar, öldürende turuncu ve büyük; `HitStop` + 5 test: öldürmede 45 ms yavaşlama, arada 0.3 sn bekleme, `GameFlow.hit_stop`; öldürmede küçük kamera sarsıntısı). Taha'nın efekt dozu onayı bekleniyor
+- [x] 5.2 Atış görseli — kod bitti 2026-11-16 (mermi izi: parlak baş, sönen kuyruk; namlu parlaması: kameraya dönük yıldız + kısa nokta ışığı; isabet kıvılcımı: havuzlu, hız yönünde çizgi, sayısı kalite profilinden). Taha itiraz etmedi
+- [x] 5.3 Vuruş geri bildirimi — kod bitti 2026-11-16 (`BloodFx`: havuzlu kan sıçraması, ölümde 3 kat; yerde solan lekeler tek MultiMesh, en çok 48/128/256; `DamageNumbers`: yükselip sönen sayılar, öldürende turuncu ve büyük; `HitStop` + 5 test: öldürmede 45 ms yavaşlama, arada 0.3 sn bekleme, `GameFlow.hit_stop`; öldürmede küçük kamera sarsıntısı). Taha: kan ve sayılar iyi; duraksama kalabalıkta takılma gibi hissettirdi → kapatıldı (`FEATURE_HIT_STOP = false`)
 - [ ] 5.4 Asker vurulunca
 - [ ] 5.5 İlk sesler
 - [ ] 5.6 İkinci silah: pompalı

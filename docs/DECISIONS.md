@@ -2,6 +2,12 @@
 
 Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar verilince "Açık kararlar"dan çıkarılıp tarihli bölüme yazılır.
 
+## 2026-11-16 — Aşama 5.3 vuruş geri bildirimi (Taha)
+
+- Kan sıçraması, lekeler ve hasar sayıları beğenildi ("kanlar vs iyi").
+- **Öldürmede duraksama (hit-stop) iptal:** kalabalıkta oyun takılıyormuş gibi hissettiriyor. `Tuning.FEATURE_HIT_STOP = false`; kod (`HitStop`, `GameFlow.hit_stop`) duruyor, ileride boss ya da tek büyük vuruş gibi seyrek anlarda denenebilir. Öldürmedeki küçük kamera sarsıntısı kaldı.
+- Taha oyunu Godot editöründen (Play) açıyor. Ölçüm: 234 zombi + 6 silah + tüm efektlerle 128 FPS (yüksek profil), yani takılma hissi FPS'ten değil duraksamadan.
+
 ## 2026-11-16 — Aşama 5.1 silah yerleşimi ve enerji çemberi (Taha)
 
 - Geri bildirim: silah sola koşarken çok geride kalıyor, sağa koşarken askerin içine giriyor. → Silahlar askere sabit bağlandı (izleme gecikmesi kaldırıldı); süzülme hissi yalnız salınımdan.
