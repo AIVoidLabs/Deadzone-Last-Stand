@@ -7,6 +7,10 @@ const BAR_SIZE: Vector2 = Vector2(260.0, 22.0)
 const BAR_CORNER_RADIUS: int = 4
 const HP_FILL_COLOR: Color = Color(0.85, 0.22, 0.2)
 const HP_BACK_COLOR: Color = Color(0.0, 0.0, 0.0, 0.5)
+const DASH_BAR_HEIGHT: float = 6.0
+const DASH_BAR_GAP: int = 4
+const DASH_READY_COLOR: Color = Color(0.35, 0.8, 1.0)
+const DASH_CHARGING_COLOR: Color = Color(0.35, 0.8, 1.0, 0.45)
 const OVERLAY_COLOR: Color = Color(0.0, 0.0, 0.0, 0.55)
 const TITLE_FONT_SIZE: int = 48
 const TEXT_FONT_SIZE: int = 20
@@ -14,6 +18,8 @@ const TEXT_FONT_SIZE: int = 20
 var _player: Player
 var _enemies: EnemyManager
 var _hp_bar: ProgressBar
+var _dash_bar: ProgressBar
+var _dash_fill: StyleBoxFlat
 var _stats_label: Label
 var _over: Control
 var _over_label: Label
@@ -35,6 +41,9 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	_hp_bar.max_value = _player.health.maximum
 	_hp_bar.value = _player.health.current
+	var readiness: float = _player.dash.readiness()
+	_dash_bar.value = readiness
+	_dash_fill.bg_color = DASH_READY_COLOR if readiness >= 1.0 else DASH_CHARGING_COLOR
 	_stats_label.text = "%s   ·   %d öldürme" % [_format_time(_enemies.elapsed), _enemies.kills]
 
 
@@ -52,7 +61,19 @@ func _build_top_bar() -> void:
 	_hp_bar.show_percentage = false
 	_hp_bar.add_theme_stylebox_override("background", _flat_box(HP_BACK_COLOR))
 	_hp_bar.add_theme_stylebox_override("fill", _flat_box(HP_FILL_COLOR))
-	row.add_child(_hp_bar)
+	var bars: VBoxContainer = VBoxContainer.new()
+	bars.add_theme_constant_override("separation", DASH_BAR_GAP)
+	row.add_child(bars)
+	bars.add_child(_hp_bar)
+	_dash_bar = ProgressBar.new()
+	_dash_bar.custom_minimum_size = Vector2(BAR_SIZE.x, DASH_BAR_HEIGHT)
+	_dash_bar.max_value = 1.0
+	_dash_bar.show_percentage = false
+	_dash_bar.visible = Tuning.FEATURE_DASH
+	_dash_fill = _flat_box(DASH_READY_COLOR)
+	_dash_bar.add_theme_stylebox_override("background", _flat_box(HP_BACK_COLOR))
+	_dash_bar.add_theme_stylebox_override("fill", _dash_fill)
+	bars.add_child(_dash_bar)
 	var spacer: Control = Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(spacer)

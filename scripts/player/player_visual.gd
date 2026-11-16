@@ -17,6 +17,7 @@ var _meshes: Array[MeshInstance3D] = []
 var _animator: PlayerAnimator
 var _move_blend: float = 0.0
 var _blink_left: float = 0.0
+var _dust: CPUParticles3D
 
 
 func _ready() -> void:
@@ -28,6 +29,9 @@ func _ready() -> void:
 		_build_model()
 	else:
 		_build_capsule()
+	if Tuning.FEATURE_DASH_DUST:
+		_dust = DashDust.create()
+		add_child(_dust)
 	_player.event.connect(_on_event)
 	_player.state_changed.connect(_on_state_changed)
 
@@ -45,6 +49,12 @@ func _process(delta: float) -> void:
 
 
 func _on_event(event_name: StringName, data: Dictionary) -> void:
+	if event_name == &"dash_started":
+		_on_dash_started()
+		return
+	if event_name == &"dash_ended":
+		_set_dust(false)
+		return
 	if event_name != &"hit":
 		return
 	if _animator != null:
@@ -67,10 +77,23 @@ func _on_state_changed(new_state: int, _old_state: int) -> void:
 		scale = Vector3(1.0, DEAD_SQUASH, 1.0)
 
 
+func _on_dash_started() -> void:
+	if _animator != null:
+		_animator.set_roll_duration(Tuning.DASH_ROLL_ANIM_TIME)
+		_animator.play_roll()
+	_set_dust(true)
+
+
+func _set_dust(emitting: bool) -> void:
+	if _dust != null:
+		_dust.emitting = emitting
+
+
 func _update_locomotion(delta: float) -> void:
 	if _animator == null:
 		return
 	var speed: float = _player.planar_speed() if _player.state != Player.State.DEAD else 0.0
+	speed = minf(speed, Tuning.PLAYER_SPEED)
 	var target: float = clampf(speed / Tuning.PLAYER_SPEED, 0.0, 1.0)
 	_move_blend = lerpf(_move_blend, target, 1.0 - exp(-Tuning.PLAYER_ANIM_MOVE_SHARPNESS * delta))
 	_animator.set_locomotion(_move_blend, speed / Tuning.PLAYER_RUN_ANIM_SPEED)
@@ -79,7 +102,7 @@ func _update_locomotion(delta: float) -> void:
 func _update_lean(yaw_error: float, delta: float) -> void:
 	var forward: float = 0.0
 	var side: float = 0.0
-	if Tuning.FEATURE_PLAYER_LEAN and _player.state != Player.State.DEAD:
+	if Tuning.FEATURE_PLAYER_LEAN and _player.state != Player.State.DEAD and not _player.is_dashing():
 		forward = Locomotion.forward_lean(_player.planar_speed(), Tuning.PLAYER_SPEED, deg_to_rad(Tuning.PLAYER_LEAN_FORWARD_DEG))
 		side = Locomotion.turn_lean(yaw_error, Tuning.PLAYER_LEAN_TURN_GAIN, deg_to_rad(Tuning.PLAYER_LEAN_TURN_DEG))
 	var weight: float = 1.0 - exp(-Tuning.PLAYER_LEAN_SHARPNESS * delta)

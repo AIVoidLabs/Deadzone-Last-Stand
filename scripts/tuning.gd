@@ -9,6 +9,10 @@ const FEATURE_HIT_FLASH: bool = true
 const FEATURE_PLAYER_IFRAMES: bool = true
 const FEATURE_SPAWN_RAMP: bool = true
 const FEATURE_START_FULLSCREEN: bool = true
+const FEATURE_DASH: bool = true
+## Dash sırasında asker zombilerin içinden geçer (kapalıysa onları iter).
+const FEATURE_DASH_PASS_THROUGH: bool = true
+const FEATURE_DASH_DUST: bool = true
 ## Kapalıyken asker Aşama 1'deki kapsülle çizilir.
 const FEATURE_PLAYER_MODEL: bool = true
 ## Kapalıyken zombiler Aşama 1'deki kutularla çizilir.
@@ -32,6 +36,17 @@ const PLAYER_RADIUS: float = 0.4
 const PLAYER_HEIGHT: float = 1.8
 const PLAYER_HIT_IFRAMES: float = 0.5
 const PLAYER_TURN_SHARPNESS: float = 14.0
+
+# --- Dash ---
+const DASH_SPEED: float = 15.0
+const DASH_DURATION: float = 0.35
+const DASH_COOLDOWN: float = 1.4
+## Dash bittikten sonraki kısa dokunulmazlık (sn).
+const DASH_EXIT_IFRAMES: float = 0.12
+## Takla klibinin oynatıldığı süre (sn); dash'ten biraz uzun, kalkış koşuya karışır.
+const DASH_ROLL_ANIM_TIME: float = 0.6
+const DASH_DUST_AMOUNT: int = 24
+const DASH_DUST_LIFETIME: float = 0.45
 
 # --- Asker görüntüsü ---
 ## Animasyonlar arası geçiş süresi (sn).

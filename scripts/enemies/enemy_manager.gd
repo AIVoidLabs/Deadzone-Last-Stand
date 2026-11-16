@@ -139,6 +139,7 @@ func _pick_spawn_point() -> Vector2:
 func _move(delta: float) -> void:
 	var target: Vector2 = player.position_2d()
 	var hittable: bool = player.is_hittable()
+	var solid: bool = not (Tuning.FEATURE_DASH_PASS_THROUGH and player.is_dashing())
 	for i in _pos.size():
 		var p: Vector2 = _pos[i]
 		var dir: Vector2 = Steering.seek(p, target)
@@ -151,7 +152,7 @@ func _move(delta: float) -> void:
 		var reach: float = Tuning.PLAYER_RADIUS + _radius[i]
 		var away: Vector2 = p - target
 		var dist: float = away.length()
-		if dist < reach:
+		if solid and dist < reach:
 			if hittable:
 				player.take_hit(_damage[i])
 				hittable = player.is_hittable()
