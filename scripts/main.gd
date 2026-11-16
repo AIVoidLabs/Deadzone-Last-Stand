@@ -37,6 +37,11 @@ func _ready() -> void:
 
 	_add_hit_feedback(enemies, camera)
 
+	if Tuning.FEATURE_HURT_VIGNETTE:
+		var vignette: HurtVignette = HurtVignette.new()
+		vignette.setup(player)
+		add_child(vignette)
+
 	var hud: Hud = Hud.new()
 	hud.setup(player, enemies)
 	add_child(hud)

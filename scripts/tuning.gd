@@ -44,6 +44,9 @@ const FEATURE_BLOOD_DECALS: bool = true
 const FEATURE_DAMAGE_NUMBERS: bool = true
 const FEATURE_HIT_STOP: bool = false
 const FEATURE_KILL_SHAKE: bool = true
+## Asker vurulunca (5.4): ekran kenarı kızarması (can azken nabız) ve vuruştan uzağa kısa itilme.
+const FEATURE_HURT_VIGNETTE: bool = true
+const FEATURE_PLAYER_KNOCKBACK: bool = true
 ## Asker gövdesinin hıza ve dönüşe göre yatması.
 const FEATURE_PLAYER_LEAN: bool = true
 
@@ -159,6 +162,15 @@ const HIT_STOP_KILL_TIME: float = 0.045
 const HIT_STOP_TIME_SCALE: float = 0.08
 const HIT_STOP_COOLDOWN: float = 0.3
 const CAMERA_SHAKE_ON_KILL: float = 0.12
+## Asker vurulunca: kızarmanın gücü ve sönme süresi; can bu oranın altındayken kenar nabız atar.
+const HURT_VIGNETTE_STRENGTH: float = 0.85
+const HURT_VIGNETTE_FADE_TIME: float = 0.45
+const LOW_HP_THRESHOLD: float = 0.35
+const LOW_HP_VIGNETTE: float = 0.55
+const LOW_HP_PULSE_RATE: float = 1.2
+## Askerin vurulunca aldığı ilk itme hızı (m/sn) ve sönmesi; kat edilen yol = hız / sönme.
+const PLAYER_HIT_KNOCKBACK: float = 6.0
+const PLAYER_KNOCKBACK_DAMPING: float = 11.0
 ## Debug: F7 ile eklenen silah.
 const DEBUG_WEAPON: StringName = &"pistol"
 const PROJECTILE_LENGTH: float = 0.6

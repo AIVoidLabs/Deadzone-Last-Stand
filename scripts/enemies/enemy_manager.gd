@@ -206,7 +206,7 @@ func _move(delta: float) -> void:
 		var dist: float = away.length()
 		if solid and dist < reach:
 			if hittable and not windup_attack:
-				player.take_hit(_damage[i])
+				player.take_hit(_damage[i], -away)
 				hittable = player.is_hittable()
 			p = target + (away / dist if dist > 0.0001 else -dir) * reach
 			dist = reach
@@ -231,7 +231,7 @@ func _on_timer(index: int, state: ZombieRules.State, target: Vector2) -> ZombieR
 	if state == ZombieRules.State.WINDUP:
 		var contact: float = Tuning.PLAYER_RADIUS + _radius[index]
 		if ZombieRules.strike_hits(_pos[index].distance_to(target), contact, row["attack_hit_range"]):
-			player.take_hit(_damage[index])
+			player.take_hit(_damage[index], target - _pos[index])
 		_enter(index, next, row["attack_recover"])
 	else:
 		_enter(index, next, 0.0)

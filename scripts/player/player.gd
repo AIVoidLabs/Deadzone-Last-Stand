@@ -21,6 +21,8 @@ var input_override: Vector2 = Vector2.ZERO
 var _iframes_left: float = 0.0
 var _dash_direction: Vector2 = Vector2.ZERO
 var _dash_requested: bool = false
+## Vurulunca aldığı itme hızı (XZ); kendiliğinden söner.
+var _knock: Vector2 = Vector2.ZERO
 
 
 func _init() -> void:
@@ -56,6 +58,8 @@ func _physics_process(delta: float) -> void:
 			Vector2(velocity.x, velocity.z), input, Tuning.PLAYER_SPEED, Tuning.PLAYER_ACCEL, Tuning.PLAYER_FRICTION, delta)
 		if input != Vector2.ZERO:
 			facing = input.normalized()
+		planar += _knock
+		_knock = Knockback.decay(_knock, Tuning.PLAYER_KNOCKBACK_DAMPING, delta)
 	velocity = Vector3(planar.x, 0.0, planar.y)
 	move_and_slide()
 	global_position.y = 0.0
@@ -84,9 +88,12 @@ func request_dash() -> void:
 	_dash_requested = true
 
 
-func take_hit(amount: float) -> void:
+## push: vuruşun geldiği yönde itme (zombiden askere); sıfırsa itilmez.
+func take_hit(amount: float, push: Vector2 = Vector2.ZERO) -> void:
 	if not is_hittable():
 		return
+	if Tuning.FEATURE_PLAYER_KNOCKBACK:
+		_knock = Knockback.impulse(push, Tuning.PLAYER_HIT_KNOCKBACK, 1.0)
 	var dealt: float = health.take_damage(CombatMath.mitigate(amount, Tuning.PLAYER_ARMOR))
 	if Tuning.FEATURE_PLAYER_IFRAMES:
 		_iframes_left = Tuning.PLAYER_HIT_IFRAMES
