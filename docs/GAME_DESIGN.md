@@ -50,6 +50,7 @@ Zırhlı ve kasklı bir asker, kapalı bir şehir kavşağında dalga dalga gele
 - **Zombi saldırısı:** askere yaklaşınca durur, 0.5 sn hazırlanır (yönü kilitlenir), sonra vurur; asker o an erişimin (temas + 0.9 m) dışındaysa ıskalar. Ardından 0.6 sn toparlanır. "Değince hasar" `Tuning.FEATURE_ZOMBIE_WINDUP_ATTACK = false` ile geri açılır; hangisinin kalacağını Taha oynayarak seçer (4.3).
 - **Zombi doğması ve ölümü:** yerden doğrularak doğar (0.9 sn). Ölünce vuruş yönüne düşer ve biraz kayar, 1.5 sn yerde kalır, 0.5 sn'de solarak silinir; ceset hedef alınmaz ve çarpışmaz.
 - **Ölüm:** vuruş yönüne doğru ölüm animasyonu, ardından solarak silinme.
+- **Silahlar ve enerji çemberi:** askerin zırhı çevresine turuncu bir enerji çemberi yansıtır; en çok 6 silah bu çemberin üstünde, askere sabit yuvalarda süzülür. Her silah kendi en yakın hedefine döner ve kendi namlusundan ateş eder. İleride yakın dövüş silahları (ışın kılıcı vb.) da çemberde durur (7.1).
 - **Zombi türleri:** her tür oyuncuya ayrı bir karar çıkarır, siluet ve hareketle uzaktan ayırt edilir ve kendi içinde çok sayıda görünüme sahiptir (gövde çeşidi × renk şeması). Hedef liste (Aşama 7.2–7.3; Taha, 2026-11-16):
 
   | Tür | Davranış | Oyuncuya çıkardığı karar |

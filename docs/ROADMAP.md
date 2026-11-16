@@ -73,7 +73,7 @@ Arayüz bu aşamada işlevsel ve sade; son görünüm Aşama 9'da. Taha her alt 
 
 | # | Alt aşama | Bitti sayılır, eğer… | Taha |
 |---|---|---|---|
-| 7.1 | Silah davranış seti | Veri satırından seçilen davranışlar: tek mermi, saçılma, delip geçme, patlama (alan hasarı), yakın dövüş savurma, yanma | Oynayıp yorum |
+| 7.1 | Silah davranış seti | Veri satırından seçilen davranışlar: tek mermi, saçılma, delip geçme, patlama (alan hasarı), yakın dövüş savurma (ışın kılıcı gibi; çemberden fırlayıp savrulur), yanma | Oynayıp yorum |
 | 7.2 | Hareket türleri: koşucu, zıplayan, sürünen, tank | Blender'dan; her tür siluet ve hareketle uzaktan ayırt ediliyor ve oyuncuya ayrı bir karar çıkarıyor (tablo `GAME_DESIGN.md`). Koşucu hazırlık animasyonundan sonra atılır; zıplayanın düşeceği yer belli; her türün kendi gövde çeşitleri ve renk şemaları var | Görünüm onayı |
 | 7.3 | Özel türler: zırhlı, çığlıkçı, tükürücü, taş fırlatan, patlayıcı | Zırhlı önden dayanıklı, yandan/arkadan zayıf. Çığlıkçı uzaktan zombi çağırır. Tükürücü yerde süre kalan asit alanı bırakır. Taş fırlatanın atışı görülüp kaçılabilir. Patlayıcı uyarı verip patlar, çevresindeki zombilere de zarar verir | Tripo'da özel zombi modelleri (istenirse) |
 | 7.4 | Boss | Kendi saldırı düzenleri, can çubuğu, boss dalgası | Tripo'da boss modeli |

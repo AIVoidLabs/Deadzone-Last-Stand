@@ -2,6 +2,12 @@
 
 Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar verilince "Açık kararlar"dan çıkarılıp tarihli bölüme yazılır.
 
+## 2026-11-16 — Aşama 5.1 silah yerleşimi ve enerji çemberi (Taha)
+
+- Geri bildirim: silah sola koşarken çok geride kalıyor, sağa koşarken askerin içine giriyor. → Silahlar askere sabit bağlandı (izleme gecikmesi kaldırıldı); süzülme hissi yalnız salınımdan.
+- Hikâye: gelişmiş zırh, askerin çevresine bir **enerji çemberi** yansıtır; silahlar bu çemberin üstünde durur. Çember 5.1'de eklendi (turuncu, kesikli, dönen; silah yuvalarında parlar).
+- İleride: çemberde yakın dövüş silahları da olabilir (**ışın kılıcı** vb.) → Aşama 7.1 silah davranış setine eklendi.
+
 ## 2026-11-16 — Aşama 4 kapanışı (Taha)
 
 - Zombi saldırısı: **hazırlıklı vuruş** (kaçılabilir) varsayılan. Taha ayrıca seçim yapmadan "devam" dedi; "değince hasar" `Tuning.FEATURE_ZOMBIE_WINDUP_ATTACK = false` ile hâlâ geri açılabilir. Oynarken fikri değişirse 5.7 dilim onayında yeniden bakılır.
