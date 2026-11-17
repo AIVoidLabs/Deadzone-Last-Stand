@@ -5,14 +5,14 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 
 ## Şu an
 
-Oturum 3 (2026-11-17). Push yok.
+Oturum 3 sonu (2026-11-17, Taha "gayet güzel" deyip oturumu kapattı). Çalışma ağacı temiz, push yok.
 
 - **Ana aşama:** 5 — Dikey dilim: silah ve vuruş hissi
-- **Alt aşama:** 5.1–5.6 bitti. **5.7 cila bitti, dikey dilim onayı bekleniyor.**
+- **Alt aşama:** 5.1–5.6 bitti. **5.7 cila bitti; dikey dilim onayı bekleniyor.** Taha dilime "gayet güzel" dedi ama açıkça "onay" demedi; yeni oturumda tek cümleyle teyit et (ya da takıldığı şeyi sor), sonra 5.7'yi işaretle.
 - **Sıradaki:**
   1. Taha 60 sn oynar ve **dikey dilimi onaylar** (Aşama 1'den devreden his onayı da bu). Onayda 5.7'yi işaretle, 🚩 Aşama 5 bildirimini yap, devam bekle.
   2. Sonra Aşama 6 — Tur döngüsü (6.1 dalgalar).
-- **Bekleyen (Taha'dan):** dikey dilim onayı. Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
+- **Bekleyen (Taha'dan):** dikey dilim onayı (üstteki not). Zombi saldırısı hâlâ "hazırlanıp vurur"; değiştirmek isterse onay turunda söyler. Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
 - **Taha oyunu Godot editöründen (Play) açıyor.** Editör oyunu varsayılan olarak Game sekmesine gömer: gömülü pencerede tam ekran yok ve F tuşları oyuna ulaşmayabilir. Gömme: Game sekmesi araç çubuğunun en sağındaki ⋮ → "Embed Game on Next Play". Debug tuşlarının yedekleri Ctrl+3 … Ctrl+7.
 - **Not:** Blender MCP eklentisi 2026-11-16'da güncellendi; Blender scriptleri zaten penceresiz çalışıyor, Taha'nın Blender açması gerekmiyor.
 
@@ -155,6 +155,7 @@ Profil üst sınırları (2.5 ölçümüne göre, efektlere pay bırakılarak): 
 ## Oturum günlüğü
 
 ### 2026-11-17 — Oturum 3
+- **Oturum sonu özeti:** 5.4–5.6 kapandı, 5.7 cilası bitti (onay bekliyor). Son commit'ler: `0b10609` (akşam ışığı), `10eb870` (ışık ön ayarları, asker tonu, dash tozu), `99b42fb` (ses sızıntısı), `30532d3` (pompalı), `510b83d` / `cbdc768` (5.5). 85 test geçiyor. Bu oturumun sonunda model Sonnet 5.5'e alındı (varsayılan).
 - Ortam kontrolü temiz. Taha 5.4 kızarmayı onayladı; F tuşları gömme kapalıyken sorunsuz.
 - 5.5 ilk tur geri bildirimi: isabet sesi kapandı, sürü homurtusu (5 çeşit, yoğunluğa göre sıklık ve düzey), takla kısıldı + zırh/alet çantası tıngırtısı (3 çeşit); zombi ölüm sesi kapandı, 5.5 temel seslerle kapandı.
 - 5.6: pompalı (`Spread`, silah tablosunda varsayılan alanlar `DEFAULTS`, `add_debug_weapon`). 85 test. Kapanışta çalan seslerin sızıntı uyarısı bulundu ve düzeltildi (`99b42fb`).
