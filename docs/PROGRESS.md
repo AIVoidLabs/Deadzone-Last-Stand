@@ -8,9 +8,8 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 Oturum 4 (2026-11-17). Taha dikey dilimi onayladı ("her şey okey"); Aşama 5 kapandı.
 
 - **Ana aşama:** 6 — Tur döngüsü
-- **Alt aşama:** 6.1 Dalgalar — kod bitti, Taha'nın oynaması bekleniyor
-- **Sıradaki:** Taha oynar ve yorum yapar → 6.2 Düşenler (XP ve para).
-- **Bekleyen (Taha'dan):** 6.1 oynama yorumu (dalga temposu, ekran dışı doğma, yazılar). Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
+- **Alt aşama:** 6.2 Düşenler (plan kararları soruluyor)
+- **Bekleyen (Taha'dan):** 6.2 kararları. Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
 - **Taha oyunu Godot editöründen (Play) açıyor.** Gömülü pencerede tam ekran yok ve F tuşları oyuna ulaşmayabilir; Game sekmesi ⋮ → "Embed Game on Next Play" kapatılır. Debug tuşlarının yedekleri Ctrl+3 … Ctrl+7.
 
 ## Ana aşama durumu
@@ -66,7 +65,7 @@ Bitiş ölçütleri `ROADMAP.md`'de. Biten kutunun yanına tarih ve commit yazı
 - [x] 5.7 Dilim cilası ve **dikey dilim onayı** — 2026-11-17, Taha onayladı ("her şey okey"); zombi saldırısı hazırlıklı vuruş olarak kaldı. Cila (ışık ön ayarları `LightingData`, Taha "dusk" seçti; asker renk tonu `PLAYER_ALBEDO_TINT`; yumuşak dash tozu; kapanışta ses sızıntısı düzeltildi). 258 zombi + 4 silah, akşam ışığı: 135 FPS
 
 ### 6 — Tur döngüsü
-- [ ] 6.1 Dalgalar — kod bitti 2026-11-17 (`WaveData` 5 dalga, `WaveRun` + 7 test, `SpawnDirector`, ekran dışı doğma `SpawnRules` + 5 test, dalga sayacı ve ortadaki yazılar `WaveBanner`, "HAYATTA KALDIN" ekranı, F8 dalgayı bitir). 97 test. Taha'nın oynaması bekleniyor
+- [x] 6.1 Dalgalar — 2026-11-17 (`2cc7038`; Taha yorum yapmadan "devam" dedi) (`WaveData` 5 dalga, `WaveRun` + 7 test, `SpawnDirector`, ekran dışı doğma `SpawnRules` + 5 test, dalga sayacı ve ortadaki yazılar `WaveBanner`, "HAYATTA KALDIN" ekranı, F8 dalgayı bitir). 97 test
 - [ ] 6.2 Düşenler
 - [ ] 6.3 İstatistikler ve kartlar
 - [ ] 6.4 Silah yuvaları ve birleştirme
