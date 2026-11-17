@@ -65,6 +65,8 @@ const FEATURE_SFX_DASH: bool = true
 const FEATURE_SFX_PLAYER_HURT: bool = true
 
 # --- Arena ---
+## Işık ve zemin ön ayarı (LightingData tablosundan).
+const LIGHTING_PRESET: StringName = &"classic"
 const ARENA_SIZE: float = 60.0
 const ARENA_WALL_HEIGHT: float = 1.2
 const ARENA_WALL_THICKNESS: float = 1.0
@@ -93,6 +95,9 @@ const DASH_DUST_AMOUNT: int = 24
 const DASH_DUST_LIFETIME: float = 0.45
 
 # --- Asker görüntüsü ---
+## Asker dokusunun çarpıldığı renk: Tripo dokusu açık tonlu, yukarıdan ışıkta beyaza kaçıyor.
+## Biraz koyu ve maviye çekilince lacivert zırh ve gri plakalar okunur. Color.WHITE = doku olduğu gibi.
+const PLAYER_ALBEDO_TINT: Color = Color(0.62, 0.66, 0.82)
 ## Animasyonlar arası geçiş süresi (sn).
 const PLAYER_ANIM_BLEND: float = 0.15
 ## Vurulma klibinin girip çıkma süresi (sn).

@@ -5,18 +5,16 @@ extends Node3D
 
 const GROUND_SHADER: Shader = preload("res://assets/shaders/ground_grid.gdshader")
 const WALL_COLOR: Color = Color(0.42, 0.38, 0.33)
-const BACKGROUND_COLOR: Color = Color(0.09, 0.1, 0.12)
-const AMBIENT_COLOR: Color = Color(0.55, 0.6, 0.7)
-const AMBIENT_ENERGY: float = 0.6
-const SUN_ROTATION_DEG: Vector3 = Vector3(-55.0, -35.0, 0.0)
-const SUN_ENERGY: float = 1.2
 const SHADOW_MAX_DISTANCE: float = 60.0
+const LIGHTING_ARG: String = "--lighting="
 
 var _sun: DirectionalLight3D
+var _preset: Dictionary
 
 
 func _ready() -> void:
 	name = "Arena"
+	_preset = LightingData.get_preset(preset_id())
 	_build_environment()
 	_build_ground()
 	_build_walls()
@@ -24,20 +22,40 @@ func _ready() -> void:
 	Quality.profile_changed.connect(_apply_quality)
 
 
+## Etkin ışık ön ayarı; debug yapıda --lighting=<ad> ile değiştirilebilir (karşılaştırma görüntüleri).
+static func preset_id() -> StringName:
+	if OS.is_debug_build():
+		for arg: String in OS.get_cmdline_user_args():
+			if arg.begins_with(LIGHTING_ARG):
+				return StringName(arg.trim_prefix(LIGHTING_ARG))
+	return Tuning.LIGHTING_PRESET
+
+
 func _build_environment() -> void:
 	var env: Environment = Environment.new()
 	env.background_mode = Environment.BG_COLOR
-	env.background_color = BACKGROUND_COLOR
+	env.background_color = _preset["background"]
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.ambient_light_color = AMBIENT_COLOR
-	env.ambient_light_energy = AMBIENT_ENERGY
-	env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
+	env.ambient_light_color = _preset["ambient_color"]
+	env.ambient_light_energy = _preset["ambient_energy"]
+	env.tonemap_mode = _preset["tonemap"]
+	env.tonemap_exposure = _preset["exposure"]
+	env.adjustment_enabled = true
+	env.adjustment_saturation = _preset["saturation"]
+	env.adjustment_contrast = _preset["contrast"]
+	var fog: float = _preset["fog_density"]
+	if fog > 0.0:
+		env.fog_enabled = true
+		env.fog_light_color = _preset["fog_color"]
+		env.fog_density = fog
+		env.fog_sky_affect = 0.0
 	var world_env: WorldEnvironment = WorldEnvironment.new()
 	world_env.environment = env
 	add_child(world_env)
 	_sun = DirectionalLight3D.new()
-	_sun.rotation_degrees = SUN_ROTATION_DEG
-	_sun.light_energy = SUN_ENERGY
+	_sun.rotation_degrees = _preset["sun_rotation_deg"]
+	_sun.light_color = _preset["sun_color"]
+	_sun.light_energy = _preset["sun_energy"]
 	_sun.directional_shadow_max_distance = SHADOW_MAX_DISTANCE
 	add_child(_sun)
 
@@ -49,13 +67,16 @@ func _build_ground() -> void:
 	var mat: ShaderMaterial = ShaderMaterial.new()
 	mat.shader = GROUND_SHADER
 	mat.set_shader_parameter(&"arena_half", Tuning.ARENA_SIZE * 0.5)
+	mat.set_shader_parameter(&"base_color", _preset["ground_base"])
+	mat.set_shader_parameter(&"line_color", _preset["ground_line"])
+	mat.set_shader_parameter(&"outside_color", _preset["ground_outside"])
+	mat.set_shader_parameter(&"stains", _preset["ground_stains"])
 	var ground: MeshInstance3D = MeshInstance3D.new()
 	ground.name = "Ground"
 	ground.mesh = plane
 	ground.material_override = mat
 	ground.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(ground)
-
 
 func _build_walls() -> void:
 	var half: float = Tuning.ARENA_SIZE * 0.5

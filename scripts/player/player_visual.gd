@@ -121,7 +121,7 @@ func _build_model() -> void:
 	_pivot.add_child(model)
 	for node: Node in model.find_children("*", "MeshInstance3D", true, false):
 		var mesh: MeshInstance3D = node as MeshInstance3D
-		mesh.material_override = _flash_material(Color.WHITE, _albedo_texture_of(mesh))
+		mesh.material_override = _flash_material(Tuning.PLAYER_ALBEDO_TINT, _albedo_texture_of(mesh))
 		_meshes.append(mesh)
 	_animator = PlayerAnimator.new(model)
 

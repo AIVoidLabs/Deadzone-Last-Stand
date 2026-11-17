@@ -3,8 +3,10 @@ extends RefCounted
 ## Dash sırasında askerin ayak hizasından çıkan toz izi. Tek örnek askere bağlı kalır,
 ## yalnız dash süresince yayar (yaratıp yok etme yok).
 
-const COLOR: Color = Color(0.85, 0.82, 0.75, 0.7)
-const PUFF_SIZE: float = 0.28
+const COLOR: Color = Color(0.8, 0.77, 0.7, 0.55)
+const PUFF_SIZE: float = 0.55
+## Toz bulutu dokusu: ortası dolu, kenara doğru yumuşakça sönen daire (kare parçacık görünmesin).
+const DISC_SIZE: int = 64
 const HEIGHT: float = 0.15
 const SPREAD_RADIUS: float = 0.25
 const RISE_SPEED: Vector2 = Vector2(0.3, 1.0)
@@ -47,7 +49,26 @@ static func _puff_mesh() -> QuadMesh:
 	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	material.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
 	material.vertex_color_use_as_albedo = true
+	material.albedo_texture = _soft_disc()
+	# Zemine gömülen kısım düz bir çizgiyle kesilmesin, yere yaklaştıkça sönsün.
+	material.proximity_fade_enabled = true
+	material.proximity_fade_distance = PUFF_SIZE * 0.5
 	var quad: QuadMesh = QuadMesh.new()
 	quad.size = Vector2(PUFF_SIZE, PUFF_SIZE)
 	quad.material = material
 	return quad
+
+
+static func _soft_disc() -> GradientTexture2D:
+	var fade: Gradient = Gradient.new()
+	fade.set_color(0, Color(1.0, 1.0, 1.0, 1.0))
+	fade.set_color(1, Color(1.0, 1.0, 1.0, 0.0))
+	fade.add_point(0.45, Color(1.0, 1.0, 1.0, 0.6))
+	var texture: GradientTexture2D = GradientTexture2D.new()
+	texture.gradient = fade
+	texture.fill = GradientTexture2D.FILL_RADIAL
+	texture.fill_from = Vector2(0.5, 0.5)
+	texture.fill_to = Vector2(0.5, 0.0)
+	texture.width = DISC_SIZE
+	texture.height = DISC_SIZE
+	return texture
