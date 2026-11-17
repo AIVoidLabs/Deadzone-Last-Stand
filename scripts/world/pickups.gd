@@ -148,16 +148,16 @@ func _write_at(i: int, p: Vector2, lift: float) -> void:
 	_mm.set_instance_transform(i, Transform3D(basis, Vector3(p.x, Tuning.PICKUP_HEIGHT + lift, p.y)))
 
 
-## Dikine uzatılmış sekizyüzlü; düz yüzler (yüz başına normal), low-poly kristal.
+## Taş kesimi çift piramit: üst ucu uzun, alt ucu kısa; düz yüzler (yüz başına normal).
 static func _build_crystal_mesh() -> ArrayMesh:
-	var top: Vector3 = Vector3(0.0, Tuning.PICKUP_CRYSTAL_STRETCH, 0.0)
-	var bottom: Vector3 = Vector3(0.0, -Tuning.PICKUP_CRYSTAL_STRETCH, 0.0)
-	var ring: Array[Vector3] = [Vector3(1, 0, 0), Vector3(0, 0, 1), Vector3(-1, 0, 0), Vector3(0, 0, -1)]
+	var top: Vector3 = Vector3(0.0, Tuning.PICKUP_CRYSTAL_TOP, 0.0)
+	var bottom: Vector3 = Vector3(0.0, -Tuning.PICKUP_CRYSTAL_BOTTOM, 0.0)
+	var sides: int = Tuning.PICKUP_CRYSTAL_SIDES
 	var st: SurfaceTool = SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	for k in 4:
-		var a: Vector3 = ring[k]
-		var b: Vector3 = ring[(k + 1) % 4]
+	for k in sides:
+		var a: Vector3 = Vector3.RIGHT.rotated(Vector3.UP, -TAU * k / sides)
+		var b: Vector3 = Vector3.RIGHT.rotated(Vector3.UP, -TAU * (k + 1) / sides)
 		_add_face(st, top, b, a)
 		_add_face(st, bottom, a, b)
 	return st.commit()

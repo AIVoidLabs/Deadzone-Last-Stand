@@ -186,13 +186,17 @@ const PICKUP_COLLECT_ALL_SPEED: float = 8.0
 const PICKUP_HOP_TIME: float = 0.35
 const PICKUP_HOP_HEIGHT: float = 0.6
 const PICKUP_HOP_DISTANCE: float = 0.8
-## Görüntü: yerden yükseklik, boy, dikine uzama, değer başına büyüme ve en çok büyüme.
+## Görüntü: yerden yükseklik, boy, değer başına büyüme ve en çok büyüme.
 const PICKUP_HEIGHT: float = 0.35
-const PICKUP_SIZE: float = 0.2
-const PICKUP_CRYSTAL_STRETCH: float = 1.7
+const PICKUP_SIZE: float = 0.11
+## Kristal kesimi: köşe sayısı, üst ve alt ucun boyu (yarıçapa oranla).
+const PICKUP_CRYSTAL_SIDES: int = 6
+const PICKUP_CRYSTAL_TOP: float = 2.2
+const PICKUP_CRYSTAL_BOTTOM: float = 1.0
 const PICKUP_VALUE_SCALE: float = 0.12
 const PICKUP_MAX_SCALE: float = 2.0
-const PICKUP_COLOR: Color = Color(0.05, 0.85, 0.65)
+## Beyazımsı, çok hafif buz mavisi.
+const PICKUP_COLOR: Color = Color(0.86, 0.95, 1.0)
 ## Seviye için gereken XP: (seviye + bu)². 1→2: 16 kristal.
 const XP_LEVEL_OFFSET: int = 3
 
