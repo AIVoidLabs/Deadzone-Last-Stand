@@ -36,6 +36,7 @@ func _ready() -> void:
 			camera.add_trauma(Tuning.CAMERA_SHAKE_ON_PLAYER_HIT))
 
 	_add_hit_feedback(enemies, camera)
+	_add_sounds(player, enemies, weapons)
 
 	if Tuning.FEATURE_HURT_VIGNETTE:
 		var vignette: HurtVignette = HurtVignette.new()
@@ -69,6 +70,24 @@ func _add_hit_feedback(enemies: EnemyManager, camera: FollowCamera) -> void:
 		GameFlow.hit_stop(Tuning.HIT_STOP_KILL_TIME)
 		if Tuning.FEATURE_KILL_SHAKE:
 			camera.add_trauma(Tuning.CAMERA_SHAKE_ON_KILL))
+
+
+## Ses efektleri: olaylar Audio.play'e bağlanır; hangi sesin açık olduğu SoundData/Tuning'den.
+func _add_sounds(player: Player, enemies: EnemyManager, weapons: WeaponRig) -> void:
+	if not Tuning.FEATURE_SFX:
+		return
+	weapons.weapon_fired.connect(func(row: Dictionary) -> void:
+		Audio.play(row.get("sound", SoundData.SHOT)))
+	enemies.enemy_damaged.connect(func(_at: Vector3, _dir: Vector2, _amount: float, killed: bool) -> void:
+		Audio.play(SoundData.ZOMBIE_DEATH if killed else SoundData.HIT))
+	player.event.connect(func(event_name: StringName, _data: Dictionary) -> void:
+		if event_name == &"hit":
+			Audio.play(SoundData.PLAYER_HURT)
+		elif event_name == &"dash_started":
+			Audio.play(SoundData.DASH))
+	var steps: Footsteps = Footsteps.new()
+	steps.player = player
+	add_child(steps)
 
 
 func _add_debug_tools(player: Player, enemies: EnemyManager, projectiles: ProjectilePool, camera: FollowCamera, weapons: WeaponRig) -> void:

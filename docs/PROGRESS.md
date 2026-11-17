@@ -5,10 +5,10 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 
 ## Şu an
 
-Oturum 2 sonu (2026-11-16, Taha "burada kalalım" dedi). Çalışma ağacı temiz, push yok.
+Oturum 3 (2026-11-17). Push yok.
 
 - **Ana aşama:** 5 — Dikey dilim: silah ve vuruş hissi
-- **Alt aşama:** 5.1, 5.2, 5.3 bitti. **5.4 kod bitti, açık:** askerin itilmesi Taha'nın isteğiyle kapatıldı; kalan kızarma (ekran kenarı + düşük canda nabız) için Taha'nın yorumu bekleniyor.
+- **Alt aşama:** 5.1–5.4 bitti. **5.5 (ilk sesler) kod bitti, Taha'nın dinlemesi bekleniyor.**
 - **Yeni oturumda ilk iş:**
   1. Ortam kontrolü (CLAUDE.md bölüm 0).
   2. Taha'ya sor: (a) "Embed Game on Next Play" kapatınca F7/F11 çalıştı mı? (b) 5.4 kızarma tamam mı? Onay gelirse 5.4'ü işaretle.
@@ -66,7 +66,7 @@ Bitiş ölçütleri `ROADMAP.md`'de. Biten kutunun yanına tarih ve commit yazı
 - [x] 5.2 Atış görseli — kod bitti 2026-11-16 (mermi izi: parlak baş, sönen kuyruk; namlu parlaması: kameraya dönük yıldız + kısa nokta ışığı; isabet kıvılcımı: havuzlu, hız yönünde çizgi, sayısı kalite profilinden). Taha itiraz etmedi
 - [x] 5.3 Vuruş geri bildirimi — kod bitti 2026-11-16 (`BloodFx`: havuzlu kan sıçraması, ölümde 3 kat; yerde solan lekeler tek MultiMesh, en çok 48/128/256; `DamageNumbers`: yükselip sönen sayılar, öldürende turuncu ve büyük; `HitStop` + 5 test: öldürmede 45 ms yavaşlama, arada 0.3 sn bekleme, `GameFlow.hit_stop`; öldürmede küçük kamera sarsıntısı). Taha: kan ve sayılar iyi; duraksama kalabalıkta takılma gibi hissettirdi → kapatıldı (`FEATURE_HIT_STOP = false`)
 - [x] 5.4 Asker vurulunca — 2026-11-17 (`41b3ce8`, `9767e2a`). Ekran kenarı kızarması, can %35'in altındayken nabız; sarsıntı ve yanıp sönme zaten vardı. Taha: itilme kötü → kapatıldı (`FEATURE_PLAYER_KNOCKBACK = false`); kızarmayı onayladı
-- [ ] 5.5 İlk sesler
+- [ ] 5.5 İlk sesler — kod bitti 2026-11-17 (`tools/sfx/gen_sfx.py`: Python standart kütüphanesiyle sentez, sabit tohum, 6 ses 13 dosya; `Audio` autoload: 32 oynatıcılık havuz, "SFX" veri yolu; `SoundData` tablosu: düzey, perde payı, aynı anda en çok kopya, çalışlar arası bekleme; `VoiceLimiter` + `Stride` 10 test; adımlar koşu klibinin temposundan). Taha dinleyip onaylayacak
 - [ ] 5.6 İkinci silah: pompalı
 - [ ] 5.7 Dilim cilası ve **dikey dilim onayı**
 
@@ -156,6 +156,10 @@ Profil üst sınırları (2.5 ölçümüne göre, efektlere pay bırakılarak): 
 - 2026-11-15: "Pencere modunda bile küçük duruyor, oyun tam ekran olmalı." → tam ekran açılış + F11/Alt+Enter (`Tuning.FEATURE_START_FULLSCREEN`).
 
 ## Oturum günlüğü
+
+### 2026-11-17 — Oturum 3
+- Ortam kontrolü temiz. Taha 5.4 kızarmayı onayladı.
+- 5.5: ses sentezi (	ools/sfx/gen_sfx.py), Audio havuzu, SoundData, VoiceLimiter, Stride, Footsteps; F3 panelinde çalan ses sayısı. 79 test geçiyor. 150 zombi + 6 silahta 9 sn'de 193 ses, aynı anda en çok 9, 144 FPS.
 
 ### 2026-11-16 — Oturum 2
 - **Oturum sonu özeti:** Aşama 3 ve 4 kapandı; Aşama 5'te 5.1–5.3 bitti, 5.4 yorum bekliyor. 69 GUT testi geçiyor. Bu oturumun son commit'leri: `9767e2a` (itilme kapalı, gömülü pencerede tam ekran denenmiyor), `bc18079`, `41b3ce8` (5.4), `c42e2c3` (duraksama kapalı), `996a2d7` (Ctrl yedek tuşlar), `a6facff` (5.3), `571c76e` (5.2), `57d6d23` ve `8b3ab3c` (5.1). Ölçüm: 234 zombi + 6 silah + tüm efektler, yüksek profil 128 FPS.

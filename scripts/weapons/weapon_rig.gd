@@ -7,6 +7,9 @@ extends Node3D
 ## Asker hareket ettikten sonra, mermiler ilerlemeden önce çalışır.
 const PHYSICS_PRIORITY: int = 5
 
+## Herhangi bir silah ateş edince (ses vb. için); row: silahın WeaponData satırı.
+signal weapon_fired(row: Dictionary)
+
 var player: Player
 var enemies: EnemyManager
 var projectiles: ProjectilePool
@@ -34,6 +37,7 @@ func add_weapon(id: StringName) -> bool:
 		return false
 	var weapon: Weapon = Weapon.new()
 	weapon.setup(id, player, enemies, projectiles)
+	weapon.fired.connect(func(_direction: Vector2) -> void: weapon_fired.emit(weapon.row))
 	add_child(weapon)
 	_weapons.append(weapon)
 	weapon.global_position = _slot_position(_weapons.size() - 1)

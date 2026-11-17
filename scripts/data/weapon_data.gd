@@ -18,6 +18,8 @@ const TABLE: Dictionary = {
 		"model_scale": 2.2,
 		"recoil": 0.12,
 		"muzzle_offset": 0.25,
+		# Atış sesi (SoundData satırı).
+		"sound": &"shot",
 	},
 }
 

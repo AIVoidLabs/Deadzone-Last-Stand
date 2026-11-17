@@ -49,6 +49,14 @@ const FEATURE_HURT_VIGNETTE: bool = true
 const FEATURE_PLAYER_KNOCKBACK: bool = false
 ## Asker gövdesinin hıza ve dönüşe göre yatması.
 const FEATURE_PLAYER_LEAN: bool = true
+## Ses efektleri (5.5): ana anahtar + her ses için ayrı anahtar. Ses satırları scripts/data/sound_data.gd'de.
+const FEATURE_SFX: bool = true
+const FEATURE_SFX_SHOT: bool = true
+const FEATURE_SFX_HIT: bool = true
+const FEATURE_SFX_ZOMBIE_DEATH: bool = true
+const FEATURE_SFX_FOOTSTEP: bool = true
+const FEATURE_SFX_DASH: bool = true
+const FEATURE_SFX_PLAYER_HURT: bool = true
 
 # --- Arena ---
 const ARENA_SIZE: float = 60.0
@@ -198,6 +206,14 @@ const CAMERA_SHAKE_MAX_OFFSET: float = 0.6
 const CAMERA_SHAKE_FREQUENCY: float = 6.0
 const CAMERA_SHAKE_DECAY: float = 2.2
 const CAMERA_SHAKE_ON_PLAYER_HIT: float = 0.45
+
+# --- Ses ---
+## Aynı anda çalabilecek en çok ses (havuzdaki oynatıcı sayısı).
+const SFX_POOL_SIZE: int = 32
+## Adım sesi: koşu klibinin bir döngüsündeki adım sayısı (adım boyu klipten türetilir).
+const FOOTSTEP_STEPS_PER_CYCLE: int = 2
+## Bu hızın altında adım sesi çalmaz (m/sn).
+const FOOTSTEP_MIN_SPEED: float = 1.0
 
 # --- Uzay ızgarası ---
 const GRID_CELL_SIZE: float = 1.5

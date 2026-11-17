@@ -1,0 +1,314 @@
+"""Deadzone Last Stand ses efektleri: koddan sentez, dış dosya yok.
+
+Çalıştırma (proje kökünden):  python tools/sfx/gen_sfx.py
+Çıktı: assets/audio/sfx/<ad>_<n>.wav (44.1 kHz, 16 bit, mono). Sabit tohumlu: her çalıştırma aynı dosyaları üretir.
+Ardından: godot --headless --path . --import
+Ses adları ve çeşit sayıları scripts/data/sound_data.gd ile eşleşmeli.
+"""
+
+from __future__ import annotations
+
+import math
+import random
+import struct
+import sys
+import wave
+from pathlib import Path
+
+SR = 44100
+PEAK = 0.89  # ~ -1 dBFS
+OUT_DIR = Path(__file__).resolve().parents[2] / "assets" / "audio" / "sfx"
+
+
+# --- Temel parçalar ---------------------------------------------------------------------------
+
+def frames(seconds: float) -> int:
+    return int(seconds * SR)
+
+
+def silence(seconds: float) -> list[float]:
+    return [0.0] * frames(seconds)
+
+
+def noise(n: int, rng: random.Random) -> list[float]:
+    return [rng.uniform(-1.0, 1.0) for _ in range(n)]
+
+
+def mix_into(dst: list[float], src: list[float], gain: float = 1.0, start: float = 0.0) -> None:
+    offset = frames(start)
+    for i, v in enumerate(src):
+        j = i + offset
+        if j >= len(dst):
+            break
+        dst[j] += v * gain
+
+
+def env_exp(n: int, tau: float, attack: float = 0.0005) -> list[float]:
+    """Kısa yükseliş + üstel sönme."""
+    a = max(1, frames(attack))
+    out = []
+    for i in range(n):
+        t = i / SR
+        rise = min(1.0, i / a)
+        out.append(rise * math.exp(-t / tau))
+    return out
+
+
+def env_swell(n: int, peak_at: float, power: float = 1.5) -> list[float]:
+    """0'dan yükselip peak_at oranında tepe yapan, sonra sönen zarf (hışırtı için)."""
+    out = []
+    for i in range(n):
+        x = i / max(1, n - 1)
+        if x < peak_at:
+            v = (x / peak_at) ** power
+        else:
+            v = ((1.0 - x) / (1.0 - peak_at)) ** power
+        out.append(v)
+    return out
+
+
+def apply(sig: list[float], env: list[float]) -> list[float]:
+    return [s * e for s, e in zip(sig, env)]
+
+
+class Biquad:
+    """RBJ biquad süzgeci; kesim frekansı her örnekte değişebilir."""
+
+    def __init__(self, kind: str) -> None:
+        self.kind = kind
+        self.x1 = self.x2 = self.y1 = self.y2 = 0.0
+        self.b0 = self.b1 = self.b2 = self.a1 = self.a2 = 0.0
+
+    def set(self, freq: float, q: float) -> None:
+        freq = min(max(freq, 20.0), SR * 0.45)
+        w = 2.0 * math.pi * freq / SR
+        cw, sw = math.cos(w), math.sin(w)
+        alpha = sw / (2.0 * q)
+        if self.kind == "lp":
+            b0, b1, b2 = (1 - cw) / 2, 1 - cw, (1 - cw) / 2
+        elif self.kind == "hp":
+            b0, b1, b2 = (1 + cw) / 2, -(1 + cw), (1 + cw) / 2
+        else:  # "bp": tepe kazancı 1
+            b0, b1, b2 = alpha, 0.0, -alpha
+        a0 = 1 + alpha
+        self.b0, self.b1, self.b2 = b0 / a0, b1 / a0, b2 / a0
+        self.a1, self.a2 = -2 * cw / a0, (1 - alpha) / a0
+
+    def tick(self, x: float) -> float:
+        y = self.b0 * x + self.b1 * self.x1 + self.b2 * self.x2 - self.a1 * self.y1 - self.a2 * self.y2
+        self.x2, self.x1 = self.x1, x
+        self.y2, self.y1 = self.y1, y
+        return y
+
+
+def filt(sig: list[float], kind: str, freq, q: float = 0.707) -> list[float]:
+    """freq sabit sayı ya da t (sn) -> Hz fonksiyonu olabilir."""
+    f = Biquad(kind)
+    sweeping = callable(freq)
+    if not sweeping:
+        f.set(freq, q)
+    out = []
+    for i, x in enumerate(sig):
+        if sweeping and i % 32 == 0:
+            f.set(freq(i / SR), q)
+        out.append(f.tick(x))
+    return out
+
+
+def sine_sweep(n: int, freq) -> list[float]:
+    phase = 0.0
+    out = []
+    for i in range(n):
+        phase += 2.0 * math.pi * freq(i / SR) / SR
+        out.append(math.sin(phase))
+    return out
+
+
+def saw(n: int, freq) -> list[float]:
+    phase = 0.0
+    out = []
+    for i in range(n):
+        phase = (phase + freq(i / SR) / SR) % 1.0
+        out.append(2.0 * phase - 1.0)
+    return out
+
+
+def partials(n: int, specs: list[tuple[float, float, float]]) -> list[float]:
+    """Metal tınısı: (frekans, sönme tau, genlik) kısmi sesleri."""
+    out = [0.0] * n
+    for freq, tau, amp in specs:
+        for i in range(n):
+            t = i / SR
+            out[i] += amp * math.sin(2.0 * math.pi * freq * t) * math.exp(-t / tau)
+    return out
+
+
+def formants(sig: list[float], specs: list[tuple[float, float, float]]) -> list[float]:
+    """Ses yolu taklidi: (frekans, Q, kazanç) bant geçiren süzgeçlerin toplamı."""
+    out = [0.0] * len(sig)
+    for freq, q, gain in specs:
+        band = filt(sig, "bp", freq, q)
+        for i, v in enumerate(band):
+            out[i] += v * gain
+    return out
+
+
+def soft_clip(sig: list[float], drive: float) -> list[float]:
+    norm = math.tanh(drive)
+    return [math.tanh(v * drive) / norm for v in sig]
+
+
+def fade_out(sig: list[float], seconds: float) -> list[float]:
+    n = min(len(sig), frames(seconds))
+    out = list(sig)
+    for i in range(n):
+        out[len(out) - n + i] *= 1.0 - i / n
+    return out
+
+
+def normalize(sig: list[float]) -> list[float]:
+    peak = max(abs(v) for v in sig) or 1.0
+    return [v * PEAK / peak for v in sig]
+
+
+def write_wav(name: str, sig: list[float]) -> None:
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    path = OUT_DIR / f"{name}.wav"
+    data = normalize(fade_out(sig, 0.01))
+    with wave.open(str(path), "wb") as w:
+        w.setnchannels(1)
+        w.setsampwidth(2)
+        w.setframerate(SR)
+        w.writeframes(b"".join(struct.pack("<h", int(max(-1.0, min(1.0, v)) * 32767)) for v in data))
+    print(f"  {path.relative_to(OUT_DIR.parents[2])}  {len(sig) / SR:.2f} sn")
+
+
+# --- Sesler -----------------------------------------------------------------------------------
+
+def shot(rng: random.Random) -> list[float]:
+    """Tabanca: keskin çatlama + gövde + alçak darbe + kısa oda kuyruğu."""
+    total = 0.32
+    n = frames(total)
+    out = [0.0] * n
+    crack = filt(noise(frames(0.06), rng), "hp", 1800.0)
+    mix_into(out, apply(crack, env_exp(len(crack), 0.010)), 1.0)
+    body = filt(noise(frames(0.15), rng), "lp", lambda t: 400.0 + 3200.0 * math.exp(-t / 0.02))
+    mix_into(out, apply(body, env_exp(len(body), 0.040)), 1.1)
+    thump = sine_sweep(frames(0.15), lambda t: 55.0 + 140.0 * math.exp(-t / 0.025))
+    mix_into(out, apply(thump, env_exp(len(thump), 0.045, 0.001)), 0.9)
+    tail = filt(noise(n, rng), "bp", 900.0, 0.8)
+    mix_into(out, apply(tail, env_exp(n, 0.09, 0.008)), 0.18)
+    return soft_clip(out, 1.6)
+
+
+def hit(rng: random.Random) -> list[float]:
+    """Mermi ete giriyor: kısa tık + ıslak boğuk darbe."""
+    n = frames(0.16)
+    out = [0.0] * n
+    tick = filt(noise(frames(0.02), rng), "bp", rng.uniform(2200.0, 3000.0), 2.0)
+    mix_into(out, apply(tick, env_exp(len(tick), 0.004)), 0.5)
+    cut = rng.uniform(900.0, 1400.0)
+    squish = filt(noise(n, rng), "lp", lambda t: 350.0 + cut * math.exp(-t / 0.03), 1.4)
+    mix_into(out, apply(squish, env_exp(n, 0.035, 0.002)), 1.0)
+    base = rng.uniform(55.0, 70.0)
+    thud = sine_sweep(n, lambda t: base + 70.0 * math.exp(-t / 0.02))
+    mix_into(out, apply(thud, env_exp(n, 0.03, 0.001)), 0.8)
+    return soft_clip(out, 1.3)
+
+
+def zombie_death(rng: random.Random, base: float) -> list[float]:
+    """Zombi ölümü: ıslak çarpma + düşen, hırıltılı inilti."""
+    total = 0.8
+    n = frames(total)
+    out = [0.0] * n
+    splat = filt(noise(frames(0.15), rng), "lp", lambda t: 500.0 + 1800.0 * math.exp(-t / 0.03), 1.2)
+    mix_into(out, apply(splat, env_exp(len(splat), 0.05, 0.002)), 0.7)
+
+    groan_len = total - 0.03
+    m = frames(groan_len)
+    # Perde aşağı düşer, rastgele titreşir (yürüyüş: yavaş rastgele sapma).
+    wobble = [0.0] * m
+    w = 0.0
+    for i in range(m):
+        if i % 200 == 0:
+            w = max(-1.0, min(1.0, w + rng.uniform(-0.35, 0.35)))
+        wobble[i] = w
+    pitch = lambda t: base * (1.0 - 0.38 * (t / groan_len)) * (1.0 + 0.04 * wobble[min(m - 1, int(t * SR))])
+    voice = saw(m, pitch)
+    sub = saw(m, lambda t: pitch(t) * 0.5)
+    voice = [v + 0.5 * s for v, s in zip(voice, sub)]
+    # Hırıltı: genliği alçak geçirilmiş gürültüyle oynat.
+    grit = filt(noise(m, rng), "lp", 60.0)
+    grit_peak = max(abs(g) for g in grit) or 1.0
+    voice = [v * (0.6 + 0.4 * g / grit_peak) for v, g in zip(voice, grit)]
+    voice = formants(voice, [(rng.uniform(420.0, 520.0), 5.0, 1.0), (rng.uniform(950.0, 1150.0), 6.0, 0.55), (2400.0, 7.0, 0.2)])
+    env = env_swell(m, 0.18, 0.8)
+    mix_into(out, apply(voice, env), 1.0, 0.03)
+    return soft_clip(out, 1.8)
+
+
+def footstep(rng: random.Random) -> list[float]:
+    """Zırhlı bot sert zeminde: boğuk darbe, kum, belli belirsiz metal şıngırtı."""
+    n = frames(0.13)
+    out = [0.0] * n
+    thump = filt(noise(n, rng), "lp", rng.uniform(450.0, 700.0), 1.1)
+    mix_into(out, apply(thump, env_exp(n, 0.018, 0.001)), 1.0)
+    low = sine_sweep(n, lambda t: 55.0 + 40.0 * math.exp(-t / 0.015))
+    mix_into(out, apply(low, env_exp(n, 0.022, 0.001)), 0.6)
+    grit = filt(noise(frames(0.03), rng), "bp", rng.uniform(3000.0, 4200.0), 1.0)
+    mix_into(out, apply(grit, env_exp(len(grit), 0.007)), 0.18)
+    clink = partials(frames(0.08), [(rng.uniform(2200.0, 2500.0), 0.025, 1.0), (rng.uniform(3500.0, 3900.0), 0.018, 0.6)])
+    mix_into(out, clink, 0.05, 0.006)
+    return out
+
+
+def dash(rng: random.Random) -> list[float]:
+    """Dash: yükselip inen hava hışırtısı + zırh tıkırtısı."""
+    total = 0.42
+    n = frames(total)
+    out = [0.0] * n
+    sweep = lambda t: 350.0 + 2300.0 * math.sin(math.pi * min(1.0, t / total)) ** 1.6
+    air = filt(noise(n, rng), "bp", sweep, 1.1)
+    mix_into(out, apply(air, env_swell(n, 0.32, 1.4)), 1.0)
+    body = filt(noise(n, rng), "lp", 500.0)
+    mix_into(out, apply(body, env_swell(n, 0.25, 2.0)), 0.5)
+    for _ in range(3):
+        click = partials(frames(0.04), [(rng.uniform(2600.0, 3400.0), 0.008, 1.0), (rng.uniform(4200.0, 5200.0), 0.005, 0.5)])
+        mix_into(out, click, 0.06, rng.uniform(0.05, 0.25))
+    return out
+
+
+def player_hurt(rng: random.Random) -> list[float]:
+    """Asker vuruldu: zırha çarpan metal + boğuk darbe + kısa homurtu."""
+    n = frames(0.42)
+    out = [0.0] * n
+    clank = partials(n, [(620.0, 0.16, 1.0), (1470.0, 0.11, 0.6), (2380.0, 0.07, 0.4), (3310.0, 0.045, 0.25)])
+    mix_into(out, clank, 0.35)
+    thud = sine_sweep(n, lambda t: 60.0 + 70.0 * math.exp(-t / 0.03))
+    mix_into(out, apply(thud, env_exp(n, 0.05, 0.001)), 0.9)
+    punch = filt(noise(n, rng), "lp", 900.0)
+    mix_into(out, apply(punch, env_exp(n, 0.03, 0.001)), 0.7)
+    g = frames(0.2)
+    grunt = saw(g, lambda t: 150.0 - 40.0 * (t / 0.2))
+    grunt = formants(grunt, [(600.0, 5.0, 1.0), (1150.0, 6.0, 0.5)])
+    mix_into(out, apply(grunt, env_swell(g, 0.12, 0.7)), 0.5, 0.015)
+    return soft_clip(out, 1.5)
+
+
+def main() -> int:
+    print(f"Ses efektleri -> {OUT_DIR}")
+    # Tohumlar sabit: aynı dosyalar. Çeşit eklemek için listeyi uzat, sound_data.gd'yi güncelle.
+    write_wav("shot_1", shot(random.Random(101)))
+    for i, seed in enumerate((201, 202, 203), start=1):
+        write_wav(f"hit_{i}", hit(random.Random(seed)))
+    for i, (seed, base) in enumerate(((301, 92.0), (302, 78.0), (303, 108.0)), start=1):
+        write_wav(f"zombie_death_{i}", zombie_death(random.Random(seed), base))
+    for i, seed in enumerate((401, 402, 403, 404), start=1):
+        write_wav(f"footstep_{i}", footstep(random.Random(seed)))
+    write_wav("dash_1", dash(random.Random(501)))
+    write_wav("player_hurt_1", player_hurt(random.Random(601)))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

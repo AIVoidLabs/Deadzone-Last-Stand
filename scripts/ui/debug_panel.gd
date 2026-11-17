@@ -66,7 +66,7 @@ func _build_text() -> String:
 		"Zombi %d / %d (havuz %d)" % [enemies.active_count(), Quality.max_enemies(), enemies.pool_size()],
 		"Mermi %d   draw call %d   silah %d / %d" % [projectiles.active_count(), draw_calls, weapons.count(), Tuning.WEAPON_SLOTS],
 		"Can %.0f / %.0f   ölümsüz %s" % [player.health.current, player.health.maximum, "AÇIK" if player.god_mode else "kapalı"],
-		"Profil %s" % Quality.current,
+		"Profil %s   ses %d / %d çalıyor (toplam %d)" % [Quality.current, Audio.active_voices(), Tuning.SFX_POOL_SIZE, Audio.played_total],
 		"F4 +%d zombi · F5 ölümsüz · F6 profil · F7 +silah" % Tuning.DEBUG_SPAWN_BATCH,
 		"(Fn gerekmeden: Ctrl+3 … Ctrl+7 aynı sırayla)",
 	])
