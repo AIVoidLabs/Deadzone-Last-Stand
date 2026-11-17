@@ -9,12 +9,10 @@ Oturum 3 (2026-11-17). Push yok.
 
 - **Ana aşama:** 5 — Dikey dilim: silah ve vuruş hissi
 - **Alt aşama:** 5.1–5.4 bitti. **5.5 (ilk sesler) kod bitti, Taha'nın dinlemesi bekleniyor.**
-- **Yeni oturumda ilk iş:**
-  1. Ortam kontrolü (CLAUDE.md bölüm 0).
-  2. Taha'ya sor: (a) "Embed Game on Next Play" kapatınca F7/F11 çalıştı mı? (b) 5.4 kızarma tamam mı? Onay gelirse 5.4'ü işaretle.
-  3. **5.5 — ilk sesler:** atış, isabet, zombi ölümü, adım, dash, asker vurulma. Kodla sentez (`tools/sfx/`, harici dosya indirme yok), ses havuzu `scripts/autoload/audio.gd` (planlandı, yok), her ses tek `Tuning` sabitiyle kapanır, çok ses aynı anda çalınca sınır ve hafif perde çeşitlemesi. Claude duyamaz: her sesi Taha dinleyip onaylar.
-  4. Sonra 5.6 (pompalı: modeli `weapons.glb` içinde hazır, veri satırı ve saçılma kuralı eksik), 5.7 (ışık ve dilim onayı; 🚩 Aşama 5 bildirimi).
-- **Bekleyen (Taha'dan):** yukarıdaki iki soru. Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
+- **Sıradaki:**
+  1. Taha 5.5 seslerini dinler (oyunda ve `assets/audio/sfx/*.wav`). Beğenilmeyen ses `gen_sfx.py`'de ayarlanıp yeniden üretilir; düzeyler `SoundData`'da. Onay gelince 5.5'i işaretle.
+  2. Sonra 5.6 (pompalı: modeli `weapons.glb` içinde hazır, veri satırı, saçılma kuralı ve kendi atış sesi eksik), 5.7 (ışık ve dilim onayı; 🚩 Aşama 5 bildirimi).
+- **Bekleyen (Taha'dan):** 5.5 ses onayı; "Embed Game on Next Play" kapatınca F7/F11 çalıştı mı (cevaplanmadı). Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
 - **Taha oyunu Godot editöründen (Play) açıyor.** Editör oyunu varsayılan olarak Game sekmesine gömer: gömülü pencerede tam ekran yok ve F tuşları oyuna ulaşmayabilir. Gömme: Game sekmesi araç çubuğunun en sağındaki ⋮ → "Embed Game on Next Play". Debug tuşlarının yedekleri Ctrl+3 … Ctrl+7.
 - **Not:** Blender MCP eklentisi 2026-11-16'da güncellendi; Blender scriptleri zaten penceresiz çalışıyor, Taha'nın Blender açması gerekmiyor.
 
@@ -159,7 +157,7 @@ Profil üst sınırları (2.5 ölçümüne göre, efektlere pay bırakılarak): 
 
 ### 2026-11-17 — Oturum 3
 - Ortam kontrolü temiz. Taha 5.4 kızarmayı onayladı.
-- 5.5: ses sentezi (	ools/sfx/gen_sfx.py), Audio havuzu, SoundData, VoiceLimiter, Stride, Footsteps; F3 panelinde çalan ses sayısı. 79 test geçiyor. 150 zombi + 6 silahta 9 sn'de 193 ses, aynı anda en çok 9, 144 FPS.
+- 5.5: ses sentezi (`tools/sfx/gen_sfx.py`), `Audio` havuzu, `SoundData`, `VoiceLimiter`, `Stride`, `Footsteps`; F3 panelinde çalan ses sayısı. 79 test geçiyor. 150 zombi + 6 silahta 9 sn'de 193 ses, aynı anda en çok 9, 144 FPS.
 
 ### 2026-11-16 — Oturum 2
 - **Oturum sonu özeti:** Aşama 3 ve 4 kapandı; Aşama 5'te 5.1–5.3 bitti, 5.4 yorum bekliyor. 69 GUT testi geçiyor. Bu oturumun son commit'leri: `9767e2a` (itilme kapalı, gömülü pencerede tam ekran denenmiyor), `bc18079`, `41b3ce8` (5.4), `c42e2c3` (duraksama kapalı), `996a2d7` (Ctrl yedek tuşlar), `a6facff` (5.3), `571c76e` (5.2), `57d6d23` ve `8b3ab3c` (5.1). Ölçüm: 234 zombi + 6 silah + tüm efektler, yüksek profil 128 FPS.
