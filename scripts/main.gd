@@ -16,6 +16,9 @@ func _ready() -> void:
 	director.enemies = enemies
 	add_child(director)
 
+	var loot: RunLoot = RunLoot.new()
+	var pickups: Pickups = _add_pickups(player, enemies, director, loot)
+
 	var projectiles: ProjectilePool = ProjectilePool.new()
 	projectiles.enemies = enemies
 	add_child(projectiles)
@@ -51,14 +54,34 @@ func _ready() -> void:
 		add_child(vignette)
 
 	var hud: Hud = Hud.new()
-	hud.setup(player, enemies, director)
+	hud.setup(player, enemies, director, loot)
 	add_child(hud)
 
 	player.died.connect(GameFlow.game_over)
 	Quality.apply_to_viewport(get_viewport())
 
 	if OS.is_debug_build():
-		_add_debug_tools(player, enemies, projectiles, camera, weapons, director)
+		_add_debug_tools(player, enemies, projectiles, camera, weapons, director, pickups)
+
+
+## Kristaller: öldürmede düşer, toplanınca RunLoot'a eklenir, dalga sonunda hepsi çekilir.
+## Kapalıyken null döner.
+func _add_pickups(player: Player, enemies: EnemyManager, director: SpawnDirector, loot: RunLoot) -> Pickups:
+	if not Tuning.FEATURE_PICKUPS:
+		return null
+	var pickups: Pickups = Pickups.new()
+	pickups.player = player
+	add_child(pickups)
+	enemies.enemy_killed.connect(func(at: Vector3, row: Dictionary) -> void:
+		pickups.drop(at, row.get("drop_value", 0)))
+	pickups.collected.connect(func(value: int) -> void:
+		loot.add(value)
+		if Tuning.FEATURE_SFX:
+			Audio.play(SoundData.PICKUP))
+	director.phase_changed.connect(func(phase: WaveRun.Phase, _wave_index: int) -> void:
+		if phase == WaveRun.Phase.CLEAR:
+			pickups.collect_all())
+	return pickups
 
 
 ## Vuruş geri bildirimi: kan, lekeler, hasar sayıları, öldürmede duraksama ve sarsıntı.
@@ -102,13 +125,14 @@ func _add_sounds(player: Player, enemies: EnemyManager, weapons: WeaponRig) -> v
 		add_child(horde)
 
 
-func _add_debug_tools(player: Player, enemies: EnemyManager, projectiles: ProjectilePool, camera: FollowCamera, weapons: WeaponRig, director: SpawnDirector) -> void:
+func _add_debug_tools(player: Player, enemies: EnemyManager, projectiles: ProjectilePool, camera: FollowCamera, weapons: WeaponRig, director: SpawnDirector, pickups: Pickups) -> void:
 	var panel: DebugPanel = DebugPanel.new()
 	panel.player = player
 	panel.enemies = enemies
 	panel.projectiles = projectiles
 	panel.weapons = weapons
 	panel.director = director
+	panel.pickups = pickups
 	add_child(panel)
 	if Benchmark.requested():
 		var bench: Benchmark = Benchmark.new()

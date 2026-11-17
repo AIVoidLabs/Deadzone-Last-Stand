@@ -79,7 +79,8 @@ Zırhlı ve kasklı bir asker, kapalı bir şehir kavşağında dalga dalga gele
 - Son dalga temizlenince "HAYATTA KALDIN" (R ile yeniden); ölünce "ÖLDÜN". İkisinde de dalga, süre, öldürme.
 - Zombiler ekranın hemen dışında doğar (görünür alan kamera açısından hesaplanır, 3 m pay); duvar yüzünden olmazsa arena kenarı. `FEATURE_SPAWN_OFFSCREEN`.
 - `FEATURE_WAVES = false`: Aşama 1'deki sonsuz, giderek hızlanan doğma.
-- Ölen zombi XP ve para bırakır (6.2).
+- **Kristaller (6.2):** ölen zombi kristal bırakır (satırda `drop_value`); her kristal hem para hem XP (Brotato'daki gibi tek kaynak). Kristal sekerek düşer, yerde döner. Asker 3 m içine girince ona çekilir (ileride "toplama menzili" istatistiği); uzaktakiler bekler. Dalga bitince yerde kalanların hepsi çekilir. Yerde en çok 300; dolunca yeni değer var olana eklenir, o kristal büyür.
+- Seviye için gereken XP: (seviye + 3)² → 1→2: 16, 2→3: 25. Seviye atlayınca şimdilik yalnız "SEVİYE N" yazısı; kartlar 6.3'te. Kristaller mağazada harcanır (6.5).
 - Seviye atlayınca 3 karttan biri (istatistik artışı).
 - 6 silah yuvası; aynı silah + aynı kademe iki tane → bir üst kademe (en çok 4).
 - Temel istatistikler: can, hasar, atış hızı, menzil, hız, zırh, şans.

@@ -3,7 +3,7 @@ extends CanvasLayer
 ## F3 debug paneli ve debug tuşları. Yalnız debug yapıda eklenir (main.gd).
 
 const LAYER: int = 10
-const POSITION: Vector2 = Vector2(16.0, 52.0)
+const POSITION: Vector2 = Vector2(16.0, 116.0)
 const FONT_SIZE: int = 15
 
 var player: Player
@@ -11,6 +11,8 @@ var enemies: EnemyManager
 var projectiles: ProjectilePool
 var weapons: WeaponRig
 var director: SpawnDirector
+## Kristaller kapalıyken null.
+var pickups: Pickups
 
 var _panel: PanelContainer
 var _label: Label
@@ -67,7 +69,7 @@ func _build_text() -> String:
 	var lines: PackedStringArray = PackedStringArray([
 		"FPS %d   işlem %.2f ms   fizik %.2f ms" % [Engine.get_frames_per_second(), frame_ms, physics_ms],
 		"Zombi %d / %d (havuz %d)" % [enemies.active_count(), Quality.max_enemies(), enemies.pool_size()],
-		"Mermi %d   draw call %d   silah %d / %d" % [projectiles.active_count(), draw_calls, weapons.count(), Tuning.WEAPON_SLOTS],
+		"Mermi %d   draw call %d   silah %d / %d   kristal %d" % [projectiles.active_count(), draw_calls, weapons.count(), Tuning.WEAPON_SLOTS, pickups.count() if pickups != null else 0],
 		"Can %.0f / %.0f   ölümsüz %s" % [player.health.current, player.health.maximum, "AÇIK" if player.god_mode else "kapalı"],
 		"Profil %s   ses %d / %d çalıyor (toplam %d)" % [Quality.current, Audio.active_voices(), Tuning.SFX_POOL_SIZE, Audio.played_total],
 		"F4 +%d zombi · F5 ölümsüz · F6 profil · F7 +silah · F8 dalgayı bitir" % Tuning.DEBUG_SPAWN_BATCH,

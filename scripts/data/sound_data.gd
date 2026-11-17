@@ -14,6 +14,7 @@ const FOOTSTEP: StringName = &"footstep"
 const DASH: StringName = &"dash"
 const PLAYER_HURT: StringName = &"player_hurt"
 const HORDE_GROAN: StringName = &"horde_groan"
+const PICKUP: StringName = &"pickup"
 
 const TABLE: Dictionary = {
 	&"shot": {
@@ -50,6 +51,11 @@ const TABLE: Dictionary = {
 		"enabled": Tuning.FEATURE_SFX_HORDE_GROAN,
 		"files": ["horde_groan_1", "horde_groan_2", "horde_groan_3", "horde_groan_4", "horde_groan_5"],
 		"volume_db": -12.0, "pitch_variance": 0.12, "max_voices": 4, "min_interval": 0.15,
+	},
+	&"pickup": {
+		"enabled": Tuning.FEATURE_SFX_PICKUP,
+		"files": ["pickup_1", "pickup_2", "pickup_3"],
+		"volume_db": -17.0, "pitch_variance": 0.08, "max_voices": 3, "min_interval": 0.035,
 	},
 	&"player_hurt": {
 		"enabled": Tuning.FEATURE_SFX_PLAYER_HURT,

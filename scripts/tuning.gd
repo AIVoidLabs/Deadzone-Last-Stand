@@ -14,6 +14,8 @@ const FEATURE_SPAWN_RAMP: bool = true
 const FEATURE_WAVES: bool = true
 ## Zombiler ekranın hemen dışında doğar; kapalıyken arena kenarında.
 const FEATURE_SPAWN_OFFSCREEN: bool = true
+## Ölen zombi kristal bırakır (hem XP hem para); kapalıyken hiçbir şey düşmez.
+const FEATURE_PICKUPS: bool = true
 const FEATURE_START_FULLSCREEN: bool = true
 const FEATURE_DASH: bool = true
 ## Dash sırasında asker zombilerin içinden geçer (kapalıysa onları iter).
@@ -67,6 +69,7 @@ const FEATURE_SFX_ZOMBIE_DEATH: bool = false
 const FEATURE_SFX_FOOTSTEP: bool = true
 const FEATURE_SFX_DASH: bool = true
 const FEATURE_SFX_PLAYER_HURT: bool = true
+const FEATURE_SFX_PICKUP: bool = true
 
 # --- Arena ---
 ## Işık ve zemin ön ayarı (LightingData tablosundan).
@@ -165,6 +168,33 @@ const SPAWN_VIEW_MIN_RAY_DEG: float = 5.0
 const WAVE_CLEAR_TIME: float = 0.8
 ## Dalgalar arası bekleme (sn); 6.5'te mağaza buraya gelir.
 const WAVE_BREAK_TIME: float = 3.0
+
+# --- Kristaller (düşenler) ---
+## Yerde aynı anda en çok kristal; dolunca yeni değer var olana eklenir (o büyür).
+const PICKUP_MAX: int = 300
+## Asker bu yarıçapa girince kristal ona çekilir (m); ileride "toplama menzili" istatistiği.
+const PICKUP_MAGNET_RADIUS: float = 3.0
+## Askerin merkezine bu kadar yaklaşınca toplanır (m).
+const PICKUP_COLLECT_RADIUS: float = 0.6
+## Çekilme: başlangıç hızı, ivme, üst hız (m/sn).
+const PICKUP_PULL_START_SPEED: float = 3.0
+const PICKUP_PULL_ACCEL: float = 45.0
+const PICKUP_PULL_MAX_SPEED: float = 22.0
+## Dalga sonunda hepsi çekilirken başlangıç hızı.
+const PICKUP_COLLECT_ALL_SPEED: float = 8.0
+## Düşerken sekme: süre (sn), tepe yüksekliği ve en çok yatay uzaklık (m).
+const PICKUP_HOP_TIME: float = 0.35
+const PICKUP_HOP_HEIGHT: float = 0.6
+const PICKUP_HOP_DISTANCE: float = 0.8
+## Görüntü: yerden yükseklik, boy, dikine uzama, değer başına büyüme ve en çok büyüme.
+const PICKUP_HEIGHT: float = 0.35
+const PICKUP_SIZE: float = 0.2
+const PICKUP_CRYSTAL_STRETCH: float = 1.7
+const PICKUP_VALUE_SCALE: float = 0.12
+const PICKUP_MAX_SCALE: float = 2.0
+const PICKUP_COLOR: Color = Color(0.05, 0.85, 0.65)
+## Seviye için gereken XP: (seviye + bu)². 1→2: 16 kristal.
+const XP_LEVEL_OFFSET: int = 3
 
 # --- Mermi ---
 const PROJECTILE_POOL_SIZE: int = 128

@@ -11,6 +11,10 @@ const DASH_BAR_HEIGHT: float = 6.0
 const DASH_BAR_GAP: int = 4
 const DASH_READY_COLOR: Color = Color(0.35, 0.8, 1.0)
 const DASH_CHARGING_COLOR: Color = Color(0.35, 0.8, 1.0, 0.45)
+const XP_BAR_HEIGHT: float = 8.0
+const XP_FILL_COLOR: Color = Color(0.2, 0.95, 0.8)
+const LEVEL_FONT_SIZE: int = 16
+const BANNER_LEVEL_HOLD: float = 0.9
 const OVERLAY_COLOR: Color = Color(0.0, 0.0, 0.0, 0.55)
 const TITLE_FONT_SIZE: int = 48
 const TEXT_FONT_SIZE: int = 20
@@ -26,6 +30,10 @@ var _player: Player
 var _enemies: EnemyManager
 ## Dalgalar kapalıyken run null.
 var _director: SpawnDirector
+var _loot: RunLoot
+var _xp_bar: ProgressBar
+var _level_label: Label
+var _shown_level: int = 1
 var _wave_label: Label
 var _banner: WaveBanner
 var _over_title: Label
@@ -37,7 +45,8 @@ var _over: Control
 var _over_label: Label
 
 
-func setup(player: Player, enemies: EnemyManager, director: SpawnDirector) -> void:
+func setup(player: Player, enemies: EnemyManager, director: SpawnDirector, loot: RunLoot) -> void:
+	_loot = loot
 	_player = player
 	_enemies = enemies
 	_director = director
@@ -60,11 +69,12 @@ func _process(_delta: float) -> void:
 	var readiness: float = _player.dash.readiness()
 	_dash_bar.value = readiness
 	_dash_fill.bg_color = DASH_READY_COLOR if readiness >= 1.0 else DASH_CHARGING_COLOR
+	_update_loot()
 	var run: WaveRun = _director.run
 	if run == null:
-		_stats_label.text = "%s   ·   %d öldürme" % [_format_time(_enemies.elapsed), _enemies.kills]
+		_stats_label.text = "%s   ·   %s" % [_format_time(_enemies.elapsed), _loot_text()]
 		return
-	_stats_label.text = "%d öldürme" % _enemies.kills
+	_stats_label.text = _loot_text()
 	var status: String = _format_time(ceilf(run.phase_left)) if run.phase == WaveRun.Phase.WAVE else "temizlendi"
 	_wave_label.text = "DALGA %d/%d   ·   %s" % [run.index + 1, run.wave_count(), status]
 
@@ -96,12 +106,41 @@ func _build_top_bar() -> void:
 	_dash_bar.add_theme_stylebox_override("background", _flat_box(HP_BACK_COLOR))
 	_dash_bar.add_theme_stylebox_override("fill", _dash_fill)
 	bars.add_child(_dash_bar)
+	var xp_row: HBoxContainer = HBoxContainer.new()
+	xp_row.visible = Tuning.FEATURE_PICKUPS
+	bars.add_child(xp_row)
+	_xp_bar = ProgressBar.new()
+	_xp_bar.custom_minimum_size = Vector2(BAR_SIZE.x, XP_BAR_HEIGHT)
+	_xp_bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_xp_bar.max_value = 1.0
+	_xp_bar.show_percentage = false
+	_xp_bar.add_theme_stylebox_override("background", _flat_box(HP_BACK_COLOR))
+	_xp_bar.add_theme_stylebox_override("fill", _flat_box(XP_FILL_COLOR))
+	xp_row.add_child(_xp_bar)
+	_level_label = Label.new()
+	_level_label.add_theme_font_size_override("font_size", LEVEL_FONT_SIZE)
+	_level_label.add_theme_color_override("font_color", XP_FILL_COLOR)
+	xp_row.add_child(_level_label)
 	var spacer: Control = Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(spacer)
 	_stats_label = Label.new()
 	_stats_label.add_theme_font_size_override("font_size", TEXT_FONT_SIZE)
 	row.add_child(_stats_label)
+
+
+func _update_loot() -> void:
+	_xp_bar.value = _loot.level_progress()
+	_level_label.text = "Sv. %d" % _loot.level
+	if _loot.level > _shown_level:
+		_shown_level = _loot.level
+		_banner.flash("SEVİYE %d" % _loot.level, XP_FILL_COLOR, BANNER_LEVEL_HOLD)
+
+
+func _loot_text() -> String:
+	if not Tuning.FEATURE_PICKUPS:
+		return "%d öldürme" % _enemies.kills
+	return "%d kristal   ·   %d öldürme" % [_loot.crystals, _enemies.kills]
 
 
 func _build_wave_widgets() -> void:
@@ -160,6 +199,8 @@ func _show_end(won: bool) -> void:
 		lines.append("Dalga: %d/%d" % [run.wave_count() if won else run.index + 1, run.wave_count()])
 	lines.append("Süre: %s" % _format_time(_enemies.elapsed))
 	lines.append("Öldürme: %d" % _enemies.kills)
+	if Tuning.FEATURE_PICKUPS:
+		lines.append("Kristal: %d   ·   Seviye: %d" % [_loot.crystals, _loot.level])
 	lines.append("")
 	lines.append("R — yeniden başla")
 	_over_label.text = "\n".join(lines)

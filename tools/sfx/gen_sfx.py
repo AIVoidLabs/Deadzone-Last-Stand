@@ -370,6 +370,20 @@ def player_hurt(rng: random.Random) -> list[float]:
     return soft_clip(out, 1.5)
 
 
+def pickup(rng: random.Random, base: float) -> list[float]:
+    """Kristal toplama: kısa, cam gibi tınlama; hafif yukarı kayan iki nota + parıltı."""
+    n = frames(0.22)
+    out = [0.0] * n
+    glass = partials(n, [(base, 0.07, 1.0), (base * 2.76, 0.04, 0.45), (base * 5.4, 0.025, 0.2)])
+    mix_into(out, glass, 0.5)
+    m = frames(0.16)
+    chirp = sine_sweep(m, lambda t: base * 1.5 * (1.0 + 0.25 * min(1.0, t / 0.05)))
+    mix_into(out, apply(chirp, env_exp(m, 0.045, 0.002)), 0.35, 0.03)
+    sparkle = filt(noise(n, rng), "hp", 6000.0)
+    mix_into(out, apply(sparkle, env_exp(n, 0.02, 0.001)), 0.12)
+    return fade_out(out, 0.04)
+
+
 def main() -> int:
     print(f"Ses efektleri -> {OUT_DIR}")
     # Tohumlar sabit: aynı dosyalar. Çeşit eklemek için listeyi uzat, sound_data.gd'yi güncelle.
@@ -387,6 +401,8 @@ def main() -> int:
     for i, (seed, base, length) in enumerate(groans, start=1):
         write_wav(f"horde_groan_{i}", horde_groan(random.Random(seed), base, length))
     write_wav("player_hurt_1", player_hurt(random.Random(601)))
+    for i, (seed, base) in enumerate(((801, 1320.0), (802, 1480.0), (803, 1180.0)), start=1):
+        write_wav(f"pickup_{i}", pickup(random.Random(seed), base))
     return 0
 
 

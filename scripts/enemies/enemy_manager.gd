@@ -5,7 +5,8 @@ extends Node3D
 ## Ölenler kare içinde işaretlenir, bir sonraki karenin başında diziden çıkarılır
 ## (böylece aynı kare içinde indeksler kaymaz).
 
-signal enemy_killed(at: Vector3)
+## Öldürülen zombi (dalga sonu devrilmeleri hariç). row: tür satırı (drop_value vb.).
+signal enemy_killed(at: Vector3, row: Dictionary)
 ## Her isabette (öldüren dahil). at: zombinin yerdeki konumu; direction: vuruş yönü.
 signal enemy_damaged(at: Vector3, direction: Vector2, amount: float, killed: bool)
 
@@ -265,7 +266,7 @@ func _kill(index: int, push: Vector2 = Vector2.ZERO, credit: bool = true) -> voi
 	var node: Zombie = _nodes[index]
 	if credit:
 		kills += 1
-		enemy_killed.emit(node.position)
+		enemy_killed.emit(node.position, _rows[index])
 	if not Tuning.FEATURE_ZOMBIE_DEATH_ANIM:
 		node.deactivate()
 		return

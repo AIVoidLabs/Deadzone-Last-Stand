@@ -2,6 +2,13 @@
 
 Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar verilince "Açık kararlar"dan çıkarılıp tarihli bölüme yazılır.
 
+## 2026-11-17 — Aşama 6.2 düşenler (Taha)
+
+- **Tek tür düşen: kristal** — hem XP hem para (iki ayrı para birimi yok). Ad Claude'dan: zırhın enerji teması.
+- **Yalnız yakındakiler çekilir** (3 m); dalga sonunda hepsi.
+- **Görünüm:** dönen, turkuaz, low-poly kristal (sekizyüzlü); ekran görüntüsüyle değerlendirilecek.
+- Claude'un kararı: seviye eğrisi (seviye + 3)², Brotato'daki gibi; ses: kısa cam tınlaması (Taha dinleyip onaylar).
+
 ## 2026-11-17 — Aşama 6.1 dalgalar (Taha)
 
 - Dikey dilim onaylandı ("her şey okey"); zombi saldırısı hazırlıklı vuruş olarak kaldı.
