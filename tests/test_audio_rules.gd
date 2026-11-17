@@ -56,6 +56,30 @@ func test_stride_reset_restores_half_step() -> void:
 	assert_eq(stride.advance(0.2), 1)
 
 
+func test_horde_silent_below_min_and_full_at_full_count() -> void:
+	var lo: int = Tuning.HORDE_GROAN_MIN_COUNT
+	var hi: int = Tuning.HORDE_GROAN_FULL_COUNT
+	assert_eq(HordeGroan.intensity(lo - 1, lo, hi), 0.0)
+	assert_gt(HordeGroan.intensity(lo + 1, lo, hi), 0.0)
+	assert_eq(HordeGroan.intensity(hi, lo, hi), 1.0)
+	assert_eq(HordeGroan.intensity(hi * 3, lo, hi), 1.0)
+
+
+func test_horde_denser_means_more_often_and_louder() -> void:
+	var sparse: float = HordeGroan.interval(0.1, Tuning.HORDE_GROAN_INTERVAL_SPARSE, Tuning.HORDE_GROAN_INTERVAL_DENSE, 0.0, 0.5)
+	var dense: float = HordeGroan.interval(1.0, Tuning.HORDE_GROAN_INTERVAL_SPARSE, Tuning.HORDE_GROAN_INTERVAL_DENSE, 0.0, 0.5)
+	assert_lt(dense, sparse)
+	assert_almost_eq(dense, Tuning.HORDE_GROAN_INTERVAL_DENSE, EPSILON)
+	assert_lt(HordeGroan.volume_offset(0.1, Tuning.HORDE_GROAN_SPARSE_DB), HordeGroan.volume_offset(1.0, Tuning.HORDE_GROAN_SPARSE_DB))
+	assert_almost_eq(HordeGroan.volume_offset(1.0, Tuning.HORDE_GROAN_SPARSE_DB), 0.0, EPSILON)
+
+
+func test_horde_interval_jitter_stays_positive() -> void:
+	var shortest: float = HordeGroan.interval(1.0, Tuning.HORDE_GROAN_INTERVAL_SPARSE, Tuning.HORDE_GROAN_INTERVAL_DENSE,
+		Tuning.HORDE_GROAN_JITTER, 0.0)
+	assert_gt(shortest, 0.0)
+
+
 func test_every_sound_row_has_existing_files() -> void:
 	for id: StringName in SoundData.TABLE:
 		var row: Dictionary = SoundData.get_row(id)

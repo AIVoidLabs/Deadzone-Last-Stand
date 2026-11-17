@@ -52,7 +52,10 @@ const FEATURE_PLAYER_LEAN: bool = true
 ## Ses efektleri (5.5): ana anahtar + her ses için ayrı anahtar. Ses satırları scripts/data/sound_data.gd'de.
 const FEATURE_SFX: bool = true
 const FEATURE_SFX_SHOT: bool = true
-const FEATURE_SFX_HIT: bool = true
+## Zombiye isabet sesi: Taha'nın isteğiyle kapalı (her vuruşta rahatsız ediciydi); yerine sürü homurtusu.
+const FEATURE_SFX_HIT: bool = false
+## Askerin yakınındaki zombi sayısı arttıkça sıklaşan ve yükselen homurtu.
+const FEATURE_SFX_HORDE_GROAN: bool = true
 const FEATURE_SFX_ZOMBIE_DEATH: bool = true
 const FEATURE_SFX_FOOTSTEP: bool = true
 const FEATURE_SFX_DASH: bool = true
@@ -214,6 +217,18 @@ const SFX_POOL_SIZE: int = 32
 const FOOTSTEP_STEPS_PER_CYCLE: int = 2
 ## Bu hızın altında adım sesi çalmaz (m/sn).
 const FOOTSTEP_MIN_SPEED: float = 1.0
+## Sürü homurtusu: askerin çevresinde sayılan yarıçap (m); bu sayının altında sessiz, bu sayıda en yoğun.
+const HORDE_GROAN_RADIUS: float = 10.0
+const HORDE_GROAN_MIN_COUNT: int = 5
+const HORDE_GROAN_FULL_COUNT: int = 40
+## İki homurtu arası süre (sn): seyrek sürüde / en yoğun sürüde. Üstüne ± oransal rastgele pay.
+const HORDE_GROAN_INTERVAL_SPARSE: float = 3.0
+const HORDE_GROAN_INTERVAL_DENSE: float = 0.4
+const HORDE_GROAN_JITTER: float = 0.4
+## Seyrek sürüde homurtu bu kadar kısık (dB); en yoğunda tablo düzeyinde.
+const HORDE_GROAN_SPARSE_DB: float = -10.0
+## Yoğunluk kaç saniyede bir sayılır.
+const HORDE_GROAN_CHECK_TIME: float = 0.25
 
 # --- Uzay ızgarası ---
 const GRID_CELL_SIZE: float = 1.5

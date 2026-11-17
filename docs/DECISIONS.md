@@ -2,6 +2,14 @@
 
 Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar verilince "Açık kararlar"dan çıkarılıp tarihli bölüme yazılır.
 
+## 2026-11-17 — Aşama 5.5 ilk sesler (Taha)
+
+- **Zombiye isabet sesi yok:** her vuruşta çalması rahatsız edici. `Tuning.FEATURE_SFX_HIT = false` (dosyalar duruyor). Yerine **sürü homurtusu:** askerin 10 m çevresindeki zombi sayısı arttıkça homurtu sıklaşır ve yükselir (`HordeGroan`, `HordeAmbience`, `FEATURE_SFX_HORDE_GROAN`).
+- **Atış sesi beğenildi. Her silah modelinin kendi sesi olacak:** silah satırındaki `sound` alanı; pompalı 5.6'da kendi sesini alır, diğerleri 7.1'de.
+- **Adım sesi şimdilik metal zemin gibi, kabul.** İleride zemine duyarlı olacak (asfalt, metal, moloz…): 8.1 şehir parçaları gelince zemin türü, 8.4 tam ses setinde zemin başına adım çeşitleri.
+- **Takla sesi çok baskındı:** kısıldı (-6 → -13 dB), hava hışırtısı azaltıldı; zırhlı asker hissi için zırh plakası ve alet çantası tıngırtısı eklendi (3 çeşit).
+- Editör gömmesi kapatılınca F tuşları ve tam ekran sorunsuz (Taha doğruladı).
+
 ## 2026-11-16 — Aşama 5.4 asker vurulunca (Taha)
 
 - **Askerin vurulunca itilmesi iptal:** "çok uzağa alakasız itiliyoruz". `Tuning.FEATURE_PLAYER_KNOCKBACK = false`; kızarma, sarsıntı ve yanıp sönme kaldı.

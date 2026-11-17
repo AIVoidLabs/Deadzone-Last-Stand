@@ -262,20 +262,66 @@ def footstep(rng: random.Random) -> list[float]:
     return out
 
 
+def gear_clink(rng: random.Random) -> list[float]:
+    """Çantadaki tek bir metal parça: 2-3 uyumsuz kısmi ses, kısa sönme."""
+    base = rng.uniform(1500.0, 3200.0)
+    specs = [(base, rng.uniform(0.02, 0.045), 1.0),
+             (base * rng.uniform(2.3, 2.9), rng.uniform(0.01, 0.025), 0.55),
+             (base * rng.uniform(3.9, 4.6), 0.008, 0.3)]
+    return partials(frames(0.09), specs)
+
+
+def gear_clunk(rng: random.Random) -> list[float]:
+    """Zırh plakasının boğuk tok vuruşu."""
+    n = frames(0.08)
+    knock = filt(noise(n, rng), "bp", rng.uniform(550.0, 850.0), 3.0)
+    ring = partials(n, [(rng.uniform(700.0, 950.0), 0.03, 1.0)])
+    return [(k * 1.5 + r * 0.4) * math.exp(-(i / SR) / 0.025) for i, (k, r) in enumerate(zip(knock, ring))]
+
+
 def dash(rng: random.Random) -> list[float]:
-    """Dash: yükselip inen hava hışırtısı + zırh tıkırtısı."""
-    total = 0.42
+    """Dash (takla): yumuşak hava hışırtısı + zırh ve alet çantası tıngırtısı.
+    Tıngırtı taklanın üç anında yoğunlaşır: yere iniş, yuvarlanma, kalkış."""
+    total = 0.5
     n = frames(total)
     out = [0.0] * n
-    sweep = lambda t: 350.0 + 2300.0 * math.sin(math.pi * min(1.0, t / total)) ** 1.6
-    air = filt(noise(n, rng), "bp", sweep, 1.1)
-    mix_into(out, apply(air, env_swell(n, 0.32, 1.4)), 1.0)
-    body = filt(noise(n, rng), "lp", 500.0)
-    mix_into(out, apply(body, env_swell(n, 0.25, 2.0)), 0.5)
-    for _ in range(3):
-        click = partials(frames(0.04), [(rng.uniform(2600.0, 3400.0), 0.008, 1.0), (rng.uniform(4200.0, 5200.0), 0.005, 0.5)])
-        mix_into(out, click, 0.06, rng.uniform(0.05, 0.25))
-    return out
+    sweep = lambda t: 300.0 + 1400.0 * math.sin(math.pi * min(1.0, t / total)) ** 1.6
+    air = filt(noise(n, rng), "bp", sweep, 1.0)
+    mix_into(out, apply(air, env_swell(n, 0.3, 1.6)), 0.35)
+    body = filt(noise(n, rng), "lp", 400.0)
+    mix_into(out, apply(body, env_swell(n, 0.25, 2.0)), 0.25)
+    for center, count, spread in ((0.06, 3, 0.03), (0.2, 4, 0.06), (0.36, 4, 0.04)):
+        mix_into(out, gear_clunk(rng), 0.5, max(0.0, center - 0.01))
+        for _ in range(count):
+            at = max(0.0, center + rng.uniform(-spread, spread))
+            mix_into(out, gear_clink(rng), rng.uniform(0.12, 0.28), at)
+    return soft_clip(out, 1.2)
+
+
+def horde_groan(rng: random.Random, base: float, length: float) -> list[float]:
+    """Sürü homurtusu: yavaş yükselip inen, boğuk (uzaktan gelen) inilti."""
+    n = frames(length)
+    wobble = [0.0] * n
+    w = 0.0
+    for i in range(n):
+        if i % 300 == 0:
+            w = max(-1.0, min(1.0, w + rng.uniform(-0.3, 0.3)))
+        wobble[i] = w
+    rise = rng.uniform(0.08, 0.2)
+    contour = lambda t: 1.0 + rise * math.sin(math.pi * t / length) - 0.15 * (t / length)
+    pitch = lambda t: base * contour(t) * (1.0 + 0.05 * wobble[min(n - 1, int(t * SR))])
+    voice = saw(n, pitch)
+    sub = saw(n, lambda t: pitch(t) * 0.5)
+    voice = [v + 0.6 * s for v, s in zip(voice, sub)]
+    grit = filt(noise(n, rng), "lp", 45.0)
+    grit_peak = max(abs(g) for g in grit) or 1.0
+    voice = [v * (0.55 + 0.45 * g / grit_peak) for v, g in zip(voice, grit)]
+    vowel = rng.uniform(0.85, 1.15)
+    voice = formants(voice, [(420.0 * vowel, 4.5, 1.0), (850.0 * vowel, 5.0, 0.45), (2200.0, 6.0, 0.12)])
+    voice = filt(voice, "lp", 1800.0)  # uzaklık: tizler yumuşak
+    breath = filt(noise(n, rng), "bp", 1200.0, 0.8)
+    voice = [v + 0.04 * b for v, b in zip(voice, breath)]
+    return soft_clip(apply(voice, env_swell(n, rng.uniform(0.3, 0.5), 1.3)), 1.4)
 
 
 def player_hurt(rng: random.Random) -> list[float]:
@@ -305,7 +351,11 @@ def main() -> int:
         write_wav(f"zombie_death_{i}", zombie_death(random.Random(seed), base))
     for i, seed in enumerate((401, 402, 403, 404), start=1):
         write_wav(f"footstep_{i}", footstep(random.Random(seed)))
-    write_wav("dash_1", dash(random.Random(501)))
+    for i, seed in enumerate((501, 502, 503), start=1):
+        write_wav(f"dash_{i}", dash(random.Random(seed)))
+    groans = ((701, 88.0, 1.3), (702, 72.0, 1.6), (703, 104.0, 1.1), (704, 80.0, 1.8), (705, 96.0, 1.4))
+    for i, (seed, base, length) in enumerate(groans, start=1):
+        write_wav(f"horde_groan_{i}", horde_groan(random.Random(seed), base, length))
     write_wav("player_hurt_1", player_hurt(random.Random(601)))
     return 0
 

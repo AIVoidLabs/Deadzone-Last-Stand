@@ -85,6 +85,15 @@ func nearest_enemy(from: Vector2, max_range: float) -> int:
 	return _grid.nearest(from, max_range, _pos, _alive)
 
 
+## center çevresinde radius içindeki canlı zombi sayısı (ızgara sorgusu, tüm listeyi taramaz).
+func count_near(center: Vector2, radius: float) -> int:
+	var count: int = 0
+	for i in _grid.query_radius(center, radius, _pos):
+		if i < _alive.size() and _alive[i] != 0:
+			count += 1
+	return count
+
+
 ## a→b yolunda ilk değilen canlı zombi; yoksa -1.
 func find_segment_hit(a: Vector2, b: Vector2, radius: float) -> int:
 	var margin: float = radius + _max_radius + HIT_QUERY_MARGIN

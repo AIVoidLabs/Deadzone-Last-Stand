@@ -31,7 +31,8 @@ func _ready() -> void:
 		_playing_id.append(&"")
 
 
-func play(id: StringName) -> void:
+## volume_offset_db: tablo düzeyine eklenir (ör. sürü homurtusu yoğunluğa göre kısılır).
+func play(id: StringName, volume_offset_db: float = 0.0) -> void:
 	if not Tuning.FEATURE_SFX or not _streams.has(id):
 		return
 	var row: Dictionary = SoundData.get_row(id)
@@ -44,7 +45,7 @@ func play(id: StringName) -> void:
 	var variants: Array = _streams[id]
 	var player: AudioStreamPlayer = _players[index]
 	player.stream = variants[_rng.randi() % variants.size()]
-	player.volume_db = row["volume_db"]
+	player.volume_db = float(row["volume_db"]) + volume_offset_db
 	player.pitch_scale = VoiceLimiter.pitch(row["pitch_variance"], _rng.randf())
 	_playing_id[index] = id
 	player.play()

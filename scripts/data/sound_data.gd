@@ -13,6 +13,7 @@ const ZOMBIE_DEATH: StringName = &"zombie_death"
 const FOOTSTEP: StringName = &"footstep"
 const DASH: StringName = &"dash"
 const PLAYER_HURT: StringName = &"player_hurt"
+const HORDE_GROAN: StringName = &"horde_groan"
 
 const TABLE: Dictionary = {
 	&"shot": {
@@ -37,8 +38,13 @@ const TABLE: Dictionary = {
 	},
 	&"dash": {
 		"enabled": Tuning.FEATURE_SFX_DASH,
-		"files": ["dash_1"],
-		"volume_db": -6.0, "pitch_variance": 0.05, "max_voices": 1, "min_interval": 0.2,
+		"files": ["dash_1", "dash_2", "dash_3"],
+		"volume_db": -13.0, "pitch_variance": 0.05, "max_voices": 1, "min_interval": 0.2,
+	},
+	&"horde_groan": {
+		"enabled": Tuning.FEATURE_SFX_HORDE_GROAN,
+		"files": ["horde_groan_1", "horde_groan_2", "horde_groan_3", "horde_groan_4", "horde_groan_5"],
+		"volume_db": -12.0, "pitch_variance": 0.12, "max_voices": 4, "min_interval": 0.15,
 	},
 	&"player_hurt": {
 		"enabled": Tuning.FEATURE_SFX_PLAYER_HURT,

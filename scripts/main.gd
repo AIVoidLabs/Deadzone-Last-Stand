@@ -88,6 +88,11 @@ func _add_sounds(player: Player, enemies: EnemyManager, weapons: WeaponRig) -> v
 	var steps: Footsteps = Footsteps.new()
 	steps.player = player
 	add_child(steps)
+	if Tuning.FEATURE_SFX_HORDE_GROAN:
+		var horde: HordeAmbience = HordeAmbience.new()
+		horde.player = player
+		horde.enemies = enemies
+		add_child(horde)
 
 
 func _add_debug_tools(player: Player, enemies: EnemyManager, projectiles: ProjectilePool, camera: FollowCamera, weapons: WeaponRig) -> void:
