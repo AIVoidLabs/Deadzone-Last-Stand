@@ -154,7 +154,7 @@ Profil üst sınırları (2.5 ölçümüne göre, efektlere pay bırakılarak): 
 ### 2026-11-17 — Oturum 4
 - Ortam kontrolü temiz. Taha dikey dilimi onayladı → 5.7 ve Aşama 5 kapandı (Aşama 1 his onayı dahil).
 - 6.1: Taha'nın kararları: 5 dalga 20→60 sn, otomatik 3 sn ara, ekran dışı doğma. Doğma `EnemyManager`'dan `SpawnDirector`'a taşındı (sonsuz mod `FEATURE_WAVES = false` ile duruyor, denendi). Kazanınca 1.5 sn bekleme (`VICTORY_DELAY`), devrilen zombiler donmasın diye. 97 test geçiyor.
-- 6.2: Taha'nın kararları: tek tür düşen (kristal = XP + para), yalnız yakındakiler çekilir, dönen turkuaz kristal. İlk görüntüde kristal ışımadan beyaza kaçıyordu → ışıma azaltıldı, renk doygunlaştı. Debug paneli XP çubuğunun altına kaydı.
+- 6.2: Taha'nın kararları: tek tür düşen (kristal = XP + para), yalnız yakındakiler çekilir, dönen turkuaz kristal. İlk görüntüde kristal ışımadan beyaza kaçıyordu → ışıma azaltıldı, renk doygunlaştı. Taha: "çok büyük ve çok basit, küçük ve beyazımsı olsun" → boy 0.2 → 0.11, beyazımsı buz mavisi, altı köşeli taş kesimi (üst ucu uzun) (`64c3908`). Debug paneli XP çubuğunun altına kaydı.
 - Not: PowerShell 5.1'de `Get-Content | Set-Content` UTF-8 dosyayı bozuyor (Türkçe harfler); dosya düzenlemesini Python ya da Edit ile yap.
 
 ### 2026-11-17 — Oturum 3

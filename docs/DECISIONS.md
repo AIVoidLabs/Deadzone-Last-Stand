@@ -6,7 +6,7 @@ Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar v
 
 - **Tek tür düşen: kristal** — hem XP hem para (iki ayrı para birimi yok). Ad Claude'dan: zırhın enerji teması.
 - **Yalnız yakındakiler çekilir** (3 m); dalga sonunda hepsi.
-- **Görünüm:** dönen, turkuaz, low-poly kristal (sekizyüzlü); ekran görüntüsüyle değerlendirilecek.
+- **Görünüm:** ilk deneme turkuaz sekizyüzlü; Taha "çok büyük ve çok basit" dedi → küçük, beyazımsı, altı köşeli taş kesimi kristal.
 - Claude'un kararı: seviye eğrisi (seviye + 3)², Brotato'daki gibi; ses: kısa cam tınlaması (Taha dinleyip onaylar).
 
 ## 2026-11-17 — Aşama 6.1 dalgalar (Taha)
