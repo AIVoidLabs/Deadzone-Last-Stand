@@ -16,6 +16,8 @@ const FEATURE_WAVES: bool = true
 const FEATURE_SPAWN_OFFSCREEN: bool = true
 ## Ölen zombi kristal bırakır (hem XP hem para); kapalıyken hiçbir şey düşmez.
 const FEATURE_PICKUPS: bool = true
+## Seviye atlayınca kart seçimi (dalga arasında); kapalıyken seviye yalnız sayılır.
+const FEATURE_LEVEL_CARDS: bool = true
 const FEATURE_START_FULLSCREEN: bool = true
 const FEATURE_DASH: bool = true
 ## Dash sırasında asker zombilerin içinden geçer (kapalıysa onları iter).
@@ -200,6 +202,15 @@ const PICKUP_COLOR: Color = Color(0.86, 0.95, 1.0)
 ## Seviye için gereken XP: (seviye + bu)². 1→2: 16 kristal.
 const XP_LEVEL_OFFSET: int = 3
 
+# --- İstatistikler ve kartlar (satırlar StatData / CardData'da) ---
+const CARD_OFFER_COUNT: int = 3
+## Bir can yenileme puanı saniyede bu kadar can.
+const HP_REGEN_PER_POINT: float = 0.25
+## Dash bekleme süresi en çok bu yüzde kadar kısalır.
+const DASH_COOLDOWN_CUT_CAP: float = 60.0
+## Yüzdelik istatistik eksiye düşse bile çarpan bunun altına inmez (ileride eksi veren eşyalar).
+const MIN_STAT_MULTIPLIER: float = 0.1
+
 # --- Mermi ---
 const PROJECTILE_POOL_SIZE: int = 128
 const PROJECTILE_RADIUS: float = 0.12
@@ -298,6 +309,8 @@ const PLAYER_BLINK_RATE: float = 20.0
 # --- Debug ---
 const DEBUG_SPAWN_BATCH: int = 50
 const DEBUG_PANEL_REFRESH: float = 0.25
+## Capture --capture-pick: kart ekranında tuşa basmadan önce bekleme (sn).
+const CAPTURE_PICK_DELAY: float = 0.5
 const BENCH_STEP_ENEMIES: int = 50
 const BENCH_STEP_TIME: float = 3.0
 const BENCH_MEASURE_TIME: float = 2.0

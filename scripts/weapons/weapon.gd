@@ -43,7 +43,7 @@ func tick(delta: float) -> void:
 		has_target = false
 		return
 	var origin: Vector2 = position_2d()
-	var max_range: float = row["max_range"]
+	var max_range: float = _player.stats.weapon_range(row["max_range"])
 	var target: int = enemies.nearest_enemy(origin, max_range)
 	has_target = target >= 0
 	if not has_target:
@@ -57,9 +57,10 @@ func tick(delta: float) -> void:
 		return
 	var muzzle: Vector2 = origin + direction * float(row["muzzle_offset"])
 	var pellets: int = row["pellets"]
+	var damage: float = _player.stats.weapon_damage(row["damage"])
 	var spread: float = deg_to_rad(row["spread_deg"])
 	for i: int in pellets:
 		var angle: float = Spread.angle_offset(i, pellets, spread) + Spread.jitter(pellets, spread, row["spread_jitter"], _rng.randf())
-		projectiles.fire(muzzle, direction.rotated(angle), row["projectile_speed"], row["damage"], max_range, row["knockback"])
-	_cooldown = row["fire_interval"]
+		projectiles.fire(muzzle, direction.rotated(angle), row["projectile_speed"], damage, max_range, row["knockback"])
+	_cooldown = _player.stats.fire_interval(row["fire_interval"])
 	fired.emit(direction)

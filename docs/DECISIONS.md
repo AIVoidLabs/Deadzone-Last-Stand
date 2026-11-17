@@ -2,6 +2,13 @@
 
 Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar verilince "Açık kararlar"dan çıkarılıp tarihli bölüme yazılır.
 
+## 2026-11-17 — Aşama 6.3 istatistikler ve kartlar (Taha)
+
+- **Kart seçimi dalga sonunda** (Brotato gibi), dalga içinde akış kesilmez.
+- **İstatistikler:** temel 7 (can, hasar, atış hızı, menzil, hız, zırh, şans) + can yenileme, toplama menzili, dash bekleme süresi.
+- **4 nadirlik kademesi** (sıradan / nadir / destansı / efsanevi), renkle ayrılır; seviye ve şansla üst kademe sıklaşır.
+- Claude'un kararları: kart değerleri ve kademe olasılıkları Brotato oranlarından uyarlandı (`CardData`); zırh mevcut düz düşme kuralıyla (`CombatMath.mitigate`); kart başına farklı istatistik; yenileme yok (mağazada olacak).
+
 ## 2026-11-17 — Aşama 6.2 düşenler (Taha)
 
 - **Tek tür düşen: kristal** — hem XP hem para (iki ayrı para birimi yok). Ad Claude'dan: zırhın enerji teması.

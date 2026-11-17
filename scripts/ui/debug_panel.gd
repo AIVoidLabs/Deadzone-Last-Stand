@@ -13,6 +13,7 @@ var weapons: WeaponRig
 var director: SpawnDirector
 ## Kristaller kapalıyken null.
 var pickups: Pickups
+var loot: RunLoot
 
 var _panel: PanelContainer
 var _label: Label
@@ -50,6 +51,8 @@ func _unhandled_input(input_event: InputEvent) -> void:
 		weapons.add_debug_weapon()
 	elif input_event.is_action_pressed(&"debug_wave_end"):
 		director.end_wave()
+	elif input_event.is_action_pressed(&"debug_level"):
+		loot.add(RunLoot.xp_needed(loot.level) - loot.xp)
 
 
 func _process(delta: float) -> void:
@@ -71,8 +74,9 @@ func _build_text() -> String:
 		"Zombi %d / %d (havuz %d)" % [enemies.active_count(), Quality.max_enemies(), enemies.pool_size()],
 		"Mermi %d   draw call %d   silah %d / %d   kristal %d" % [projectiles.active_count(), draw_calls, weapons.count(), Tuning.WEAPON_SLOTS, pickups.count() if pickups != null else 0],
 		"Can %.0f / %.0f   ölümsüz %s" % [player.health.current, player.health.maximum, "AÇIK" if player.god_mode else "kapalı"],
+		"Kartlar: %s" % CardScreen.stats_text(player.stats),
 		"Profil %s   ses %d / %d çalıyor (toplam %d)" % [Quality.current, Audio.active_voices(), Tuning.SFX_POOL_SIZE, Audio.played_total],
-		"F4 +%d zombi · F5 ölümsüz · F6 profil · F7 +silah · F8 dalgayı bitir" % Tuning.DEBUG_SPAWN_BATCH,
-		"(Fn gerekmeden: Ctrl+3 … Ctrl+8 aynı sırayla)",
+		"F4 +%d zombi · F5 ölümsüz · F6 profil · F7 +silah · F8 dalgayı bitir · F9 +seviye" % Tuning.DEBUG_SPAWN_BATCH,
+		"(Fn gerekmeden: Ctrl+3 … Ctrl+9 aynı sırayla)",
 	])
 	return "\n".join(lines)

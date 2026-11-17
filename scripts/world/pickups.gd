@@ -78,6 +78,7 @@ func collect_all() -> void:
 
 func _physics_process(delta: float) -> void:
 	var target: Vector2 = player.position_2d()
+	var magnet: float = player.stats.pickup_radius()
 	var i: int = _pos.size() - 1
 	# Sondan başa: toplanan sondakiyle takaslanır, takaslanan zaten işlenmiştir.
 	while i >= 0:
@@ -85,7 +86,7 @@ func _physics_process(delta: float) -> void:
 			State.HOP:
 				_tick_hop(i, delta)
 			State.IDLE:
-				if PickupRules.in_magnet(_pos[i], target, Tuning.PICKUP_MAGNET_RADIUS):
+				if PickupRules.in_magnet(_pos[i], target, magnet):
 					_state[i] = State.PULL
 					_t[i] = Tuning.PICKUP_PULL_START_SPEED
 			State.PULL:

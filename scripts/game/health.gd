@@ -18,6 +18,12 @@ func take_damage(amount: float) -> float:
 	return dealt
 
 
+## Üst sınırı amount kadar artırır; artan kadar can da dolar.
+func raise_maximum(amount: float) -> void:
+	maximum = maxf(1.0, maximum + amount)
+	current = clampf(current + maxf(0.0, amount), 0.0, maximum)
+
+
 ## Gerçekten eklenen miktarı döndürür.
 func heal(amount: float) -> float:
 	var gained: float = clampf(amount, 0.0, maximum - current)

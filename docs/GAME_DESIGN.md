@@ -81,7 +81,9 @@ Zırhlı ve kasklı bir asker, kapalı bir şehir kavşağında dalga dalga gele
 - `FEATURE_WAVES = false`: Aşama 1'deki sonsuz, giderek hızlanan doğma.
 - **Kristaller (6.2):** ölen zombi kristal bırakır (satırda `drop_value`); her kristal hem para hem XP (Brotato'daki gibi tek kaynak). Kristal sekerek düşer, yerde döner. Asker 3 m içine girince ona çekilir (ileride "toplama menzili" istatistiği); uzaktakiler bekler. Dalga bitince yerde kalanların hepsi çekilir. Yerde en çok 300; dolunca yeni değer var olana eklenir, o kristal büyür.
 - Seviye için gereken XP: (seviye + 3)² → 1→2: 16, 2→3: 25. Seviye atlayınca şimdilik yalnız "SEVİYE N" yazısı; kartlar 6.3'te. Kristaller mağazada harcanır (6.5).
-- Seviye atlayınca 3 karttan biri (istatistik artışı).
+- **Kartlar (6.3):** seviye atlayınca dalga içinde yalnız "SEVİYE N" yazısı; dalga bitip kristaller toplanınca her seviye için 3 karttan biri seçilir (oyun durur; fare ya da 1/2/3). Sonra 3 sn ara (6.5'te mağaza).
+- Kartlar farklı istatistiklerden; 4 kademe: sıradan / nadir (seviye 1'den, seviye başına %6, en çok %60) / destansı (seviye 3'ten, %2, en çok %25) / efsanevi (seviye 6'dan, %0.75, en çok %8). Şans olasılığı (1 + şans/100) ile çarpar. Değerler `CardData`'da.
+- İstatistikler (`StatData`, `PlayerStats`): can (+10/20/30/40, artan kadar can dolar), hasar %, atış hızı % (aralığı böler), menzil %, hareket hızı %, zırh (düz; gelen hasardan düşülür, en az 1), şans, can yenileme (puan başına 0.25 can/sn), toplama menzili %, dash bekleme % (en çok %60 kısalır). Yüzdeler çarpan; `Tuning` temel değerleri sabit kalır.
 - 6 silah yuvası; aynı silah + aynı kademe iki tane → bir üst kademe (en çok 4).
 - Temel istatistikler: can, hasar, atış hızı, menzil, hız, zırh, şans.
 

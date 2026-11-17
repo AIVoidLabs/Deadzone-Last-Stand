@@ -1,0 +1,60 @@
+class_name LevelUpFlow
+extends Node
+## Bekleyen seviyeler için kart seçimi. Dalgalar açıkken dalga arasında, yerdeki kristaller
+## toplandıktan sonra açılır; dalgalar kapalıyken seviye atlar atlamaz. Seçim sırasında oyun durur.
+
+var loot: RunLoot
+var stats: PlayerStats
+var director: SpawnDirector
+## Kristaller kapalıyken null.
+var pickups: Pickups
+
+var _screen: CardScreen
+var _offer: Array[Dictionary] = []
+var _open: bool = false
+var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
+
+
+func _ready() -> void:
+	name = "LevelUpFlow"
+	_rng.randomize()
+	_screen = CardScreen.new()
+	add_child(_screen)
+	_screen.chosen.connect(_on_chosen)
+
+
+func _physics_process(_delta: float) -> void:
+	if _open or loot.pending_levels <= 0 or not _can_open():
+		return
+	_open = true
+	GameFlow.open_menu()
+	_show_next()
+
+
+func _can_open() -> bool:
+	if GameFlow.state != GameFlow.State.PLAYING:
+		return false
+	if director.run == null:
+		return true
+	if director.run.phase != WaveRun.Phase.BREAK:
+		return false
+	return pickups == null or pickups.count() == 0
+
+
+func _show_next() -> void:
+	_offer = CardRules.roll_offer(_rng, CardData.CARDS, CardData.TIERS, Tuning.CARD_OFFER_COUNT, loot.level, stats.luck())
+	_screen.show_offer(_offer, loot.pending_levels, stats)
+
+
+func _on_chosen(index: int) -> void:
+	if not _open:
+		return
+	var card: Dictionary = _offer[index]
+	stats.add(card["stat"], card["value"])
+	loot.pending_levels -= 1
+	if loot.pending_levels > 0:
+		_show_next()
+		return
+	_open = false
+	_screen.close()
+	GameFlow.close_menu()

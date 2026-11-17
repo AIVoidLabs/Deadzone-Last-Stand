@@ -52,6 +52,17 @@ func game_over() -> void:
 	_end_run(Tuning.GAME_OVER_DELAY, game_over_started)
 
 
+## Oyun içi menü (kart seçimi, ileride mağaza): dünya durur, menü ALWAYS düğümünde çalışır.
+func open_menu() -> void:
+	if state == State.PLAYING:
+		get_tree().paused = true
+
+
+func close_menu() -> void:
+	if state == State.PLAYING:
+		get_tree().paused = false
+
+
 ## Son dalga temizlendi: oyun durur, "hayatta kaldın" ekranı.
 func victory() -> void:
 	if state != State.PLAYING:

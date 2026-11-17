@@ -57,11 +57,19 @@ func _ready() -> void:
 	hud.setup(player, enemies, director, loot)
 	add_child(hud)
 
+	if Tuning.FEATURE_LEVEL_CARDS:
+		var level_up: LevelUpFlow = LevelUpFlow.new()
+		level_up.loot = loot
+		level_up.stats = player.stats
+		level_up.director = director
+		level_up.pickups = pickups
+		add_child(level_up)
+
 	player.died.connect(GameFlow.game_over)
 	Quality.apply_to_viewport(get_viewport())
 
 	if OS.is_debug_build():
-		_add_debug_tools(player, enemies, projectiles, camera, weapons, director, pickups)
+		_add_debug_tools(player, enemies, projectiles, camera, weapons, director, pickups, loot)
 
 
 ## Kristaller: öldürmede düşer, toplanınca RunLoot'a eklenir, dalga sonunda hepsi çekilir.
@@ -125,7 +133,7 @@ func _add_sounds(player: Player, enemies: EnemyManager, weapons: WeaponRig) -> v
 		add_child(horde)
 
 
-func _add_debug_tools(player: Player, enemies: EnemyManager, projectiles: ProjectilePool, camera: FollowCamera, weapons: WeaponRig, director: SpawnDirector, pickups: Pickups) -> void:
+func _add_debug_tools(player: Player, enemies: EnemyManager, projectiles: ProjectilePool, camera: FollowCamera, weapons: WeaponRig, director: SpawnDirector, pickups: Pickups, loot: RunLoot) -> void:
 	var panel: DebugPanel = DebugPanel.new()
 	panel.player = player
 	panel.enemies = enemies
@@ -133,6 +141,7 @@ func _add_debug_tools(player: Player, enemies: EnemyManager, projectiles: Projec
 	panel.weapons = weapons
 	panel.director = director
 	panel.pickups = pickups
+	panel.loot = loot
 	add_child(panel)
 	if Benchmark.requested():
 		var bench: Benchmark = Benchmark.new()
@@ -147,4 +156,5 @@ func _add_debug_tools(player: Player, enemies: EnemyManager, projectiles: Projec
 		capture.camera = camera
 		capture.weapons = weapons
 		capture.director = director
+		capture.loot = loot
 		add_child(capture)

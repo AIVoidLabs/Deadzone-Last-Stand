@@ -7,6 +7,8 @@ var crystals: int = 0
 var level: int = 1
 ## Bu seviyede toplanan XP (seviye atlayınca sıfırdan sayar).
 var xp: int = 0
+## Kart seçimi bekleyen seviye sayısı (LevelUpFlow azaltır).
+var pending_levels: int = 0
 
 
 static func xp_needed(at_level: int) -> int:
@@ -23,6 +25,7 @@ func add(value: int) -> int:
 		xp -= xp_needed(level)
 		level += 1
 		gained += 1
+	pending_levels += gained
 	return gained
 
 

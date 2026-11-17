@@ -9,6 +9,8 @@ signal died
 enum State { IDLE, MOVE, DASH, DEAD }
 
 var state: State = State.IDLE
+## Kartlardan gelen artışlar; temel değerler Tuning'de.
+var stats: PlayerStats = PlayerStats.new()
 var health: Health = Health.new(Tuning.PLAYER_MAX_HP)
 var dash: Dash = Dash.new(Tuning.DASH_DURATION, Tuning.DASH_COOLDOWN)
 ## XZ düzleminde bakış yönü (Vector2.y = dünya Z).
@@ -39,12 +41,14 @@ func _init() -> void:
 	var visual: PlayerVisual = PlayerVisual.new()
 	visual.name = "Visual"
 	add_child(visual)
+	stats.changed.connect(_on_stat_changed)
 
 
 func _physics_process(delta: float) -> void:
 	if state == State.DEAD:
 		return
 	_iframes_left = maxf(0.0, _iframes_left - delta)
+	health.heal(stats.regen_per_second() * delta)
 	var input: Vector2 = _read_input()
 	if dash.tick(delta):
 		_end_dash()
@@ -55,7 +59,7 @@ func _physics_process(delta: float) -> void:
 		planar = _dash_direction * Tuning.DASH_SPEED
 	else:
 		planar = Locomotion.step(
-			Vector2(velocity.x, velocity.z), input, Tuning.PLAYER_SPEED, Tuning.PLAYER_ACCEL, Tuning.PLAYER_FRICTION, delta)
+			Vector2(velocity.x, velocity.z), input, stats.move_speed(), Tuning.PLAYER_ACCEL, Tuning.PLAYER_FRICTION, delta)
 		if input != Vector2.ZERO:
 			facing = input.normalized()
 		planar += _knock
@@ -94,7 +98,7 @@ func take_hit(amount: float, push: Vector2 = Vector2.ZERO) -> void:
 		return
 	if Tuning.FEATURE_PLAYER_KNOCKBACK:
 		_knock = Knockback.impulse(push, Tuning.PLAYER_HIT_KNOCKBACK, 1.0)
-	var dealt: float = health.take_damage(CombatMath.mitigate(amount, Tuning.PLAYER_ARMOR))
+	var dealt: float = health.take_damage(CombatMath.mitigate(amount, stats.armor()))
 	if Tuning.FEATURE_PLAYER_IFRAMES:
 		_iframes_left = Tuning.PLAYER_HIT_IFRAMES
 	event.emit(&"hit", {"amount": dealt, "hp": health.current, "iframes": _iframes_left})
@@ -121,9 +125,17 @@ func _try_start_dash(input: Vector2) -> void:
 func _end_dash() -> void:
 	# Dash biter bitmez yakalanmasın diye kısa bir dokunulmazlık payı.
 	_iframes_left = maxf(_iframes_left, Tuning.DASH_EXIT_IFRAMES)
-	velocity = Vector3(_dash_direction.x, 0.0, _dash_direction.y) * Tuning.PLAYER_SPEED
+	velocity = Vector3(_dash_direction.x, 0.0, _dash_direction.y) * stats.move_speed()
 	_set_state(State.MOVE)
 	event.emit(&"dash_ended", {})
+
+
+func _on_stat_changed(stat: StringName, amount: float) -> void:
+	match stat:
+		StatData.MAX_HP:
+			health.raise_maximum(amount)
+		StatData.DASH_COOLDOWN:
+			dash.cooldown = stats.dash_cooldown()
 
 
 func _read_input() -> Vector2:

@@ -6,7 +6,7 @@ extends Node
 ## --capture-kill=S: görüntüden S saniye önce askeri öldürür (ölüm animasyonu denetimi).
 ## --camera-distance=M: kamera uzaklığını dener (karşılaştırma görüntüleri için).
 ## --weapons=N: toplam N silahla başlar (debug silahı eklenir).
-## --wave=N: N. dalgadan başlar. --capture-wave-end=S: görüntüden S saniye önce dalgayı bitirir.
+## --levels=N: N seviye atlatır (kart seçimi dalga arasında açılır). --capture-pick: açılan kart ekranında 1'e basar. --wave=N: N. dalgadan başlar. --capture-wave-end=S: görüntüden S saniye önce dalgayı bitirir.
 ## --autopilot: asker ölümsüz, daire çizerek yürür. --god: asker ölümsüz ama yerinde durur.
 
 var player: Player
@@ -15,6 +15,7 @@ var debug_panel: DebugPanel
 var camera: FollowCamera
 var weapons: WeaponRig
 var director: SpawnDirector
+var loot: RunLoot
 
 var _out: String = ""
 var _seconds: float = 6.0
@@ -24,6 +25,8 @@ var _show_panel: bool = false
 var _dash_lead: float = -1.0
 var _kill_lead: float = -1.0
 var _wave_end_lead: float = -1.0
+var _auto_pick: bool = false
+var _pick_wait: float = 0.0
 var _time: float = 0.0
 var _angle: float = 0.0
 
@@ -60,6 +63,11 @@ func _ready() -> void:
 			player.god_mode = true
 		elif arg == "--debug-panel":
 			_show_panel = true
+		elif arg == "--capture-pick":
+			_auto_pick = true
+		elif arg.begins_with("--levels="):
+			for _i in arg.trim_prefix("--levels=").to_int():
+				loot.add(RunLoot.xp_needed(loot.level) - loot.xp)
 		elif arg.begins_with("--wave="):
 			director.start_at.call_deferred(arg.trim_prefix("--wave=").to_int() - 1)
 		elif arg.begins_with("--capture-wave-end="):
@@ -87,6 +95,8 @@ func _process(delta: float) -> void:
 	if _wave_end_lead >= 0.0 and _time >= _seconds - _wave_end_lead:
 		_wave_end_lead = -1.0
 		director.end_wave()
+	if _auto_pick:
+		_tick_auto_pick(delta)
 	if _time < _seconds:
 		return
 	var path: String = ProjectSettings.globalize_path("res://").path_join(_out)
@@ -94,3 +104,18 @@ func _process(delta: float) -> void:
 	get_viewport().get_texture().get_image().save_png(path)
 	print("CAPTURE ", _out)
 	get_tree().quit()
+
+
+## Oyun menü için durunca (kart ekranı) kısa aralıklarla 1 tuşuna basar.
+func _tick_auto_pick(delta: float) -> void:
+	if not get_tree().paused:
+		_pick_wait = Tuning.CAPTURE_PICK_DELAY
+		return
+	_pick_wait -= delta
+	if _pick_wait > 0.0:
+		return
+	_pick_wait = Tuning.CAPTURE_PICK_DELAY
+	var key: InputEventKey = InputEventKey.new()
+	key.physical_keycode = KEY_1
+	key.pressed = true
+	Input.parse_input_event(key)
