@@ -31,6 +31,14 @@ func _ready() -> void:
 		_playing_id.append(&"")
 
 
+## Kapanışta çalan sesler ses sunucusunda asılı kalmasın (sızıntı uyarısı).
+func _exit_tree() -> void:
+	for player: AudioStreamPlayer in _players:
+		player.stop()
+		player.stream = null
+	_streams.clear()
+
+
 ## volume_offset_db: tablo düzeyine eklenir (ör. sürü homurtusu yoğunluğa göre kısılır).
 func play(id: StringName, volume_offset_db: float = 0.0) -> void:
 	if not Tuning.FEATURE_SFX or not _streams.has(id):
