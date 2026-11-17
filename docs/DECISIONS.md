@@ -9,6 +9,8 @@ Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar v
 - **Adım sesi şimdilik metal zemin gibi, kabul.** İleride zemine duyarlı olacak (asfalt, metal, moloz…): 8.1 şehir parçaları gelince zemin türü, 8.4 tam ses setinde zemin başına adım çeşitleri.
 - **Takla sesi çok baskındı:** kısıldı (-6 → -13 dB), hava hışırtısı azaltıldı; zırhlı asker hissi için zırh plakası ve alet çantası tıngırtısı eklendi (3 çeşit).
 - Editör gömmesi kapatılınca F tuşları ve tam ekran sorunsuz (Taha doğruladı).
+- **Zombi ölüm sesi de yok** (`FEATURE_SFX_ZOMBIE_DEATH = false`). Zombiden gelen tek ses sürü homurtusu.
+- **Bunlar temel sesler.** Şimdilik böyle ilerlenir. İlerleyen aşamalarda (8.4 tam ses seti) ya yeniden düzenlenir ya da animasyon kütüphanesinde olduğu gibi Claude'un yönlendirmesiyle Taha ücretsiz lisanslı (CC0) bir ses paketi indirir; Claude lisansı kontrol edip seçim önerir.
 
 ## 2026-11-16 — Aşama 5.4 asker vurulunca (Taha)
 

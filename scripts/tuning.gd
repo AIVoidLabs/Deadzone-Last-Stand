@@ -56,7 +56,8 @@ const FEATURE_SFX_SHOT: bool = true
 const FEATURE_SFX_HIT: bool = false
 ## Askerin yakınındaki zombi sayısı arttıkça sıklaşan ve yükselen homurtu.
 const FEATURE_SFX_HORDE_GROAN: bool = true
-const FEATURE_SFX_ZOMBIE_DEATH: bool = true
+## Zombi ölüm sesi: Taha'nın isteğiyle kapalı.
+const FEATURE_SFX_ZOMBIE_DEATH: bool = false
 const FEATURE_SFX_FOOTSTEP: bool = true
 const FEATURE_SFX_DASH: bool = true
 const FEATURE_SFX_PLAYER_HURT: bool = true
