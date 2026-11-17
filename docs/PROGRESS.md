@@ -5,27 +5,23 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 
 ## Şu an
 
-Oturum 3 sonu (2026-11-17, Taha "gayet güzel" deyip oturumu kapattı). Çalışma ağacı temiz, push yok.
+Oturum 4 (2026-11-17). Taha dikey dilimi onayladı ("her şey okey"); Aşama 5 kapandı.
 
-- **Ana aşama:** 5 — Dikey dilim: silah ve vuruş hissi
-- **Alt aşama:** 5.1–5.6 bitti. **5.7 cila bitti; dikey dilim onayı bekleniyor.** Taha dilime "gayet güzel" dedi ama açıkça "onay" demedi; yeni oturumda tek cümleyle teyit et (ya da takıldığı şeyi sor), sonra 5.7'yi işaretle.
-- **Sıradaki:**
-  1. Taha 60 sn oynar ve **dikey dilimi onaylar** (Aşama 1'den devreden his onayı da bu). Onayda 5.7'yi işaretle, 🚩 Aşama 5 bildirimini yap, devam bekle.
-  2. Sonra Aşama 6 — Tur döngüsü (6.1 dalgalar).
-- **Bekleyen (Taha'dan):** dikey dilim onayı (üstteki not). Zombi saldırısı hâlâ "hazırlanıp vurur"; değiştirmek isterse onay turunda söyler. Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
-- **Taha oyunu Godot editöründen (Play) açıyor.** Editör oyunu varsayılan olarak Game sekmesine gömer: gömülü pencerede tam ekran yok ve F tuşları oyuna ulaşmayabilir. Gömme: Game sekmesi araç çubuğunun en sağındaki ⋮ → "Embed Game on Next Play". Debug tuşlarının yedekleri Ctrl+3 … Ctrl+7.
-- **Not:** Blender MCP eklentisi 2026-11-16'da güncellendi; Blender scriptleri zaten penceresiz çalışıyor, Taha'nın Blender açması gerekmiyor.
+- **Ana aşama:** 6 — Tur döngüsü
+- **Alt aşama:** 6.1 Dalgalar (plan onayı bekleniyor)
+- **Bekleyen (Taha'dan):** 6.1 planına onay. Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
+- **Taha oyunu Godot editöründen (Play) açıyor.** Gömülü pencerede tam ekran yok ve F tuşları oyuna ulaşmayabilir; Game sekmesi ⋮ → "Embed Game on Next Play" kapatılır. Debug tuşlarının yedekleri Ctrl+3 … Ctrl+7.
 
 ## Ana aşama durumu
 
 | # | Aşama | Durum |
 |---|---|---|
 | 0 | Kurulum ve iskelet | ✔ bitti |
-| 1 | Kutu prototip | ✔ bitti (his onayı 5.7'ye devredildi) |
+| 1 | Kutu prototip | ✔ bitti (his onayı 5.7'de verildi) |
 | 2 | Model ve animasyon hattı | ✔ bitti (2026-11-16) |
 | 3 | Dikey dilim: asker | ✔ bitti (2026-11-16) |
 | 4 | Dikey dilim: zombi | ✔ bitti (2026-11-16) |
-| 5 | Dikey dilim: silah ve vuruş hissi | sürüyor (5.4) |
+| 5 | Dikey dilim: silah ve vuruş hissi | ✔ bitti (2026-11-17, dikey dilim onaylandı) |
 | 6 | Tur döngüsü | — |
 | 7 | Silah ve zombi çeşitliliği | — |
 | 8 | Arena, atmosfer, ses | — |
@@ -66,7 +62,7 @@ Bitiş ölçütleri `ROADMAP.md`'de. Biten kutunun yanına tarih ve commit yazı
 - [x] 5.4 Asker vurulunca — 2026-11-17 (`41b3ce8`, `9767e2a`). Ekran kenarı kızarması, can %35'in altındayken nabız; sarsıntı ve yanıp sönme zaten vardı. Taha: itilme kötü → kapatıldı (`FEATURE_PLAYER_KNOCKBACK = false`); kızarmayı onayladı
 - [x] 5.5 İlk sesler — 2026-11-17 (`de2a620`, `510b83d`; temel sesler, 8.4'te yeniden ele alınır) (`tools/sfx/gen_sfx.py`: Python standart kütüphanesiyle sentez, sabit tohum, 6 ses 13 dosya; `Audio` autoload: 32 oynatıcılık havuz, "SFX" veri yolu; `SoundData` tablosu: düzey, perde payı, aynı anda en çok kopya, çalışlar arası bekleme; `VoiceLimiter` + `Stride` 10 test; adımlar koşu klibinin temposundan). Taha ilk tur: atış iyi, isabet sesi kapatıldı → sürü homurtusu eklendi (`HordeGroan` + 3 test), takla kısıldı + alet çantası tıngırtısı; zombi ölüm sesi de kapatıldı. Taha: "şimdilik böyle ilerleyelim"
 - [x] 5.6 İkinci silah: pompalı — 2026-11-17 (`30532d3`; Taha: "güzel") (`shotgun` satırı: 6 saçma × 7 hasar, 30° yelpaze + rastgele sapma, 7 m, 1.1 sn; saçma başına itme toplanır, yakından ~1.7 m savurur (tabanca ~0.4 m); büyük namlu parlaması, atışta hafif kamera sarsıntısı `FEATURE_FIRE_SHAKE`; kendi sesi: tok patlama + pompa çekme; `Spread` + 3 test; F7 sırayla pompalı / tabanca ekler)
-- [ ] 5.7 Dilim cilası ve **dikey dilim onayı** — cila bitti 2026-11-17 (ışık ön ayarları `LightingData`, Taha "dusk" seçti; asker renk tonu `PLAYER_ALBEDO_TINT`; yumuşak dash tozu; kapanışta ses sızıntısı düzeltildi). 258 zombi + 4 silah, akşam ışığı: 135 FPS. **Taha'nın 60 sn oynayıp dikey dilimi onaylaması bekleniyor**
+- [x] 5.7 Dilim cilası ve **dikey dilim onayı** — 2026-11-17, Taha onayladı ("her şey okey"); zombi saldırısı hazırlıklı vuruş olarak kaldı. Cila (ışık ön ayarları `LightingData`, Taha "dusk" seçti; asker renk tonu `PLAYER_ALBEDO_TINT`; yumuşak dash tozu; kapanışta ses sızıntısı düzeltildi). 258 zombi + 4 silah, akşam ışığı: 135 FPS
 
 ### 6 — Tur döngüsü
 - [ ] 6.1 Dalgalar
@@ -153,6 +149,9 @@ Profil üst sınırları (2.5 ölçümüne göre, efektlere pay bırakılarak): 
 - 2026-11-15: "Pencere modunda bile küçük duruyor, oyun tam ekran olmalı." → tam ekran açılış + F11/Alt+Enter (`Tuning.FEATURE_START_FULLSCREEN`).
 
 ## Oturum günlüğü
+
+### 2026-11-17 — Oturum 4
+- Ortam kontrolü temiz. Taha dikey dilimi onayladı → 5.7 ve Aşama 5 kapandı (Aşama 1 his onayı dahil).
 
 ### 2026-11-17 — Oturum 3
 - **Oturum sonu özeti:** 5.4–5.6 kapandı, 5.7 cilası bitti (onay bekliyor). Son commit'ler: `0b10609` (akşam ışığı), `10eb870` (ışık ön ayarları, asker tonu, dash tozu), `99b42fb` (ses sızıntısı), `30532d3` (pompalı), `510b83d` / `cbdc768` (5.5). 85 test geçiyor. Bu oturumun sonunda model Sonnet 5.5'e alındı (varsayılan).
