@@ -2,6 +2,13 @@
 
 Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar verilince "Açık kararlar"dan çıkarılıp tarihli bölüme yazılır.
 
+## 2026-11-17 — Aşama 5.6–5.7 pompalı, ışık (Taha)
+
+- Pompalı onaylandı ("güzel"), ayar değişmedi.
+- **Işık: "dusk" (akşam) seçildi** (galeri `docs/concept/lighting_gallery.png`: classic / dusk / overcast). Koyu lekeli asfalt, sıcak alçak güneş, hafif mavi sis, AgX ton eşleme. Değerler `LightingData` tablosunda, seçim `Tuning.LIGHTING_PRESET`. 8.3'te (ışık, sis, ekran efektleri) buradan devam edilir.
+- Asker zırhı soluk görünüyordu: Tripo dokusu açık tonlu. Doku değişmeden `Tuning.PLAYER_ALBEDO_TINT` ile koyulaştırılıp maviye çekildi.
+- Dash toz izi kare parçacıklardan yumuşak yuvarlak bulutlara çevrildi (`docs/concept/dash_dust.png`).
+
 ## 2026-11-17 — Aşama 5.5 ilk sesler (Taha)
 
 - **Zombiye isabet sesi yok:** her vuruşta çalması rahatsız edici. `Tuning.FEATURE_SFX_HIT = false` (dosyalar duruyor). Yerine **sürü homurtusu:** askerin 10 m çevresindeki zombi sayısı arttıkça homurtu sıklaşır ve yükselir (`HordeGroan`, `HordeAmbience`, `FEATURE_SFX_HORDE_GROAN`).

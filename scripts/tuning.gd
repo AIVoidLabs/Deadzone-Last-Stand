@@ -66,7 +66,7 @@ const FEATURE_SFX_PLAYER_HURT: bool = true
 
 # --- Arena ---
 ## Işık ve zemin ön ayarı (LightingData tablosundan).
-const LIGHTING_PRESET: StringName = &"classic"
+const LIGHTING_PRESET: StringName = &"dusk"
 const ARENA_SIZE: float = 60.0
 const ARENA_WALL_HEIGHT: float = 1.2
 const ARENA_WALL_THICKNESS: float = 1.0

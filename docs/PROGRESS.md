@@ -8,11 +8,11 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 Oturum 3 (2026-11-17). Push yok.
 
 - **Ana aşama:** 5 — Dikey dilim: silah ve vuruş hissi
-- **Alt aşama:** 5.1–5.5 bitti. **5.6 (pompalı) kod bitti, Taha'nın oynaması bekleniyor.**
+- **Alt aşama:** 5.1–5.6 bitti. **5.7 cila bitti, dikey dilim onayı bekleniyor.**
 - **Sıradaki:**
-  1. Taha 5.6 pompalıyı oynar (F7 ile eklenir). Yorumuna göre ayar; sonra 5.6'yı işaretle.
-  2. 5.7 (ışık ve dilim onayı; 🚩 Aşama 5 bildirimi).
-- **Bekleyen (Taha'dan):** pompalı yorumu. Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
+  1. Taha 60 sn oynar ve **dikey dilimi onaylar** (Aşama 1'den devreden his onayı da bu). Onayda 5.7'yi işaretle, 🚩 Aşama 5 bildirimini yap, devam bekle.
+  2. Sonra Aşama 6 — Tur döngüsü (6.1 dalgalar).
+- **Bekleyen (Taha'dan):** dikey dilim onayı. Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
 - **Taha oyunu Godot editöründen (Play) açıyor.** Editör oyunu varsayılan olarak Game sekmesine gömer: gömülü pencerede tam ekran yok ve F tuşları oyuna ulaşmayabilir. Gömme: Game sekmesi araç çubuğunun en sağındaki ⋮ → "Embed Game on Next Play". Debug tuşlarının yedekleri Ctrl+3 … Ctrl+7.
 - **Not:** Blender MCP eklentisi 2026-11-16'da güncellendi; Blender scriptleri zaten penceresiz çalışıyor, Taha'nın Blender açması gerekmiyor.
 
@@ -66,7 +66,7 @@ Bitiş ölçütleri `ROADMAP.md`'de. Biten kutunun yanına tarih ve commit yazı
 - [x] 5.4 Asker vurulunca — 2026-11-17 (`41b3ce8`, `9767e2a`). Ekran kenarı kızarması, can %35'in altındayken nabız; sarsıntı ve yanıp sönme zaten vardı. Taha: itilme kötü → kapatıldı (`FEATURE_PLAYER_KNOCKBACK = false`); kızarmayı onayladı
 - [x] 5.5 İlk sesler — 2026-11-17 (`de2a620`, `510b83d`; temel sesler, 8.4'te yeniden ele alınır) (`tools/sfx/gen_sfx.py`: Python standart kütüphanesiyle sentez, sabit tohum, 6 ses 13 dosya; `Audio` autoload: 32 oynatıcılık havuz, "SFX" veri yolu; `SoundData` tablosu: düzey, perde payı, aynı anda en çok kopya, çalışlar arası bekleme; `VoiceLimiter` + `Stride` 10 test; adımlar koşu klibinin temposundan). Taha ilk tur: atış iyi, isabet sesi kapatıldı → sürü homurtusu eklendi (`HordeGroan` + 3 test), takla kısıldı + alet çantası tıngırtısı; zombi ölüm sesi de kapatıldı. Taha: "şimdilik böyle ilerleyelim"
 - [x] 5.6 İkinci silah: pompalı — 2026-11-17 (`30532d3`; Taha: "güzel") (`shotgun` satırı: 6 saçma × 7 hasar, 30° yelpaze + rastgele sapma, 7 m, 1.1 sn; saçma başına itme toplanır, yakından ~1.7 m savurur (tabanca ~0.4 m); büyük namlu parlaması, atışta hafif kamera sarsıntısı `FEATURE_FIRE_SHAKE`; kendi sesi: tok patlama + pompa çekme; `Spread` + 3 test; F7 sırayla pompalı / tabanca ekler)
-- [ ] 5.7 Dilim cilası ve **dikey dilim onayı**
+- [ ] 5.7 Dilim cilası ve **dikey dilim onayı** — cila bitti 2026-11-17 (ışık ön ayarları `LightingData`, Taha "dusk" seçti; asker renk tonu `PLAYER_ALBEDO_TINT`; yumuşak dash tozu; kapanışta ses sızıntısı düzeltildi). 258 zombi + 4 silah, akşam ışığı: 135 FPS. **Taha'nın 60 sn oynayıp dikey dilimi onaylaması bekleniyor**
 
 ### 6 — Tur döngüsü
 - [ ] 6.1 Dalgalar
@@ -137,8 +137,6 @@ Profil üst sınırları (2.5 ölçümüne göre, efektlere pay bırakılarak): 
 ## Bilinen notlar / sonraya kalanlar
 
 - Silah gücü düşük: zombi itilince tabanca başka hedefe dönüyor, hasar sürüye dağılıyor → 5.6 (pompalı) ve 6.6 dengesi.
-- Renkler oyunda Blender'dakinden açık (lacivert zırh soluk): ışık pozlaması yüksek → 5.7 ışık ayarı.
-- Dash toz izi kare parçacıklar, Taha "dandik" buldu → efekt cilası (5.7 ya da 8.3).
 - Zombi doğması (yerden kalkma) kamera dışında oluyor, oyunda pek görünmüyor → 6.1 dalgalarda doğma yerleri.
 - Silahlar 1.1 m'de, sürüde zombi başlarının arasına gömülebiliyor; Taha şimdilik itiraz etmedi.
 - Kapalı ama kodu duran özellikler: öldürmede duraksama (`FEATURE_HIT_STOP`, kalabalıkta takılma hissi), askerin vurulunca itilmesi (`FEATURE_PLAYER_KNOCKBACK`, "alakasız itiliyoruz"). Yeniden açmadan önce Taha'ya sor.
@@ -159,7 +157,8 @@ Profil üst sınırları (2.5 ölçümüne göre, efektlere pay bırakılarak): 
 ### 2026-11-17 — Oturum 3
 - Ortam kontrolü temiz. Taha 5.4 kızarmayı onayladı; F tuşları gömme kapalıyken sorunsuz.
 - 5.5 ilk tur geri bildirimi: isabet sesi kapandı, sürü homurtusu (5 çeşit, yoğunluğa göre sıklık ve düzey), takla kısıldı + zırh/alet çantası tıngırtısı (3 çeşit); zombi ölüm sesi kapandı, 5.5 temel seslerle kapandı.
-- 5.6: pompalı (`Spread`, silah tablosunda varsayılan alanlar `DEFAULTS`, `add_debug_weapon`). 85 test. Bir çekimde kapanışta tek seferlik 'ObjectDB leaked' uyarısı çıktı, üç tekrarda çıkmadı; yeniden görülürse incelenecek.
+- 5.6: pompalı (`Spread`, silah tablosunda varsayılan alanlar `DEFAULTS`, `add_debug_weapon`). 85 test. Kapanışta çalan seslerin sızıntı uyarısı bulundu ve düzeltildi (`99b42fb`).
+- 5.7: ışık galerisi (`make_gallery.gd`), Taha "dusk" seçti; asker renk tonu; yumuşak dash tozu.
 - 5.5: ses sentezi (`tools/sfx/gen_sfx.py`), `Audio` havuzu, `SoundData`, `VoiceLimiter`, `Stride`, `Footsteps`; F3 panelinde çalan ses sayısı. 79 test geçiyor. 150 zombi + 6 silahta 9 sn'de 193 ses, aynı anda en çok 9, 144 FPS.
 
 ### 2026-11-16 — Oturum 2
