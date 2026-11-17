@@ -8,9 +8,8 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 Oturum 4 (2026-11-17). Taha dikey dilimi onayladı ("her şey okey"); Aşama 5 kapandı.
 
 - **Ana aşama:** 6 — Tur döngüsü
-- **Alt aşama:** 6.2 Düşenler — kod bitti, Taha'nın oynayıp dinlemesi bekleniyor
-- **Sıradaki:** 6.3 İstatistikler ve kartlar.
-- **Bekleyen (Taha'dan):** 6.2 yorumu (kristal görünümü, çekim menzili, toplama sesi). Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
+- **Alt aşama:** 6.3 İstatistikler ve kartlar (plan kararları soruluyor)
+- **Bekleyen (Taha'dan):** 6.3 kararları. Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
 - **Taha oyunu Godot editöründen (Play) açıyor.** Gömülü pencerede tam ekran yok ve F tuşları oyuna ulaşmayabilir; Game sekmesi ⋮ → "Embed Game on Next Play" kapatılır. Debug tuşlarının yedekleri Ctrl+3 … Ctrl+7.
 
 ## Ana aşama durumu
@@ -67,7 +66,7 @@ Bitiş ölçütleri `ROADMAP.md`'de. Biten kutunun yanına tarih ve commit yazı
 
 ### 6 — Tur döngüsü
 - [x] 6.1 Dalgalar — 2026-11-17 (`2cc7038`; Taha yorum yapmadan "devam" dedi) (`WaveData` 5 dalga, `WaveRun` + 7 test, `SpawnDirector`, ekran dışı doğma `SpawnRules` + 5 test, dalga sayacı ve ortadaki yazılar `WaveBanner`, "HAYATTA KALDIN" ekranı, F8 dalgayı bitir). 97 test
-- [ ] 6.2 Düşenler — kod bitti 2026-11-17 (`Pickups`: tek MultiMesh, dönme shader'da; `PickupRules` + `RunLoot` 8 test; sekerek düşme, 3 m çekim, dalga sonunda hepsi; HUD XP çubuğu + seviye + kristal sayısı; toplama sesi `pickup_1..3`; `FEATURE_PICKUPS`). 105 test. Taha'nın oynaması bekleniyor
+- [x] 6.2 Düşenler — 2026-11-17 (`3120d29`, `64c3908`; Taha: "şu an okey") (`Pickups`: tek MultiMesh, dönme shader'da; `PickupRules` + `RunLoot` 8 test; sekerek düşme, 3 m çekim, dalga sonunda hepsi; HUD XP çubuğu + seviye + kristal sayısı; toplama sesi `pickup_1..3`; `FEATURE_PICKUPS`). 105 test
 - [ ] 6.3 İstatistikler ve kartlar
 - [ ] 6.4 Silah yuvaları ve birleştirme
 - [ ] 6.5 Mağaza ve eşyalar
