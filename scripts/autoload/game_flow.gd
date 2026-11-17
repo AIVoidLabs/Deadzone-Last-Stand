@@ -2,9 +2,10 @@ extends Node
 ## Oyun akışı ve duraklatma tek yerden. get_tree().paused'a yalnız burası dokunur.
 
 signal game_over_started
+signal victory_started
 signal run_started
 
-enum State { PLAYING, GAME_OVER }
+enum State { PLAYING, GAME_OVER, VICTORY }
 
 var state: State = State.PLAYING
 ## Bekleme sırasında yeniden başlatılırsa eski bekleyişi geçersiz kılar.
@@ -39,7 +40,7 @@ func _clear_hit_stop() -> void:
 
 
 func _unhandled_input(input_event: InputEvent) -> void:
-	if state == State.GAME_OVER and input_event.is_action_pressed("restart"):
+	if state != State.PLAYING and input_event.is_action_pressed("restart"):
 		restart()
 
 
@@ -47,16 +48,31 @@ func game_over() -> void:
 	if state == State.GAME_OVER:
 		return
 	state = State.GAME_OVER
+	# Ölüm animasyonu oynasın diye dünya kısa süre akmaya devam eder.
+	_end_run(Tuning.GAME_OVER_DELAY, game_over_started)
+
+
+## Son dalga temizlendi: oyun durur, "hayatta kaldın" ekranı.
+func victory() -> void:
+	if state != State.PLAYING:
+		return
+	state = State.VICTORY
+	# Son zombiler devrilip bitsin diye dünya kısa süre akmaya devam eder.
+	_end_run(Tuning.VICTORY_DELAY, victory_started)
+
+
+## delay saniye sonra oyunu durdurur ve done'ı yayar; arada yeniden başlatılırsa vazgeçer.
+func _end_run(delay: float, done: Signal) -> void:
+	var ending: State = state
 	_run_id += 1
 	_clear_hit_stop()
-	if Tuning.GAME_OVER_DELAY > 0.0:
-		# Ölüm animasyonu oynasın diye dünya kısa süre akmaya devam eder.
+	if delay > 0.0:
 		var run: int = _run_id
-		await get_tree().create_timer(Tuning.GAME_OVER_DELAY).timeout
-		if run != _run_id or state != State.GAME_OVER:
+		await get_tree().create_timer(delay).timeout
+		if run != _run_id or state != ending:
 			return
 	get_tree().paused = true
-	game_over_started.emit()
+	done.emit()
 
 
 func restart() -> void:

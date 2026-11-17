@@ -2,6 +2,14 @@
 
 Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar verilince "Açık kararlar"dan çıkarılıp tarihli bölüme yazılır.
 
+## 2026-11-17 — Aşama 6.1 dalgalar (Taha)
+
+- Dikey dilim onaylandı ("her şey okey"); zombi saldırısı hazırlıklı vuruş olarak kaldı.
+- **Tur: 5 dalga, 20 → 60 sn** (başlangıç değeri; kesin sayılar Aşama 11'de).
+- **Mağaza gelene kadar dalga arası otomatik 3 sn** ("Dalga N" yazısı, tuş beklemez).
+- **Zombiler ekranın hemen dışında doğar** (arena kenarı yerine); yerden kalkma yine çoğunlukla görünmez ama sürü ekrana hızlı girer.
+- Claude'un kararı (gerekçeli): dalga sonunda devrilen zombiler öldürme sayılmaz ve ileride XP/para bırakmaz (Brotato'daki gibi); bekleme sırasında asker iyileşmez (iyileşme 6.3 istatistik/kart ya da 6.5 eşya işi).
+
 ## 2026-11-17 — Aşama 5.6–5.7 pompalı, ışık (Taha)
 
 - Pompalı onaylandı ("güzel"), ayar değişmedi.

@@ -10,6 +10,10 @@ const FEATURE_CAMERA_SHAKE: bool = true
 const FEATURE_HIT_FLASH: bool = true
 const FEATURE_PLAYER_IFRAMES: bool = true
 const FEATURE_SPAWN_RAMP: bool = true
+## Tur dalgalardan oluşur (WaveData); kapalıyken Aşama 1'deki sonsuz, giderek hızlanan doğma.
+const FEATURE_WAVES: bool = true
+## Zombiler ekranın hemen dışında doğar; kapalıyken arena kenarında.
+const FEATURE_SPAWN_OFFSCREEN: bool = true
 const FEATURE_START_FULLSCREEN: bool = true
 const FEATURE_DASH: bool = true
 ## Dash sırasında asker zombilerin içinden geçer (kapalıysa onları iter).
@@ -104,6 +108,8 @@ const PLAYER_ANIM_BLEND: float = 0.15
 const PLAYER_ANIM_HIT_FADE: float = 0.06
 ## Asker ölünce "öldün" ekranından önce ölüm animasyonuna tanınan süre (sn); 0 = beklemeden duraklat.
 const GAME_OVER_DELAY: float = 1.8
+## Son dalga temizlenince "hayatta kaldın" ekranından önceki süre (sn); 0 = beklemeden duraklat.
+const VICTORY_DELAY: float = 1.5
 ## Koşu klibinin 1.0 hızda oynadığı yer hızı (m/sn); gerçek hız buna oranlanır (ayak kaymasın).
 const PLAYER_RUN_ANIM_SPEED: float = 5.0
 ## Bekleme<->koşu harmanının hıza yetişme keskinliği.
@@ -149,6 +155,16 @@ const SPAWN_BATCH_GROWTH_SEC: float = 15.0
 const SPAWN_MIN_PLAYER_DIST: float = 18.0
 const SPAWN_EDGE_INSET: float = 1.0
 const SPAWN_TRIES: int = 8
+## Ekran dışı doğma: görünür alanın bu kadar dışında (m; ileri bakış ve zombi boyu payı).
+const SPAWN_OFFSCREEN_MARGIN: float = 3.0
+## Görünür alan hesabında en alçak bakış ışınının yatayla açısı (derece); alan sonsuza gitmesin.
+const SPAWN_VIEW_MIN_RAY_DEG: float = 5.0
+
+# --- Dalgalar (satırlar WaveData'da) ---
+## Dalga bitince kalan zombilerin devrilip bittiği süre (sn).
+const WAVE_CLEAR_TIME: float = 0.8
+## Dalgalar arası bekleme (sn); 6.5'te mağaza buraya gelir.
+const WAVE_BREAK_TIME: float = 3.0
 
 # --- Mermi ---
 const PROJECTILE_POOL_SIZE: int = 128

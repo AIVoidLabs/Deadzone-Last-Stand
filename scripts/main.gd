@@ -12,6 +12,10 @@ func _ready() -> void:
 	enemies.player = player
 	add_child(enemies)
 
+	var director: SpawnDirector = SpawnDirector.new()
+	director.enemies = enemies
+	add_child(director)
+
 	var projectiles: ProjectilePool = ProjectilePool.new()
 	projectiles.enemies = enemies
 	add_child(projectiles)
@@ -47,14 +51,14 @@ func _ready() -> void:
 		add_child(vignette)
 
 	var hud: Hud = Hud.new()
-	hud.setup(player, enemies)
+	hud.setup(player, enemies, director)
 	add_child(hud)
 
 	player.died.connect(GameFlow.game_over)
 	Quality.apply_to_viewport(get_viewport())
 
 	if OS.is_debug_build():
-		_add_debug_tools(player, enemies, projectiles, camera, weapons)
+		_add_debug_tools(player, enemies, projectiles, camera, weapons, director)
 
 
 ## Vuruş geri bildirimi: kan, lekeler, hasar sayıları, öldürmede duraksama ve sarsıntı.
@@ -98,12 +102,13 @@ func _add_sounds(player: Player, enemies: EnemyManager, weapons: WeaponRig) -> v
 		add_child(horde)
 
 
-func _add_debug_tools(player: Player, enemies: EnemyManager, projectiles: ProjectilePool, camera: FollowCamera, weapons: WeaponRig) -> void:
+func _add_debug_tools(player: Player, enemies: EnemyManager, projectiles: ProjectilePool, camera: FollowCamera, weapons: WeaponRig, director: SpawnDirector) -> void:
 	var panel: DebugPanel = DebugPanel.new()
 	panel.player = player
 	panel.enemies = enemies
 	panel.projectiles = projectiles
 	panel.weapons = weapons
+	panel.director = director
 	add_child(panel)
 	if Benchmark.requested():
 		var bench: Benchmark = Benchmark.new()
@@ -117,4 +122,5 @@ func _add_debug_tools(player: Player, enemies: EnemyManager, projectiles: Projec
 		capture.debug_panel = panel
 		capture.camera = camera
 		capture.weapons = weapons
+		capture.director = director
 		add_child(capture)

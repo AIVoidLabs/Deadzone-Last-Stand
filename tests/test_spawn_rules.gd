@@ -54,3 +54,58 @@ func test_quality_profiles_share_keys_and_grow() -> void:
 func test_quality_cycle_wraps() -> void:
 	assert_eq(QualityProfiles.next_after(QualityProfiles.HIGH), QualityProfiles.LOW)
 	assert_eq(QualityProfiles.next_after(QualityProfiles.LOW), QualityProfiles.MEDIUM)
+
+
+func _view() -> Rect2:
+	return SpawnRules.ground_view_rect(Tuning.CAMERA_PITCH_DEG, Tuning.CAMERA_DISTANCE, Tuning.CAMERA_FOV, 16.0 / 9.0, Tuning.SPAWN_VIEW_MIN_RAY_DEG)
+
+
+func test_wave_interval_and_batch_follow_row() -> void:
+	var row: Dictionary = WaveData.WAVES[WaveData.WAVES.size() - 1]
+	assert_almost_eq(SpawnRules.wave_interval(row, 0.0), row["interval_start"], 0.0001)
+	assert_almost_eq(SpawnRules.wave_interval(row, 1.0), row["interval_end"], 0.0001)
+	assert_almost_eq(SpawnRules.wave_interval(row, 5.0), row["interval_end"], 0.0001, "oran kırpılır")
+	assert_eq(SpawnRules.wave_batch(row, 0.0), row["batch_start"])
+	assert_eq(SpawnRules.wave_batch(row, 1.0), row["batch_end"])
+
+
+func test_pick_kind_respects_weights() -> void:
+	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
+	rng.seed = 3
+	var mix: Dictionary = {&"a": 0.0, &"b": 1.0}
+	for _i in 100:
+		assert_eq(SpawnRules.pick_kind(rng, mix), &"b")
+	var even: Dictionary = {&"a": 1.0, &"b": 1.0}
+	var count_a: int = 0
+	for _i in 1000:
+		if SpawnRules.pick_kind(rng, even) == &"a":
+			count_a += 1
+	assert_between(count_a, 400, 600)
+
+
+func test_view_rect_sees_further_ahead_than_behind() -> void:
+	var view: Rect2 = _view()
+	assert_true(view.has_point(Vector2.ZERO), "asker görünür alanın içinde")
+	assert_gt(-view.position.y, view.end.y, "kameranın baktığı yön daha uzun")
+	var wide: Rect2 = SpawnRules.ground_view_rect(Tuning.CAMERA_PITCH_DEG, Tuning.CAMERA_DISTANCE, Tuning.CAMERA_FOV, 21.0 / 9.0, Tuning.SPAWN_VIEW_MIN_RAY_DEG)
+	assert_gt(wide.size.x, view.size.x, "geniş ekran daha geniş görür")
+
+
+func test_rect_exit_distance() -> void:
+	var rect: Rect2 = Rect2(-4.0, -10.0, 8.0, 12.0)
+	assert_almost_eq(SpawnRules.rect_exit_distance(rect, Vector2.RIGHT), 4.0, 0.0001)
+	assert_almost_eq(SpawnRules.rect_exit_distance(rect, Vector2.UP), 10.0, 0.0001)
+	assert_almost_eq(SpawnRules.rect_exit_distance(rect, Vector2.DOWN), 2.0, 0.0001)
+
+
+func test_offscreen_points_are_outside_view_and_inside_arena() -> void:
+	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
+	rng.seed = 11
+	var view: Rect2 = _view()
+	# Ortada ve duvara yakın iki konum.
+	for player: Vector2 in [Vector2.ZERO, Vector2(HALF - 3.0, 4.0)]:
+		for _i in 200:
+			var p: Vector2 = SpawnRules.pick_offscreen_point(rng, HALF, player, view, Tuning.SPAWN_OFFSCREEN_MARGIN, Tuning.SPAWN_TRIES)
+			assert_false(view.has_point(p - player), "nokta ekranda: %s" % p)
+			assert_lte(absf(p.x), HALF + 0.0001)
+			assert_lte(absf(p.y), HALF + 0.0001)

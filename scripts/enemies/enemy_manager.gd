@@ -15,6 +15,7 @@ const HIT_QUERY_MARGIN: float = 1.0
 const KNOCK_REST_SQ: float = 0.0025
 
 var player: Player
+## Ana anahtar: kapalıyken hiçbir yönetici doğurmaz (ölçüm aracı kapatır).
 var spawning_enabled: bool = true
 var elapsed: float = 0.0
 var kills: int = 0
@@ -22,7 +23,6 @@ var kills: int = 0
 var _grid: SpatialGrid
 var _half: float
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
-var _spawn_timer: float = 0.0
 var _max_radius: float = 0.0
 
 var _pos: PackedVector2Array = PackedVector2Array()
@@ -49,7 +49,6 @@ func _ready() -> void:
 	_half = Tuning.ARENA_SIZE * 0.5
 	_grid = SpatialGrid.new(Vector2(-_half, -_half), Vector2(Tuning.ARENA_SIZE, Tuning.ARENA_SIZE), Tuning.GRID_CELL_SIZE)
 	_rng.randomize()
-	_spawn_timer = SpawnRules.interval_at(0.0)
 	_grow_pool(Quality.max_enemies())
 
 
@@ -59,7 +58,6 @@ func _physics_process(delta: float) -> void:
 		node.deactivate()
 		_pool.append(node)
 	elapsed += delta
-	_tick_spawning(delta)
 	_grid.rebuild(_pos)
 	_move(delta)
 
@@ -161,26 +159,27 @@ func spawn(kind: StringName, at: Vector2) -> void:
 ## Debug ve ölçüm için: üst sınıra bakmadan count kadar zombi doğurur.
 func spawn_many(count: int) -> void:
 	for _i in count:
-		spawn(EnemyData.WALKER, _pick_spawn_point())
+		spawn(EnemyData.WALKER, pick_spawn_point())
 
 
-func _tick_spawning(delta: float) -> void:
-	if not spawning_enabled:
-		return
-	_spawn_timer -= delta
-	if _spawn_timer > 0.0:
-		return
-	_spawn_timer = SpawnRules.interval_at(elapsed)
-	var cap: int = Quality.max_enemies()
-	for _i in SpawnRules.batch_at(elapsed):
-		if active_count() >= cap:
-			break
-		spawn(EnemyData.WALKER, _pick_spawn_point())
+## Dalga sonu: count kadar canlı zombiyi öldürme sayılmadan devirir (ölüm animasyonu + solma).
+func dismiss(count: int) -> void:
+	var i: int = _pos.size() - 1
+	while i >= 0 and count > 0:
+		if _alive[i] != 0:
+			_kill(i, Vector2.ZERO, false)
+			count -= 1
+		i -= 1
 
 
-func _pick_spawn_point() -> Vector2:
+## Ekranın hemen dışında (FEATURE_SPAWN_OFFSCREEN) ya da arena kenarında, askerden uzak bir nokta.
+func pick_spawn_point() -> Vector2:
 	var half: float = _half - Tuning.SPAWN_EDGE_INSET
-	return SpawnRules.pick_edge_point(_rng, half, player.position_2d(), Tuning.SPAWN_MIN_PLAYER_DIST, Tuning.SPAWN_TRIES)
+	if not Tuning.FEATURE_SPAWN_OFFSCREEN:
+		return SpawnRules.pick_edge_point(_rng, half, player.position_2d(), Tuning.SPAWN_MIN_PLAYER_DIST, Tuning.SPAWN_TRIES)
+	var size: Vector2 = get_viewport().get_visible_rect().size
+	var view: Rect2 = SpawnRules.ground_view_rect(Tuning.CAMERA_PITCH_DEG, Tuning.CAMERA_DISTANCE, Tuning.CAMERA_FOV, size.x / maxf(size.y, 1.0), Tuning.SPAWN_VIEW_MIN_RAY_DEG)
+	return SpawnRules.pick_offscreen_point(_rng, half, player.position_2d(), view, Tuning.SPAWN_OFFSCREEN_MARGIN, Tuning.SPAWN_TRIES)
 
 
 func _move(delta: float) -> void:
@@ -259,12 +258,14 @@ static func _yaw_towards(from: Vector2, to: Vector2) -> float:
 
 
 ## push: öldüren vuruşun itmesi; ceset bu yöne düşer ve kayar.
-func _kill(index: int, push: Vector2 = Vector2.ZERO) -> void:
+## credit: öldürme sayılır ve enemy_killed yayılır (dalga sonu devrilmelerde kapalı).
+func _kill(index: int, push: Vector2 = Vector2.ZERO, credit: bool = true) -> void:
 	_alive[index] = 0
 	_dead_count += 1
-	kills += 1
 	var node: Zombie = _nodes[index]
-	enemy_killed.emit(node.position)
+	if credit:
+		kills += 1
+		enemy_killed.emit(node.position)
 	if not Tuning.FEATURE_ZOMBIE_DEATH_ANIM:
 		node.deactivate()
 		return

@@ -6,6 +6,7 @@ extends Node
 ## --capture-kill=S: görüntüden S saniye önce askeri öldürür (ölüm animasyonu denetimi).
 ## --camera-distance=M: kamera uzaklığını dener (karşılaştırma görüntüleri için).
 ## --weapons=N: toplam N silahla başlar (debug silahı eklenir).
+## --wave=N: N. dalgadan başlar. --capture-wave-end=S: görüntüden S saniye önce dalgayı bitirir.
 ## --autopilot: asker ölümsüz, daire çizerek yürür. --god: asker ölümsüz ama yerinde durur.
 
 var player: Player
@@ -13,6 +14,7 @@ var enemies: EnemyManager
 var debug_panel: DebugPanel
 var camera: FollowCamera
 var weapons: WeaponRig
+var director: SpawnDirector
 
 var _out: String = ""
 var _seconds: float = 6.0
@@ -21,6 +23,7 @@ var _autopilot: bool = false
 var _show_panel: bool = false
 var _dash_lead: float = -1.0
 var _kill_lead: float = -1.0
+var _wave_end_lead: float = -1.0
 var _time: float = 0.0
 var _angle: float = 0.0
 
@@ -57,6 +60,10 @@ func _ready() -> void:
 			player.god_mode = true
 		elif arg == "--debug-panel":
 			_show_panel = true
+		elif arg.begins_with("--wave="):
+			director.start_at.call_deferred(arg.trim_prefix("--wave=").to_int() - 1)
+		elif arg.begins_with("--capture-wave-end="):
+			_wave_end_lead = arg.trim_prefix("--capture-wave-end=").to_float()
 	if _autopilot:
 		player.god_mode = true
 		player.use_input_override = true
@@ -77,6 +84,9 @@ func _process(delta: float) -> void:
 	if _kill_lead >= 0.0 and _time >= _seconds - _kill_lead:
 		_kill_lead = -1.0
 		player.take_hit(Tuning.PLAYER_MAX_HP * 1000.0)
+	if _wave_end_lead >= 0.0 and _time >= _seconds - _wave_end_lead:
+		_wave_end_lead = -1.0
+		director.end_wave()
 	if _time < _seconds:
 		return
 	var path: String = ProjectSettings.globalize_path("res://").path_join(_out)

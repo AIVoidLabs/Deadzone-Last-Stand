@@ -74,7 +74,12 @@ Zırhlı ve kasklı bir asker, kapalı bir şehir kavşağında dalga dalga gele
 
 ## Tur yapısı (Aşama 6, taslak)
 
-- Dalga süresi 30–90 sn; dalga bitince mağaza. Ölen zombi XP ve para bırakır.
+- **Dalgalar (6.1):** tur 5 dalga, süreler 20 / 30 / 40 / 50 / 60 sn (~3.5 dk; kesin sayılar Aşama 11'de). Satırlar `WaveData`'da: doğma aralığı ve grup boyu dalga içinde doğrusal artar, aynı anda en çok zombi (60 → 350) kalite profilinin sınırıyla ayrıca kırpılır, tür karışımı ağırlıkla.
+- Dalga süresi bitince doğma durur, kalan zombiler 0.8 sn içinde devrilip solar (öldürme sayılmaz, ileride düşen de bırakmaz), "DALGA TEMİZLENDİ", 3 sn ara, sıradaki dalga. Mağaza gelince (6.5) ara mağaza ekranı olur.
+- Son dalga temizlenince "HAYATTA KALDIN" (R ile yeniden); ölünce "ÖLDÜN". İkisinde de dalga, süre, öldürme.
+- Zombiler ekranın hemen dışında doğar (görünür alan kamera açısından hesaplanır, 3 m pay); duvar yüzünden olmazsa arena kenarı. `FEATURE_SPAWN_OFFSCREEN`.
+- `FEATURE_WAVES = false`: Aşama 1'deki sonsuz, giderek hızlanan doğma.
+- Ölen zombi XP ve para bırakır (6.2).
 - Seviye atlayınca 3 karttan biri (istatistik artışı).
 - 6 silah yuvası; aynı silah + aynı kademe iki tane → bir üst kademe (en çok 4).
 - Temel istatistikler: can, hasar, atış hızı, menzil, hız, zırh, şans.
