@@ -178,6 +178,7 @@ docs/          GAME_DESIGN.md, PROGRESS.md, concept/
 - Blender penceresiz çalışır: `blender --background --python tools/blender/<script>.py` → `godot --headless --path . --import` → `godot --headless --path . -s res://tools/godot/check_anim_import.gd`. Blender MCP bağlantısı yalnız canlı önizleme için; kullanıcıdan Blender'ı açmasını isteme.
 - İskelet standardı, kemik eşlemesi ve komutların açıklaması `docs/TECH.md`'de. Her karakter 25 kemikli ortak iskelete bağlanır.
 - Ham Tripo dosyası ve ham kütüphane paketleri (`assets/models/source/`) git'e girmez.
+- Blender skill'leri `.claude/skills/` altında (arjun988/blender-skills'ten seçilmiş 35 skill + ortak `references/`, MIT). Bütçe, topoloji, UV, isimlendirme, export ve QA bilgisi için kullanılır. Skill'ler "her şeyi MCP ile yap" dese de bu bölüm kazanır: kalıcı iş `tools/blender/` scripti olarak yazılır, MCP (`execute_blender_code`, `get_viewport_screenshot`) yalnız canlı deneme ve önizleme içindir. Export her zaman GLB'dir (`godot-export`); polycount ve doku sınırları `docs/TECH.md` ile çelişirse `docs/TECH.md` geçerlidir.
 
 ---
 
