@@ -7,6 +7,7 @@ Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar v
 - **Kart seçimi dalga sonunda** (Brotato gibi), dalga içinde akış kesilmez.
 - **İstatistikler:** temel 7 (can, hasar, atış hızı, menzil, hız, zırh, şans) + can yenileme, toplama menzili, dash bekleme süresi.
 - **4 nadirlik kademesi** (sıradan / nadir / destansı / efsanevi), renkle ayrılır; seviye ve şansla üst kademe sıklaşır.
+- Taha onayladı (işlev okey); **kart ekranının görünümü basit, genel tasarım düzeltmelerinde (9.4) yeniden yapılacak.**
 - Claude'un kararları: kart değerleri ve kademe olasılıkları Brotato oranlarından uyarlandı (`CardData`); zırh mevcut düz düşme kuralıyla (`CombatMath.mitigate`); kart başına farklı istatistik; yenileme yok (mağazada olacak).
 
 ## 2026-11-17 — Aşama 6.2 düşenler (Taha)

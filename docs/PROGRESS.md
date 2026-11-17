@@ -5,13 +5,21 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 
 ## Şu an
 
-Oturum 4 (2026-11-17). Taha dikey dilimi onayladı ("her şey okey"); Aşama 5 kapandı.
+Oturum 4 sonu (2026-11-17, Taha "bugünlük yeter" dedi). Çalışma ağacı temiz, push yok.
 
 - **Ana aşama:** 6 — Tur döngüsü
-- **Alt aşama:** 6.3 İstatistikler ve kartlar — kod bitti, Taha'nın oynaması bekleniyor
-- **Sıradaki:** 6.4 Silah yuvaları ve birleştirme.
-- **Bekleyen (Taha'dan):** 6.3 yorumu (kart ekranı, değerler, dalga sonu akışı). Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
-- **Taha oyunu Godot editöründen (Play) açıyor.** Gömülü pencerede tam ekran yok ve F tuşları oyuna ulaşmayabilir; Game sekmesi ⋮ → "Embed Game on Next Play" kapatılır. Debug tuşlarının yedekleri Ctrl+3 … Ctrl+7.
+- **Alt aşama:** 6.1–6.3 bitti. **Sıradaki: 6.4 Silah yuvaları ve birleştirme.**
+- **Yeni oturum başlangıcı:** ortam kontrolü (CLAUDE.md bölüm 0) → bu bölümü oku → 6.4 için aşağıdaki kararları Taha'ya sor → onaydan sonra kod.
+- **6.4'te Taha'ya sorulacaklar** (kod yazmadan önce):
+  1. Silah kademesi neyi artırır? Öneri: hasar ve atış hızı çarpanı (kademe başına), kademe 4 en çok; değerler `WeaponData`'da kademe sütunu.
+  2. Birleştirme ne zaman olur? Öneri: aynı silah + aynı kademe yuvaya gelince kendiliğinden (Brotato'da mağazada elle); mağaza 6.5'te geldiği için 6.4'te silahlar debug ile (F7) ve dalga sonu ödülü olmadan denenir.
+  3. Kademe görünümü: silah modelinde renk/parıltı mı, çemberde yuva rengi mi? Birden çok seçenek → önce galeri görseli (CLAUDE.md kural 8).
+  4. Yuvalar dolunca (6/6) yeni silah ne olur: reddedilir mi, birleştirilebilecekse birleşir mi?
+- **Sonra:** 6.5 Mağaza ve eşyalar (sorulacak: eşya sayısı ~10, fiyat ve yenileme maliyeti, kilitleme, silah satın alma/satma; mağaza dalga arasında kart ekranından sonra açılır, 3 sn ara yerine) → 6.6 Tam tur (5 dalga, 3–4 silah, ilk denge) → 🚩 Aşama 6 bildirimi.
+- **Taha'nın işi Aşama 6'da:** yok; her alt aşamayı oynayıp yorum.
+- **Tasarım borcu (Aşama 9'da düzeltilecek, Taha 2026-11-17):** kart ekranı işlevsel ama görünümü basit → 9.4 (mağaza ve kart ekranları son hali). HUD (dalga sayacı, XP çubuğu, kristal sayısı) ve ölüm/kazanma ekranları da prototip → 9.3, 9.5.
+- **Açık küçük konular:** dalga arasında iyileşme yok (can yenileme kartı var; mağaza eşyası olabilir); kristal toplama sesi ve XP çubuğu rengi Taha'dan ayrıca yorum almadı.
+- **Taha oyunu Godot editöründen (Play) açıyor.** Gömülü pencerede tam ekran yok ve F tuşları oyuna ulaşmayabilir; Game sekmesi ⋮ → "Embed Game on Next Play" kapatılır. Debug tuşlarının yedekleri Ctrl+3 … Ctrl+9.
 
 ## Ana aşama durumu
 
@@ -23,7 +31,7 @@ Oturum 4 (2026-11-17). Taha dikey dilimi onayladı ("her şey okey"); Aşama 5 k
 | 3 | Dikey dilim: asker | ✔ bitti (2026-11-16) |
 | 4 | Dikey dilim: zombi | ✔ bitti (2026-11-16) |
 | 5 | Dikey dilim: silah ve vuruş hissi | ✔ bitti (2026-11-17, dikey dilim onaylandı) |
-| 6 | Tur döngüsü | — |
+| 6 | Tur döngüsü | sürüyor (6.4) |
 | 7 | Silah ve zombi çeşitliliği | — |
 | 8 | Arena, atmosfer, ses | — |
 | 9 | Arayüz ve akış | — |
@@ -68,7 +76,7 @@ Bitiş ölçütleri `ROADMAP.md`'de. Biten kutunun yanına tarih ve commit yazı
 ### 6 — Tur döngüsü
 - [x] 6.1 Dalgalar — 2026-11-17 (`2cc7038`; Taha yorum yapmadan "devam" dedi) (`WaveData` 5 dalga, `WaveRun` + 7 test, `SpawnDirector`, ekran dışı doğma `SpawnRules` + 5 test, dalga sayacı ve ortadaki yazılar `WaveBanner`, "HAYATTA KALDIN" ekranı, F8 dalgayı bitir). 97 test
 - [x] 6.2 Düşenler — 2026-11-17 (`3120d29`, `64c3908`; Taha: "şu an okey") (`Pickups`: tek MultiMesh, dönme shader'da; `PickupRules` + `RunLoot` 8 test; sekerek düşme, 3 m çekim, dalga sonunda hepsi; HUD XP çubuğu + seviye + kristal sayısı; toplama sesi `pickup_1..3`; `FEATURE_PICKUPS`). 105 test
-- [ ] 6.3 İstatistikler ve kartlar — kod bitti 2026-11-17 (`StatData` 10 istatistik, `CardData` 4 kademe, `PlayerStats` + `CardRules` 11 test; `LevelUpFlow` dalga arasında kristaller toplanınca açılır, `CardScreen` 3 kart + güncel artışlar; `GameFlow.open_menu`; asker/silah/kristal değerleri istatistikten; F9 +seviye; `FEATURE_LEVEL_CARDS`). 116 test. Taha'nın oynaması bekleniyor
+- [x] 6.3 İstatistikler ve kartlar — 2026-11-17 (`677a86f`; Taha: işlev onaylı, kart görünümü basit → 9.4'te yeniden tasarlanacak) (`StatData` 10 istatistik, `CardData` 4 kademe, `PlayerStats` + `CardRules` 11 test; `LevelUpFlow` dalga arasında kristaller toplanınca açılır, `CardScreen` 3 kart + güncel artışlar; `GameFlow.open_menu`; asker/silah/kristal değerleri istatistikten; F9 +seviye; `FEATURE_LEVEL_CARDS`). 116 test
 - [ ] 6.4 Silah yuvaları ve birleştirme
 - [ ] 6.5 Mağaza ve eşyalar
 - [ ] 6.6 Tam tur
@@ -152,6 +160,7 @@ Profil üst sınırları (2.5 ölçümüne göre, efektlere pay bırakılarak): 
 ## Oturum günlüğü
 
 ### 2026-11-17 — Oturum 4
+- **Oturum sonu özeti:** dikey dilim onaylandı, Aşama 5 kapandı; 6.1 dalgalar, 6.2 kristaller, 6.3 istatistikler ve kartlar bitti (Taha onayladı). 116 test. Commit'ler: `677a86f` (6.3), `64c3908` / `3120d29` (6.2), `2cc7038` (6.1), `3b51589` (5.7). Sıradaki 6.4; sorulacaklar "Şu an" bölümünde.
 - Ortam kontrolü temiz. Taha dikey dilimi onayladı → 5.7 ve Aşama 5 kapandı (Aşama 1 his onayı dahil).
 - 6.1: Taha'nın kararları: 5 dalga 20→60 sn, otomatik 3 sn ara, ekran dışı doğma. Doğma `EnemyManager`'dan `SpawnDirector`'a taşındı (sonsuz mod `FEATURE_WAVES = false` ile duruyor, denendi). Kazanınca 1.5 sn bekleme (`VICTORY_DELAY`), devrilen zombiler donmasın diye. 97 test geçiyor.
 - 6.2: Taha'nın kararları: tek tür düşen (kristal = XP + para), yalnız yakındakiler çekilir, dönen turkuaz kristal. İlk görüntüde kristal ışımadan beyaza kaçıyordu → ışıma azaltıldı, renk doygunlaştı. Taha: "çok büyük ve çok basit, küçük ve beyazımsı olsun" → boy 0.2 → 0.11, beyazımsı buz mavisi, altı köşeli taş kesimi (üst ucu uzun) (`64c3908`). Debug paneli XP çubuğunun altına kaydı.

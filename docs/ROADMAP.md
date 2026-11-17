@@ -83,7 +83,7 @@ Arayüz bu aşamada işlevsel ve sade; son görünüm Aşama 9'da. Taha her alt 
 8.1 Şehir sokağı parçaları (yol, kaldırım, binalar, barikat, enkaz; Blender) · 8.2 Engeller ve zombilerin engel çevresinden dolaşması (yol bulma yok, basit kaçınma) · 8.3 Işık, sis, ekran efektleri; karakterler zeminden net ayrışıyor · 8.4 Tam ses seti · 8.5 Müzik kararı. — Taha: görünüm ve ses onayı, müzik kararı.
 
 ### 9 — Arayüz ve akış
-9.1 Ana menü ve duraklatma · 9.2 Ayarlar (ses, tam ekran, kalite profili) · 9.3 HUD son hali · 9.4 Mağaza ve kart ekranları son hali · 9.5 Tur sonu özeti · 9.6 Kayıt dosyası · 9.7 Gamepad ve oyun dili (karara göre). — Taha: gamepad ve dil kararı.
+9.1 Ana menü ve duraklatma · 9.2 Ayarlar (ses, tam ekran, kalite profili) · 9.3 HUD son hali · 9.4 Mağaza ve kart ekranları son hali (6.3 kart ekranı yalnız işlevsel; Taha görünümü yeniden istedi) · 9.5 Tur sonu özeti · 9.6 Kayıt dosyası · 9.7 Gamepad ve oyun dili (karara göre). — Taha: gamepad ve dil kararı.
 
 ### 10 — Kalıcı ilerleme
 10.1 Kalıcı para ve kayıt · 10.2 Asker sınıfları (Tripo modelleri) · 10.3 Başlangıç silahı açılımları · 10.4 Kalıcı yükseltmeler. Gerçek para yok. — Taha: kapsam onayı, diğer asker modelleri.
