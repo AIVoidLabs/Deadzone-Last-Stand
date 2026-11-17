@@ -21,6 +21,11 @@ const TABLE: Dictionary = {
 		"files": ["shot_1"],
 		"volume_db": -9.0, "pitch_variance": 0.07, "max_voices": 6, "min_interval": 0.03,
 	},
+	&"shotgun": {
+		"enabled": Tuning.FEATURE_SFX_SHOT,
+		"files": ["shotgun_1"],
+		"volume_db": -7.0, "pitch_variance": 0.05, "max_voices": 3, "min_interval": 0.05,
+	},
 	&"hit": {
 		"enabled": Tuning.FEATURE_SFX_HIT,
 		"files": ["hit_1", "hit_2", "hit_3"],

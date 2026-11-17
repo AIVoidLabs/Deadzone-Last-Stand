@@ -15,6 +15,7 @@ var has_target: bool = false
 
 var _player: Player
 var _cooldown: float = 0.0
+var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
 
 func setup(id: StringName, player: Player, p_enemies: EnemyManager, p_projectiles: ProjectilePool) -> void:
@@ -23,6 +24,7 @@ func setup(id: StringName, player: Player, p_enemies: EnemyManager, p_projectile
 	_player = player
 	enemies = p_enemies
 	projectiles = p_projectiles
+	_rng.randomize()
 	name = "Weapon_%s" % id
 	if Tuning.FEATURE_FLOATING_WEAPONS:
 		var visual: WeaponVisual = WeaponVisual.new()
@@ -54,6 +56,10 @@ func tick(delta: float) -> void:
 	if _cooldown > 0.0:
 		return
 	var muzzle: Vector2 = origin + direction * float(row["muzzle_offset"])
-	projectiles.fire(muzzle, direction, row["projectile_speed"], row["damage"], max_range, row["knockback"])
+	var pellets: int = row["pellets"]
+	var spread: float = deg_to_rad(row["spread_deg"])
+	for i: int in pellets:
+		var angle: float = Spread.angle_offset(i, pellets, spread) + Spread.jitter(pellets, spread, row["spread_jitter"], _rng.randf())
+		projectiles.fire(muzzle, direction.rotated(angle), row["projectile_speed"], row["damage"], max_range, row["knockback"])
 	_cooldown = row["fire_interval"]
 	fired.emit(direction)

@@ -47,6 +47,12 @@ func add_weapon(id: StringName) -> bool:
 	return true
 
 
+## Debug: Tuning.DEBUG_WEAPONS listesinden sırayla bir silah ekler (F7, --weapons=N).
+func add_debug_weapon() -> bool:
+	var list: Array[StringName] = Tuning.DEBUG_WEAPONS
+	return add_weapon(list[_weapons.size() % list.size()])
+
+
 func _physics_process(delta: float) -> void:
 	_place_ring()
 	for i: int in _weapons.size():

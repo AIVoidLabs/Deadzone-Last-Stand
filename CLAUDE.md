@@ -171,7 +171,7 @@ docs/          GAME_DESIGN.md, PROGRESS.md, concept/
 - Model inceleme: `blender --background --python tools/blender/inspect_model.py -- <model> build/shots/<ad>` → üç yönden görüntü + ölçüler.
 - Zombi galerisi: `godot --path . res://scenes/debug/zombie_gallery.tscn [-- --clips] [--capture=build/shots/zombies.png]` → gövde çeşitleri ve renk şemaları; `--clips` ile zombi klip seti (her klip adıyla).
 - `--import` çıktısındaki `ERROR` satırlarını süzmeden oku; doku ve model hataları yalnız orada görünür.
-- Debug tuşları: F3 panel, F4 +50 zombi, F5 ölümsüz, F6 kalite profili, F7 +silah (en çok 6). Fn kilitli dizüstünde aynı sırayla Ctrl+3 … Ctrl+7; tam ekran F11 ya da Alt+Enter. Editörün gömülü oyun penceresinde (Game sekmesi, "Embed Game on Next Play") tam ekran desteklenmez ve tuşlar editöre gidebilir; debug tuşlarını denerken gömmeyi kapat ya da `godot --path .` kullan.
+- Debug tuşları: F3 panel, F4 +50 zombi, F5 ölümsüz, F6 kalite profili, F7 +silah (en çok 6; `Tuning.DEBUG_WEAPONS` sırasıyla: tabancayla başlanınca ilk F7 pompalı). Fn kilitli dizüstünde aynı sırayla Ctrl+3 … Ctrl+7; tam ekran F11 ya da Alt+Enter. Editörün gömülü oyun penceresinde (Game sekmesi, "Embed Game on Next Play") tam ekran desteklenmez ve tuşlar editöre gidebilir; debug tuşlarını denerken gömmeyi kapat ya da `godot --path .` kullan.
 
 ### Model hattı (Aşama 2–4, 7)
 - Blender işleri script olarak `tools/blender/` altında saklanır; model elle değil script ile yeniden üretilebilir olmalı.

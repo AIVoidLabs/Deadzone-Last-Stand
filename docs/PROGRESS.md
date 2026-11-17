@@ -8,11 +8,11 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 Oturum 3 (2026-11-17). Push yok.
 
 - **Ana aşama:** 5 — Dikey dilim: silah ve vuruş hissi
-- **Alt aşama:** 5.1–5.4 bitti. **5.5 (ilk sesler) kod bitti, Taha'nın dinlemesi bekleniyor.**
+- **Alt aşama:** 5.1–5.5 bitti. **5.6 (pompalı) kod bitti, Taha'nın oynaması bekleniyor.**
 - **Sıradaki:**
-  1. Taha ilk turu dinledi (kararlar `DECISIONS.md` 2026-11-17). İkinci tur: sürü homurtusu ve yeni takla sesi dinlenecek. Onay gelince 5.5'i işaretle.
-  2. Sonra 5.6 (pompalı: modeli `weapons.glb` içinde hazır, veri satırı, saçılma kuralı ve **kendi atış sesi** eksik), 5.7 (ışık ve dilim onayı; 🚩 Aşama 5 bildirimi).
-- **Bekleyen (Taha'dan):** homurtu ve takla sesine yorum. Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
+  1. Taha 5.6 pompalıyı oynar (F7 ile eklenir). Yorumuna göre ayar; sonra 5.6'yı işaretle.
+  2. 5.7 (ışık ve dilim onayı; 🚩 Aşama 5 bildirimi).
+- **Bekleyen (Taha'dan):** pompalı yorumu. Acil değil: kod lisansı (MIT?), Linux deneme ortamı.
 - **Taha oyunu Godot editöründen (Play) açıyor.** Editör oyunu varsayılan olarak Game sekmesine gömer: gömülü pencerede tam ekran yok ve F tuşları oyuna ulaşmayabilir. Gömme: Game sekmesi araç çubuğunun en sağındaki ⋮ → "Embed Game on Next Play". Debug tuşlarının yedekleri Ctrl+3 … Ctrl+7.
 - **Not:** Blender MCP eklentisi 2026-11-16'da güncellendi; Blender scriptleri zaten penceresiz çalışıyor, Taha'nın Blender açması gerekmiyor.
 
@@ -65,7 +65,7 @@ Bitiş ölçütleri `ROADMAP.md`'de. Biten kutunun yanına tarih ve commit yazı
 - [x] 5.3 Vuruş geri bildirimi — kod bitti 2026-11-16 (`BloodFx`: havuzlu kan sıçraması, ölümde 3 kat; yerde solan lekeler tek MultiMesh, en çok 48/128/256; `DamageNumbers`: yükselip sönen sayılar, öldürende turuncu ve büyük; `HitStop` + 5 test: öldürmede 45 ms yavaşlama, arada 0.3 sn bekleme, `GameFlow.hit_stop`; öldürmede küçük kamera sarsıntısı). Taha: kan ve sayılar iyi; duraksama kalabalıkta takılma gibi hissettirdi → kapatıldı (`FEATURE_HIT_STOP = false`)
 - [x] 5.4 Asker vurulunca — 2026-11-17 (`41b3ce8`, `9767e2a`). Ekran kenarı kızarması, can %35'in altındayken nabız; sarsıntı ve yanıp sönme zaten vardı. Taha: itilme kötü → kapatıldı (`FEATURE_PLAYER_KNOCKBACK = false`); kızarmayı onayladı
 - [x] 5.5 İlk sesler — 2026-11-17 (`de2a620`, `510b83d`; temel sesler, 8.4'te yeniden ele alınır) (`tools/sfx/gen_sfx.py`: Python standart kütüphanesiyle sentez, sabit tohum, 6 ses 13 dosya; `Audio` autoload: 32 oynatıcılık havuz, "SFX" veri yolu; `SoundData` tablosu: düzey, perde payı, aynı anda en çok kopya, çalışlar arası bekleme; `VoiceLimiter` + `Stride` 10 test; adımlar koşu klibinin temposundan). Taha ilk tur: atış iyi, isabet sesi kapatıldı → sürü homurtusu eklendi (`HordeGroan` + 3 test), takla kısıldı + alet çantası tıngırtısı; zombi ölüm sesi de kapatıldı. Taha: "şimdilik böyle ilerleyelim"
-- [ ] 5.6 İkinci silah: pompalı
+- [ ] 5.6 İkinci silah: pompalı — kod bitti 2026-11-17 (`shotgun` satırı: 6 saçma × 7 hasar, 30° yelpaze + rastgele sapma, 7 m, 1.1 sn; saçma başına itme toplanır, yakından ~1.7 m savurur (tabanca ~0.4 m); büyük namlu parlaması, atışta hafif kamera sarsıntısı `FEATURE_FIRE_SHAKE`; kendi sesi: tok patlama + pompa çekme; `Spread` + 3 test; F7 sırayla pompalı / tabanca ekler). Taha oynayıp yorum yapacak
 - [ ] 5.7 Dilim cilası ve **dikey dilim onayı**
 
 ### 6 — Tur döngüsü
@@ -158,7 +158,8 @@ Profil üst sınırları (2.5 ölçümüne göre, efektlere pay bırakılarak): 
 
 ### 2026-11-17 — Oturum 3
 - Ortam kontrolü temiz. Taha 5.4 kızarmayı onayladı; F tuşları gömme kapalıyken sorunsuz.
-- 5.5 ilk tur geri bildirimi: isabet sesi kapandı, sürü homurtusu (5 çeşit, yoğunluğa göre sıklık ve düzey), takla kısıldı + zırh/alet çantası tıngırtısı (3 çeşit). 82 test.
+- 5.5 ilk tur geri bildirimi: isabet sesi kapandı, sürü homurtusu (5 çeşit, yoğunluğa göre sıklık ve düzey), takla kısıldı + zırh/alet çantası tıngırtısı (3 çeşit); zombi ölüm sesi kapandı, 5.5 temel seslerle kapandı.
+- 5.6: pompalı (`Spread`, silah tablosunda varsayılan alanlar `DEFAULTS`, `add_debug_weapon`). 85 test. Bir çekimde kapanışta tek seferlik 'ObjectDB leaked' uyarısı çıktı, üç tekrarda çıkmadı; yeniden görülürse incelenecek.
 - 5.5: ses sentezi (`tools/sfx/gen_sfx.py`), `Audio` havuzu, `SoundData`, `VoiceLimiter`, `Stride`, `Footsteps`; F3 panelinde çalan ses sayısı. 79 test geçiyor. 150 zombi + 6 silahta 9 sn'de 193 ses, aynı anda en çok 9, 144 FPS.
 
 ### 2026-11-16 — Oturum 2

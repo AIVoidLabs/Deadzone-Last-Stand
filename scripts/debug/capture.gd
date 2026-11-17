@@ -52,7 +52,7 @@ func _ready() -> void:
 			_autopilot = true
 		elif arg.begins_with("--weapons="):
 			for _i in arg.trim_prefix("--weapons=").to_int() - weapons.count():
-				weapons.add_weapon(Tuning.DEBUG_WEAPON)
+				weapons.add_debug_weapon()
 		elif arg == "--god":
 			player.god_mode = true
 		elif arg == "--debug-panel":

@@ -35,6 +35,9 @@ func _ready() -> void:
 		if event_name == &"hit":
 			camera.add_trauma(Tuning.CAMERA_SHAKE_ON_PLAYER_HIT))
 
+	if Tuning.FEATURE_FIRE_SHAKE:
+		weapons.weapon_fired.connect(func(row: Dictionary) -> void:
+			camera.add_trauma(row["fire_shake"]))
 	_add_hit_feedback(enemies, camera)
 	_add_sounds(player, enemies, weapons)
 

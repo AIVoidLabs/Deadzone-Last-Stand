@@ -51,7 +51,7 @@ func _on_fired(_direction: Vector2) -> void:
 	_flash_left = Tuning.MUZZLE_FLASH_TIME
 	_flash.visible = true
 	_flash.set_instance_shader_parameter(&"angle", randf() * TAU)
-	_flash.scale = Vector3.ONE * Tuning.MUZZLE_FLASH_SIZE * randf_range(0.8, 1.2)
+	_flash.scale = Vector3.ONE * Tuning.MUZZLE_FLASH_SIZE * float(_weapon.row["flash_scale"]) * randf_range(0.8, 1.2)
 	_light.visible = Quality.get_value("muzzle_light")
 
 

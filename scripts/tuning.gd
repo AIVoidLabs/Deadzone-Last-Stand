@@ -34,6 +34,8 @@ const FEATURE_ZOMBIE_DEATH_ANIM: bool = true
 const FEATURE_FLOATING_WEAPONS: bool = true
 ## Silahların durduğu, zırhın yansıttığı enerji çemberi (yalnız görüntü).
 const FEATURE_ENERGY_RING: bool = true
+## Ağır silahlar (silah satırında fire_shake) atışta kamerayı hafifçe sarsar.
+const FEATURE_FIRE_SHAKE: bool = true
 ## Mermi parlak, kuyruğu sönen bir iz olarak çizilir; kapalıyken eski sarı kutu.
 const FEATURE_TRACERS: bool = true
 const FEATURE_MUZZLE_FLASH: bool = true
@@ -183,8 +185,8 @@ const LOW_HP_PULSE_RATE: float = 1.2
 ## Askerin vurulunca aldığı ilk itme hızı (m/sn) ve sönmesi; kat edilen yol = hız / sönme.
 const PLAYER_HIT_KNOCKBACK: float = 6.0
 const PLAYER_KNOCKBACK_DAMPING: float = 11.0
-## Debug: F7 ile eklenen silah.
-const DEBUG_WEAPON: StringName = &"pistol"
+## Debug: F7 ile eklenen silahlar, sırayla (eldeki silah sayısına göre; tabancayla başlanınca ilk F7 pompalı).
+const DEBUG_WEAPONS: Array[StringName] = [&"pistol", &"shotgun"]
 const PROJECTILE_LENGTH: float = 0.6
 const PROJECTILE_THICKNESS: float = 0.1
 ## Mermi izi (FEATURE_TRACERS): uzunluk ve kalınlık (m).

@@ -201,6 +201,35 @@ def shot(rng: random.Random) -> list[float]:
     return soft_clip(out, 1.6)
 
 
+def pump_clack(rng: random.Random, low: float, high: float) -> list[float]:
+    """Pompa sürgüsü: kısa tahta/metal vuruş + metal kısmi sesler."""
+    n = frames(0.07)
+    knock = filt(noise(n, rng), "bp", rng.uniform(low, high), 2.5)
+    knock = apply(knock, env_exp(n, 0.012, 0.0005))
+    ring = partials(n, [(rng.uniform(1800.0, 2300.0), 0.02, 1.0), (rng.uniform(3600.0, 4300.0), 0.01, 0.5)])
+    return [k * 1.4 + r * 0.25 for k, r in zip(knock, ring)]
+
+
+def shotgun(rng: random.Random) -> list[float]:
+    """Pompalı: tabancadan tok ve geniş patlama, uzun kuyruk; ardından pompa çekme (geri-ileri)."""
+    total = 0.85
+    n = frames(total)
+    out = [0.0] * n
+    crack = filt(noise(frames(0.08), rng), "hp", 1200.0)
+    mix_into(out, apply(crack, env_exp(len(crack), 0.014)), 0.9)
+    body = filt(noise(frames(0.3), rng), "lp", lambda t: 250.0 + 2600.0 * math.exp(-t / 0.035), 1.0)
+    mix_into(out, apply(body, env_exp(len(body), 0.075)), 1.4)
+    thump = sine_sweep(frames(0.3), lambda t: 42.0 + 120.0 * math.exp(-t / 0.035))
+    mix_into(out, apply(thump, env_exp(len(thump), 0.085, 0.001)), 1.2)
+    tail = filt(noise(frames(0.45), rng), "bp", 650.0, 0.7)
+    mix_into(out, apply(tail, env_exp(len(tail), 0.14, 0.01)), 0.22)
+    out = soft_clip(out, 2.0)
+    # Pompa: geri (daha tok) ve ileri (daha keskin), patlama söndükten sonra.
+    mix_into(out, pump_clack(rng, 500.0, 750.0), 0.22, 0.46)
+    mix_into(out, pump_clack(rng, 900.0, 1300.0), 0.25, 0.6)
+    return out
+
+
 def hit(rng: random.Random) -> list[float]:
     """Mermi ete giriyor: kısa tık + ıslak boğuk darbe."""
     n = frames(0.16)
@@ -345,6 +374,7 @@ def main() -> int:
     print(f"Ses efektleri -> {OUT_DIR}")
     # Tohumlar sabit: aynı dosyalar. Çeşit eklemek için listeyi uzat, sound_data.gd'yi güncelle.
     write_wav("shot_1", shot(random.Random(101)))
+    write_wav("shotgun_1", shotgun(random.Random(111)))
     for i, seed in enumerate((201, 202, 203), start=1):
         write_wav(f"hit_{i}", hit(random.Random(seed)))
     for i, (seed, base) in enumerate(((301, 92.0), (302, 78.0), (303, 108.0)), start=1):

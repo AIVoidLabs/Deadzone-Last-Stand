@@ -44,7 +44,7 @@ func _unhandled_input(input_event: InputEvent) -> void:
 	elif input_event.is_action_pressed(&"debug_quality"):
 		Quality.cycle()
 	elif input_event.is_action_pressed(&"debug_weapon"):
-		weapons.add_weapon(Tuning.DEBUG_WEAPON)
+		weapons.add_debug_weapon()
 
 
 func _process(delta: float) -> void:
