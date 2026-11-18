@@ -52,6 +52,7 @@ Blender tarafı: Blender açık olmalı, 3D görünümde N → BlenderMCP sekmes
 6. **Web hiçbir kararı sınırlamaz.** Web gerekçesiyle özellik, efekt ya da zombi sayısı kısma. Platforma bağlı her değer kalite profilinden okunur (bölüm 3).
 7. **Her yeni özellik tek sabitle kapatılabilir olmalı.** Kullanıcı beğenmezse anında çıkarılabilmeli.
 8. Onay almadan kod yazma. Birden çok görsel seçenek varsa önce galeri görseliyle göster. Sessizce karar verme; kısa gerekçe ver.
+9. **Görsel kalite önceliklidir.** Model, malzeme, ışık, efekt veya arena işi yaparken ilgili Blender skill'lerini kullan, Blender'ı blender-mcp ile aktif olarak açıp düzenle ve viewport görüntüsüyle yinele. Sonuç yalnız teknik olarak çalışan değil, Deadzone'un görsel diline uyan ve oyunda okunaklı olmalı. Tek seferde bir görsel yön göster; Taha'nın geri bildirimiyle cilala.
 
 ---
 
@@ -175,10 +176,12 @@ docs/          GAME_DESIGN.md, PROGRESS.md, concept/
 
 ### Model hattı (Aşama 2–4, 7)
 - Blender işleri script olarak `tools/blender/` altında saklanır; model elle değil script ile yeniden üretilebilir olmalı.
-- Blender penceresiz çalışır: `blender --background --python tools/blender/<script>.py` → `godot --headless --path . --import` → `godot --headless --path . -s res://tools/godot/check_anim_import.gd`. Blender MCP bağlantısı yalnız canlı önizleme için; kullanıcıdan Blender'ı açmasını isteme.
+- **Blender + MCP etkileşimli üretim hattının parçasıdır.** Her Blender işinde önce `claude mcp list` ile `blender` bağlantısını kontrol et; Blender açıksa `blender-mcp` eklentisinden bağlanmış olmalı. MCP bağlantısı yoksa sessizce arka plan betiğine geçme: Taha'dan Blender'ı açıp N → BlenderMCP → Connect to Claude ile bağlamasını iste, ardından devam et. Blender MCP'yi sahne kurma, modeli canlı inceleme, malzeme/ışık/kompozisyon ayarı ve viewport ekran görüntüsü alma için aktif kullan.
+- **Yeniden üretilebilirlik şartı:** MCP ile bulunan ve Taha'nın beğendiği son görünüm, `tools/blender/<asset>.py` içinde temiz ve tekrar çalıştırılabilir üretim adımı olarak saklanır. Son doğrulamayı bu scripti Blender MCP üzerinden yeniden çalıştırarak yap; elle yapılan kalıcı değişiklikleri scriptte karşılığı olmadan bırakma. MCP canlı Blender oturumu ve script birbirini tamamlar: MCP görsel keşif/cila için, script kaynak gerçekliği ve yeniden üretim için kullanılır.
+- Model dışa aktarımından sonra `godot --headless --path . --import` ve `godot --headless --path . -s res://tools/godot/check_anim_import.gd` ile içe aktarımı doğrula; oyunda veya model inceleme sahnesinde görüntü alıp gerçek sonucu kontrol et. Görsel kaliteyi viewport/oyun görüntüsünden değerlendir; ölçüler, topoloji, animasyon ve export için ilgili Blender skill'lerinin QA adımlarını da uygula.
 - İskelet standardı, kemik eşlemesi ve komutların açıklaması `docs/TECH.md`'de. Her karakter 25 kemikli ortak iskelete bağlanır.
 - Ham Tripo dosyası ve ham kütüphane paketleri (`assets/models/source/`) git'e girmez.
-- Blender skill'leri `.claude/skills/` altında (arjun988/blender-skills'ten seçilmiş 35 skill + ortak `references/`, MIT). Bütçe, topoloji, UV, isimlendirme, export ve QA bilgisi için kullanılır. Skill'ler "her şeyi MCP ile yap" dese de bu bölüm kazanır: kalıcı iş `tools/blender/` scripti olarak yazılır, MCP (`execute_blender_code`, `get_viewport_screenshot`) yalnız canlı deneme ve önizleme içindir. Export her zaman GLB'dir (`godot-export`); polycount ve doku sınırları `docs/TECH.md` ile çelişirse `docs/TECH.md` geçerlidir.
+- Blender skill'leri `.claude/skills/` altında (arjun988/blender-skills'ten seçilmiş 35 skill + ortak `references/`, MIT). İşe başlamadan ilgili skill'leri aç ve kullan: genelde `blender-director` + `lowpoly-style`/`stylized-style`; karakterde `character-artist`/`creature-artist` ve `rigging`/`animation`; silah/prop'ta `hard-surface`/`prop-artist`; arenada `environment-artist`, `apocalypse-worlds`, `lighting`, `set-dressing`; her işte gerektiğinde `materials`, `uv-workflow`, `asset-optimization`, `godot-export`, `qa-review`. Skill seçimini ihtiyaca göre dar tut; ilgisiz skill'leri topluca yükleme. Skill'ler kalite ve Blender iş akışını yönlendirir; yukarıdaki MCP + script sözleşmesi Deadzone'un kalıcı üretim kuralıdır. Export her zaman GLB'dir (`godot-export`); polycount ve doku sınırları `docs/TECH.md` ile çelişirse `docs/TECH.md` geçerlidir.
 
 ---
 

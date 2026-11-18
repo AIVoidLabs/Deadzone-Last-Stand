@@ -2,7 +2,13 @@
 
 Teknoloji, kod yapısı, iskelet standardı, model bütçeleri ve model hattı. Mimari kuralların özü `CLAUDE.md` bölüm 3–4'te; burası ayrıntı ve Aşama 2'den itibaren büyüyen teknik kayıt.
 
-**Araçlar:** Godot 4.7.2 Standard + GDScript (statik tipli), Forward+; GUT 9.7.x; Blender 5.3 + blender-mcp (her model işi `tools/blender/` altında yeniden çalıştırılabilir script); Tripo (Taha); CC0 animasyon kütüphanesi; sesler kodla sentez (`tools/sfx/`).
+**Araçlar:** Godot 4.7.2 Standard + GDScript (statik tipli), Forward+; GUT 9.7.x; Blender 5.3 + aktif blender-mcp iş akışı (canlı modelleme, görünüş inceleme ve cila) + `tools/blender/` altında yeniden çalıştırılabilir üretim scriptleri; `.claude/skills/` içindeki işe uygun Blender skill'leri; Tripo (Taha); CC0 animasyon kütüphanesi; sesler kodla sentez (`tools/sfx/`).
+
+### Blender üretim döngüsü
+
+Blender, Deadzone'un görsel üretiminde etkin çalışma aracıdır; Blender MCP yalnızca sonradan bakılan bir önizleme değildir. Blender işine başlarken MCP bağlantısını kontrol et. Bağlantı yoksa Taha'dan Blender'da BlenderMCP eklentisini açıp bağlanmasını iste; bağlantı kurulana dek Blender gerektiren üretimi sürdürme. İlgili `.claude/skills/` yönergelerini kalite, modelleme, malzeme, ışık, export ve QA için uygula.
+
+Görsel keşfi ve yinelemeyi Blender MCP ile yap; viewport görüntülerini al, gerçek görünüşü değerlendir ve geri bildirime göre düzelt. Onaylanan görünüşün tamamını `tools/blender/<asset>.py` içinde tekrar çalıştırılabilir biçimde kodla. Son scripti Blender MCP üzerinden çalıştırıp sahneyi yeniden oluştur; böylece elle yapılan düzeltme script dışında kaybolmaz. Ardından GLB'yi Godot'a aktar, iskelet/animasyon ve oyun içi görünüşü doğrula. Kabul ölçütleri hem teknik sınırları hem okunaklı, tutarlı ve cilalı oyun görünüşünü kapsar.
 
 **Değişmeyen mimari kurallar** (`CLAUDE.md` bölüm 3): XZ düzlemi, fizik/görüntü ayrımı ve sinyaller, `Tuning` + veri tabloları, kalite profilleri, havuzlama, saf kurallar + GUT, `GameFlow` tek duraklatma noktası, her özellik tek sabitle kapanır.
 
