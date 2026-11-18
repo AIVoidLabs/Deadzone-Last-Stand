@@ -157,6 +157,7 @@ Profil üst sınırları (2.5 ölçümüne göre, efektlere pay bırakılarak): 
 
 ### 2026-11-18 — Oturum 6
 - 7.1 kararları alındı (yukarıda "Şu an"). Yakın dövüş silahları yapıldı: `MeleeRules` + 9 test, `query_arc`/`ignite`, kesik izi, yanma görseli, 4 model (Blender, headless betik), `swing_*` sesleri, mağaza dalga kilidi + ağırlık (2 test). 145 test. Bot turu 3/3 kazandı.
+- Taha: kesik izi "beyaz koni gibi yoğun" → rüzgar tarzına çevrildi: dış kenarda incelen hilal, ince kopuk rüzgar çizgileri, yumuşak uçlar, sönerken dağılma; bıçakta dışa ilerleyen ince çizgi (`melee_slash.gdshader`, `MeleeSlash`). Taha'nın onayı bekleniyor.
 - Not: Blender MCP açıkken betikte `read_factory_settings` çalıştırmak MCP bağlantısını koparır; modeller headless (`blender --background --python tools/blender/build_weapons.py`) üretilir.
 
 ### 2026-11-18 — Oturum 5
