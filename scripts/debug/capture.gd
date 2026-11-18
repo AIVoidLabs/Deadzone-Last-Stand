@@ -25,6 +25,7 @@ var _show_panel: bool = false
 var _dash_lead: float = -1.0
 var _kill_lead: float = -1.0
 var _wave_end_lead: float = -1.0
+var _merge_lead: float = -1.0
 var _auto_pick: bool = false
 var _pick_wait: float = 0.0
 var _time: float = 0.0
@@ -72,6 +73,8 @@ func _ready() -> void:
 				loot.add(RunLoot.xp_needed(loot.level) - loot.xp)
 		elif arg.begins_with("--wave="):
 			director.start_at.call_deferred(arg.trim_prefix("--wave=").to_int() - 1)
+		elif arg.begins_with("--capture-merge="):
+			_merge_lead = arg.trim_prefix("--capture-merge=").to_float()
 		elif arg.begins_with("--capture-wave-end="):
 			_wave_end_lead = arg.trim_prefix("--capture-wave-end=").to_float()
 	if _autopilot:
@@ -94,6 +97,9 @@ func _process(delta: float) -> void:
 	if _kill_lead >= 0.0 and _time >= _seconds - _kill_lead:
 		_kill_lead = -1.0
 		player.take_hit(Tuning.PLAYER_MAX_HP * 1000.0)
+	if _merge_lead >= 0.0 and _time >= _seconds - _merge_lead:
+		_merge_lead = -1.0
+		weapons.add_weapon(WeaponData.PISTOL)
 	if _wave_end_lead >= 0.0 and _time >= _seconds - _wave_end_lead:
 		_wave_end_lead = -1.0
 		director.end_wave()

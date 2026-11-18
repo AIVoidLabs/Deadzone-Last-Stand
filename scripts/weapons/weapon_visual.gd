@@ -18,6 +18,8 @@ var _time: float = 0.0
 var _flash: MeshInstance3D
 var _light: OmniLight3D
 var _flash_left: float = 0.0
+var _mesh: MeshInstance3D
+var _merge_left: float = 0.0
 
 
 func _ready() -> void:
@@ -29,6 +31,10 @@ func _ready() -> void:
 	_weapon.fired.connect(_on_fired)
 	_bob_phase = randf() * TAU
 	rotation.y = atan2(_weapon.aim.x, _weapon.aim.y)
+	if _weapon.just_merged and Tuning.FEATURE_MERGE_FX:
+		_merge_left = Tuning.MERGE_FX_TIME
+		var tint: Color = WeaponData.tier_row(_weapon.tier)["tint"]
+		MergeBurst.play.call_deferred(_weapon, tint)
 
 
 func _process(delta: float) -> void:
@@ -42,6 +48,18 @@ func _process(delta: float) -> void:
 	_pivot.position = Vector3(0.0, bob, -kick)
 	_pivot.rotation.x = -deg_to_rad(Tuning.WEAPON_RECOIL_PITCH_DEG) * _recoil
 	_update_flash(delta)
+	_update_merge(delta)
+
+
+## Birleşme: silah küçükten başlayıp yaylanarak oturur, kademe renginde beyaza parlayıp söner.
+func _update_merge(delta: float) -> void:
+	if _merge_left <= 0.0:
+		return
+	_merge_left = maxf(0.0, _merge_left - delta)
+	var t: float = 1.0 - _merge_left / Tuning.MERGE_FX_TIME
+	var pop: float = 1.0 - exp(-7.0 * t) * cos(12.0 * t) * 0.7
+	_pivot.scale = Vector3.ONE * (1.0 if _merge_left == 0.0 else pop)
+	_mesh.set_instance_shader_parameter(&"flash", (1.0 - t) * (1.0 - t))
 
 
 func _on_fired(_direction: Vector2) -> void:
@@ -100,6 +118,8 @@ func _build_model() -> void:
 	material.shader = FLASH_SHADER
 	material.set_shader_parameter(&"albedo", tier_row["tint"])
 	material.set_shader_parameter(&"glow", tier_row["glow"])
+	material.set_shader_parameter(&"flash_color", (tier_row["tint"] as Color).lerp(Color.WHITE, 0.6))
+	_mesh = mesh
 	var base: BaseMaterial3D = source.mesh.surface_get_material(0) as BaseMaterial3D
 	if base != null:
 		material.set_shader_parameter(&"albedo_texture", base.albedo_texture)

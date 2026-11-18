@@ -9,6 +9,8 @@ var weapon_id: StringName
 var row: Dictionary
 ## Birleştirme kademesi (1..WeaponData.max_tier()).
 var tier: int = 1
+## Bu silah az önce bir birleşmeden çıktıysa true (görüntü animasyonu oynatır).
+var just_merged: bool = false
 var enemies: EnemyManager
 var projectiles: ProjectilePool
 ## XZ düzleminde nişan yönü; hedef yokken askerin baktığı yön.

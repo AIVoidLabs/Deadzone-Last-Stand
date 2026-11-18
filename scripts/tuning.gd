@@ -44,6 +44,10 @@ const FEATURE_FLOATING_WEAPONS: bool = true
 const FEATURE_ENERGY_RING: bool = true
 ## Aynı silah + aynı kademe yuvaya gelince birleşip üst kademe olur (6.4); kapalıysa kademe hep 1.
 const FEATURE_WEAPON_MERGE: bool = true
+## Birleşme animasyonu: silah büyüyüp oturur + parlar, halka ve kıvılcım patlar.
+const FEATURE_MERGE_FX: bool = true
+## Birleşme animasyonunun süresi (sn).
+const MERGE_FX_TIME: float = 0.7
 ## Ağır silahlar (silah satırında fire_shake) atışta kamerayı hafifçe sarsar.
 const FEATURE_FIRE_SHAKE: bool = true
 ## Mermi parlak, kuyruğu sönen bir iz olarak çizilir; kapalıyken eski sarı kutu.

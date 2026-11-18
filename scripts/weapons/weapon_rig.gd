@@ -39,13 +39,13 @@ func add_weapon(id: StringName) -> bool:
 	var plan: Dictionary = WeaponMerge.add(_slot_list(), id, Tuning.WEAPON_SLOTS, max_tier)
 	if not plan["ok"]:
 		return false
-	_apply(plan["slots"])
+	_apply(plan["slots"], plan["merged"])
 	return true
 
 
 ## Mevcut silahları yeni yuva listesine göre eşler: aynı silah + kademe korunur (bekleme süresi bozulmaz),
 ## eksik olanlar yeni yaratılır, artanlar silinir.
-func _apply(slots: Array[Dictionary]) -> void:
+func _apply(slots: Array[Dictionary], merged: bool = false) -> void:
 	var pool: Array[Weapon] = _weapons.duplicate()
 	var result: Array[Weapon] = []
 	for slot: Dictionary in slots:
@@ -58,7 +58,7 @@ func _apply(slots: Array[Dictionary]) -> void:
 			pool.erase(reuse)
 			result.append(reuse)
 		else:
-			result.append(_create(slot["id"], slot["tier"]))
+			result.append(_create(slot["id"], slot["tier"], merged))
 	for leftover: Weapon in pool:
 		leftover.queue_free()
 	_weapons = result
@@ -69,8 +69,9 @@ func _apply(slots: Array[Dictionary]) -> void:
 		_ring.set_slot_count(_weapons.size())
 
 
-func _create(id: StringName, tier: int) -> Weapon:
+func _create(id: StringName, tier: int, merged: bool) -> Weapon:
 	var weapon: Weapon = Weapon.new()
+	weapon.just_merged = merged
 	weapon.setup(id, tier, player, enemies, projectiles)
 	weapon.fired.connect(func(_direction: Vector2) -> void: weapon_fired.emit(weapon.row))
 	add_child(weapon)
