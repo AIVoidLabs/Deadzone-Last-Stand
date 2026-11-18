@@ -11,6 +11,10 @@ Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar v
 - **Asker animasyonları (Taha: önemli):** bağlanınca **çırpınma** animasyonu, bırakılınca **kollarını açarak bağdan kurtulma** animasyonuna geçer. Bunlar için ortak kütüphanede uygun klip yoksa Blender'da/koddan türetilir (`ZombieClipData` yöntemi gibi).
 - Gereken parçalar: oyuncuya "bağlı" durumu (saf kural + test), dil görseli (ince uzayan çizgi ağı), iki yeni zombi modeli (Blender), `FEATURE_ZOMBIE_JUMP`, `FEATURE_ZOMBIE_TONGUE`.
 
+## 2026-11-18 — Dilci görsel ve animasyon geri bildirimi (Taha)
+
+- İlk sürüm beğenilmedi: dil dümdüz çizgi ("berbat"), bağlanma animasyonu çok kötü, kurtulunca koşma animasyonu bozuluyor. Düzeltmeler sonraya bırakıldı (Taha: şimdi yapma); ayrıntı `PROGRESS.md` "Şu an".
+
 ## 2026-11-18 — Zıplayan ve dilci onaylandı, kodlandı (Taha)
 
 - Tasarım onayı: kaçışlar zorlayıcı, dilci bağlayınca dash yok, bağ 1 sn, çırpınma ve kollarını açarak kurtulma animasyonları. Zıplayan sıçrama hissi veriyor (yay, yer halkası, iniş şoku). Taha "şimdi başlamak zorunda değilsin" dedi, sonra "kaldığımız yerden devam" ile başlandı.
