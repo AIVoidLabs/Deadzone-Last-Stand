@@ -327,6 +327,32 @@ def dash(rng: random.Random) -> list[float]:
     return soft_clip(out, 1.2)
 
 
+def swing(rng: random.Random, total: float, low: float, high: float, hum: float = 0.0, crackle: float = 0.0, ring: float = 0.0) -> list[float]:
+    """Yakın dövüş savurması: hava hışırtısı (süpürülen bant). hum: enerji uğultusu (Hz, 0 yok),
+    crackle: ateş çıtırtısı payı, ring: metal tınısı payı (kılıç)."""
+    n = frames(total)
+    out = [0.0] * n
+    sweep = lambda t: low + (high - low) * math.sin(math.pi * min(1.0, t / total)) ** 1.4
+    air = filt(noise(n, rng), "bp", sweep, 1.2)
+    mix_into(out, apply(air, env_swell(n, 0.4, 1.4)), 0.7)
+    if hum > 0.0:
+        tone = sine_sweep(n, lambda t: hum * (1.0 + 0.5 * math.sin(math.pi * min(1.0, t / total))))
+        mix_into(out, apply(tone, env_swell(n, 0.4, 1.2)), 0.35)
+        buzz = saw(n, lambda t: hum * 0.5 * (1.0 + 0.5 * math.sin(math.pi * min(1.0, t / total))))
+        mix_into(out, apply(filt(buzz, "lp", 900.0), env_swell(n, 0.4, 1.2)), 0.2)
+    if crackle > 0.0:
+        for _ in range(int(total * 90)):
+            at = rng.uniform(0.0, total * 0.9)
+            pop = apply(filt(noise(frames(0.012), rng), "hp", 1800.0), env_exp(frames(0.012), 0.003))
+            mix_into(out, pop, crackle * rng.uniform(0.3, 1.0), at)
+        low_roar = filt(noise(n, rng), "lp", 500.0)
+        mix_into(out, apply(low_roar, env_swell(n, 0.35, 1.5)), 0.4)
+    if ring > 0.0:
+        tink = partials(frames(0.18), [(rng.uniform(2300.0, 2700.0), 0.05, 0.5), (rng.uniform(4100.0, 4600.0), 0.03, 0.3)])
+        mix_into(out, tink, ring, total * 0.45)
+    return soft_clip(out, 1.1)
+
+
 def horde_groan(rng: random.Random, base: float, length: float) -> list[float]:
     """Sürü homurtusu: yavaş yükselip inen, boğuk (uzaktan gelen) inilti."""
     n = frames(length)
@@ -400,6 +426,14 @@ def main() -> int:
     groans = ((701, 88.0, 1.3), (702, 72.0, 1.6), (703, 104.0, 1.1), (704, 80.0, 1.8), (705, 96.0, 1.4))
     for i, (seed, base, length) in enumerate(groans, start=1):
         write_wav(f"horde_groan_{i}", horde_groan(random.Random(seed), base, length))
+    for i, seed in enumerate((901, 902, 903), start=1):
+        write_wav(f"swing_light_{i}", swing(random.Random(seed), 0.16, 1800.0, 4200.0))
+    for i, seed in enumerate((911, 912, 913), start=1):
+        write_wav(f"swing_medium_{i}", swing(random.Random(seed), 0.26, 900.0, 3000.0, ring=0.25))
+    for i, seed in enumerate((921, 922, 923), start=1):
+        write_wav(f"swing_energy_{i}", swing(random.Random(seed), 0.36, 600.0, 2200.0, hum=140.0))
+    for i, seed in enumerate((931, 932, 933), start=1):
+        write_wav(f"swing_fire_{i}", swing(random.Random(seed), 0.34, 500.0, 2000.0, crackle=0.5))
     write_wav("player_hurt_1", player_hurt(random.Random(601)))
     for i, (seed, base) in enumerate(((801, 1320.0), (802, 1480.0), (803, 1180.0)), start=1):
         write_wav(f"pickup_{i}", pickup(random.Random(seed), base))

@@ -80,3 +80,18 @@ func test_item_table_is_consistent() -> void:
 		for effect: Dictionary in row["effects"]:
 			assert_true(StatData.TABLE.has(effect["stat"]), "%s: bilinmeyen istatistik" % id)
 	assert_eq(ItemData.ids().size(), 10)
+
+
+func test_weighted_weapon_pick_prefers_heavy_weights() -> void:
+	var counts: Dictionary = {&"w1": 0, &"w2": 0}
+	var rng: RandomNumberGenerator = _rng(3)
+	for _i in 300:
+		var offer: Array[Dictionary] = ShopRules.roll_offer(rng, [], [&"w1", &"w2"], 1, 1.0, [], {&"w1": 9.0, &"w2": 1.0})
+		counts[offer[0]["id"]] += 1
+	assert_gt(counts[&"w1"], counts[&"w2"] * 3)
+
+
+func test_shop_pool_unlocks_by_wave() -> void:
+	assert_true(WeaponData.shop_pool(1).has(WeaponData.KNIFE))
+	assert_false(WeaponData.shop_pool(1).has(WeaponData.LIGHTSABER))
+	assert_true(WeaponData.shop_pool(99).has(WeaponData.LIGHTSABER))

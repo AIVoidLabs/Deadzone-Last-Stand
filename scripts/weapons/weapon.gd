@@ -16,6 +16,11 @@ var projectiles: ProjectilePool
 ## XZ düzleminde nişan yönü; hedef yokken askerin baktığı yön.
 var aim: Vector2 = Vector2(0.0, 1.0)
 var has_target: bool = false
+## Son savurmanın gerçek menzili (m, istatistik dahil); kesik izi görüntüsü okur.
+var last_reach: float = 0.0
+
+## Yakın dövüşte hedef seçerken menzile eklenen pay (m): zombinin gövdesi de vurulur.
+const MELEE_TARGET_SLACK: float = 0.4
 
 var _player: Player
 var _tier_row: Dictionary
@@ -51,6 +56,9 @@ func tick(delta: float) -> void:
 		return
 	var origin: Vector2 = position_2d()
 	var max_range: float = _player.stats.weapon_range(row["max_range"])
+	if row["behavior"] == &"melee":
+		_tick_melee(origin, max_range)
+		return
 	var target: int = enemies.nearest_enemy(origin, max_range)
 	has_target = target >= 0
 	if not has_target:
@@ -69,5 +77,30 @@ func tick(delta: float) -> void:
 	for i: int in pellets:
 		var angle: float = Spread.angle_offset(i, pellets, spread) + Spread.jitter(pellets, spread, row["spread_jitter"], _rng.randf())
 		projectiles.fire(muzzle, direction.rotated(angle), row["projectile_speed"], damage, max_range, row["knockback"])
+	_cooldown = _player.stats.fire_interval(float(row["fire_interval"]) / float(_tier_row["rate_mult"]))
+	fired.emit(direction)
+
+
+## Yakın dövüş: menzildeki en yakın zombiye döner; bekleme bitince yayı (ya da tek hedefi) vurur.
+func _tick_melee(origin: Vector2, reach: float) -> void:
+	var target: int = enemies.nearest_enemy(origin, reach + MELEE_TARGET_SLACK)
+	has_target = target >= 0
+	if not has_target:
+		aim = _player.facing
+		return
+	var direction: Vector2 = Steering.seek(origin, enemies.enemy_position(target))
+	if direction == Vector2.ZERO:
+		return
+	aim = direction
+	if _cooldown > 0.0:
+		return
+	var damage: float = _player.stats.weapon_damage(float(row["damage"]) * float(_tier_row["damage_mult"]))
+	var arc: float = deg_to_rad(row["melee_arc_deg"])
+	var hits: PackedInt32Array = PackedInt32Array([target]) if arc <= 0.0 else enemies.query_arc(origin, direction, reach, arc)
+	for i: int in hits:
+		var away: Vector2 = Steering.seek(origin, enemies.enemy_position(i))
+		enemies.damage(i, damage, away if away != Vector2.ZERO else direction, row["knockback"])
+		enemies.ignite(i, row["burn_dps"], row["burn_time"])
+	last_reach = reach
 	_cooldown = _player.stats.fire_interval(float(row["fire_interval"]) / float(_tier_row["rate_mult"]))
 	fired.emit(direction)

@@ -42,6 +42,10 @@ func notify_hit(amount: float) -> void:
 	event.emit(&"hit", {"amount": amount})
 
 
+func notify_burn(on: bool) -> void:
+	event.emit(&"burn", {"on": on})
+
+
 ## Havuza dönüş: görünmez ve durgun.
 func deactivate() -> void:
 	visible = false

@@ -50,6 +50,8 @@ func _on_event(event_name: StringName, data: Dictionary) -> void:
 	match event_name:
 		&"configure":
 			_apply_kind(data)
+		&"burn":
+			_set_burn(1.0 if data["on"] else 0.0)
 		&"hit":
 			if Tuning.FEATURE_HIT_FLASH:
 				_flash_left = Tuning.HIT_FLASH_TIME
@@ -85,6 +87,7 @@ func _on_state_changed(new_state: int, _old_state: int) -> void:
 			if _animation != null:
 				_animation.speed_scale = 1.0
 		ZombieRules.State.INACTIVE:
+			_set_burn(0.0)
 			_flash_left = 0.0
 			_set_flash(0.0)
 			set_process(false)
@@ -96,6 +99,11 @@ func _on_state_changed(new_state: int, _old_state: int) -> void:
 func _set_fade(value: float) -> void:
 	for mesh: MeshInstance3D in _meshes:
 		mesh.set_instance_shader_parameter(&"fade", value)
+
+
+func _set_burn(value: float) -> void:
+	for mesh: MeshInstance3D in _meshes:
+		mesh.set_instance_shader_parameter(&"burn", value)
 
 
 func _set_flash(value: float) -> void:

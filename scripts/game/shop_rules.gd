@@ -22,9 +22,22 @@ static func sell_value(base_price: int, tier: int, fraction: float) -> int:
 	return floori(float(base_price) * pow(2.0, float(tier - 1)) * fraction)
 
 
+## weights: id → çıkma ağırlığı (silah nadirliği); boşsa ya da id'de yoksa ağırlık 1.
+static func _pick_weighted(rng: RandomNumberGenerator, pool: Array, weights: Dictionary) -> StringName:
+	var total: float = 0.0
+	for id: StringName in pool:
+		total += float(weights.get(id, 1.0))
+	var roll: float = rng.randf() * total
+	for id: StringName in pool:
+		roll -= float(weights.get(id, 1.0))
+		if roll <= 0.0:
+			return id
+	return pool[pool.size() - 1]
+
+
 ## count öğelik raf. Kilitli ve satılmamış öğeler yerinde kalır; kalan yerler rastgele dolar.
 ## Raf içinde aynı ürün tekrar etmez (havuz yetiyorsa). weapon_chance: dolan yerin silah olma olasılığı.
-static func roll_offer(rng: RandomNumberGenerator, item_ids: Array, weapon_ids: Array, count: int, weapon_chance: float, previous: Array[Dictionary]) -> Array[Dictionary]:
+static func roll_offer(rng: RandomNumberGenerator, item_ids: Array, weapon_ids: Array, count: int, weapon_chance: float, previous: Array[Dictionary], weapon_weights: Dictionary = {}) -> Array[Dictionary]:
 	var offer: Array[Dictionary] = []
 	for entry: Dictionary in previous:
 		if entry["locked"] and not entry["sold"] and offer.size() < count:
@@ -36,7 +49,7 @@ static func roll_offer(rng: RandomNumberGenerator, item_ids: Array, weapon_ids: 
 		var pool: Array = weapon_ids if kind == WEAPON else item_ids
 		if pool.is_empty():
 			break
-		var id: StringName = pool[rng.randi_range(0, pool.size() - 1)]
+		var id: StringName = _pick_weighted(rng, pool, weapon_weights) if kind == WEAPON else pool[rng.randi_range(0, pool.size() - 1)]
 		if _contains(offer, kind, id):
 			continue
 		offer.append({"kind": kind, "id": id, "locked": false, "sold": false})

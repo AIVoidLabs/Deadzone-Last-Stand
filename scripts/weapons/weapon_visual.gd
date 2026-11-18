@@ -9,6 +9,9 @@ const FLASH_SHADER_PATH: Shader = preload("res://assets/shaders/muzzle_flash.gds
 const MUZZLE_LIGHT_COLOR: Color = Color(1.0, 0.7, 0.35)
 ## Parlamanın namlu ucundan öne taşma payı (m).
 const FLASH_FORWARD: float = 0.08
+## Yakın dövüşte savurma sırasında öne atılma (m) ve dürtmede en çok atılma (m).
+const MELEE_LUNGE: float = 0.3
+const MELEE_THRUST_MAX: float = 0.9
 
 var _weapon: Weapon
 var _pivot: Node3D
@@ -20,6 +23,14 @@ var _light: OmniLight3D
 var _flash_left: float = 0.0
 var _mesh: MeshInstance3D
 var _merge_left: float = 0.0
+## Yakın dövüş: savurma animasyonu (kalan süre, toplam, yön, yay, öne atılma) ve kesik izi.
+var _melee: bool = false
+var _swing_left: float = 0.0
+var _swing_total: float = 0.1
+var _swing_side: float = 1.0
+var _swing_arc: float = 0.0
+var _lunge: float = 0.0
+var _slash: MeleeSlash
 
 
 func _ready() -> void:
@@ -27,7 +38,13 @@ func _ready() -> void:
 	_pivot = Node3D.new()
 	_pivot.name = "Pivot"
 	add_child(_pivot)
+	_melee = _weapon.row["behavior"] == &"melee"
 	_build_model()
+	if _melee and Tuning.FEATURE_MELEE_SLASH_FX:
+		_slash = MeleeSlash.new()
+		_slash.position = Vector3(0.0, -0.3, 0.0)
+		add_child(_slash)
+		_slash.setup(_weapon.row["melee_arc_deg"], _weapon.row["slash_color"])
 	_weapon.fired.connect(_on_fired)
 	_bob_phase = randf() * TAU
 	rotation.y = atan2(_weapon.aim.x, _weapon.aim.y)
@@ -47,6 +64,7 @@ func _process(delta: float) -> void:
 	# Model +Z'ye bakar: geri tepme -Z yönünde, namlu yukarı kalkar (-X ekseninde dönüş).
 	_pivot.position = Vector3(0.0, bob, -kick)
 	_pivot.rotation.x = -deg_to_rad(Tuning.WEAPON_RECOIL_PITCH_DEG) * _recoil
+	_update_swing(delta)
 	_update_flash(delta)
 	_update_merge(delta)
 
@@ -62,7 +80,22 @@ func _update_merge(delta: float) -> void:
 	_mesh.set_instance_shader_parameter(&"flash", (1.0 - t) * (1.0 - t))
 
 
-func _on_fired(_direction: Vector2) -> void:
+## Yakın dövüş savurması: kılıç kabzasından yayın bir ucundan öbür ucuna döner ve öne atılır; dürtmede yalnız öne atılır.
+func _update_swing(delta: float) -> void:
+	if _swing_left <= 0.0:
+		_pivot.rotation.y = 0.0
+		return
+	_swing_left = maxf(0.0, _swing_left - delta)
+	var t: float = 1.0 - _swing_left / _swing_total
+	var eased: float = t * t * (3.0 - 2.0 * t)
+	_pivot.rotation.y = _swing_side * lerpf(_swing_arc * 0.5, -_swing_arc * 0.5, eased)
+	_pivot.position.z += sin(t * PI) * _lunge
+
+
+func _on_fired(direction: Vector2) -> void:
+	if _melee:
+		_start_swing(direction)
+		return
 	_recoil = 1.0
 	if _flash == null:
 		return
@@ -117,7 +150,7 @@ func _build_model() -> void:
 	var material: ShaderMaterial = ShaderMaterial.new()
 	material.shader = FLASH_SHADER
 	material.set_shader_parameter(&"albedo", tier_row["tint"])
-	material.set_shader_parameter(&"glow", tier_row["glow"])
+	material.set_shader_parameter(&"glow", maxf(float(tier_row["glow"]), float(_weapon.row["base_glow"])))
 	material.set_shader_parameter(&"flash_color", (tier_row["tint"] as Color).lerp(Color.WHITE, 0.6))
 	_mesh = mesh
 	var base: BaseMaterial3D = source.mesh.surface_get_material(0) as BaseMaterial3D
@@ -125,6 +158,18 @@ func _build_model() -> void:
 		material.set_shader_parameter(&"albedo_texture", base.albedo_texture)
 	mesh.material_override = material
 	_pivot.add_child(mesh)
-	if Tuning.FEATURE_MUZZLE_FLASH:
+	if Tuning.FEATURE_MUZZLE_FLASH and not _melee:
 		_build_flash(source.mesh.get_aabb().end.z * mesh.scale.z)
 	scene.free()
+
+
+func _start_swing(direction: Vector2) -> void:
+	var row: Dictionary = _weapon.row
+	_swing_total = float(row["melee_swing_time"])
+	_swing_left = _swing_total
+	_swing_side = -_swing_side
+	_swing_arc = deg_to_rad(row["melee_arc_deg"])
+	_lunge = MELEE_LUNGE if _swing_arc > 0.0 else minf(_weapon.last_reach * 0.45, MELEE_THRUST_MAX)
+	if _slash != null:
+		var yaw: float = wrapf(atan2(direction.x, direction.y) - rotation.y, -PI, PI)
+		_slash.play(yaw, _swing_side, _weapon.last_reach, _swing_total)

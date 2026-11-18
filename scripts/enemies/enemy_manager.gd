@@ -38,6 +38,11 @@ var _timer: PackedFloat32Array = PackedFloat32Array()
 var _rows: Array[Dictionary] = []
 ## İtilme hızı (m/sn); kendiliğinden söner.
 var _knock: PackedVector2Array = PackedVector2Array()
+## Yanma: kalan süre (sn), saniye başına hasar, son vuruştan beri biriken süre.
+var _burn_left: PackedFloat32Array = PackedFloat32Array()
+var _burn_dps: PackedFloat32Array = PackedFloat32Array()
+var _burn_acc: PackedFloat32Array = PackedFloat32Array()
+var _burning: int = 0
 var _nodes: Array[Zombie] = []
 var _pool: Array[Zombie] = []
 var _dead_count: int = 0
@@ -61,6 +66,8 @@ func _physics_process(delta: float) -> void:
 	elapsed += delta
 	_grid.rebuild(_pos)
 	_move(delta)
+	if _burning > 0:
+		_burn(delta)
 
 
 func active_count() -> int:
@@ -91,6 +98,50 @@ func count_near(center: Vector2, radius: float) -> int:
 		if i < _alive.size() and _alive[i] != 0:
 			count += 1
 	return count
+
+
+## origin'den dir yönüne açılan yayın (arc_rad, reach) içindeki canlı zombiler (yakın dövüş savurması).
+func query_arc(origin: Vector2, dir: Vector2, reach: float, arc_rad: float) -> PackedInt32Array:
+	var out: PackedInt32Array = PackedInt32Array()
+	var span: float = reach + _max_radius
+	for i in _grid.query_rect(origin - Vector2(span, span), origin + Vector2(span, span)):
+		if i < _alive.size() and _alive[i] != 0 and MeleeRules.in_arc(origin, dir, _pos[i], _radius[i], reach, arc_rad):
+			out.append(i)
+	return out
+
+
+## Zombiyi yakar: duration sn boyunca saniyede dps hasar. Yanan zombi tekrar yakılırsa süre yenilenir, hasar yükselir.
+func ignite(index: int, dps: float, duration: float) -> void:
+	if not Tuning.FEATURE_BURN or _alive[index] == 0 or dps <= 0.0 or duration <= 0.0:
+		return
+	if _burn_left[index] <= 0.0:
+		_burning += 1
+		_burn_acc[index] = 0.0
+		_nodes[index].notify_burn(true)
+	_burn_left[index] = maxf(_burn_left[index], duration)
+	_burn_dps[index] = maxf(_burn_dps[index], dps)
+
+
+func _burn(delta: float) -> void:
+	for i in _pos.size():
+		if _burn_left[i] <= 0.0 or _alive[i] == 0:
+			continue
+		var step: Dictionary = MeleeRules.burn_step(_burn_left[i], _burn_acc[i], delta, Tuning.BURN_TICK_INTERVAL)
+		_burn_left[i] = step["left"]
+		_burn_acc[i] = step["acc"]
+		for _t in int(step["ticks"]):
+			damage(i, _burn_dps[i] * Tuning.BURN_TICK_INTERVAL, Vector2.from_angle(_rng.randf() * TAU))
+			if _alive[i] == 0:
+				break
+		if _alive[i] != 0 and _burn_left[i] <= 0.0:
+			_extinguish(i)
+
+
+func _extinguish(index: int) -> void:
+	_burn_left[index] = 0.0
+	_burn_dps[index] = 0.0
+	_burning = maxi(0, _burning - 1)
+	_nodes[index].notify_burn(false)
 
 
 ## a→b yolunda ilk değilen canlı zombi; yoksa -1.
@@ -147,6 +198,9 @@ func spawn(kind: StringName, at: Vector2) -> void:
 	_timer.append(0.0)
 	_rows.append(row)
 	_knock.append(Vector2.ZERO)
+	_burn_left.append(0.0)
+	_burn_dps.append(0.0)
+	_burn_acc.append(0.0)
 	_nodes.append(z)
 	z.activate(Vector3(at.x, 0.0, at.y))
 	var index: int = _nodes.size() - 1
@@ -261,6 +315,8 @@ static func _yaw_towards(from: Vector2, to: Vector2) -> float:
 ## push: öldüren vuruşun itmesi; ceset bu yöne düşer ve kayar.
 ## credit: öldürme sayılır ve enemy_killed yayılır (dalga sonu devrilmelerde kapalı).
 func _kill(index: int, push: Vector2 = Vector2.ZERO, credit: bool = true) -> void:
+	if _burn_left[index] > 0.0:
+		_extinguish(index)
 	_alive[index] = 0
 	_dead_count += 1
 	var node: Zombie = _nodes[index]
@@ -300,6 +356,9 @@ func _compact() -> void:
 				_timer[i] = _timer[last]
 				_rows[i] = _rows[last]
 				_knock[i] = _knock[last]
+				_burn_left[i] = _burn_left[last]
+				_burn_dps[i] = _burn_dps[last]
+				_burn_acc[i] = _burn_acc[last]
 				_nodes[i] = _nodes[last]
 			_pos.resize(last)
 			_hp.resize(last)
@@ -311,6 +370,9 @@ func _compact() -> void:
 			_timer.resize(last)
 			_rows.resize(last)
 			_knock.resize(last)
+			_burn_left.resize(last)
+			_burn_dps.resize(last)
+			_burn_acc.resize(last)
 			_nodes.resize(last)
 		i -= 1
 	_dead_count = 0

@@ -96,7 +96,8 @@ func _close() -> void:
 
 
 func _roll() -> void:
-	_offer = ShopRules.roll_offer(_rng, ItemData.ids(), WeaponData.ids(), Tuning.SHOP_OFFER_COUNT, Tuning.SHOP_WEAPON_CHANCE, _offer)
+	var pool: Dictionary = WeaponData.shop_pool(_wave_index() + 1)
+	_offer = ShopRules.roll_offer(_rng, ItemData.ids(), pool.keys(), Tuning.SHOP_OFFER_COUNT, Tuning.SHOP_WEAPON_CHANCE, _offer, pool)
 
 
 func _wave_index() -> int:

@@ -13,6 +13,8 @@ uniform float glow = 0.0;
 instance uniform float palette_offset = 0.0;
 // Solarak silinme (0 görünür, 1 yok): saydamlık yerine noktalı eleme, böylece malzeme opak kalır.
 instance uniform float fade = 0.0;
+// Yanma (0 kapalı, 1 yanıyor): turuncu nabız atan kor parlaması.
+instance uniform float burn = 0.0;
 
 void fragment() {
 	if (fade > 0.0) {
@@ -24,5 +26,10 @@ void fragment() {
 	vec3 base = albedo.rgb * texture(albedo_texture, UV + vec2(0.0, palette_offset)).rgb;
 	ALBEDO = mix(base, flash_color.rgb, flash);
 	EMISSION = flash_color.rgb * flash * 0.6 + base * glow;
+	if (burn > 0.0) {
+		float pulse = 0.65 + 0.35 * sin(TIME * 11.0 + NODE_POSITION_WORLD.x * 3.0);
+		ALBEDO = mix(ALBEDO, vec3(1.0, 0.35, 0.05), burn * 0.35);
+		EMISSION += vec3(1.0, 0.38, 0.06) * burn * pulse * 0.9;
+	}
 	ROUGHNESS = roughness;
 }

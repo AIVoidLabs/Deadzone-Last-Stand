@@ -27,6 +27,26 @@ const TABLE: Dictionary = {
 		"files": ["shotgun_1"],
 		"volume_db": -7.0, "pitch_variance": 0.05, "max_voices": 3, "min_interval": 0.05,
 	},
+	&"swing_light": {
+		"enabled": Tuning.FEATURE_SFX_SHOT,
+		"files": ["swing_light_1", "swing_light_2", "swing_light_3"],
+		"volume_db": -12.0, "pitch_variance": 0.08, "max_voices": 3, "min_interval": 0.06,
+	},
+	&"swing_medium": {
+		"enabled": Tuning.FEATURE_SFX_SHOT,
+		"files": ["swing_medium_1", "swing_medium_2", "swing_medium_3"],
+		"volume_db": -10.0, "pitch_variance": 0.07, "max_voices": 3, "min_interval": 0.08,
+	},
+	&"swing_energy": {
+		"enabled": Tuning.FEATURE_SFX_SHOT,
+		"files": ["swing_energy_1", "swing_energy_2", "swing_energy_3"],
+		"volume_db": -10.0, "pitch_variance": 0.06, "max_voices": 2, "min_interval": 0.1,
+	},
+	&"swing_fire": {
+		"enabled": Tuning.FEATURE_SFX_SHOT,
+		"files": ["swing_fire_1", "swing_fire_2", "swing_fire_3"],
+		"volume_db": -10.0, "pitch_variance": 0.06, "max_voices": 2, "min_interval": 0.1,
+	},
 	&"hit": {
 		"enabled": Tuning.FEATURE_SFX_HIT,
 		"files": ["hit_1", "hit_2", "hit_3"],

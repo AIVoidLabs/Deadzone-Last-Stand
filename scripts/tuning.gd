@@ -56,6 +56,11 @@ const SHOP_REROLL_BASE: int = 5
 const SHOP_REROLL_STEP: int = 2
 ## Silah satışında geri ödenen kesir.
 const SHOP_SELL_FRACTION: float = 0.5
+## Yakın dövüş silahları (7.1): savurma/dürtme görseli (kesik izi) ve yanma etkisi (zombide turuncu parlama).
+const FEATURE_MELEE_SLASH_FX: bool = true
+const FEATURE_BURN: bool = true
+## Yanan zombiye iki yanma vuruşu arası (sn); hasar saniye başına verilir, vuruşa bölünür.
+const BURN_TICK_INTERVAL: float = 0.5
 ## Birleşme animasyonu: silah büyüyüp oturur + parlar, halka ve kıvılcım patlar.
 const FEATURE_MERGE_FX: bool = true
 ## Birleşme animasyonunun süresi (sn).
@@ -270,7 +275,7 @@ const LOW_HP_PULSE_RATE: float = 1.2
 const PLAYER_HIT_KNOCKBACK: float = 6.0
 const PLAYER_KNOCKBACK_DAMPING: float = 11.0
 ## Debug: F7 ile eklenen silahlar, sırayla (eldeki silah sayısına göre; tabancayla başlanınca ilk F7 pompalı).
-const DEBUG_WEAPONS: Array[StringName] = [&"pistol", &"shotgun"]
+const DEBUG_WEAPONS: Array[StringName] = [&"pistol", &"shotgun", &"knife", &"katana", &"lightsaber", &"flame_sword"]
 const PROJECTILE_LENGTH: float = 0.6
 const PROJECTILE_THICKNESS: float = 0.1
 ## Mermi izi (FEATURE_TRACERS): uzunluk ve kalınlık (m).
