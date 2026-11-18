@@ -5,11 +5,12 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 
 ## Şu an
 
-Oturum 6 (2026-11-18). **Aşama 7.1 kod olarak bitti: yakın dövüş (bıçak, katana, ışın kılıcı, ateşli kılıç) + SMG, plazma tüfeği, graviton topu, bomba atar**; Taha oynayıp yorum yapacak. Aşama 6 onayı hâlâ bekliyor. 145 test, commit yapıldı, push yok.
+Oturum 6 sonu (2026-11-18). **Aşama 7.1 bitti, Taha onayladı ("her şey okey"): yakın dövüş (bıçak, katana, ışın kılıcı, ateşli kılıç) + SMG, plazma tüfeği, graviton topu, bomba atar.** Sıradaki **7.2 (koşan, zıplayan, sürünen, tank zombi)**; Taha temiz oturumda başlatacak. Aşama 6 onayı hâlâ bekliyor. 145 test, commit yapıldı, push yok.
 
 - **7.1 kararları (Taha, 2026-11-18):** yakın dövüş ilk iş. Silahlar: bıçak (tekli dürtme), katana (yay savurma), ışın kılıcı (geniş savurma + yanma), **ateşli kılıç** (yanma, Taha ekledi); SMG, uzay silahları (plazma tüfeği = delip geçen, graviton topu = ittirme; sonra istenirse yenileri), bomba atar (alan hasarı). Yakın dövüş de 6 yuvadan birini kullanır, birleşme kuralları aynı. Zor erişim: 10–15 dalgalık oyuna göre silahlar dalga kilidiyle (`min_wave`) ve nadirlikle (`weight`) mağazaya çıkar, fiyatlar yüksek.
 - **Uzak silahlar (2026-11-18):** SMG (hızlı, sapmalı), plazma tüfeği (`pierce` 4, cyan iz), graviton topu (`behavior: &"burst"`: 80° koniyi bir kerede iter, mor iz), bomba atar (`explode_radius` 3 m, yay çizen kısa tıknaz mermi, `ExplosionFx` + kamera sarsıntısı). `ProjectilePool.fire(..., opts)`: pierce, explode_radius, color, size, length, arc; `EnemyManager.query_circle`. 4 yeni model, 4 yeni ses (`plasma`, `graviton`, `launcher`, `explosion`; SMG `shot_1`'i kısık kullanır). `FEATURE_EXPLOSION_FX`.
-- **Sırada:** Taha'nın yorumu, sonra 7.2 (koşan ve tank zombi). Yeni silahların sayıları ilk tahmin.
+- **Yeni oturum başlangıcı:** ortam kontrolü → bu bölüm → `GAME_DESIGN.md` zombi türleri tablosu ve ROADMAP 7.2 satırı → 7.2 için kararları sor (hangi türler, hız/can/ağırlık, siluet ve hareket farkı, Blender modelleri), kod yazma. Yeni zombi türü eklenince `EnemyData` satırı + `drop_value` + `WaveData.mix` satırı gerekir; model Blender'dan (`build_zombie.py` hattı), skill'ler `creature-artist`, `rigging`, `animation`, `lowpoly-style`.
+- **Silah sayıları ilk tahmin;** 11. aşamada dengelenir. Taha silahlardan memnun.
 - **Yakın dövüş nasıl çalışır:** `WeaponData` satırında `behavior: &"melee"`; `max_range` = menzil, `melee_arc_deg` = yay (0 = tekli dürtme), `burn_dps/burn_time` = yanma. `MeleeRules` (saf: yay + yanma sayacı, 9 test), `EnemyManager.query_arc/ignite`, görüntü `WeaponVisual` (kabzadan savurma, öne atılma) + `MeleeSlash` (kesik izi, `FEATURE_MELEE_SLASH_FX`), yanan zombi turuncu parlar (`flash_lit` `burn`, `FEATURE_BURN`). Modeller `build_weapons.py` (kökeni kabza), sesler `gen_sfx.py` `swing_*`. Mağaza: `WeaponData.shop_pool(wave)` + ağırlıklı çekiliş (`ShopRules`).
 - **Denge notu:** yeni silahların sayıları ilk tahmin; bot 3 turda kazandı (bıçak alındı). Gerçek denge Taha'nın oynayışıyla.
 - **Yeni oturum başlangıcı:** ortam kontrolü → Taha'nın yakın dövüş yorumu → 7.1'in kalanı (SMG, uzay silahları, bomba atar).
@@ -29,7 +30,7 @@ Oturum 6 (2026-11-18). **Aşama 7.1 kod olarak bitti: yakın dövüş (bıçak, 
 | 4 | Dikey dilim: zombi | ✔ bitti (2026-11-16) |
 | 5 | Dikey dilim: silah ve vuruş hissi | ✔ bitti (2026-11-17, dikey dilim onaylandı) |
 | 6 | Tur döngüsü | ✔ kod bitti 2026-11-18 (Taha'nın oynayıp onayı bekleniyor: 6.4–6.6) |
-| 7 | Silah ve zombi çeşitliliği | 7.1 kod bitti (Taha testi bekliyor) |
+| 7 | Silah ve zombi çeşitliliği | 7.1 ✔ (Taha onayladı), 7.2 sırada |
 | 8 | Arena, atmosfer, ses | — |
 | 9 | Arayüz ve akış | — |
 | 10 | Kalıcı ilerleme | — |
@@ -79,7 +80,7 @@ Bitiş ölçütleri `ROADMAP.md`'de. Biten kutunun yanına tarih ve commit yazı
 - [x] 6.6 Tam tur — kod ve ilk denge bitti 2026-11-18, Taha'nın oynayıp yorumu bekliyor. Tam tur botu (`Autoplay`, `tools/autoplay_runs.ps1`: ~10 sn'de 5 dalga) ölçüm aracı oldu. Ölçümle bulunan **hata:** temizlik sırasında düşen kristal yerde kalıp mağaza ve kartları bekletiyordu → dalga sonunda düşen her kristal de çekilir (`Pickups.pull_all`). **Denge değişiklikleri:** zombi kristali 1 → 3; dalga 1 hafifledi (tek zombi, aralık 1.1→0.8), dalga 2–5 daha yumuşak tırmanış ve üst sınırlar 60/90/120/180/260 (`WaveData`); mağazada silah olasılığı %30 → %40. Bot sonucu (6 tur): 4 kazandı, 2 dalga 4–5'te öldü; 3–4 silah ve K2 birleşmeleri dalga 4–5'te görülüyor; dalga başına kristal ~45 → ~650. Bot insan değil: gerçek denge Taha'nın oynayışıyla ayarlanır
 
 ### 7 — Silah ve zombi çeşitliliği
-- [ ] 7.1 Silah davranış seti — yakın dövüş (bıçak, katana, ışın kılıcı, ateşli kılıç + yanma) kod bitti 2026-11-18, Taha testi bekliyor; SMG, plazma, graviton, bomba atar da eklendi
+- [x] 7.1 Silah davranış seti — yakın dövüş (bıçak, katana, ışın kılıcı, ateşli kılıç + yanma) 2026-11-18, Taha onayladı. Commit'ler `51062b0`, `962f58a`, `a97f11b`; SMG, plazma, graviton, bomba atar da eklendi
 - [ ] 7.2 Koşan ve tank
 - [ ] 7.3 Tüküren ve patlayan
 - [ ] 7.4 Boss
