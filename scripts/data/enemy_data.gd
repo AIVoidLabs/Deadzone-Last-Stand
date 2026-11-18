@@ -21,7 +21,7 @@ const TABLE: Dictionary = {
 		"attack_anim_hit_time": 0.7,
 		"spawn_time": 0.9,
 		# Ölünce bıraktığı kristal (hem XP hem para).
-		"drop_value": 1,
+		"drop_value": 3,
 		# İtilmeye direnç (büyük = az itilir) ve vurulunca sendeleme süresi (sn).
 		"weight": 1.0,
 		"stagger_time": 0.22,

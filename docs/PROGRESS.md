@@ -8,7 +8,7 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 Oturum 4 sonu (2026-11-17, Taha "bugünlük yeter" dedi). Çalışma ağacı temiz, push yok.
 
 - **Ana aşama:** 6 — Tur döngüsü
-- **Güncelleme 2026-11-18 (oturum 5):** 6.4 kodu bitti (Taha'nın kararları: öneriler kabul, kademe görünümü renk + model güncellemesi). Taha testi bekleniyor; sonra 6.5.
+- **Güncelleme 2026-11-18 (oturum 5):** 6.4, 6.5 ve 6.6 kodları bitti; Aşama 6 tamam, Taha'nın tam turu oynayıp onayı bekleniyor. Sıradaki ana aşama: 7 — Silah ve zombi çeşitliliği (Taha "devam" deyince; önce 7.1 için sorular).
 - **Alt aşama:** 6.1–6.3 bitti. **Sıradaki: 6.4 Silah yuvaları ve birleştirme.** (aşağıdaki 6.4 soruları cevaplandı)
 - **Yeni oturum başlangıcı:** ortam kontrolü (CLAUDE.md bölüm 0) → bu bölümü oku → 6.4 için aşağıdaki kararları Taha'ya sor → onaydan sonra kod.
 - **6.4'te Taha'ya sorulacaklar** (kod yazmadan önce):
@@ -32,7 +32,7 @@ Oturum 4 sonu (2026-11-17, Taha "bugünlük yeter" dedi). Çalışma ağacı tem
 | 3 | Dikey dilim: asker | ✔ bitti (2026-11-16) |
 | 4 | Dikey dilim: zombi | ✔ bitti (2026-11-16) |
 | 5 | Dikey dilim: silah ve vuruş hissi | ✔ bitti (2026-11-17, dikey dilim onaylandı) |
-| 6 | Tur döngüsü | sürüyor (6.4 ve 6.5 test bekliyor, sıradaki 6.6) |
+| 6 | Tur döngüsü | ✔ kod bitti 2026-11-18 (Taha'nın oynayıp onayı bekleniyor: 6.4–6.6) |
 | 7 | Silah ve zombi çeşitliliği | — |
 | 8 | Arena, atmosfer, ses | — |
 | 9 | Arayüz ve akış | — |
@@ -80,7 +80,7 @@ Bitiş ölçütleri `ROADMAP.md`'de. Biten kutunun yanına tarih ve commit yazı
 - [x] 6.3 İstatistikler ve kartlar — 2026-11-17 (`677a86f`; Taha: işlev onaylı, kart görünümü basit → 9.4'te yeniden tasarlanacak) (`StatData` 10 istatistik, `CardData` 4 kademe, `PlayerStats` + `CardRules` 11 test; `LevelUpFlow` dalga arasında kristaller toplanınca açılır, `CardScreen` 3 kart + güncel artışlar; `GameFlow.open_menu`; asker/silah/kristal değerleri istatistikten; F9 +seviye; `FEATURE_LEVEL_CARDS`). 116 test
 - [x] 6.4 Silah yuvaları ve birleştirme — kod bitti 2026-11-18, Taha testi bekliyor (`WeaponMerge` + 9 test: yeni silah kademe 1, aynı silah + aynı kademe kendiliğinden birleşir, zincirleme, en çok 4; 6/6 doluyken birleşemeyen reddedilir. `WeaponData.TIERS` kademe sütunu: hasar ×1/1.5/2.2/3.2, atış hızı ×1/1.12/1.25/1.4. Görünüm: gri → yeşil → mavi → altın renk + ışıma + hafif büyüme. F7 ile dene: ilk F7 pompalı, ikinci tabanca → başlangıç tabancasıyla birleşir; `--tiers=pistol:1,shotgun:3` ile görüntü; `FEATURE_WEAPON_MERGE`). Birleşme animasyonu (Taha isteği, 2026-11-18): silah küçükten yaylanarak oturur + kademe renginde parlar (`WeaponVisual`), genişleyen halka + kıvılcım (`MergeBurst`, sayı kalite profilinden); `FEATURE_MERGE_FX`, `MERGE_FX_TIME`; `--capture-merge=S` ile görüntü. 125 test
 - [x] 6.5 Mağaza ve eşyalar — kod bitti 2026-11-18, Taha testi bekliyor. Taha'nın kararları: raf 4 ürün karışık (silah olasılığı %30), yenileme 5 kristal + her seferinde +2 (dalga başında sıfırlanır), kilit var, 10 eşya (artı + eksi bedel, yığılır), silah alınır (6.4 kurallarıyla birleşir), satılır (kademe bedelinin yarısı, son silah satılamaz). Fiyatlar dalga başına +%15. (`ItemData` 10 eşya, `ShopRules` + 9 test, `ShopFlow` dalga arası kart ekranından sonra açılır ve oyunu durdurur, `ShopScreen` sade görünüm [1–4 al, R yenile, Enter sonraki dalga]; mağaza açılana kadar ara süresi akmaz `SpawnDirector.hold_break`; "sonraki dalga" arayı bitirir; `StatData` eksi değer gösterimi; `FEATURE_SHOP`). Görüntüler: `--crystals=N --capture-wave-end=S --capture-pick [--capture-pick-key=R|Enter]`. 134 test. Fiyat/gelir dengesi 6.6'da
-- [ ] 6.6 Tam tur
+- [x] 6.6 Tam tur — kod ve ilk denge bitti 2026-11-18, Taha'nın oynayıp yorumu bekliyor. Tam tur botu (`Autoplay`, `tools/autoplay_runs.ps1`: ~10 sn'de 5 dalga) ölçüm aracı oldu. Ölçümle bulunan **hata:** temizlik sırasında düşen kristal yerde kalıp mağaza ve kartları bekletiyordu → dalga sonunda düşen her kristal de çekilir (`Pickups.pull_all`). **Denge değişiklikleri:** zombi kristali 1 → 3; dalga 1 hafifledi (tek zombi, aralık 1.1→0.8), dalga 2–5 daha yumuşak tırmanış ve üst sınırlar 60/90/120/180/260 (`WaveData`); mağazada silah olasılığı %30 → %40. Bot sonucu (6 tur): 4 kazandı, 2 dalga 4–5'te öldü; 3–4 silah ve K2 birleşmeleri dalga 4–5'te görülüyor; dalga başına kristal ~45 → ~650. Bot insan değil: gerçek denge Taha'nın oynayışıyla ayarlanır
 
 ### 7 — Silah ve zombi çeşitliliği
 - [ ] 7.1 Silah davranış seti

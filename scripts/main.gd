@@ -66,8 +66,9 @@ func _ready() -> void:
 		level_up.pickups = pickups
 		add_child(level_up)
 
+	var shop: ShopFlow = null
 	if Tuning.FEATURE_SHOP and Tuning.FEATURE_WAVES:
-		var shop: ShopFlow = ShopFlow.new()
+		shop = ShopFlow.new()
 		shop.loot = loot
 		shop.stats = player.stats
 		shop.director = director
@@ -81,6 +82,15 @@ func _ready() -> void:
 
 	if OS.is_debug_build():
 		_add_debug_tools(player, enemies, projectiles, camera, weapons, director, pickups, loot)
+		if Autoplay.requested() and shop != null:
+			var bot: Autoplay = Autoplay.new()
+			bot.player = player
+			bot.enemies = enemies
+			bot.director = director
+			bot.loot = loot
+			bot.weapons = weapons
+			bot.shop = shop
+			add_child(bot)
 
 
 ## Kristaller: öldürmede düşer, toplanınca RunLoot'a eklenir, dalga sonunda hepsi çekilir.
@@ -99,7 +109,9 @@ func _add_pickups(player: Player, enemies: EnemyManager, director: SpawnDirector
 			Audio.play(SoundData.PICKUP))
 	director.phase_changed.connect(func(phase: WaveRun.Phase, _wave_index: int) -> void:
 		if phase == WaveRun.Phase.CLEAR:
-			pickups.collect_all())
+			pickups.collect_all()
+		elif phase == WaveRun.Phase.WAVE:
+			pickups.pull_all = false)
 	return pickups
 
 

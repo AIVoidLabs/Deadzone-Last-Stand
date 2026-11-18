@@ -48,7 +48,7 @@ const FEATURE_WEAPON_MERGE: bool = true
 const FEATURE_SHOP: bool = true
 ## Raftaki ürün sayısı ve dolan yerin silah olma olasılığı.
 const SHOP_OFFER_COUNT: int = 4
-const SHOP_WEAPON_CHANCE: float = 0.3
+const SHOP_WEAPON_CHANCE: float = 0.4
 ## Fiyat artışı: her dalgada temel fiyatın bu kesri kadar.
 const SHOP_PRICE_WAVE_GROWTH: float = 0.15
 ## Yenileme: ilk bedel ve her yenilemede artış (kristal); dalga başında sıfırlanır.

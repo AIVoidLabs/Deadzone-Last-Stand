@@ -12,6 +12,8 @@ const SHADER: Shader = preload("res://assets/shaders/pickup.gdshader")
 enum State { HOP, IDLE, PULL }
 
 var player: Player
+## true iken yerdeki her kristal askere çekilir (dalga sonu); yeni dalgada kapanır.
+var pull_all: bool = false
 
 var _mm: MultiMesh
 var _pos: PackedVector2Array = PackedVector2Array()
@@ -68,8 +70,10 @@ func drop(at: Vector3, value: int) -> void:
 	_write(index, 0.0)
 
 
-## Dalga sonu: hepsi askere çekilir.
+## Dalga sonu: hepsi askere çekilir; dalga bitene kadar yeni düşenler de çekilir (temizlikte
+## devrilen zombilerin kristali yerde kalıp mağazayı/kartları bekletmesin).
 func collect_all() -> void:
+	pull_all = true
 	for i in _pos.size():
 		if _state[i] != State.PULL:
 			_state[i] = State.PULL
@@ -86,7 +90,10 @@ func _physics_process(delta: float) -> void:
 			State.HOP:
 				_tick_hop(i, delta)
 			State.IDLE:
-				if PickupRules.in_magnet(_pos[i], target, magnet):
+				if pull_all:
+					_state[i] = State.PULL
+					_t[i] = Tuning.PICKUP_COLLECT_ALL_SPEED
+				elif PickupRules.in_magnet(_pos[i], target, magnet):
 					_state[i] = State.PULL
 					_t[i] = Tuning.PICKUP_PULL_START_SPEED
 			State.PULL:

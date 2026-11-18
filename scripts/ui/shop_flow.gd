@@ -47,6 +47,28 @@ func _physics_process(_delta: float) -> void:
 		_open_shop(run.index)
 
 
+func is_open() -> bool:
+	return _open
+
+
+## Debug (otomatik oyun botu): alınabilir silahları (en çok max_weapons yuva ya da birleşiyorsa), sonra eşyaları
+## alır ve mağazayı kapatır.
+func debug_autobuy(max_weapons: int) -> void:
+	var bought: bool = true
+	while bought:
+		bought = false
+		for i: int in _offer.size():
+			var entry: Dictionary = _offer[i]
+			if _state_of(entry) != "ok":
+				continue
+			if entry["kind"] == ShopRules.WEAPON and weapons.count() >= max_weapons and not weapons.preview_add(entry["id"])["merged"]:
+				continue
+			_on_buy(i)
+			bought = true
+			break
+	_close()
+
+
 func _can_open() -> bool:
 	if GameFlow.state != GameFlow.State.PLAYING:
 		return false
