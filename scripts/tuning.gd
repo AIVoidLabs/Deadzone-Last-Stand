@@ -44,6 +44,18 @@ const FEATURE_FLOATING_WEAPONS: bool = true
 const FEATURE_ENERGY_RING: bool = true
 ## Aynı silah + aynı kademe yuvaya gelince birleşip üst kademe olur (6.4); kapalıysa kademe hep 1.
 const FEATURE_WEAPON_MERGE: bool = true
+## Dalga arası mağaza (6.5): kart seçiminden sonra açılır; kapalıyken eski 3 sn ara.
+const FEATURE_SHOP: bool = true
+## Raftaki ürün sayısı ve dolan yerin silah olma olasılığı.
+const SHOP_OFFER_COUNT: int = 4
+const SHOP_WEAPON_CHANCE: float = 0.3
+## Fiyat artışı: her dalgada temel fiyatın bu kesri kadar.
+const SHOP_PRICE_WAVE_GROWTH: float = 0.15
+## Yenileme: ilk bedel ve her yenilemede artış (kristal); dalga başında sıfırlanır.
+const SHOP_REROLL_BASE: int = 5
+const SHOP_REROLL_STEP: int = 2
+## Silah satışında geri ödenen kesir.
+const SHOP_SELL_FRACTION: float = 0.5
 ## Birleşme animasyonu: silah büyüyüp oturur + parlar, halka ve kıvılcım patlar.
 const FEATURE_MERGE_FX: bool = true
 ## Birleşme animasyonunun süresi (sn).

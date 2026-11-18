@@ -9,6 +9,8 @@ signal phase_changed(phase: WaveRun.Phase, wave_index: int)
 var enemies: EnemyManager
 ## Dalgalar kapalıyken null.
 var run: WaveRun
+## true iken ara (BREAK) süresi akmaz: mağaza açılmayı bekler ya da açıktır.
+var hold_break: bool = false
 
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 var _spawn_timer: float = 0.0
@@ -33,13 +35,20 @@ func _physics_process(delta: float) -> void:
 	if run == null:
 		_tick_endless(delta)
 		return
-	if run.tick(delta) != WaveRun.NO_CHANGE:
+	if not (hold_break and run.phase == WaveRun.Phase.BREAK) and run.tick(delta) != WaveRun.NO_CHANGE:
 		_on_phase_entered()
 	match run.phase:
 		WaveRun.Phase.WAVE:
 			_tick_wave(delta)
 		WaveRun.Phase.CLEAR:
 			_tick_clear(delta)
+
+
+## Arayı hemen bitirir (mağazadan "sonraki dalga"); bir sonraki karede yeni dalga başlar.
+func skip_break() -> void:
+	hold_break = false
+	if run != null and run.phase == WaveRun.Phase.BREAK:
+		run.phase_left = 0.0
 
 
 ## Debug: süren dalgayı hemen bitirir.

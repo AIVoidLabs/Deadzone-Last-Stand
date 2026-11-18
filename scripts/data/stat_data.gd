@@ -30,11 +30,19 @@ const TABLE: Dictionary = {
 
 
 static func describe(stat: StringName, value: float) -> String:
-	return (TABLE[stat]["format"] as String) % _number(value)
+	return _signed(TABLE[stat]["format"], value)
 
 
 static func short_value(stat: StringName, value: float) -> String:
-	return (TABLE[stat]["short"] as String) % _number(value)
+	return _signed(TABLE[stat]["short"], value)
+
+
+## Eksi değerde baştaki işaret ters çevrilir ("+%s can" → "-5 can", "-%s%% dash" → "+5% dash").
+static func _signed(pattern: String, value: float) -> String:
+	if value >= 0.0:
+		return pattern % _number(value)
+	var flipped: String = ("-" if pattern.begins_with("+") else "+") + pattern.substr(1)
+	return flipped % _number(-value)
 
 
 static func display_name(stat: StringName) -> String:

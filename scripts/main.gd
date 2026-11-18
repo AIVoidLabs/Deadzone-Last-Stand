@@ -57,13 +57,24 @@ func _ready() -> void:
 	hud.setup(player, enemies, director, loot)
 	add_child(hud)
 
+	var level_up: LevelUpFlow = null
 	if Tuning.FEATURE_LEVEL_CARDS:
-		var level_up: LevelUpFlow = LevelUpFlow.new()
+		level_up = LevelUpFlow.new()
 		level_up.loot = loot
 		level_up.stats = player.stats
 		level_up.director = director
 		level_up.pickups = pickups
 		add_child(level_up)
+
+	if Tuning.FEATURE_SHOP and Tuning.FEATURE_WAVES:
+		var shop: ShopFlow = ShopFlow.new()
+		shop.loot = loot
+		shop.stats = player.stats
+		shop.director = director
+		shop.weapons = weapons
+		shop.pickups = pickups
+		shop.level_up = level_up
+		add_child(shop)
 
 	player.died.connect(GameFlow.game_over)
 	Quality.apply_to_viewport(get_viewport())

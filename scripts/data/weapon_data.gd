@@ -16,6 +16,9 @@ const DEFAULTS: Dictionary = {
 const TABLE: Dictionary = {
 	&"pistol": {
 		"id": &"pistol",
+		# Mağaza: görünen ad ve temel kristal fiyatı.
+		"name": "Tabanca",
+		"price": 30,
 		"damage": 10.0,
 		"fire_interval": 0.35,
 		"max_range": 12.0,
@@ -33,6 +36,8 @@ const TABLE: Dictionary = {
 	# Pompalı: yakın menzil, yavaş, saçılan atış ve güçlü itme (saçma başına itme toplanır).
 	&"shotgun": {
 		"id": &"shotgun",
+		"name": "Pompalı",
+		"price": 55,
 		"damage": 7.0,
 		"pellets": 6,
 		"spread_deg": 30.0,
@@ -60,6 +65,13 @@ const TIERS: Array[Dictionary] = [
 	{"damage_mult": 2.2, "rate_mult": 1.25, "tint": Color(0.4, 0.65, 1.0), "glow": 0.5, "scale": 1.14},
 	{"damage_mult": 3.2, "rate_mult": 1.4, "tint": Color(1.0, 0.78, 0.2), "glow": 0.8, "scale": 1.22},
 ]
+
+
+static func ids() -> Array[StringName]:
+	var list: Array[StringName] = []
+	for id: StringName in TABLE:
+		list.append(id)
+	return list
 
 
 static func max_tier() -> int:

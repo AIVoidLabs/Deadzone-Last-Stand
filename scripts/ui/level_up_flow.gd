@@ -31,6 +31,11 @@ func _physics_process(_delta: float) -> void:
 	_show_next()
 
 
+## Kart ekranı açık ya da seçim bekleyen seviye var (mağaza bunu bekler).
+func is_busy() -> bool:
+	return _open or loot.pending_levels > 0
+
+
 func _can_open() -> bool:
 	if GameFlow.state != GameFlow.State.PLAYING:
 		return false

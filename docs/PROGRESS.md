@@ -32,7 +32,7 @@ Oturum 4 sonu (2026-11-17, Taha "bugünlük yeter" dedi). Çalışma ağacı tem
 | 3 | Dikey dilim: asker | ✔ bitti (2026-11-16) |
 | 4 | Dikey dilim: zombi | ✔ bitti (2026-11-16) |
 | 5 | Dikey dilim: silah ve vuruş hissi | ✔ bitti (2026-11-17, dikey dilim onaylandı) |
-| 6 | Tur döngüsü | sürüyor (6.4 test bekliyor, sıradaki 6.5) |
+| 6 | Tur döngüsü | sürüyor (6.4 ve 6.5 test bekliyor, sıradaki 6.6) |
 | 7 | Silah ve zombi çeşitliliği | — |
 | 8 | Arena, atmosfer, ses | — |
 | 9 | Arayüz ve akış | — |
@@ -79,7 +79,7 @@ Bitiş ölçütleri `ROADMAP.md`'de. Biten kutunun yanına tarih ve commit yazı
 - [x] 6.2 Düşenler — 2026-11-17 (`3120d29`, `64c3908`; Taha: "şu an okey") (`Pickups`: tek MultiMesh, dönme shader'da; `PickupRules` + `RunLoot` 8 test; sekerek düşme, 3 m çekim, dalga sonunda hepsi; HUD XP çubuğu + seviye + kristal sayısı; toplama sesi `pickup_1..3`; `FEATURE_PICKUPS`). 105 test
 - [x] 6.3 İstatistikler ve kartlar — 2026-11-17 (`677a86f`; Taha: işlev onaylı, kart görünümü basit → 9.4'te yeniden tasarlanacak) (`StatData` 10 istatistik, `CardData` 4 kademe, `PlayerStats` + `CardRules` 11 test; `LevelUpFlow` dalga arasında kristaller toplanınca açılır, `CardScreen` 3 kart + güncel artışlar; `GameFlow.open_menu`; asker/silah/kristal değerleri istatistikten; F9 +seviye; `FEATURE_LEVEL_CARDS`). 116 test
 - [x] 6.4 Silah yuvaları ve birleştirme — kod bitti 2026-11-18, Taha testi bekliyor (`WeaponMerge` + 9 test: yeni silah kademe 1, aynı silah + aynı kademe kendiliğinden birleşir, zincirleme, en çok 4; 6/6 doluyken birleşemeyen reddedilir. `WeaponData.TIERS` kademe sütunu: hasar ×1/1.5/2.2/3.2, atış hızı ×1/1.12/1.25/1.4. Görünüm: gri → yeşil → mavi → altın renk + ışıma + hafif büyüme. F7 ile dene: ilk F7 pompalı, ikinci tabanca → başlangıç tabancasıyla birleşir; `--tiers=pistol:1,shotgun:3` ile görüntü; `FEATURE_WEAPON_MERGE`). Birleşme animasyonu (Taha isteği, 2026-11-18): silah küçükten yaylanarak oturur + kademe renginde parlar (`WeaponVisual`), genişleyen halka + kıvılcım (`MergeBurst`, sayı kalite profilinden); `FEATURE_MERGE_FX`, `MERGE_FX_TIME`; `--capture-merge=S` ile görüntü. 125 test
-- [ ] 6.5 Mağaza ve eşyalar
+- [x] 6.5 Mağaza ve eşyalar — kod bitti 2026-11-18, Taha testi bekliyor. Taha'nın kararları: raf 4 ürün karışık (silah olasılığı %30), yenileme 5 kristal + her seferinde +2 (dalga başında sıfırlanır), kilit var, 10 eşya (artı + eksi bedel, yığılır), silah alınır (6.4 kurallarıyla birleşir), satılır (kademe bedelinin yarısı, son silah satılamaz). Fiyatlar dalga başına +%15. (`ItemData` 10 eşya, `ShopRules` + 9 test, `ShopFlow` dalga arası kart ekranından sonra açılır ve oyunu durdurur, `ShopScreen` sade görünüm [1–4 al, R yenile, Enter sonraki dalga]; mağaza açılana kadar ara süresi akmaz `SpawnDirector.hold_break`; "sonraki dalga" arayı bitirir; `StatData` eksi değer gösterimi; `FEATURE_SHOP`). Görüntüler: `--crystals=N --capture-wave-end=S --capture-pick [--capture-pick-key=R|Enter]`. 134 test. Fiyat/gelir dengesi 6.6'da
 - [ ] 6.6 Tam tur
 
 ### 7 — Silah ve zombi çeşitliliği

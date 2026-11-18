@@ -37,6 +37,11 @@ func spend(amount: int) -> bool:
 	return true
 
 
+## Satıştan geri ödeme: yalnız para, XP değil.
+func refund(amount: int) -> void:
+	crystals += amount
+
+
 ## Bu seviyedeki ilerleme (0..1).
 func level_progress() -> float:
 	return float(xp) / float(xp_needed(level))

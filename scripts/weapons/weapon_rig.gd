@@ -35,8 +35,7 @@ func count() -> int:
 ## Silahı yuvaya ekler; aynı silah + aynı kademe varsa birleşir (WeaponMerge). Dönüş: kabul edildi mi
 ## (yuvalar doluysa ve birleşemiyorsa false).
 func add_weapon(id: StringName) -> bool:
-	var max_tier: int = WeaponData.max_tier() if Tuning.FEATURE_WEAPON_MERGE else 1
-	var plan: Dictionary = WeaponMerge.add(_slot_list(), id, Tuning.WEAPON_SLOTS, max_tier)
+	var plan: Dictionary = preview_add(id)
 	if not plan["ok"]:
 		return false
 	_apply(plan["slots"], plan["merged"])
@@ -78,7 +77,28 @@ func _create(id: StringName, tier: int, merged: bool) -> Weapon:
 	return weapon
 
 
-func _slot_list() -> Array[Dictionary]:
+## Eklenseydi ne olurdu (WeaponMerge.add sonucu); hiçbir şey değişmez. Mağaza önizlemesi için.
+func preview_add(id: StringName) -> Dictionary:
+	return WeaponMerge.add(slot_list(), id, Tuning.WEAPON_SLOTS, _max_tier())
+
+
+## index'teki silahı çıkarır (mağazada satış). En az bir silah kalmalı; dönüş: çıkarıldı mı.
+func remove_at(index: int) -> bool:
+	if _weapons.size() <= 1 or index < 0 or index >= _weapons.size():
+		return false
+	var slots: Array[Dictionary] = slot_list()
+	slots.remove_at(index)
+	# Birleşme animasyonu oynamasın diye merged=false.
+	_apply(slots)
+	return true
+
+
+func _max_tier() -> int:
+	return WeaponData.max_tier() if Tuning.FEATURE_WEAPON_MERGE else 1
+
+
+## Yuvalardaki silahlar sırayla: [{id, tier}].
+func slot_list() -> Array[Dictionary]:
 	var list: Array[Dictionary] = []
 	for weapon: Weapon in _weapons:
 		list.append({"id": weapon.weapon_id, "tier": weapon.tier})

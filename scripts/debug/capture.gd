@@ -27,6 +27,8 @@ var _kill_lead: float = -1.0
 var _wave_end_lead: float = -1.0
 var _merge_lead: float = -1.0
 var _auto_pick: bool = false
+## --capture-pick-key=Enter gibi: otomatik basılan tuş (varsayılan 1).
+var _pick_key: Key = KEY_1
 var _pick_wait: float = 0.0
 var _time: float = 0.0
 var _angle: float = 0.0
@@ -73,6 +75,10 @@ func _ready() -> void:
 				loot.add(RunLoot.xp_needed(loot.level) - loot.xp)
 		elif arg.begins_with("--wave="):
 			director.start_at.call_deferred(arg.trim_prefix("--wave=").to_int() - 1)
+		elif arg.begins_with("--capture-pick-key="):
+			_pick_key = OS.find_keycode_from_string(arg.trim_prefix("--capture-pick-key=")) as Key
+		elif arg.begins_with("--crystals="):
+			loot.crystals += arg.trim_prefix("--crystals=").to_int()
 		elif arg.begins_with("--capture-merge="):
 			_merge_lead = arg.trim_prefix("--capture-merge=").to_float()
 		elif arg.begins_with("--capture-wave-end="):
@@ -124,6 +130,6 @@ func _tick_auto_pick(delta: float) -> void:
 		return
 	_pick_wait = Tuning.CAPTURE_PICK_DELAY
 	var key: InputEventKey = InputEventKey.new()
-	key.physical_keycode = KEY_1
+	key.physical_keycode = _pick_key
 	key.pressed = true
 	Input.parse_input_event(key)
