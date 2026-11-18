@@ -52,6 +52,24 @@ const TABLE: Dictionary = {
 }
 
 
+## Kademe sütunu (dizin = kademe - 1). damage_mult: hasar çarpanı; rate_mult: atış hızı çarpanı.
+## tint: model rengi çarpanı; glow: kendi ışıma payı; scale: model büyütme çarpanı.
+const TIERS: Array[Dictionary] = [
+	{"damage_mult": 1.0, "rate_mult": 1.0, "tint": Color(1.0, 1.0, 1.0), "glow": 0.0, "scale": 1.0},
+	{"damage_mult": 1.5, "rate_mult": 1.12, "tint": Color(0.45, 1.0, 0.55), "glow": 0.3, "scale": 1.07},
+	{"damage_mult": 2.2, "rate_mult": 1.25, "tint": Color(0.4, 0.65, 1.0), "glow": 0.5, "scale": 1.14},
+	{"damage_mult": 3.2, "rate_mult": 1.4, "tint": Color(1.0, 0.78, 0.2), "glow": 0.8, "scale": 1.22},
+]
+
+
+static func max_tier() -> int:
+	return TIERS.size()
+
+
+static func tier_row(tier: int) -> Dictionary:
+	return TIERS[clampi(tier, 1, TIERS.size()) - 1]
+
+
 ## Satır + eksik alanlar için DEFAULTS.
 static func get_row(id: StringName) -> Dictionary:
 	assert(TABLE.has(id), "Bilinmeyen silah: %s" % id)

@@ -8,7 +8,8 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 Oturum 4 sonu (2026-11-17, Taha "bugünlük yeter" dedi). Çalışma ağacı temiz, push yok.
 
 - **Ana aşama:** 6 — Tur döngüsü
-- **Alt aşama:** 6.1–6.3 bitti. **Sıradaki: 6.4 Silah yuvaları ve birleştirme.**
+- **Güncelleme 2026-11-18 (oturum 5):** 6.4 kodu bitti (Taha'nın kararları: öneriler kabul, kademe görünümü renk + model güncellemesi). Taha testi bekleniyor; sonra 6.5.
+- **Alt aşama:** 6.1–6.3 bitti. **Sıradaki: 6.4 Silah yuvaları ve birleştirme.** (aşağıdaki 6.4 soruları cevaplandı)
 - **Yeni oturum başlangıcı:** ortam kontrolü (CLAUDE.md bölüm 0) → bu bölümü oku → 6.4 için aşağıdaki kararları Taha'ya sor → onaydan sonra kod.
 - **6.4'te Taha'ya sorulacaklar** (kod yazmadan önce):
   1. Silah kademesi neyi artırır? Öneri: hasar ve atış hızı çarpanı (kademe başına), kademe 4 en çok; değerler `WeaponData`'da kademe sütunu.
@@ -31,7 +32,7 @@ Oturum 4 sonu (2026-11-17, Taha "bugünlük yeter" dedi). Çalışma ağacı tem
 | 3 | Dikey dilim: asker | ✔ bitti (2026-11-16) |
 | 4 | Dikey dilim: zombi | ✔ bitti (2026-11-16) |
 | 5 | Dikey dilim: silah ve vuruş hissi | ✔ bitti (2026-11-17, dikey dilim onaylandı) |
-| 6 | Tur döngüsü | sürüyor (6.4) |
+| 6 | Tur döngüsü | sürüyor (6.4 test bekliyor, sıradaki 6.5) |
 | 7 | Silah ve zombi çeşitliliği | — |
 | 8 | Arena, atmosfer, ses | — |
 | 9 | Arayüz ve akış | — |
@@ -77,7 +78,7 @@ Bitiş ölçütleri `ROADMAP.md`'de. Biten kutunun yanına tarih ve commit yazı
 - [x] 6.1 Dalgalar — 2026-11-17 (`2cc7038`; Taha yorum yapmadan "devam" dedi) (`WaveData` 5 dalga, `WaveRun` + 7 test, `SpawnDirector`, ekran dışı doğma `SpawnRules` + 5 test, dalga sayacı ve ortadaki yazılar `WaveBanner`, "HAYATTA KALDIN" ekranı, F8 dalgayı bitir). 97 test
 - [x] 6.2 Düşenler — 2026-11-17 (`3120d29`, `64c3908`; Taha: "şu an okey") (`Pickups`: tek MultiMesh, dönme shader'da; `PickupRules` + `RunLoot` 8 test; sekerek düşme, 3 m çekim, dalga sonunda hepsi; HUD XP çubuğu + seviye + kristal sayısı; toplama sesi `pickup_1..3`; `FEATURE_PICKUPS`). 105 test
 - [x] 6.3 İstatistikler ve kartlar — 2026-11-17 (`677a86f`; Taha: işlev onaylı, kart görünümü basit → 9.4'te yeniden tasarlanacak) (`StatData` 10 istatistik, `CardData` 4 kademe, `PlayerStats` + `CardRules` 11 test; `LevelUpFlow` dalga arasında kristaller toplanınca açılır, `CardScreen` 3 kart + güncel artışlar; `GameFlow.open_menu`; asker/silah/kristal değerleri istatistikten; F9 +seviye; `FEATURE_LEVEL_CARDS`). 116 test
-- [ ] 6.4 Silah yuvaları ve birleştirme
+- [x] 6.4 Silah yuvaları ve birleştirme — kod bitti 2026-11-18, Taha testi bekliyor (`WeaponMerge` + 9 test: yeni silah kademe 1, aynı silah + aynı kademe kendiliğinden birleşir, zincirleme, en çok 4; 6/6 doluyken birleşemeyen reddedilir. `WeaponData.TIERS` kademe sütunu: hasar ×1/1.5/2.2/3.2, atış hızı ×1/1.12/1.25/1.4. Görünüm: gri → yeşil → mavi → altın renk + ışıma + hafif büyüme. F7 ile dene: ilk F7 pompalı, ikinci tabanca → başlangıç tabancasıyla birleşir; `--tiers=pistol:1,shotgun:3` ile görüntü; `FEATURE_WEAPON_MERGE`). 125 test
 - [ ] 6.5 Mağaza ve eşyalar
 - [ ] 6.6 Tam tur
 

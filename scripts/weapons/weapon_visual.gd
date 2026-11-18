@@ -94,10 +94,12 @@ func _build_model() -> void:
 	assert(source != null, "Silah modeli bulunamadı: %s" % _weapon.row["model"])
 	var mesh: MeshInstance3D = MeshInstance3D.new()
 	mesh.mesh = source.mesh
-	mesh.scale = Vector3.ONE * float(_weapon.row["model_scale"])
+	var tier_row: Dictionary = WeaponData.tier_row(_weapon.tier)
+	mesh.scale = Vector3.ONE * float(_weapon.row["model_scale"]) * float(tier_row["scale"])
 	var material: ShaderMaterial = ShaderMaterial.new()
 	material.shader = FLASH_SHADER
-	material.set_shader_parameter(&"albedo", Color.WHITE)
+	material.set_shader_parameter(&"albedo", tier_row["tint"])
+	material.set_shader_parameter(&"glow", tier_row["glow"])
 	var base: BaseMaterial3D = source.mesh.surface_get_material(0) as BaseMaterial3D
 	if base != null:
 		material.set_shader_parameter(&"albedo_texture", base.albedo_texture)

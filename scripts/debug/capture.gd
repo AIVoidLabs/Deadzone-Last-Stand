@@ -59,6 +59,8 @@ func _ready() -> void:
 		elif arg.begins_with("--weapons="):
 			for _i in arg.trim_prefix("--weapons=").to_int() - weapons.count():
 				weapons.add_debug_weapon()
+		elif arg.begins_with("--tiers="):
+			weapons.debug_set_slots(arg.trim_prefix("--tiers="))
 		elif arg == "--god":
 			player.god_mode = true
 		elif arg == "--debug-panel":

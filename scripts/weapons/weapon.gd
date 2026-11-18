@@ -7,6 +7,8 @@ signal fired(direction: Vector2)
 
 var weapon_id: StringName
 var row: Dictionary
+## Birleştirme kademesi (1..WeaponData.max_tier()).
+var tier: int = 1
 var enemies: EnemyManager
 var projectiles: ProjectilePool
 ## XZ düzleminde nişan yönü; hedef yokken askerin baktığı yön.
@@ -14,13 +16,16 @@ var aim: Vector2 = Vector2(0.0, 1.0)
 var has_target: bool = false
 
 var _player: Player
+var _tier_row: Dictionary
 var _cooldown: float = 0.0
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
 
-func setup(id: StringName, player: Player, p_enemies: EnemyManager, p_projectiles: ProjectilePool) -> void:
+func setup(id: StringName, p_tier: int, player: Player, p_enemies: EnemyManager, p_projectiles: ProjectilePool) -> void:
 	weapon_id = id
+	tier = p_tier
 	row = WeaponData.get_row(id)
+	_tier_row = WeaponData.tier_row(tier)
 	_player = player
 	enemies = p_enemies
 	projectiles = p_projectiles
@@ -57,10 +62,10 @@ func tick(delta: float) -> void:
 		return
 	var muzzle: Vector2 = origin + direction * float(row["muzzle_offset"])
 	var pellets: int = row["pellets"]
-	var damage: float = _player.stats.weapon_damage(row["damage"])
+	var damage: float = _player.stats.weapon_damage(float(row["damage"]) * float(_tier_row["damage_mult"]))
 	var spread: float = deg_to_rad(row["spread_deg"])
 	for i: int in pellets:
 		var angle: float = Spread.angle_offset(i, pellets, spread) + Spread.jitter(pellets, spread, row["spread_jitter"], _rng.randf())
 		projectiles.fire(muzzle, direction.rotated(angle), row["projectile_speed"], damage, max_range, row["knockback"])
-	_cooldown = _player.stats.fire_interval(row["fire_interval"])
+	_cooldown = _player.stats.fire_interval(float(row["fire_interval"]) / float(_tier_row["rate_mult"]))
 	fired.emit(direction)
