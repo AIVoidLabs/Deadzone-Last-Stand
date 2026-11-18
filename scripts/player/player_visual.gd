@@ -42,6 +42,7 @@ func _process(delta: float) -> void:
 	rotation.y = lerp_angle(rotation.y, target_yaw, 1.0 - exp(-Tuning.PLAYER_TURN_SHARPNESS * delta))
 	_update_lean(yaw_error, delta)
 	_update_locomotion(delta)
+	_update_struggle_shake()
 	if _blink_left > 0.0:
 		_blink_left -= delta
 		var on: bool = fmod(_blink_left * Tuning.PLAYER_BLINK_RATE, 2.0) > 1.0
@@ -54,6 +55,14 @@ func _on_event(event_name: StringName, data: Dictionary) -> void:
 		return
 	if event_name == &"dash_ended":
 		_set_dust(false)
+		return
+	if event_name == &"rooted":
+		if _animator != null:
+			_animator.play_struggle()
+		return
+	if event_name == &"released":
+		if _animator != null:
+			_animator.play_break_free()
 		return
 	if event_name != &"hit":
 		return
@@ -87,6 +96,14 @@ func _on_dash_started() -> void:
 func _set_dust(emitting: bool) -> void:
 	if _dust != null:
 		_dust.emitting = emitting
+
+
+## Bağlıyken gövde hızlıca titrer (çırpınma); serbestken yerine döner.
+func _update_struggle_shake() -> void:
+	var t: float = Time.get_ticks_msec() * 0.001
+	var strength: float = Tuning.PLAYER_STRUGGLE_SHAKE if _player.is_rooted() else 0.0
+	_pivot.position.x = sin(t * Tuning.PLAYER_STRUGGLE_RATE) * strength
+	_pivot.position.z = cos(t * Tuning.PLAYER_STRUGGLE_RATE * 0.83) * strength * 0.6
 
 
 func _update_locomotion(delta: float) -> void:

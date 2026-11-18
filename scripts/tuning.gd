@@ -31,6 +31,20 @@ const FEATURE_ZOMBIE_MODEL: bool = true
 const FEATURE_ZOMBIE_WINDUP_ATTACK: bool = true
 ## Dalgalarda koşucu ve tank da çıkar; kapalıyken yalnız yürüyen zombi (7.2).
 const FEATURE_ZOMBIE_VARIETY: bool = true
+## Dilci askeri bağlayabilir (hareket ve dash kilidi); kapalıyken dil yalnız görsel.
+const FEATURE_ROOT: bool = true
+## Zıplayan sıçrayıp işaretli yere iner; kapalıyken yürüyen gibi yaklaşıp vurur (7.3).
+const FEATURE_ZOMBIE_JUMP: bool = true
+## Dilci dilini atıp askeri bağlar; kapalıyken yürüyen gibi yaklaşıp vurur (7.3).
+const FEATURE_ZOMBIE_TONGUE: bool = true
+## Dil ıskalayınca ekranda kalma süresi (sn) ve bağlıyken dilin askerde bittiği yükseklik (m).
+const TONGUE_MISS_SHOW_TIME: float = 0.25
+const TONGUE_PLAYER_HEIGHT: float = 1.1
+## Bağlıyken asker titremesi: genlik (m) ve hız (rad/sn).
+const PLAYER_STRUGGLE_SHAKE: float = 0.05
+const PLAYER_STRUGGLE_RATE: float = 60.0
+## Zıplayanın inişinde kamera sarsıntısı.
+const CAMERA_SHAKE_ON_LAND: float = 0.25
 ## Koşucu hazırlanıp atılır; kapalıyken koşucu yürüyen gibi yaklaşıp vurur.
 const FEATURE_ZOMBIE_LUNGE: bool = true
 ## Zombiler yerden doğrularak doğar; kapalıyken doğrudan yürümeye başlar.

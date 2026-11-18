@@ -108,11 +108,12 @@ SCHEMES: list = WALKER_SCHEMES
 def variant(name: str, **overrides) -> dict:
     """Gövde çeşidi. Ölçüler çarpan. arm_cut: dirsekten kopuk kol (+1 sol, -1 sağ, 0 yok).
     sleeve: kol giysisi (0 kolsuz, 1 bileğe kadar). pants_end: paça (0 bilek, 1 diz).
-    headgear: None, "hair", "long_hair", "mohawk", "cap", "hood". pads: omuz zırhı + göğüs plakası (tank)."""
+    headgear: None, "hair", "long_hair", "mohawk", "cap", "hood". pads: omuz zırhı + göğüs plakası (tank).
+    legs: bacak kalınlığı çarpanı (zıplayan: güçlü uyluklar). jaw: iri çene, açık ağız ve sarkan dil (dilci)."""
     row: dict = {
         "name": name, "torso": 1.0, "belly": 1.0, "limb": 1.0, "head": 1.25, "arm_cut": 0, "sleeve": 0.5,
         "pants_end": 0.2, "bare_chest": False, "bloody_top": False, "headgear": None, "skirt": False,
-        "barefoot": False, "head_wound": False, "pads": False,
+        "barefoot": False, "head_wound": False, "pads": False, "legs": 1.0, "jaw": False,
     }
     row.update(overrides)
     return row
@@ -146,6 +147,48 @@ RUNNER_VARIANTS: list = [
             bare_chest=True, head_wound=True, headgear="cap"),
 ]
 
+# Zıplayan: dar gövde, güçlü uyluk ve baldır (sıçrama gücü), uzun ve çevik; turuncu-sarı-camgöbeği tonları.
+JUMPER_VARIANTS: list = [
+    variant("Variant_A", torso=0.84, belly=0.78, limb=0.85, legs=1.4, head=1.15, sleeve=0.0, pants_end=0.55,
+            bare_chest=True, barefoot=True, headgear="hair"),
+    variant("Variant_B", torso=0.86, belly=0.8, limb=0.85, legs=1.35, head=1.15, sleeve=0.2, pants_end=0.3,
+            bloody_top=True, headgear="mohawk"),
+    variant("Variant_C", torso=0.88, belly=0.85, limb=0.88, legs=1.35, head=1.18, sleeve=0.0, pants_end=0.25,
+            headgear="cap"),
+    variant("Variant_D", torso=0.84, belly=0.78, limb=0.84, legs=1.45, head=1.15, arm_cut=1, sleeve=0.0,
+            pants_end=0.6, bare_chest=True, head_wound=True),
+]
+
+JUMPER_SCHEMES: list = [
+    ((0.62, 0.56, 0.42), (0.90, 0.58, 0.12), (0.14, 0.16, 0.22), (0.10, 0.10, 0.10), (0.20, 0.14, 0.08), EYE_YELLOW),
+    ((0.56, 0.62, 0.50), (0.14, 0.62, 0.62), (0.18, 0.16, 0.14), (0.90, 0.88, 0.80), (0.10, 0.10, 0.10), EYE_YELLOW),
+    ((0.66, 0.56, 0.48), (0.92, 0.82, 0.20), (0.20, 0.22, 0.30), (0.12, 0.10, 0.10), (0.30, 0.20, 0.10), EYE_RED),
+    ((0.52, 0.58, 0.60), (0.80, 0.30, 0.10), (0.12, 0.12, 0.14), (0.82, 0.80, 0.76), (0.08, 0.08, 0.10), EYE_PALE),
+    ((0.60, 0.52, 0.50), (0.30, 0.70, 0.30), (0.24, 0.18, 0.14), (0.10, 0.09, 0.08), (0.14, 0.10, 0.06), EYE_YELLOW),
+    ((0.68, 0.64, 0.56), (0.62, 0.20, 0.50), (0.14, 0.14, 0.18), (0.12, 0.12, 0.12), (0.06, 0.06, 0.06), EYE_RED),
+]
+
+# Dilci: iri kafa ve açık çene, ince gövde; soluk pembe-mor ve çürük tonlar (dil parlak kırmızı).
+TONGUE_VARIANTS: list = [
+    variant("Variant_A", torso=0.82, belly=0.7, limb=0.85, head=1.6, sleeve=0.0, pants_end=0.3, bare_chest=True,
+            jaw=True),
+    variant("Variant_B", torso=0.86, belly=0.8, limb=0.88, head=1.55, sleeve=0.4, pants_end=0.2, bloody_top=True,
+            headgear="cap", jaw=True),
+    variant("Variant_C", torso=0.8, belly=0.7, limb=0.82, head=1.62, sleeve=1.0, pants_end=0.1, headgear="hood",
+            jaw=True),
+    variant("Variant_D", torso=0.84, belly=0.75, limb=0.86, head=1.58, arm_cut=-1, sleeve=0.0, pants_end=0.5,
+            bare_chest=True, head_wound=True, jaw=True),
+]
+
+TONGUE_SCHEMES: list = [
+    ((0.62, 0.50, 0.56), (0.30, 0.22, 0.32), (0.16, 0.14, 0.18), (0.10, 0.08, 0.10), (0.10, 0.08, 0.10), EYE_PALE),
+    ((0.56, 0.54, 0.50), (0.46, 0.26, 0.30), (0.20, 0.18, 0.16), (0.10, 0.09, 0.08), (0.14, 0.10, 0.08), EYE_YELLOW),
+    ((0.52, 0.48, 0.58), (0.20, 0.30, 0.34), (0.14, 0.16, 0.20), (0.08, 0.08, 0.10), (0.20, 0.18, 0.24), EYE_PALE),
+    ((0.64, 0.54, 0.50), (0.36, 0.34, 0.22), (0.22, 0.18, 0.14), (0.12, 0.10, 0.08), (0.08, 0.06, 0.06), EYE_RED),
+    ((0.48, 0.52, 0.46), (0.40, 0.18, 0.40), (0.12, 0.12, 0.14), (0.08, 0.08, 0.08), (0.06, 0.06, 0.06), EYE_YELLOW),
+    ((0.58, 0.56, 0.62), (0.24, 0.24, 0.28), (0.34, 0.20, 0.20), (0.10, 0.10, 0.12), (0.30, 0.26, 0.34), EYE_PALE),
+]
+
 # Tank: geniş gövde, kalın uzuvlar, küçük baş; omuz zırhı ve göğüs plakası siluetini ayırır.
 TANK_VARIANTS: list = [
     variant("Variant_A", torso=1.42, belly=1.2, limb=1.4, head=0.95, sleeve=0.5, pants_end=0.15, bloody_top=True,
@@ -162,6 +205,8 @@ SETS: dict = {
     "walker": {"variants": WALKER_VARIANTS, "schemes": WALKER_SCHEMES},
     "runner": {"variants": RUNNER_VARIANTS, "schemes": RUNNER_SCHEMES},
     "tank": {"variants": TANK_VARIANTS, "schemes": TANK_SCHEMES},
+    "jumper": {"variants": JUMPER_VARIANTS, "schemes": JUMPER_SCHEMES},
+    "tongue": {"variants": TONGUE_VARIANTS, "schemes": TONGUE_SCHEMES},
 }
 
 
@@ -336,6 +381,10 @@ def build_head(body: Body, v: dict) -> None:
     for side in (1.0, -1.0):
         body.box((side * 0.043 * s, front, HEAD_Z + 0.135 * s), (0.02 * s, 0.012, 0.016 * s), "eye", head)
     body.box((0.0, front + 0.004, HEAD_Z + 0.055 * s), (0.04 * s, 0.014, 0.018 * s), "mouth", head)
+    if v["jaw"]:
+        # Açık ağız (koyu) ve sarkan dil: ağız büyük, dil önde aşağı uzanır.
+        body.box((0.0, front + 0.006, HEAD_Z + 0.045 * s), (0.062 * s, 0.016, 0.04 * s), "mouth", head)
+        body.box((0.0, front - 0.012, HEAD_Z + 0.02 * s), (0.026 * s, 0.014, 0.075 * s), "blood", head)
     if gear in ("hair", "long_hair"):
         body.box((0.0, y + 0.065 * s, HEAD_Z + 0.15 * s), (0.098 * s, 0.05 * s, 0.085 * s), "hair", head)
     if gear == "long_hair":
@@ -396,7 +445,7 @@ def build_arm(body: Body, v: dict, side: float) -> None:
 def build_leg(body: Body, v: dict, side: float) -> None:
     suffix: str = "_l" if side > 0.0 else "_r"
     thigh, calf, foot, ball = "thigh" + suffix, "calf" + suffix, "foot" + suffix, "ball" + suffix
-    thick: float = v["limb"]
+    thick: float = v["limb"] * v["legs"]
     x: float = side * HIP_X * (1.0 + 0.25 * (v["torso"] - 1.0))
     # Paçanın bittiği yükseklik (bilek ile diz arası oran).
     pants_z: float = ANKLE_Z + (KNEE_Z - ANKLE_Z) * v["pants_end"]

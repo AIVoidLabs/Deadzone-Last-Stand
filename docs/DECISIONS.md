@@ -11,6 +11,11 @@ Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar v
 - **Asker animasyonları (Taha: önemli):** bağlanınca **çırpınma** animasyonu, bırakılınca **kollarını açarak bağdan kurtulma** animasyonuna geçer. Bunlar için ortak kütüphanede uygun klip yoksa Blender'da/koddan türetilir (`ZombieClipData` yöntemi gibi).
 - Gereken parçalar: oyuncuya "bağlı" durumu (saf kural + test), dil görseli (ince uzayan çizgi ağı), iki yeni zombi modeli (Blender), `FEATURE_ZOMBIE_JUMP`, `FEATURE_ZOMBIE_TONGUE`.
 
+## 2026-11-18 — Zıplayan ve dilci onaylandı, kodlandı (Taha)
+
+- Tasarım onayı: kaçışlar zorlayıcı, dilci bağlayınca dash yok, bağ 1 sn, çırpınma ve kollarını açarak kurtulma animasyonları. Zıplayan sıçrama hissi veriyor (yay, yer halkası, iniş şoku). Taha "şimdi başlamak zorunda değilsin" dedi, sonra "kaldığımız yerden devam" ile başlandı.
+- Bot dengesi sert: dilci dili ışın gibi anında vurduğu için radyal kaçış işe yaramaz, yalnız yan kaçış ve dash kurtarır (bilinçli). Gerekirse dalga ağırlıkları ya da dilci bekleme süresi gevşetilir.
+
 ## 2026-11-18 — Aşama 7.2 koşucu ve tank (Taha)
 
 - İlk tür seti koşucu + tank (Taha onayladı; zıplayan ve sürünen sonra). Koşucu atılışı rastgele değil: hazırlıkta oyuncunun hızına göre önden nişan (`LungeRules`), son 0.22 sn yön kilitli, atılırken sınırlı dönüşle izler; kaçmak kolay olmamalı. Dash ve hız önemli: yeni istatistik `dash_mesafesi`, kart/eşya (`Atılış Bobini`, `Hafif Çizme`), hareket hızı kartları ×1.33, dash bekleme kartları büyüdü. Blender'da ek rötuş serbest.

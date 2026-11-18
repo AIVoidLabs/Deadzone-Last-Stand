@@ -50,6 +50,10 @@ func _ready() -> void:
 		weapons.weapon_fired.connect(func(row: Dictionary) -> void:
 			camera.add_trauma(row["fire_shake"]))
 	_add_hit_feedback(enemies, camera)
+	enemies.jump_landed.connect(func(at: Vector3, radius: float) -> void:
+		LandingFx.play(self, at, radius)
+		camera.add_trauma(Tuning.CAMERA_SHAKE_ON_LAND)
+		Audio.play(&"explosion"))
 	projectiles.explosion.connect(func(_at: Vector3, _radius: float) -> void:
 		camera.add_trauma(Tuning.CAMERA_SHAKE_ON_EXPLOSION))
 	_add_sounds(player, enemies, weapons, projectiles)

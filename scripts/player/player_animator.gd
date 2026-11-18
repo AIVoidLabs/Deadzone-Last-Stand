@@ -1,7 +1,8 @@
 class_name PlayerAnimator
 extends RefCounted
 ## Askerin animasyon ağacını kodla kurar ve sürer:
-## bekleme<->koşu harmanı -> koşu hızı -> vurulma (yalnız üst gövde) -> takla -> hayatta/ölü.
+## bekleme<->koşu harmanı -> koşu hızı -> vurulma (yalnız üst gövde) -> takla -> çırpınma (bağlıyken) ->
+## kurtulma (bağ çözülünce) -> hayatta/ölü.
 
 const LIBRARY_NAME: StringName = &"ual1"
 const LIBRARY: AnimationLibrary = preload("res://assets/models/anim/ual1.glb")
@@ -11,6 +12,9 @@ const CLIP_HIT: StringName = &"ual1/Hit_Chest"
 const CLIP_ROLL: StringName = &"ual1/Roll"
 const CLIP_DEATH: StringName = &"ual1/Death01"
 const SKELETON_PATH: String = "%GeneralSkeleton"
+## Çırpınma döngüsünün hızı ve kurtulma klibinin süresi (sn).
+const STRUGGLE_SPEED: float = 1.8
+const BREAK_FREE_TIME: float = 0.5
 ## Vurulma klibi yalnız bu kemikleri oynatır; bacaklar koşmayı sürdürür.
 const UPPER_BODY: Array[String] = [
 	"Spine", "Chest", "UpperChest", "Neck", "Head",
@@ -28,9 +32,14 @@ func _init(model: Node3D) -> void:
 	_tree = AnimationTree.new()
 	_tree.name = "AnimationTree"
 	_tree.add_animation_library(LIBRARY_NAME, LIBRARY)
+	var skeleton: Skeleton3D = model.find_child("GeneralSkeleton", true, false) as Skeleton3D
+	var extra: AnimationLibrary = PlayerClipData.library(skeleton)
+	_tree.add_animation_library(PlayerClipData.LIBRARY_NAME, extra)
 	_tree.tree_root = _build_graph()
 	model.add_child(_tree)
 	_tree.active = true
+	_tree.set(&"parameters/struggle_scale/scale", STRUGGLE_SPEED)
+	_tree.set(&"parameters/free_scale/scale", extra.get_animation(&"break_free").length / BREAK_FREE_TIME)
 	# Geçiş düğümü kendiliğinden bir girişle başlamaz; ilk durumu açıkça iste.
 	set_dead(false)
 
@@ -47,6 +56,17 @@ func play_hit() -> void:
 
 func play_roll() -> void:
 	_tree.set(&"parameters/roll/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_FIRE)
+
+
+## Dilciyle bağlanınca: çırpınma döngüsü başlar.
+func play_struggle() -> void:
+	_tree.set(&"parameters/struggle/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_FIRE)
+
+
+## Bağ çözülünce: çırpınma biter, kollar açılarak kurtulma klibi bir kez oynar.
+func play_break_free() -> void:
+	_tree.set(&"parameters/struggle/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_ABORT)
+	_tree.set(&"parameters/free/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_FIRE)
 
 
 func set_dead(dead: bool) -> void:
@@ -81,13 +101,27 @@ func _build_graph() -> AnimationNodeBlendTree:
 	graph.connect_node(&"roll", 0, &"hit")
 	graph.connect_node(&"roll", 1, &"roll_scale")
 
+	graph.add_node(&"struggle_clip", _clip(PlayerClipData.full_name(&"struggle")))
+	graph.add_node(&"struggle_scale", AnimationNodeTimeScale.new())
+	graph.connect_node(&"struggle_scale", 0, &"struggle_clip")
+	graph.add_node(&"struggle", _one_shot(Tuning.PLAYER_ANIM_BLEND))
+	graph.connect_node(&"struggle", 0, &"roll")
+	graph.connect_node(&"struggle", 1, &"struggle_scale")
+
+	graph.add_node(&"free_clip", _clip(PlayerClipData.full_name(&"break_free")))
+	graph.add_node(&"free_scale", AnimationNodeTimeScale.new())
+	graph.connect_node(&"free_scale", 0, &"free_clip")
+	graph.add_node(&"free", _one_shot(Tuning.PLAYER_ANIM_BLEND))
+	graph.connect_node(&"free", 0, &"struggle")
+	graph.connect_node(&"free", 1, &"free_scale")
+
 	var life: AnimationNodeTransition = AnimationNodeTransition.new()
 	life.xfade_time = Tuning.PLAYER_ANIM_BLEND
 	life.add_input(LIFE_ALIVE)
 	life.add_input(LIFE_DEAD)
 	graph.add_node(&"death_clip", _clip(CLIP_DEATH))
 	graph.add_node(&"life", life)
-	graph.connect_node(&"life", 0, &"roll")
+	graph.connect_node(&"life", 0, &"free")
 	graph.connect_node(&"life", 1, &"death_clip")
 	graph.connect_node(&"output", 0, &"life")
 	return graph

@@ -57,6 +57,26 @@ const TABLE: Dictionary = {
 		"LeftUpperArm": Vector3(-110.0, 0.0, 0.0),
 		"RightUpperArm": Vector3(-110.0, 0.0, 0.0),
 	}},
+	# Zıplayan havada: kollar yukarı, gövde hafif geride, bacaklar toplu (yükselirken okunur duruş).
+	&"leap": {"source": &"ual1/Sprint", "offsets": {
+		"Spine": Vector3(-8.0, 0.0, 0.0),
+		"Chest": Vector3(-6.0, 0.0, 0.0),
+		"Head": Vector3(-10.0, 0.0, 0.0),
+		"LeftUpperArm": Vector3(-160.0, 0.0, 12.0),
+		"RightUpperArm": Vector3(-160.0, 0.0, -12.0),
+		"LeftUpperLeg": Vector3(-45.0, 0.0, 0.0),
+		"RightUpperLeg": Vector3(-30.0, 0.0, 0.0),
+		"LeftLowerLeg": Vector3(60.0, 0.0, 0.0),
+		"RightLowerLeg": Vector3(40.0, 0.0, 0.0),
+	}},
+	# Dilci hazırlığı: baş geride, çene açık duruş, kollar yanda.
+	&"tongue_windup": {"source": &"ual2/Zombie_Idle", "offsets": {
+		"Spine": Vector3(-10.0, 0.0, 0.0),
+		"Chest": Vector3(-10.0, 0.0, 0.0),
+		"Head": Vector3(-38.0, 0.0, 0.0),
+		"LeftUpperArm": Vector3(0.0, 0.0, 25.0),
+		"RightUpperArm": Vector3(0.0, 0.0, -25.0),
+	}},
 	# Tank yürüyüşü: gövde daha dik, kollar iri gövdeden açık (kambur yürüyüşün düzeltilmişi).
 	&"tank_walk_a": {"source": &"ual2/Zombie_Walk_Fwd", "offsets": {
 		"Spine": Vector3(-30.0, 0.0, 0.0),

@@ -16,11 +16,22 @@ func test_attack_cycle_returns_to_chase() -> void:
 
 
 func test_lunge_cycle() -> void:
-	assert_eq(ZombieRules.after_timer(S.WINDUP, true), S.LUNGE)
-	assert_eq(ZombieRules.after_timer(S.LUNGE, true), S.RECOVER)
+	assert_eq(ZombieRules.after_timer(S.WINDUP, S.LUNGE), S.LUNGE)
+	assert_eq(ZombieRules.after_timer(S.LUNGE), S.RECOVER)
 	assert_false(ZombieRules.can_stagger(S.LUNGE))
 	assert_true(ZombieRules.can_take_damage(S.LUNGE))
 	assert_true(ZombieRules.is_timed(S.LUNGE))
+
+
+func test_jump_and_lash_cycles() -> void:
+	assert_eq(ZombieRules.after_timer(S.WINDUP, S.JUMP), S.JUMP)
+	assert_eq(ZombieRules.after_timer(S.JUMP), S.RECOVER)
+	assert_eq(ZombieRules.after_timer(S.WINDUP, S.LASH), S.LASH)
+	assert_eq(ZombieRules.after_timer(S.LASH), S.RECOVER)
+	assert_false(ZombieRules.can_take_damage(S.JUMP), "havadaki vurulamaz")
+	assert_true(ZombieRules.can_take_damage(S.LASH))
+	assert_false(ZombieRules.can_stagger(S.JUMP))
+	assert_false(ZombieRules.can_stagger(S.LASH))
 
 
 func test_runner_lunge_is_fair_but_not_trivial() -> void:

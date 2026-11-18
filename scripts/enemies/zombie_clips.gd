@@ -25,6 +25,11 @@ static func library(skeleton: Skeleton3D) -> AnimationLibrary:
 	return _library
 
 
+## Tablo satırından klip türetir (asker klipleri de aynı yöntemi kullanır).
+static func derive(row: Dictionary, skeleton: Skeleton3D) -> Animation:
+	return _derive(row, skeleton)
+
+
 static func _derive(row: Dictionary, skeleton: Skeleton3D) -> Animation:
 	var parts: PackedStringArray = String(row["source"]).split("/")
 	var source: Animation = (SOURCES[StringName(parts[0])] as AnimationLibrary).get_animation(StringName(parts[1]))

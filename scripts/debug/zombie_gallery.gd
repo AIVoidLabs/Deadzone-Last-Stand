@@ -65,12 +65,12 @@ func _scene(kind: StringName) -> PackedScene:
 	return ZombieVisual.MODELS[kind]
 
 
-## Üç tür yan yana: oyundaki gerçek boy oranları ve yürüyüş / koşu klipleri.
+## Tüm türler yan yana: oyundaki gerçek boy oranları ve yürüyüş / koşu klipleri.
 func _add_lineup() -> void:
-	var kinds: Array = [&"walker", &"runner", &"tank"]
+	var kinds: Array = [&"walker", &"runner", &"jumper", &"tongue", &"tank"]
 	for k: int in kinds.size():
-		for i: int in 3:
-			var at: Vector3 = Vector3((k * 3 + i - 4.0) * 1.6, 0.0, 0.0)
+		for i: int in 2:
+			var at: Vector3 = Vector3((k * 2 + i - 4.5) * 1.7, 0.0, 0.0)
 			var row: Dictionary = EnemyData.get_row(kinds[k])
 			_add_zombie(kinds[k], i, i + k, at, 20.0, (row["anim_walk"] as Array)[0])
 

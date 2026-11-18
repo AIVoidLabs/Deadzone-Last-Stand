@@ -2,17 +2,20 @@ class_name ZombieRules
 extends RefCounted
 ## Zombi durum makinesinin saf kuralları. Süreler ve menziller veri tablosundan parametreyle gelir.
 ## Akış: SPAWN -> CHASE -> WINDUP -> (vuruş) -> RECOVER -> CHASE; STAGGER araya girer; DYING son.
-## Atılan türlerde (koşucu): WINDUP -> LUNGE -> RECOVER; atılırken sendeleme olmaz (kararlı atılış).
+## Atılan türlerde (koşucu): WINDUP -> LUNGE -> RECOVER; zıplayanda WINDUP -> JUMP (havada) -> RECOVER;
+## dilcide WINDUP -> LASH (dil bağda) -> RECOVER. Bu durumlarda sendeleme olmaz (kararlı saldırı);
+## havadaki zombi hasar da almaz.
 
-enum State { INACTIVE, SPAWN, CHASE, WINDUP, RECOVER, STAGGER, DYING, LUNGE }
+enum State { INACTIVE, SPAWN, CHASE, WINDUP, RECOVER, STAGGER, DYING, LUNGE, JUMP, LASH }
 
 
-## Süreli bir durumun süresi dolunca geçilecek durum. lunges: tür atılıyorsa hazırlık atılışa döner.
-static func after_timer(state: State, lunges: bool = false) -> State:
+## Süreli bir durumun süresi dolunca geçilecek durum. windup_next: hazırlıktan sonra gelen durum
+## (yürüyende RECOVER, koşucuda LUNGE, zıplayanda JUMP, dilcide LASH).
+static func after_timer(state: State, windup_next: State = State.RECOVER) -> State:
 	match state:
 		State.WINDUP:
-			return State.LUNGE if lunges else State.RECOVER
-		State.LUNGE:
+			return windup_next
+		State.LUNGE, State.JUMP, State.LASH:
 			return State.RECOVER
 		State.DYING, State.INACTIVE:
 			return State.INACTIVE
@@ -30,7 +33,7 @@ static func is_timed(state: State) -> bool:
 
 
 static func can_take_damage(state: State) -> bool:
-	return state != State.INACTIVE and state != State.DYING
+	return state != State.INACTIVE and state != State.DYING and state != State.JUMP
 
 
 ## Vuruşun hazırlığı sendelemeyle bozulur; doğarken ve ölürken sendeleme olmaz.

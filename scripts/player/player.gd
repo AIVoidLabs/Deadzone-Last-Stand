@@ -25,6 +25,9 @@ var _dash_direction: Vector2 = Vector2.ZERO
 var _dash_requested: bool = false
 ## Vurulunca aldığı itme hızı (XZ); kendiliğinden söner.
 var _knock: Vector2 = Vector2.ZERO
+## Dilciyle bağlıyken kalan süre (sn): hareket ve dash yok, silahlar çalışır.
+var _root_left: float = 0.0
+var _rooted: bool = false
 
 
 func _init() -> void:
@@ -50,6 +53,11 @@ func _physics_process(delta: float) -> void:
 	_iframes_left = maxf(0.0, _iframes_left - delta)
 	health.heal(stats.regen_per_second() * delta)
 	var input: Vector2 = _read_input()
+	if _rooted:
+		_root_left -= delta
+		input = Vector2.ZERO
+		if _root_left <= 0.0:
+			release_root()
 	if dash.tick(delta):
 		_end_dash()
 	if _wants_dash():
@@ -108,14 +116,39 @@ func take_hit(amount: float, push: Vector2 = Vector2.ZERO) -> void:
 		_iframes_left = Tuning.PLAYER_HIT_IFRAMES
 	event.emit(&"hit", {"amount": dealt, "hp": health.current, "iframes": _iframes_left})
 	if health.is_dead():
+		_rooted = false
 		_set_state(State.DEAD)
 		died.emit()
+
+
+## Dilci askeri duration sn bağlar. Dash ya da dokunulmazlık payı sırasında tutmaz.
+func root(duration: float) -> void:
+	if not is_exposed() or not Tuning.FEATURE_ROOT:
+		return
+	_root_left = duration
+	_rooted = true
+	velocity = Vector3.ZERO
+	_knock = Vector2.ZERO
+	event.emit(&"rooted", {"duration": duration})
+
+
+## Bağ çözülür (süre doldu ya da dilci öldü).
+func release_root() -> void:
+	if not _rooted:
+		return
+	_rooted = false
+	_root_left = 0.0
+	event.emit(&"released", {})
+
+
+func is_rooted() -> bool:
+	return _rooted
 
 
 func _wants_dash() -> bool:
 	var wanted: bool = _dash_requested or (not use_input_override and Input.is_action_just_pressed(&"dash"))
 	_dash_requested = false
-	return wanted and Tuning.FEATURE_DASH
+	return wanted and Tuning.FEATURE_DASH and not _rooted
 
 
 func _try_start_dash(input: Vector2) -> void:

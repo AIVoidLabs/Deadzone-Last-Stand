@@ -1,11 +1,14 @@
 class_name EnemyData
 extends RefCounted
 ## Zombi türleri tablosu. Yeni tür = yeni satır (eksik alanlar yürüyen zombiden gelir).
-## attack_kind: &"melee" (yaklaşıp vurur) ya da &"lunge" (uzaktan hazırlanıp atılır; lunge_* alanları).
+## attack_kind: &"melee" (yaklaşıp vurur), &"lunge" (hazırlanıp düz atılır; lunge_*), &"jump" (havaya sıçrayıp
+## işaretli yere iner; jump_*, land_radius), &"tongue" (uzaktan dil atıp askeri bağlar; tongue_*, root_time).
 
 const WALKER: StringName = &"walker"
 const RUNNER: StringName = &"runner"
 const TANK: StringName = &"tank"
+const JUMPER: StringName = &"jumper"
+const TONGUE: StringName = &"tongue"
 
 const _WALKER_ROW: Dictionary = {
 	"id": &"walker",
@@ -36,12 +39,69 @@ const _WALKER_ROW: Dictionary = {
 	"anim_walk": [&"walk_a", &"walk_b", &"walk_c"],
 	"anim_attack": [&"attack"],
 	"anim_lunge": [],
+	"anim_air": [],
 	"anim_stagger": [&"stagger"],
 	"anim_death": [&"death_a", &"death_b", &"death_c"],
 	"anim_spawn": [&"spawn"],
 }
 
 const _OVERRIDES: Dictionary = {
+	# Zıplayan: askere 7 m kala çömelir, yerde işaret çıkar (ilk 0.4 sn askeri önden izler, son 0.3 sn kilitli),
+	# yay çizerek havalanıp işaretli yere iner. Havadayken vurulamaz. İniş: alan hasarı (land_radius).
+	# Kurtulmak: halkadan çıkmak ya da dash dokunulmazlığı. İnişten sonra jump'ın toparlanması zayıf nokta.
+	&"jumper": {
+		"id": &"jumper",
+		"model": &"jumper",
+		"max_hp": 40.0,
+		"speed": 3.0,
+		"contact_damage": 14.0,
+		"radius": 0.42,
+		"attack_kind": &"jump",
+		"jump_range": 7.0,
+		"attack_windup": 0.7,
+		"attack_recover": 1.6,
+		"jump_time": 0.9,
+		"jump_height": 3.5,
+		"jump_lock_time": 0.3,
+		"jump_lead": 0.9,
+		"jump_max_range": 9.0,
+		"land_radius": 1.5,
+		"attack_anim_hit_time": 0.0,
+		"prewarm": 12,
+		"drop_value": 6,
+		"weight": 0.9,
+		"stagger_time": 0.2,
+		"height": 1.75,
+		"color": Color(0.85, 0.6, 0.2),
+		"anim_attack": [&"pounce_windup"],
+		"anim_air": [&"leap"],
+	},
+	# Dilci: uzakta (tongue_range) durup 0.8 sn hazırlanır (son 0.3 sn yön kilitli), dilini fırlatır. İsabet ederse
+	# asker root_time sn bağlanır (hareket ve dash yok, silahlar çalışır); dilci ölürse bağ çözülür.
+	&"tongue": {
+		"id": &"tongue",
+		"model": &"tongue",
+		"max_hp": 35.0,
+		"speed": 2.4,
+		"contact_damage": 6.0,
+		"radius": 0.42,
+		"attack_kind": &"tongue",
+		"tongue_range": 7.5,
+		"attack_windup": 0.8,
+		"tongue_lock_time": 0.3,
+		"tongue_hit_radius": 0.35,
+		"root_time": 1.0,
+		"attack_recover": 5.0,
+		"tongue_miss_recover": 2.0,
+		"attack_anim_hit_time": 0.0,
+		"prewarm": 8,
+		"drop_value": 8,
+		"weight": 1.0,
+		"stagger_time": 0.22,
+		"height": 1.7,
+		"color": Color(0.7, 0.35, 0.5),
+		"anim_attack": [&"tongue_windup"],
+	},
 	# Koşucu: zayıf ama hızlı. Yaklaşınca çömelip (belirgin hazırlık) askerin gideceği yere atılır.
 	# Atılış: hazırlığın başında oyuncunun hızını önceden hesaplar (lead), son lunge_lock_time saniyede yönü kilitler,
 	# atılırken lunge_turn_rate (rad/sn) ile hafifçe izler. Dash dokunulmazlığı ve zamanlı yan kaçış ıskalatır.
@@ -117,3 +177,16 @@ static func get_row(id: StringName) -> Dictionary:
 
 static func lunges(row: Dictionary) -> bool:
 	return row["attack_kind"] == &"lunge"
+
+
+static func jumps(row: Dictionary) -> bool:
+	return row["attack_kind"] == &"jump"
+
+
+static func tongues(row: Dictionary) -> bool:
+	return row["attack_kind"] == &"tongue"
+
+
+## Yürüyenden farklı saldırı düzeni var mı (hazırlıkta duruşu tutar, saldırı manager'da özel).
+static func is_special(row: Dictionary) -> bool:
+	return row["attack_kind"] != &"melee"

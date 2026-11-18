@@ -9,6 +9,8 @@ extends Node
 ## --levels=N: N seviye atlatır (kart seçimi dalga arasında açılır). --capture-pick: açılan kart ekranında 1'e basar. --wave=N: N. dalgadan başlar. --capture-wave-end=S: görüntüden S saniye önce dalgayı bitirir.
 ## --autopilot: asker ölümsüz, daire çizerek yürür. --god: asker ölümsüz ama yerinde durur.
 ## --capture-kind=runner|tank: --capture-spawn ile bu türden doğurur (varsayılan walker).
+## --capture-root=S: görüntüden S saniye önce askeri 1 sn bağlar (S<1: çırpınma, S 1.1–1.4: kurtulma karesi).
+## --capture-near=M: --capture-spawn zombilerini askerin M metre çevresine dizer (özel saldırıları hızlı görmek için).
 ## --circle: asker (ölümsüz değil) daire çizerek yürür. --zigzag=S: S saniyede bir yön değiştirerek yürür.
 ## Sonda tür başına atılış istatistiği basılır (LUNGE starts/hits): koşucu kaçış ayarı denetimi.
 
@@ -37,6 +39,8 @@ var _time: float = 0.0
 var _angle: float = 0.0
 var _kind: StringName = EnemyData.WALKER
 var _circle: bool = false
+var _root_lead: float = -1.0
+var _near: float = 0.0
 var _zigzag: float = 0.0
 
 
@@ -74,6 +78,10 @@ func _ready() -> void:
 			player.god_mode = true
 		elif arg.begins_with("--capture-kind="):
 			_kind = StringName(arg.trim_prefix("--capture-kind="))
+		elif arg.begins_with("--capture-root="):
+			_root_lead = arg.trim_prefix("--capture-root=").to_float()
+		elif arg.begins_with("--capture-near="):
+			_near = arg.trim_prefix("--capture-near=").to_float()
 		elif arg == "--circle":
 			_circle = true
 		elif arg.begins_with("--zigzag="):
@@ -100,7 +108,11 @@ func _ready() -> void:
 		player.use_input_override = true
 	if _circle or _zigzag > 0.0:
 		player.use_input_override = true
-	if _spawn > 0:
+	if _spawn > 0 and _near > 0.0:
+		for n in _spawn:
+			var at: Vector2 = player.position_2d() + Vector2.from_angle(TAU * n / _spawn + 0.4) * _near
+			enemies.spawn(_kind, at)
+	elif _spawn > 0:
 		enemies.spawn_many(_spawn, _kind)
 	if _show_panel and debug_panel != null:
 		debug_panel.set_panel_visible(true)
@@ -119,6 +131,9 @@ func _process(delta: float) -> void:
 	if _dash_lead >= 0.0 and _time >= _seconds - _dash_lead:
 		_dash_lead = -1.0
 		player.request_dash()
+	if _root_lead >= 0.0 and _time >= _seconds - _root_lead:
+		_root_lead = -1.0
+		player.root(1.0)
 	if _kill_lead >= 0.0 and _time >= _seconds - _kill_lead:
 		_kill_lead = -1.0
 		player.take_hit(Tuning.PLAYER_MAX_HP * 1000.0)
@@ -132,7 +147,8 @@ func _process(delta: float) -> void:
 		_tick_auto_pick(delta)
 	if _time < _seconds:
 		return
-	print("LUNGE starts=%d hits=%d" % [enemies.lunge_starts, enemies.lunge_hits])
+	print("LUNGE starts=%d hits=%d  JUMP lands=%d hits=%d  TONGUE shots=%d hits=%d" % [
+		enemies.lunge_starts, enemies.lunge_hits, enemies.jump_lands, enemies.jump_hits, enemies.tongue_shots, enemies.tongue_hits])
 	var image: Image = get_viewport().get_texture().get_image()
 	if image != null:
 		var path: String = ProjectSettings.globalize_path("res://").path_join(_out)

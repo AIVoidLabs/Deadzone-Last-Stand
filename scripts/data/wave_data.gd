@@ -26,20 +26,20 @@ const WAVES: Array = [
 		"interval_start": 0.8, "interval_end": 0.5,
 		"batch_start": 1, "batch_end": 3,
 		"max_alive": 120,
-		"mix": {&"walker": 1.0, &"runner": 0.18},
+		"mix": {&"walker": 1.0, &"runner": 0.18, &"jumper": 0.06},
 	},
 	{
 		"duration": 50.0,
 		"interval_start": 0.7, "interval_end": 0.4,
 		"batch_start": 2, "batch_end": 4,
 		"max_alive": 180,
-		"mix": {&"walker": 1.0, &"runner": 0.2, &"tank": 0.03},
+		"mix": {&"walker": 1.0, &"runner": 0.2, &"jumper": 0.09, &"tongue": 0.03, &"tank": 0.03},
 	},
 	{
 		"duration": 60.0,
 		"interval_start": 0.6, "interval_end": 0.3,
 		"batch_start": 2, "batch_end": 5,
 		"max_alive": 260,
-		"mix": {&"walker": 1.0, &"runner": 0.22, &"tank": 0.05},
+		"mix": {&"walker": 1.0, &"runner": 0.22, &"jumper": 0.12, &"tongue": 0.05, &"tank": 0.05},
 	},
 ]
