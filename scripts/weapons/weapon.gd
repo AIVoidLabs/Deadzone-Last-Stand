@@ -56,8 +56,8 @@ func tick(delta: float) -> void:
 		return
 	var origin: Vector2 = position_2d()
 	var max_range: float = _player.stats.weapon_range(row["max_range"])
-	if row["behavior"] == &"melee":
-		_tick_melee(origin, max_range)
+	if row["behavior"] != &"projectile":
+		_tick_area(origin, max_range)
 		return
 	var target: int = enemies.nearest_enemy(origin, max_range)
 	has_target = target >= 0
@@ -74,15 +74,18 @@ func tick(delta: float) -> void:
 	var pellets: int = row["pellets"]
 	var damage: float = _player.stats.weapon_damage(float(row["damage"]) * float(_tier_row["damage_mult"]))
 	var spread: float = deg_to_rad(row["spread_deg"])
+	var aim_jitter: float = deg_to_rad(row["aim_jitter_deg"])
+	var opts: Dictionary = {"pierce": row["pierce"], "explode_radius": row["explode_radius"], "color": row["projectile_color"], "size": row["projectile_size"], "arc": row["projectile_arc"], "length": row["projectile_length"]}
 	for i: int in pellets:
-		var angle: float = Spread.angle_offset(i, pellets, spread) + Spread.jitter(pellets, spread, row["spread_jitter"], _rng.randf())
-		projectiles.fire(muzzle, direction.rotated(angle), row["projectile_speed"], damage, max_range, row["knockback"])
+		var angle: float = Spread.angle_offset(i, pellets, spread) + Spread.jitter(pellets, spread, row["spread_jitter"], _rng.randf()) + aim_jitter * (_rng.randf() - 0.5)
+		projectiles.fire(muzzle, direction.rotated(angle), row["projectile_speed"], damage, max_range, row["knockback"], opts)
 	_cooldown = _player.stats.fire_interval(float(row["fire_interval"]) / float(_tier_row["rate_mult"]))
 	fired.emit(direction)
 
 
-## Yakın dövüş: menzildeki en yakın zombiye döner; bekleme bitince yayı (ya da tek hedefi) vurur.
-func _tick_melee(origin: Vector2, reach: float) -> void:
+## Alan silahı (yakın dövüş savurması ya da itme patlaması): menzildeki en yakın zombiye döner;
+## bekleme bitince yayı (ya da tek hedefi) vurur.
+func _tick_area(origin: Vector2, reach: float) -> void:
 	var target: int = enemies.nearest_enemy(origin, reach + MELEE_TARGET_SLACK)
 	has_target = target >= 0
 	if not has_target:

@@ -19,9 +19,12 @@ var _thrust: bool = false
 var _base_scale: Vector3 = Vector3.ONE
 
 
-func setup(arc_deg: float, color: Color) -> void:
-	_thrust = arc_deg <= 0.0
-	mesh = _build_mesh(deg_to_rad(THRUST_ARC_DEG if _thrust else arc_deg), INNER_THRUST if _thrust else INNER_SWING)
+## radial: iz merkezden dışa doğru açılır (dürtme ve itme patlaması); değilse yay boyunca savrulur.
+## arc_deg 0 ise dürtmedir ve dar bir dilim gösterilir.
+func setup(arc_deg: float, color: Color, radial: bool = false) -> void:
+	_thrust = radial or arc_deg <= 0.0
+	var arc: float = THRUST_ARC_DEG if arc_deg <= 0.0 else arc_deg
+	mesh = _build_mesh(deg_to_rad(arc), INNER_THRUST if _thrust else INNER_SWING)
 	var material: ShaderMaterial = ShaderMaterial.new()
 	material.shader = SHADER
 	material.set_shader_parameter(&"color", color)

@@ -4,6 +4,8 @@ extends Node3D
 ## (hızlı mermi zombinin içinden geçip gitmez).
 
 signal impact(at: Vector3, direction: Vector2)
+## Patlayan mermi (bomba) patladı: at yerde, radius patlama yarıçapı (m).
+signal explosion(at: Vector3, radius: float)
 
 const PHYSICS_PRIORITY: int = 10
 const TRACER_SHADER: Shader = preload("res://assets/shaders/tracer.gdshader")
@@ -20,6 +22,12 @@ var _damage: PackedFloat32Array = PackedFloat32Array()
 var _knockback: PackedFloat32Array = PackedFloat32Array()
 var _life: PackedFloat32Array = PackedFloat32Array()
 var _active: PackedByteArray = PackedByteArray()
+## Delip geçme: kalan ek isabet; patlama yarıçapı (0 = patlamaz); toplam ömür ve yay yüksekliği (bomba).
+var _pierce: PackedInt32Array = PackedInt32Array()
+var _explode: PackedFloat32Array = PackedFloat32Array()
+var _life_total: PackedFloat32Array = PackedFloat32Array()
+var _arc: PackedFloat32Array = PackedFloat32Array()
+var _hits: Array[PackedInt32Array] = []
 var _active_count: int = 0
 var _mesh: BoxMesh
 var _material: Material
@@ -51,7 +59,8 @@ func active_count() -> int:
 	return _active_count
 
 
-func fire(origin: Vector2, direction: Vector2, speed: float, dmg: float, max_range: float, knockback: float = 0.0) -> void:
+## opts: length (boy çarpanı; bomba kısa ve tıknaz), pierce (ek isabet sayısı), explode_radius (m), color (parlak uç rengi; alfa 0 = varsayılan), size (çarpan), arc (yay yüksekliği, m).
+func fire(origin: Vector2, direction: Vector2, speed: float, dmg: float, max_range: float, knockback: float = 0.0, opts: Dictionary = {}) -> void:
 	var slot: int = _active.find(0)
 	if slot < 0:
 		slot = _nodes.size()
@@ -62,11 +71,20 @@ func fire(origin: Vector2, direction: Vector2, speed: float, dmg: float, max_ran
 	_damage[slot] = dmg
 	_knockback[slot] = knockback
 	_life[slot] = max_range / speed * Tuning.PROJECTILE_LIFETIME_MARGIN
+	_life_total[slot] = _life[slot]
+	_pierce[slot] = opts.get("pierce", 0)
+	_explode[slot] = opts.get("explode_radius", 0.0)
+	_arc[slot] = opts.get("arc", 0.0)
+	_hits[slot] = PackedInt32Array()
 	_active[slot] = 1
 	_active_count += 1
 	var node: MeshInstance3D = _nodes[slot]
 	node.position = Vector3(origin.x, Tuning.PROJECTILE_HEIGHT, origin.y)
 	node.rotation.y = atan2(direction.x, direction.y)
+	var size: float = opts.get("size", 1.0)
+	node.scale = Vector3(size, size, size * float(opts.get("length", 1.0)))
+	if Tuning.FEATURE_TRACERS:
+		node.set_instance_shader_parameter(&"tint", opts.get("color", Color(0.0, 0.0, 0.0, 0.0)))
 	node.visible = true
 	node.reset_physics_interpolation()
 
@@ -77,20 +95,43 @@ func _physics_process(delta: float) -> void:
 			continue
 		var a: Vector2 = _pos[i]
 		var b: Vector2 = a + _dir[i] * _speed[i] * delta
-		var hit: int = enemies.find_segment_hit(a, b, Tuning.PROJECTILE_RADIUS)
+		var hit: int = enemies.find_segment_hit(a, b, Tuning.PROJECTILE_RADIUS, _hits[i])
 		if hit >= 0:
 			# Kıvılcım zombinin merminin geldiği yüzeyinde çıkar.
 			var surface: Vector2 = enemies.enemy_position(hit) - _dir[i] * enemies.enemy_radius(hit)
 			impact.emit(Vector3(surface.x, Tuning.PROJECTILE_HEIGHT, surface.y), _dir[i])
+			if _explode[i] > 0.0:
+				_detonate(i, surface)
+				_release(i)
+				continue
 			enemies.damage(hit, _damage[i], _dir[i], _knockback[i])
-			_release(i)
-			continue
+			if _pierce[i] > 0:
+				# Delip geçer: aynı zombiye bir daha çarpmaz, hasar her zombide aynı.
+				_pierce[i] -= 1
+				_hits[i].append(hit)
+			else:
+				_release(i)
+				continue
 		_life[i] -= delta
 		if _life[i] <= 0.0:
+			if _explode[i] > 0.0:
+				_detonate(i, b)
 			_release(i)
 			continue
 		_pos[i] = b
-		_nodes[i].position = Vector3(b.x, Tuning.PROJECTILE_HEIGHT, b.y)
+		var rise: float = 0.0
+		if _arc[i] > 0.0:
+			rise = sin(PI * (1.0 - _life[i] / _life_total[i])) * _arc[i]
+		_nodes[i].position = Vector3(b.x, Tuning.PROJECTILE_HEIGHT + rise, b.y)
+
+
+## Patlama: yarıçaptaki herkese tam hasar, merkezden dışa itme.
+func _detonate(i: int, at: Vector2) -> void:
+	var radius: float = _explode[i]
+	explosion.emit(Vector3(at.x, 0.1, at.y), radius)
+	for index in enemies.query_circle(at, radius):
+		var away: Vector2 = enemies.enemy_position(index) - at
+		enemies.damage(index, _damage[i], away.normalized() if away.length_squared() > 0.0001 else _dir[i], _knockback[i])
 
 
 func _release(i: int) -> void:
@@ -115,3 +156,8 @@ func _grow(count: int) -> void:
 		_knockback.append(0.0)
 		_life.append(0.0)
 		_active.append(0)
+		_pierce.append(0)
+		_explode.append(0.0)
+		_life_total.append(1.0)
+		_arc.append(0.0)
+		_hits.append(PackedInt32Array())

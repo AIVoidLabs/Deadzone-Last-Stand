@@ -110,6 +110,16 @@ func query_arc(origin: Vector2, dir: Vector2, reach: float, arc_rad: float) -> P
 	return out
 
 
+## center çevresinde radius içindeki (zombi gövdesi dahil) canlı zombilerin indeksleri (patlama alanı).
+func query_circle(center: Vector2, radius: float) -> PackedInt32Array:
+	var out: PackedInt32Array = PackedInt32Array()
+	var span: float = radius + _max_radius
+	for i in _grid.query_rect(center - Vector2(span, span), center + Vector2(span, span)):
+		if i < _alive.size() and _alive[i] != 0 and _pos[i].distance_to(center) <= radius + _radius[i]:
+			out.append(i)
+	return out
+
+
 ## Zombiyi yakar: duration sn boyunca saniyede dps hasar. Yanan zombi tekrar yakılırsa süre yenilenir, hasar yükselir.
 func ignite(index: int, dps: float, duration: float) -> void:
 	if not Tuning.FEATURE_BURN or _alive[index] == 0 or dps <= 0.0 or duration <= 0.0:
@@ -145,14 +155,14 @@ func _extinguish(index: int) -> void:
 
 
 ## a→b yolunda ilk değilen canlı zombi; yoksa -1.
-func find_segment_hit(a: Vector2, b: Vector2, radius: float) -> int:
+func find_segment_hit(a: Vector2, b: Vector2, radius: float, exclude: PackedInt32Array = PackedInt32Array()) -> int:
 	var margin: float = radius + _max_radius + HIT_QUERY_MARGIN
 	var lo: Vector2 = Vector2(minf(a.x, b.x), minf(a.y, b.y)) - Vector2(margin, margin)
 	var hi: Vector2 = Vector2(maxf(a.x, b.x), maxf(a.y, b.y)) + Vector2(margin, margin)
 	var best: int = -1
 	var best_t: float = 2.0
 	for i in _grid.query_rect(lo, hi):
-		if i >= _alive.size() or _alive[i] == 0:
+		if i >= _alive.size() or _alive[i] == 0 or (not exclude.is_empty() and exclude.has(i)):
 			continue
 		var t: float = CombatMath.segment_circle_t(a, b, _pos[i], _radius[i] + radius)
 		if t >= 0.0 and t < best_t:

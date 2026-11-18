@@ -38,13 +38,14 @@ func _ready() -> void:
 	_pivot = Node3D.new()
 	_pivot.name = "Pivot"
 	add_child(_pivot)
-	_melee = _weapon.row["behavior"] == &"melee"
+	var behavior: StringName = _weapon.row["behavior"]
+	_melee = behavior == &"melee"
 	_build_model()
-	if _melee and Tuning.FEATURE_MELEE_SLASH_FX:
+	if behavior != &"projectile" and Tuning.FEATURE_MELEE_SLASH_FX:
 		_slash = MeleeSlash.new()
 		_slash.position = Vector3(0.0, -0.3, 0.0)
 		add_child(_slash)
-		_slash.setup(_weapon.row["melee_arc_deg"], _weapon.row["slash_color"])
+		_slash.setup(_weapon.row["melee_arc_deg"], _weapon.row["slash_color"], behavior == &"burst")
 	_weapon.fired.connect(_on_fired)
 	_bob_phase = randf() * TAU
 	rotation.y = atan2(_weapon.aim.x, _weapon.aim.y)
@@ -96,6 +97,10 @@ func _on_fired(direction: Vector2) -> void:
 	if _melee:
 		_start_swing(direction)
 		return
+	if _slash != null:
+		# İtme patlaması: iz merkezden dışa açılır (silah dönmez, geri teper).
+		var yaw: float = wrapf(atan2(direction.x, direction.y) - rotation.y, -PI, PI)
+		_slash.play(yaw, 1.0, _weapon.last_reach, float(_weapon.row["melee_swing_time"]))
 	_recoil = 1.0
 	if _flash == null:
 		return

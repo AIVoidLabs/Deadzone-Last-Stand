@@ -27,6 +27,10 @@ func _ready() -> void:
 		add_child(sparks)
 		projectiles.impact.connect(sparks.burst)
 
+	if Tuning.FEATURE_EXPLOSION_FX:
+		projectiles.explosion.connect(func(at: Vector3, radius: float) -> void:
+			ExplosionFx.play(self, at, radius))
+
 	var weapons: WeaponRig = WeaponRig.new()
 	weapons.player = player
 	weapons.enemies = enemies
@@ -46,7 +50,9 @@ func _ready() -> void:
 		weapons.weapon_fired.connect(func(row: Dictionary) -> void:
 			camera.add_trauma(row["fire_shake"]))
 	_add_hit_feedback(enemies, camera)
-	_add_sounds(player, enemies, weapons)
+	projectiles.explosion.connect(func(_at: Vector3, _radius: float) -> void:
+		camera.add_trauma(Tuning.CAMERA_SHAKE_ON_EXPLOSION))
+	_add_sounds(player, enemies, weapons, projectiles)
 
 	if Tuning.FEATURE_HURT_VIGNETTE:
 		var vignette: HurtVignette = HurtVignette.new()
@@ -134,11 +140,13 @@ func _add_hit_feedback(enemies: EnemyManager, camera: FollowCamera) -> void:
 
 
 ## Ses efektleri: olaylar Audio.play'e bağlanır; hangi sesin açık olduğu SoundData/Tuning'den.
-func _add_sounds(player: Player, enemies: EnemyManager, weapons: WeaponRig) -> void:
+func _add_sounds(player: Player, enemies: EnemyManager, weapons: WeaponRig, projectiles: ProjectilePool) -> void:
 	if not Tuning.FEATURE_SFX:
 		return
 	weapons.weapon_fired.connect(func(row: Dictionary) -> void:
 		Audio.play(row.get("sound", SoundData.SHOT)))
+	projectiles.explosion.connect(func(_at: Vector3, _radius: float) -> void:
+		Audio.play(&"explosion"))
 	enemies.enemy_damaged.connect(func(_at: Vector3, _dir: Vector2, _amount: float, killed: bool) -> void:
 		Audio.play(SoundData.ZOMBIE_DEATH if killed else SoundData.HIT))
 	player.event.connect(func(event_name: StringName, _data: Dictionary) -> void:

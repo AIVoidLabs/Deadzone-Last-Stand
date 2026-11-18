@@ -5,17 +5,18 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 
 ## Şu an
 
-Oturum 6 (2026-11-18). **Aşama 7.1 başladı: yakın dövüş silahları kod olarak bitti** (bıçak, katana, ışın kılıcı, ateşli kılıç); Taha oynayıp yorum yapacak. Aşama 6 onayı hâlâ bekliyor. 145 test, commit yapıldı, push yok.
+Oturum 6 (2026-11-18). **Aşama 7.1 kod olarak bitti: yakın dövüş (bıçak, katana, ışın kılıcı, ateşli kılıç) + SMG, plazma tüfeği, graviton topu, bomba atar**; Taha oynayıp yorum yapacak. Aşama 6 onayı hâlâ bekliyor. 145 test, commit yapıldı, push yok.
 
 - **7.1 kararları (Taha, 2026-11-18):** yakın dövüş ilk iş. Silahlar: bıçak (tekli dürtme), katana (yay savurma), ışın kılıcı (geniş savurma + yanma), **ateşli kılıç** (yanma, Taha ekledi); SMG, uzay silahları (plazma tüfeği = delip geçen, graviton topu = ittirme; sonra istenirse yenileri), bomba atar (alan hasarı). Yakın dövüş de 6 yuvadan birini kullanır, birleşme kuralları aynı. Zor erişim: 10–15 dalgalık oyuna göre silahlar dalga kilidiyle (`min_wave`) ve nadirlikle (`weight`) mağazaya çıkar, fiyatlar yüksek.
-- **Sırada (7.1'in kalanı):** SMG, plazma tüfeği, graviton topu, bomba atar; sonra 7.2.
+- **Uzak silahlar (2026-11-18):** SMG (hızlı, sapmalı), plazma tüfeği (`pierce` 4, cyan iz), graviton topu (`behavior: &"burst"`: 80° koniyi bir kerede iter, mor iz), bomba atar (`explode_radius` 3 m, yay çizen kısa tıknaz mermi, `ExplosionFx` + kamera sarsıntısı). `ProjectilePool.fire(..., opts)`: pierce, explode_radius, color, size, length, arc; `EnemyManager.query_circle`. 4 yeni model, 4 yeni ses (`plasma`, `graviton`, `launcher`, `explosion`; SMG `shot_1`'i kısık kullanır). `FEATURE_EXPLOSION_FX`.
+- **Sırada:** Taha'nın yorumu, sonra 7.2 (koşan ve tank zombi). Yeni silahların sayıları ilk tahmin.
 - **Yakın dövüş nasıl çalışır:** `WeaponData` satırında `behavior: &"melee"`; `max_range` = menzil, `melee_arc_deg` = yay (0 = tekli dürtme), `burn_dps/burn_time` = yanma. `MeleeRules` (saf: yay + yanma sayacı, 9 test), `EnemyManager.query_arc/ignite`, görüntü `WeaponVisual` (kabzadan savurma, öne atılma) + `MeleeSlash` (kesik izi, `FEATURE_MELEE_SLASH_FX`), yanan zombi turuncu parlar (`flash_lit` `burn`, `FEATURE_BURN`). Modeller `build_weapons.py` (kökeni kabza), sesler `gen_sfx.py` `swing_*`. Mağaza: `WeaponData.shop_pool(wave)` + ağırlıklı çekiliş (`ShopRules`).
 - **Denge notu:** yeni silahların sayıları ilk tahmin; bot 3 turda kazandı (bıçak alındı). Gerçek denge Taha'nın oynayışıyla.
 - **Yeni oturum başlangıcı:** ortam kontrolü → Taha'nın yakın dövüş yorumu → 7.1'in kalanı (SMG, uzay silahları, bomba atar).
 - **Aşama 6'dan miras:** kademe değerleri `WeaponData.TIERS`; mağaza `ItemData` / `ShopRules` / `ShopFlow`; dalga tablosu `WaveData` (üst sınırlar 60/90/120/180/260); yeni zombi türü eklenince `drop_value` ve `WaveData.mix` satırı gerekir. Denge ölçümü: `tools/autoplay_runs.ps1`.
 - **Tasarım borcu (Aşama 9):** kart ekranı, mağaza, HUD, ölüm/kazanma ekranları prototip → 9.3–9.5.
 - **Açık küçük konular:** dalga arasında iyileşme yok; kristal toplama sesi ve XP çubuğu rengi yorum almadı; oyun 10–15 dalgaya uzayacak (11.2'de WaveData genişler).
-- **Taha oyunu Godot editöründen (Play) açıyor.** Gömülü pencerede tam ekran yok, F tuşları ulaşmayabilir; "Embed Game on Next Play" kapatılır. Yedekler Ctrl+3 … Ctrl+9. F7 artık sırayla pompalı, bıçak, katana, ışın kılıcı, ateşli kılıç ekler; `--tiers=knife:1,katana:2` ile görüntü.
+- **Taha oyunu Godot editöründen (Play) açıyor.** Gömülü pencerede tam ekran yok, F tuşları ulaşmayabilir; "Embed Game on Next Play" kapatılır. Yedekler Ctrl+3 … Ctrl+9. F7 artık sırayla pompalı, bıçak, katana, ışın kılıcı, ateşli kılıç, SMG, plazma, graviton, bomba atar ekler; `--tiers=knife:1,katana:2` ile görüntü.
 
 ## Ana aşama durumu
 
@@ -28,7 +29,7 @@ Oturum 6 (2026-11-18). **Aşama 7.1 başladı: yakın dövüş silahları kod ol
 | 4 | Dikey dilim: zombi | ✔ bitti (2026-11-16) |
 | 5 | Dikey dilim: silah ve vuruş hissi | ✔ bitti (2026-11-17, dikey dilim onaylandı) |
 | 6 | Tur döngüsü | ✔ kod bitti 2026-11-18 (Taha'nın oynayıp onayı bekleniyor: 6.4–6.6) |
-| 7 | Silah ve zombi çeşitliliği | 7.1 başladı (yakın dövüş bitti) |
+| 7 | Silah ve zombi çeşitliliği | 7.1 kod bitti (Taha testi bekliyor) |
 | 8 | Arena, atmosfer, ses | — |
 | 9 | Arayüz ve akış | — |
 | 10 | Kalıcı ilerleme | — |
@@ -78,7 +79,7 @@ Bitiş ölçütleri `ROADMAP.md`'de. Biten kutunun yanına tarih ve commit yazı
 - [x] 6.6 Tam tur — kod ve ilk denge bitti 2026-11-18, Taha'nın oynayıp yorumu bekliyor. Tam tur botu (`Autoplay`, `tools/autoplay_runs.ps1`: ~10 sn'de 5 dalga) ölçüm aracı oldu. Ölçümle bulunan **hata:** temizlik sırasında düşen kristal yerde kalıp mağaza ve kartları bekletiyordu → dalga sonunda düşen her kristal de çekilir (`Pickups.pull_all`). **Denge değişiklikleri:** zombi kristali 1 → 3; dalga 1 hafifledi (tek zombi, aralık 1.1→0.8), dalga 2–5 daha yumuşak tırmanış ve üst sınırlar 60/90/120/180/260 (`WaveData`); mağazada silah olasılığı %30 → %40. Bot sonucu (6 tur): 4 kazandı, 2 dalga 4–5'te öldü; 3–4 silah ve K2 birleşmeleri dalga 4–5'te görülüyor; dalga başına kristal ~45 → ~650. Bot insan değil: gerçek denge Taha'nın oynayışıyla ayarlanır
 
 ### 7 — Silah ve zombi çeşitliliği
-- [ ] 7.1 Silah davranış seti — yakın dövüş (bıçak, katana, ışın kılıcı, ateşli kılıç + yanma) kod bitti 2026-11-18, Taha testi bekliyor; SMG, plazma, graviton, bomba atar kaldı
+- [ ] 7.1 Silah davranış seti — yakın dövüş (bıçak, katana, ışın kılıcı, ateşli kılıç + yanma) kod bitti 2026-11-18, Taha testi bekliyor; SMG, plazma, graviton, bomba atar da eklendi
 - [ ] 7.2 Koşan ve tank
 - [ ] 7.3 Tüküren ve patlayan
 - [ ] 7.4 Boss
@@ -159,6 +160,8 @@ Profil üst sınırları (2.5 ölçümüne göre, efektlere pay bırakılarak): 
 - 7.1 kararları alındı (yukarıda "Şu an"). Yakın dövüş silahları yapıldı: `MeleeRules` + 9 test, `query_arc`/`ignite`, kesik izi, yanma görseli, 4 model (Blender, headless betik), `swing_*` sesleri, mağaza dalga kilidi + ağırlık (2 test). 145 test. Bot turu 3/3 kazandı.
 - Taha: kesik izi "beyaz koni gibi yoğun" → rüzgar tarzına çevrildi: dış kenarda incelen hilal, ince kopuk rüzgar çizgileri, yumuşak uçlar, sönerken dağılma; bıçakta dışa ilerleyen ince çizgi (`melee_slash.gdshader`, `MeleeSlash`). Taha'nın onayı bekleniyor.
 - Not: Blender MCP açıkken betikte `read_factory_settings` çalıştırmak MCP bağlantısını koparır; modeller headless (`blender --background --python tools/blender/build_weapons.py`) üretilir.
+
+- Uzak silahlar eklendi (yukarıda). Bot turu 3/3 kazandı, 145 test. Ekran görüntüsünde patlama parlaması ağır kaldı → daha şeffaf ve küçük yapıldı; Taha'nın gözüyle ayarlanır.
 
 ### 2026-11-18 — Oturum 5
 - **Oturum sonu özeti:** Aşama 6 kod olarak bitti (6.4 silah kademeleri ve birleşme, 6.5 mağaza ve eşyalar, 6.6 tam tur botu ve ilk denge). 134 test. Commit'ler: `2ae8783` (6.6), `c50fe1f` (6.5), `bb02b95` (birleşme animasyonu), `07e9f8d` (6.4). Taha onayı bekleniyor; Aşama 7'yi temiz oturumda başlatacak.

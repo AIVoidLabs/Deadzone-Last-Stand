@@ -353,6 +353,61 @@ def swing(rng: random.Random, total: float, low: float, high: float, hum: float 
     return soft_clip(out, 1.1)
 
 
+def plasma(rng: random.Random) -> list[float]:
+    """Plazma atışı: yüksekten alçağa süpürülen enerji cızırtısı + kısa parlak 'zap'."""
+    total = 0.22
+    n = frames(total)
+    out = [0.0] * n
+    tone = sine_sweep(n, lambda t: 1800.0 * math.exp(-t / 0.07) + 380.0)
+    mix_into(out, apply(tone, env_exp(n, 0.07)), 0.6)
+    buzz = saw(n, lambda t: 240.0 * math.exp(-t / 0.1) + 120.0)
+    mix_into(out, apply(filt(buzz, "lp", 1400.0), env_exp(n, 0.09)), 0.3)
+    mix_into(out, apply(filt(noise(n, rng), "hp", 2500.0), env_exp(n, 0.02)), 0.25)
+    return soft_clip(out, 1.3)
+
+
+def graviton(rng: random.Random) -> list[float]:
+    """Graviton itmesi: alçak, yükselen 'vuuum' darbesi ve hava yığılması."""
+    total = 0.45
+    n = frames(total)
+    out = [0.0] * n
+    thump = sine_sweep(n, lambda t: 40.0 + 90.0 * math.exp(-t / 0.12))
+    mix_into(out, apply(thump, env_exp(n, 0.16)), 0.9)
+    air = filt(noise(n, rng), "bp", lambda t: 300.0 + 1800.0 * min(1.0, t / total), 0.9)
+    mix_into(out, apply(air, env_swell(n, 0.25, 1.5)), 0.35)
+    hum = sine_sweep(n, lambda t: 220.0 - 90.0 * min(1.0, t / total))
+    mix_into(out, apply(hum, env_swell(n, 0.2, 1.4)), 0.25)
+    return soft_clip(out, 1.2)
+
+
+def launcher(rng: random.Random) -> list[float]:
+    """Bomba atar: tok 'tonk' (tüpten çıkış) + kısa hava hışırtısı."""
+    total = 0.3
+    n = frames(total)
+    out = [0.0] * n
+    thump = sine_sweep(n, lambda t: 70.0 + 110.0 * math.exp(-t / 0.03))
+    mix_into(out, apply(thump, env_exp(n, 0.07)), 1.0)
+    pop = filt(noise(n, rng), "lp", 900.0)
+    mix_into(out, apply(pop, env_exp(n, 0.03)), 0.7)
+    air = filt(noise(n, rng), "bp", 1400.0, 1.0)
+    mix_into(out, apply(air, env_swell(n, 0.3, 1.5)), 0.2)
+    return soft_clip(out, 1.4)
+
+
+def explosion(rng: random.Random) -> list[float]:
+    """Patlama: alçak gümbürtü + gürültü patlaması, uzun sönme."""
+    total = 0.8
+    n = frames(total)
+    out = [0.0] * n
+    boom = sine_sweep(n, lambda t: 38.0 + 70.0 * math.exp(-t / 0.15))
+    mix_into(out, apply(boom, env_exp(n, 0.25)), 1.0)
+    burst = filt(noise(n, rng), "lp", lambda t: 3500.0 * math.exp(-t / 0.18) + 200.0)
+    mix_into(out, apply(burst, env_exp(n, 0.22, 0.002)), 0.9)
+    crack = filt(noise(n, rng), "hp", 1500.0)
+    mix_into(out, apply(crack, env_exp(n, 0.02, 0.0005)), 0.4)
+    return soft_clip(out, 1.5)
+
+
 def horde_groan(rng: random.Random, base: float, length: float) -> list[float]:
     """Sürü homurtusu: yavaş yükselip inen, boğuk (uzaktan gelen) inilti."""
     n = frames(length)
@@ -434,6 +489,14 @@ def main() -> int:
         write_wav(f"swing_energy_{i}", swing(random.Random(seed), 0.36, 600.0, 2200.0, hum=140.0))
     for i, seed in enumerate((931, 932, 933), start=1):
         write_wav(f"swing_fire_{i}", swing(random.Random(seed), 0.34, 500.0, 2000.0, crackle=0.5))
+    for i, seed in enumerate((941, 942, 943), start=1):
+        write_wav(f"plasma_{i}", plasma(random.Random(seed)))
+    for i, seed in enumerate((951, 952), start=1):
+        write_wav(f"graviton_{i}", graviton(random.Random(seed)))
+    for i, seed in enumerate((961, 962), start=1):
+        write_wav(f"launcher_{i}", launcher(random.Random(seed)))
+    for i, seed in enumerate((971, 972, 973), start=1):
+        write_wav(f"explosion_{i}", explosion(random.Random(seed)))
     write_wav("player_hurt_1", player_hurt(random.Random(601)))
     for i, (seed, base) in enumerate(((801, 1320.0), (802, 1480.0), (803, 1180.0)), start=1):
         write_wav(f"pickup_{i}", pickup(random.Random(seed), base))

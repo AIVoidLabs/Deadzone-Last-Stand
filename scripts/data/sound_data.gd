@@ -27,6 +27,31 @@ const TABLE: Dictionary = {
 		"files": ["shotgun_1"],
 		"volume_db": -7.0, "pitch_variance": 0.05, "max_voices": 3, "min_interval": 0.05,
 	},
+	&"smg": {
+		"enabled": Tuning.FEATURE_SFX_SHOT,
+		"files": ["shot_1"],
+		"volume_db": -14.0, "pitch_variance": 0.14, "max_voices": 5, "min_interval": 0.05,
+	},
+	&"plasma": {
+		"enabled": Tuning.FEATURE_SFX_SHOT,
+		"files": ["plasma_1", "plasma_2", "plasma_3"],
+		"volume_db": -11.0, "pitch_variance": 0.06, "max_voices": 3, "min_interval": 0.08,
+	},
+	&"graviton": {
+		"enabled": Tuning.FEATURE_SFX_SHOT,
+		"files": ["graviton_1", "graviton_2"],
+		"volume_db": -8.0, "pitch_variance": 0.05, "max_voices": 2, "min_interval": 0.15,
+	},
+	&"launcher": {
+		"enabled": Tuning.FEATURE_SFX_SHOT,
+		"files": ["launcher_1", "launcher_2"],
+		"volume_db": -8.0, "pitch_variance": 0.05, "max_voices": 2, "min_interval": 0.15,
+	},
+	&"explosion": {
+		"enabled": Tuning.FEATURE_SFX_SHOT,
+		"files": ["explosion_1", "explosion_2", "explosion_3"],
+		"volume_db": -6.0, "pitch_variance": 0.08, "max_voices": 3, "min_interval": 0.1,
+	},
 	&"swing_light": {
 		"enabled": Tuning.FEATURE_SFX_SHOT,
 		"files": ["swing_light_1", "swing_light_2", "swing_light_3"],
