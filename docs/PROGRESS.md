@@ -5,19 +5,14 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 
 ## Şu an
 
-Oturum 4 sonu (2026-11-17, Taha "bugünlük yeter" dedi). Çalışma ağacı temiz, push yok.
+Oturum 5 sonu (2026-11-18). **Aşama 6 kod olarak bitti**; Taha 6.4–6.6'yı (silah birleştirme, mağaza, tam tur) oynayıp onaylayacak. Çalışma ağacı temiz, push yok. 134 test, son commit `2ae8783`.
 
-- **Ana aşama:** 6 — Tur döngüsü
-- **Güncelleme 2026-11-18 (oturum 5):** 6.4, 6.5 ve 6.6 kodları bitti; Aşama 6 tamam, Taha'nın tam turu oynayıp onayı bekleniyor. Sıradaki ana aşama: 7 — Silah ve zombi çeşitliliği (Taha "devam" deyince; önce 7.1 için sorular).
-- **Alt aşama:** 6.1–6.3 bitti. **Sıradaki: 6.4 Silah yuvaları ve birleştirme.** (aşağıdaki 6.4 soruları cevaplandı)
-- **Yeni oturum başlangıcı:** ortam kontrolü (CLAUDE.md bölüm 0) → bu bölümü oku → 6.4 için aşağıdaki kararları Taha'ya sor → onaydan sonra kod.
-- **6.4'te Taha'ya sorulacaklar** (kod yazmadan önce):
-  1. Silah kademesi neyi artırır? Öneri: hasar ve atış hızı çarpanı (kademe başına), kademe 4 en çok; değerler `WeaponData`'da kademe sütunu.
-  2. Birleştirme ne zaman olur? Öneri: aynı silah + aynı kademe yuvaya gelince kendiliğinden (Brotato'da mağazada elle); mağaza 6.5'te geldiği için 6.4'te silahlar debug ile (F7) ve dalga sonu ödülü olmadan denenir.
-  3. Kademe görünümü: silah modelinde renk/parıltı mı, çemberde yuva rengi mi? Birden çok seçenek → önce galeri görseli (CLAUDE.md kural 8).
-  4. Yuvalar dolunca (6/6) yeni silah ne olur: reddedilir mi, birleştirilebilecekse birleşir mi?
-- **Sonra:** 6.5 Mağaza ve eşyalar (sorulacak: eşya sayısı ~10, fiyat ve yenileme maliyeti, kilitleme, silah satın alma/satma; mağaza dalga arasında kart ekranından sonra açılır, 3 sn ara yerine) → 6.6 Tam tur (5 dalga, 3–4 silah, ilk denge) → 🚩 Aşama 6 bildirimi.
-- **Taha'nın işi Aşama 6'da:** yok; her alt aşamayı oynayıp yorum.
+- **Ana aşama:** 6 ✔ (Taha'nın onayı bekleniyor). **Sıradaki: Aşama 7 — Silah ve zombi çeşitliliği** (7.1 silah davranış seti, 7.2 koşan ve tank, 7.3 tüküren ve patlayan, 7.4 boss, 7.5 yeniden ölçüm). Taha temiz oturumda başlatacak.
+- **Yeni oturum başlangıcı:** ortam kontrolü (CLAUDE.md bölüm 0) → bu bölümü oku → Taha'nın Aşama 6 yorumlarını al (denge, mağaza, birleşme) → 7.1 için kararları sor, kod yazma.
+- **7.1 için sorulacaklar:** hangi silahlar (ROADMAP'e bak; Taha'nın fikirleri: enerji çemberinde yakın dövüş, ışın kılıcı), her silahın davranışı (mermi, ışın, alan, yakın dövüş), fiyat ve kademe etkileri; `WeaponData` zaten veri odaklı (yeni silah = yeni satır, `price` ve `name` alanı gerekir).
+- **Aşama 6'dan miras:** kademe değerleri `WeaponData.TIERS`; mağaza `ItemData` / `ShopRules` / `ShopFlow`; dalga tablosu `WaveData` (üst sınırlar 60/90/120/180/260); zombi kristali `EnemyData` `drop_value` 3; yeni zombi türü eklenince `drop_value` ve `WaveData.mix` satırı gerekir. Denge ölçümü: `tools/autoplay_runs.ps1` (yeni silah/zombi sonrası çalıştır; bot ölçüm aracıdır, insan değildir).
+- **Ders (6.6):** akışı bir koşula bağlarsan (`hold_break` gibi) o koşulun her zaman gerçekleştiğinden emin ol; bot turları bu tür kilitlenmeleri yakaladı.
+- **Taha'nın işi Aşama 7'de:** her alt aşamayı oynayıp yorum (ROADMAP "Taha" sütununa bak).
 - **Tasarım borcu (Aşama 9'da düzeltilecek, Taha 2026-11-17):** kart ekranı işlevsel ama görünümü basit → 9.4 (mağaza ve kart ekranları son hali). HUD (dalga sayacı, XP çubuğu, kristal sayısı) ve ölüm/kazanma ekranları da prototip → 9.3, 9.5.
 - **Açık küçük konular:** dalga arasında iyileşme yok (can yenileme kartı var; mağaza eşyası olabilir); kristal toplama sesi ve XP çubuğu rengi Taha'dan ayrıca yorum almadı.
 - **Taha oyunu Godot editöründen (Play) açıyor.** Gömülü pencerede tam ekran yok ve F tuşları oyuna ulaşmayabilir; Game sekmesi ⋮ → "Embed Game on Next Play" kapatılır. Debug tuşlarının yedekleri Ctrl+3 … Ctrl+9.
@@ -159,6 +154,13 @@ Profil üst sınırları (2.5 ölçümüne göre, efektlere pay bırakılarak): 
 - 2026-11-15: "Pencere modunda bile küçük duruyor, oyun tam ekran olmalı." → tam ekran açılış + F11/Alt+Enter (`Tuning.FEATURE_START_FULLSCREEN`).
 
 ## Oturum günlüğü
+
+### 2026-11-18 — Oturum 5
+- **Oturum sonu özeti:** Aşama 6 kod olarak bitti (6.4 silah kademeleri ve birleşme, 6.5 mağaza ve eşyalar, 6.6 tam tur botu ve ilk denge). 134 test. Commit'ler: `2ae8783` (6.6), `c50fe1f` (6.5), `bb02b95` (birleşme animasyonu), `07e9f8d` (6.4). Taha onayı bekleniyor; Aşama 7'yi temiz oturumda başlatacak.
+- 6.4: Taha'nın kararları: öneriler kabul, kademe görünümü renk + model güncellemesi; sonradan birleşme animasyonu istedi (yaylanarak oturma, parlama, halka, kıvılcım).
+- 6.5: Taha'nın kararları: 4 ürün karışık raf, artan fiyatlı yenileme + kilit, 10 eşya (artı + eksi bedel), silah alınır / birleşir / satılır. Mağaza dalga arasında kart ekranından sonra açılır ve oyunu durdurur.
+- 6.6: Tam tur botu (`Autoplay`) yazıldı; kristalin yerde kalıp mağazayı kilitlediği hata bulundu ve düzeltildi; zombi kristali 3, dalgalar yumuşatıldı, mağazada silah olasılığı %40.
+- Kapanışta bir kez "2 nesne sızdı" uyarısı görüldü, tekrarlanmadı; ayrıca doğrulanmadı (eski ses sızıntısı türünden olabilir).
 
 ### 2026-11-17 — Oturum 4
 - **Oturum sonu özeti:** dikey dilim onaylandı, Aşama 5 kapandı; 6.1 dalgalar, 6.2 kristaller, 6.3 istatistikler ve kartlar bitti (Taha onayladı). 116 test. Commit'ler: `677a86f` (6.3), `64c3908` / `3120d29` (6.2), `2cc7038` (6.1), `3b51589` (5.7). Sıradaki 6.4; sorulacaklar "Şu an" bölümünde.
