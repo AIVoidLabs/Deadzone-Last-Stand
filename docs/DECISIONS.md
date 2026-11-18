@@ -2,6 +2,15 @@
 
 Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar verilince "Açık kararlar"dan çıkarılıp tarihli bölüme yazılır.
 
+## 2026-11-18 — Sıradaki zombi türleri: zıplayan ve dilci (Taha)
+
+- Koşucu + tank onaylandı ("okey"). **Sıraya eklendi, hemen başlanmayacak** (Taha: aklına geldi, yazdırdı).
+- **Genel ilke:** Kaçışlar zorlayıcı olmalı, oyun basit olmamalı.
+- **Zıplayan:** gerçekten havada olduğu hissedilmeli (yay çizen yükseliş, küçülen gölge, havadayken silahlarla vurulamaz). Düşeceği yer yerde halkayla işaretli; halka askeri önden nişanlar, son 0.3 sn kilitlenir. İniş alan hasarı + şok dalgası + kamera sarsıntısı. Dash dokunulmazlığı ya da halkadan çıkmak kurtarır. Taslak: can 40, 7 m'de çömelir, hazırlık 0.7 sn, havada 0.9 sn, yükseklik ~3.5 m, iniş yarıçapı 1.5 m, hasar 18, iniş sonrası 1.2 sn toparlanma.
+- **Dilci (bağlayan):** Uzakta (~7 m) durur, 0.8 sn hazırlanıp dilini fırlatır. İsabet ederse asker **tam 1 sn bağlı**: hareket edemez, **dash atılamaz** (Taha kesin), silahlar ateş eder; sonra dil otomatik bırakır. Dilci ölürse bağ çözülür. Dash dokunulmazlığı dili ıskalatır. İsabetten sonra ~4 sn bekleme, hasar küçük (6), dalga 4'ten itibaren.
+- **Asker animasyonları (Taha: önemli):** bağlanınca **çırpınma** animasyonu, bırakılınca **kollarını açarak bağdan kurtulma** animasyonuna geçer. Bunlar için ortak kütüphanede uygun klip yoksa Blender'da/koddan türetilir (`ZombieClipData` yöntemi gibi).
+- Gereken parçalar: oyuncuya "bağlı" durumu (saf kural + test), dil görseli (ince uzayan çizgi ağı), iki yeni zombi modeli (Blender), `FEATURE_ZOMBIE_JUMP`, `FEATURE_ZOMBIE_TONGUE`.
+
 ## 2026-11-18 — Aşama 7.2 koşucu ve tank (Taha)
 
 - İlk tür seti koşucu + tank (Taha onayladı; zıplayan ve sürünen sonra). Koşucu atılışı rastgele değil: hazırlıkta oyuncunun hızına göre önden nişan (`LungeRules`), son 0.22 sn yön kilitli, atılırken sınırlı dönüşle izler; kaçmak kolay olmamalı. Dash ve hız önemli: yeni istatistik `dash_mesafesi`, kart/eşya (`Atılış Bobini`, `Hafif Çizme`), hareket hızı kartları ×1.33, dash bekleme kartları büyüdü. Blender'da ek rötuş serbest.
