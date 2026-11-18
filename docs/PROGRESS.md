@@ -5,7 +5,11 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 
 ## Şu an
 
-Oturum 6 sonu (2026-11-18). **Aşama 7.1 bitti, Taha onayladı ("her şey okey"): yakın dövüş (bıçak, katana, ışın kılıcı, ateşli kılıç) + SMG, plazma tüfeği, graviton topu, bomba atar.** Sıradaki **7.2 (koşan, zıplayan, sürünen, tank zombi)**; Taha temiz oturumda başlatacak. Aşama 6 onayı hâlâ bekliyor. 145 test, commit yapıldı, push yok.
+Oturum 7 (2026-11-18). Aşama 7.1 onaylı. **7.2 kod bitti, Taha'nın oynayıp yorumu bekliyor: koşucu + tank zombi** (zıplayan ve sürünen sonraya). Aşama 6 onayı hâlâ bekliyor. 154 test, push yok.
+
+- **7.2 (koşucu + tank):** `EnemyData` satırları (eksik alanlar yürüyenden gelir; `attack_kind` `melee`/`lunge`), tür başına model (`zombie_runner.glb` 4 çeşit × 8 şema, `zombie_tank.glb` 4 çeşit × 6 şema; `build_zombie.py -- runner|tank|all`, tank için omuz zırhı + göğüs plakası), tür başına havuz (`Zombie.kind`). **Koşucu (can 18, hız 3.8, atılış 9 m/sn):** yaklaşınca çömelir (0.65 sn), `LungeRules` ile oyuncunun gideceği yere nişan alır (lead 0.9), son 0.22 sn yön kilitli, atılırken 2.0 rad/sn ile izler; ıskalayınca 0.9 sn toparlanır; atılırken sendelemez, hazırlıkta vurulursa atılış bozulur. **Tank (can 220, hız 1.5, ağırlık 4, vuruş 35, sendelemez):** 0.9 sn hazırlık, 1.5 m erişim. Dalga 2'den runner, 4'ten tank (`WaveData.mix`). `FEATURE_ZOMBIE_VARIETY`, `FEATURE_ZOMBIE_LUNGE`. Ölçüm: ayakta duran asker %100 vurulur, daire çizerek kaçan ~%14 (`--capture-kind=runner --god --circle --headless --fixed-fps 60` → `LUNGE starts/hits`). Gerçek kaçış zorluğu Taha'nın elinde ayarlanır. Bot 5/5 tur kazandı.
+- **Dash ve hız (Taha: önemli):** yeni istatistik `dash_distance` (dash hızı), kart + `Atılış Bobini`, `Hafif Çizme`; hareket hızı kartları 4/8/12/16, dash bekleme kartları 6/12/18/24.
+- **Eksik:** koşucuya özel ses (atılış), zıplayan ve sürünen, tank vuruş anı (`attack_anim_hit_time` 0.55 tahmin) ve hazırlık ekranda gözle doğrulanmadı.
 
 - **7.1 kararları (Taha, 2026-11-18):** yakın dövüş ilk iş. Silahlar: bıçak (tekli dürtme), katana (yay savurma), ışın kılıcı (geniş savurma + yanma), **ateşli kılıç** (yanma, Taha ekledi); SMG, uzay silahları (plazma tüfeği = delip geçen, graviton topu = ittirme; sonra istenirse yenileri), bomba atar (alan hasarı). Yakın dövüş de 6 yuvadan birini kullanır, birleşme kuralları aynı. Zor erişim: 10–15 dalgalık oyuna göre silahlar dalga kilidiyle (`min_wave`) ve nadirlikle (`weight`) mağazaya çıkar, fiyatlar yüksek.
 - **Uzak silahlar (2026-11-18):** SMG (hızlı, sapmalı), plazma tüfeği (`pierce` 4, cyan iz), graviton topu (`behavior: &"burst"`: 80° koniyi bir kerede iter, mor iz), bomba atar (`explode_radius` 3 m, yay çizen kısa tıknaz mermi, `ExplosionFx` + kamera sarsıntısı). `ProjectilePool.fire(..., opts)`: pierce, explode_radius, color, size, length, arc; `EnemyManager.query_circle`. 4 yeni model, 4 yeni ses (`plasma`, `graviton`, `launcher`, `explosion`; SMG `shot_1`'i kısık kullanır). `FEATURE_EXPLOSION_FX`.
@@ -81,7 +85,7 @@ Bitiş ölçütleri `ROADMAP.md`'de. Biten kutunun yanına tarih ve commit yazı
 
 ### 7 — Silah ve zombi çeşitliliği
 - [x] 7.1 Silah davranış seti — yakın dövüş (bıçak, katana, ışın kılıcı, ateşli kılıç + yanma) 2026-11-18, Taha onayladı. Commit'ler `51062b0`, `962f58a`, `a97f11b`; SMG, plazma, graviton, bomba atar da eklendi
-- [ ] 7.2 Koşan ve tank
+- [x] 7.2 Koşucu ve tank — kod bitti 2026-11-18, Taha'nın oynayıp yorumu bekliyor (ayrıntı "Şu an"). Zıplayan ve sürünen ayrı turda
 - [ ] 7.3 Tüküren ve patlayan
 - [ ] 7.4 Boss
 - [ ] 7.5 Yeniden ölçüm
