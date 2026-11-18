@@ -11,9 +11,14 @@ var state: ZombieRules.State = ZombieRules.State.INACTIVE
 var state_duration: float = 0.0
 
 
-func _init() -> void:
+## Düğümün türü (modeli buna göre sabit); havuz türe göre tutulur.
+var kind: StringName = EnemyData.WALKER
+
+
+func _init(zombie_kind: StringName = EnemyData.WALKER) -> void:
+	kind = zombie_kind
 	visible = false
-	var visual: ZombieVisual = ZombieVisual.new()
+	var visual: ZombieVisual = ZombieVisual.new(EnemyData.get_row(kind)["model"])
 	visual.name = "Visual"
 	add_child(visual)
 

@@ -2,14 +2,17 @@ class_name ZombieRules
 extends RefCounted
 ## Zombi durum makinesinin saf kuralları. Süreler ve menziller veri tablosundan parametreyle gelir.
 ## Akış: SPAWN -> CHASE -> WINDUP -> (vuruş) -> RECOVER -> CHASE; STAGGER araya girer; DYING son.
+## Atılan türlerde (koşucu): WINDUP -> LUNGE -> RECOVER; atılırken sendeleme olmaz (kararlı atılış).
 
-enum State { INACTIVE, SPAWN, CHASE, WINDUP, RECOVER, STAGGER, DYING }
+enum State { INACTIVE, SPAWN, CHASE, WINDUP, RECOVER, STAGGER, DYING, LUNGE }
 
 
-## Süreli bir durumun süresi dolunca geçilecek durum.
-static func after_timer(state: State) -> State:
+## Süreli bir durumun süresi dolunca geçilecek durum. lunges: tür atılıyorsa hazırlık atılışa döner.
+static func after_timer(state: State, lunges: bool = false) -> State:
 	match state:
 		State.WINDUP:
+			return State.LUNGE if lunges else State.RECOVER
+		State.LUNGE:
 			return State.RECOVER
 		State.DYING, State.INACTIVE:
 			return State.INACTIVE

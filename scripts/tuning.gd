@@ -29,6 +29,10 @@ const FEATURE_PLAYER_MODEL: bool = true
 const FEATURE_ZOMBIE_MODEL: bool = true
 ## Zombi saldırısı: açıkken kısa hazırlıktan sonra vurur (kaçılabilir); kapalıyken eski "değince hasar".
 const FEATURE_ZOMBIE_WINDUP_ATTACK: bool = true
+## Dalgalarda koşucu ve tank da çıkar; kapalıyken yalnız yürüyen zombi (7.2).
+const FEATURE_ZOMBIE_VARIETY: bool = true
+## Koşucu hazırlanıp atılır; kapalıyken koşucu yürüyen gibi yaklaşıp vurur.
+const FEATURE_ZOMBIE_LUNGE: bool = true
 ## Zombiler yerden doğrularak doğar; kapalıyken doğrudan yürümeye başlar.
 const FEATURE_ZOMBIE_SPAWN_RISE: bool = true
 ## Vurulan zombi geriye itilir.

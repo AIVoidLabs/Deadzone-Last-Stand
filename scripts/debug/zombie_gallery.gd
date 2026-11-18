@@ -3,9 +3,10 @@ extends Node3D
 ## Yalnız debug yapıda.
 ## Aç: godot --path . res://scenes/debug/zombie_gallery.tscn [-- --capture=build/shots/zombies.png]
 ## Klip seti: ... -- --clips → ZombieClipData tablosundaki her klip bir zombide, adıyla.
+## Tür: ... -- --kind=runner|tank|walker (varsayılan walker). Boy karşılaştırması: ... -- --lineup
+## (her türden üç çeşit yan yana, gerçek oyun boylarında).
 ## Tuşlar: Esc çıkış.
 
-const MODEL: PackedScene = preload("res://assets/models/characters/zombie_walker.glb")
 const FRONT_CLIP: StringName = &"idle"
 const BACK_CLIP: StringName = &"walk_a"
 const CLIPS_YAW_DEG: float = 30.0
@@ -24,6 +25,8 @@ var _capture_path: String = ""
 var _capture_seconds: float = DEFAULT_CAPTURE_SECONDS
 var _time: float = 0.0
 var _show_clips: bool = false
+var _kind: StringName = &"walker"
+var _lineup: bool = false
 
 
 func _ready() -> void:
@@ -37,25 +40,46 @@ func _ready() -> void:
 			_capture_seconds = arg.trim_prefix("--capture-seconds=").to_float()
 		elif arg == "--clips":
 			_show_clips = true
+		elif arg.begins_with("--kind="):
+			_kind = StringName(arg.trim_prefix("--kind="))
+		elif arg == "--lineup":
+			_lineup = true
 	_add_environment()
+	if _lineup:
+		_add_lineup()
+		return
 	if _show_clips:
 		_add_clip_row()
 		return
-	var probe: Node3D = MODEL.instantiate() as Node3D
+	var probe: Node3D = _scene(_kind).instantiate() as Node3D
 	var variants: int = ZombieLook.variant_count(probe)
 	probe.free()
 	for i: int in variants:
 		var x: float = (i - (variants - 1) * 0.5) * SPACING
-		_add_zombie(i, i, Vector3(x, 0.0, 0.0), 0.0, FRONT_CLIP)
-		# Arka sıra: aynı gövdeler, paletin öbür yarısındaki (koyu) şemalarla.
-		_add_zombie(i, i + 8, Vector3(x, 0.0, BACK_ROW_Z), BACK_ROW_YAW_DEG, BACK_CLIP)
+		_add_zombie(_kind, i, i, Vector3(x, 0.0, 0.0), 0.0, FRONT_CLIP)
+		# Arka sıra: aynı gövdeler, başka renk şemalarıyla.
+		_add_zombie(_kind, i, i + 3, Vector3(x, 0.0, BACK_ROW_Z), BACK_ROW_YAW_DEG, BACK_CLIP)
+
+
+func _scene(kind: StringName) -> PackedScene:
+	return ZombieVisual.MODELS[kind]
+
+
+## Üç tür yan yana: oyundaki gerçek boy oranları ve yürüyüş / koşu klipleri.
+func _add_lineup() -> void:
+	var kinds: Array = [&"walker", &"runner", &"tank"]
+	for k: int in kinds.size():
+		for i: int in 3:
+			var at: Vector3 = Vector3((k * 3 + i - 4.0) * 1.6, 0.0, 0.0)
+			var row: Dictionary = EnemyData.get_row(kinds[k])
+			_add_zombie(kinds[k], i, i + k, at, 20.0, (row["anim_walk"] as Array)[0])
 
 
 func _add_clip_row() -> void:
 	var clips: Array = ZombieClipData.TABLE.keys()
 	for i: int in clips.size():
 		var at: Vector3 = Vector3((i - (clips.size() - 1) * 0.5) * SPACING, 0.0, 0.0)
-		_add_zombie(i, i * 3, at, CLIPS_YAW_DEG, clips[i])
+		_add_zombie(_kind, i, i * 3, at, CLIPS_YAW_DEG, clips[i])
 		var label: Label3D = Label3D.new()
 		label.text = String(clips[i])
 		label.pixel_size = LABEL_PIXEL_SIZE
@@ -83,9 +107,10 @@ func _unhandled_input(input_event: InputEvent) -> void:
 		get_tree().quit()
 
 
-func _add_zombie(variant: int, scheme: int, at: Vector3, yaw_deg: float, clip: StringName) -> void:
-	var model: Node3D = MODEL.instantiate() as Node3D
+func _add_zombie(kind: StringName, variant: int, scheme: int, at: Vector3, yaw_deg: float, clip: StringName) -> void:
+	var model: Node3D = _scene(kind).instantiate() as Node3D
 	ZombieLook.apply(model, variant, scheme)
+	model.scale = Vector3.ONE * (float(EnemyData.get_row(kind)["height"]) / Tuning.CHARACTER_MODEL_HEIGHT)
 	model.position = at
 	model.rotation_degrees.y = yaw_deg
 	add_child(model)

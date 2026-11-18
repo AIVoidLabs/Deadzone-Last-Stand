@@ -10,12 +10,13 @@ const CARDS: Array = [
 	{"stat": &"damage", "values": [5.0, 8.0, 12.0, 16.0]},
 	{"stat": &"fire_rate", "values": [5.0, 10.0, 15.0, 20.0]},
 	{"stat": &"range", "values": [5.0, 10.0, 15.0, 20.0]},
-	{"stat": &"move_speed", "values": [3.0, 6.0, 9.0, 12.0]},
+	{"stat": &"move_speed", "values": [4.0, 8.0, 12.0, 16.0]},
 	{"stat": &"armor", "values": [1.0, 2.0, 3.0, 4.0]},
 	{"stat": &"luck", "values": [5.0, 10.0, 15.0, 20.0]},
 	{"stat": &"hp_regen", "values": [1.0, 2.0, 3.0, 4.0]},
 	{"stat": &"pickup_range", "values": [15.0, 30.0, 45.0, 60.0]},
-	{"stat": &"dash_cooldown", "values": [5.0, 10.0, 15.0, 20.0]},
+	{"stat": &"dash_cooldown", "values": [6.0, 12.0, 18.0, 24.0]},
+	{"stat": &"dash_distance", "values": [8.0, 16.0, 24.0, 32.0]},
 ]
 
 const TIERS: Array = [

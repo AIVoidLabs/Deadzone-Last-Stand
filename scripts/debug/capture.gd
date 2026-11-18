@@ -8,6 +8,9 @@ extends Node
 ## --weapons=N: toplam N silahla başlar (debug silahı eklenir).
 ## --levels=N: N seviye atlatır (kart seçimi dalga arasında açılır). --capture-pick: açılan kart ekranında 1'e basar. --wave=N: N. dalgadan başlar. --capture-wave-end=S: görüntüden S saniye önce dalgayı bitirir.
 ## --autopilot: asker ölümsüz, daire çizerek yürür. --god: asker ölümsüz ama yerinde durur.
+## --capture-kind=runner|tank: --capture-spawn ile bu türden doğurur (varsayılan walker).
+## --circle: asker (ölümsüz değil) daire çizerek yürür. --zigzag=S: S saniyede bir yön değiştirerek yürür.
+## Sonda tür başına atılış istatistiği basılır (LUNGE starts/hits): koşucu kaçış ayarı denetimi.
 
 var player: Player
 var enemies: EnemyManager
@@ -32,6 +35,9 @@ var _pick_key: Key = KEY_1
 var _pick_wait: float = 0.0
 var _time: float = 0.0
 var _angle: float = 0.0
+var _kind: StringName = EnemyData.WALKER
+var _circle: bool = false
+var _zigzag: float = 0.0
 
 
 static func requested() -> bool:
@@ -66,6 +72,12 @@ func _ready() -> void:
 			weapons.debug_set_slots(arg.trim_prefix("--tiers="))
 		elif arg == "--god":
 			player.god_mode = true
+		elif arg.begins_with("--capture-kind="):
+			_kind = StringName(arg.trim_prefix("--capture-kind="))
+		elif arg == "--circle":
+			_circle = true
+		elif arg.begins_with("--zigzag="):
+			_zigzag = arg.trim_prefix("--zigzag=").to_float()
 		elif arg == "--debug-panel":
 			_show_panel = true
 		elif arg == "--capture-pick":
@@ -86,8 +98,10 @@ func _ready() -> void:
 	if _autopilot:
 		player.god_mode = true
 		player.use_input_override = true
+	if _circle or _zigzag > 0.0:
+		player.use_input_override = true
 	if _spawn > 0:
-		enemies.spawn_many(_spawn)
+		enemies.spawn_many(_spawn, _kind)
 	if _show_panel and debug_panel != null:
 		debug_panel.set_panel_visible(true)
 
@@ -96,6 +110,11 @@ func _process(delta: float) -> void:
 	if _autopilot:
 		_angle += delta * Tuning.BENCH_TURN_RATE
 		player.input_override = Vector2(-sin(_angle), cos(_angle))
+	elif _circle:
+		_angle += delta * Tuning.BENCH_TURN_RATE
+		player.input_override = Vector2(-sin(_angle), cos(_angle))
+	elif _zigzag > 0.0:
+		player.input_override = Vector2(1.0, 0.0) if int(_time / _zigzag) % 2 == 0 else Vector2(-1.0, 0.0)
 	_time += delta
 	if _dash_lead >= 0.0 and _time >= _seconds - _dash_lead:
 		_dash_lead = -1.0
@@ -113,10 +132,13 @@ func _process(delta: float) -> void:
 		_tick_auto_pick(delta)
 	if _time < _seconds:
 		return
-	var path: String = ProjectSettings.globalize_path("res://").path_join(_out)
-	DirAccess.make_dir_recursive_absolute(path.get_base_dir())
-	get_viewport().get_texture().get_image().save_png(path)
-	print("CAPTURE ", _out)
+	print("LUNGE starts=%d hits=%d" % [enemies.lunge_starts, enemies.lunge_hits])
+	var image: Image = get_viewport().get_texture().get_image()
+	if image != null:
+		var path: String = ProjectSettings.globalize_path("res://").path_join(_out)
+		DirAccess.make_dir_recursive_absolute(path.get_base_dir())
+		image.save_png(path)
+		print("CAPTURE ", _out)
 	get_tree().quit()
 
 

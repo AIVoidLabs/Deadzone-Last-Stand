@@ -20,6 +20,9 @@ var player: Player
 var spawning_enabled: bool = true
 var elapsed: float = 0.0
 var kills: int = 0
+## Koşucu atılışı sayaçları (ölçüm ve debug için).
+var lunge_starts: int = 0
+var lunge_hits: int = 0
 
 var _grid: SpatialGrid
 var _half: float
@@ -43,8 +46,11 @@ var _burn_left: PackedFloat32Array = PackedFloat32Array()
 var _burn_dps: PackedFloat32Array = PackedFloat32Array()
 var _burn_acc: PackedFloat32Array = PackedFloat32Array()
 var _burning: int = 0
+## Atılan türlerde atılış yönü (birim vektör).
+var _aim: PackedVector2Array = PackedVector2Array()
 var _nodes: Array[Zombie] = []
-var _pool: Array[Zombie] = []
+## Tür -> boştaki Zombie düğümleri (her düğümün modeli türüne göre sabit).
+var _pools: Dictionary = {}
 var _dead_count: int = 0
 var _corpses: CorpseList = CorpseList.new()
 
@@ -55,14 +61,16 @@ func _ready() -> void:
 	_half = Tuning.ARENA_SIZE * 0.5
 	_grid = SpatialGrid.new(Vector2(-_half, -_half), Vector2(Tuning.ARENA_SIZE, Tuning.ARENA_SIZE), Tuning.GRID_CELL_SIZE)
 	_rng.randomize()
-	_grow_pool(Quality.max_enemies())
+	for kind: StringName in EnemyData.TABLE:
+		var prewarm: int = Quality.max_enemies() if kind == EnemyData.WALKER else int(EnemyData.TABLE[kind].get("prewarm", 0))
+		_grow_pool(kind, prewarm)
 
 
 func _physics_process(delta: float) -> void:
 	_compact()
 	for node: Zombie in _corpses.tick(delta):
 		node.deactivate()
-		_pool.append(node)
+		_give(node)
 	elapsed += delta
 	_grid.rebuild(_pos)
 	_move(delta)
@@ -75,7 +83,10 @@ func active_count() -> int:
 
 
 func pool_size() -> int:
-	return _nodes.size() + _pool.size() + _corpses.count()
+	var idle: int = 0
+	for kind: StringName in _pools:
+		idle += (_pools[kind] as Array).size()
+	return _nodes.size() + idle + _corpses.count()
 
 
 func enemy_position(index: int) -> Vector2:
@@ -186,15 +197,13 @@ func damage(index: int, amount: float, direction: Vector2 = Vector2.ZERO, knockb
 		return
 	if Tuning.FEATURE_KNOCKBACK:
 		_knock[index] += Knockback.impulse(direction, knockback, row["weight"])
-	if Tuning.FEATURE_STAGGER and ZombieRules.can_stagger(state):
+	if Tuning.FEATURE_STAGGER and float(row["stagger_time"]) > 0.0 and ZombieRules.can_stagger(state):
 		_enter(index, ZombieRules.State.STAGGER, row["stagger_time"], true)
 
 
 func spawn(kind: StringName, at: Vector2) -> void:
 	var row: Dictionary = EnemyData.get_row(kind)
-	if _pool.is_empty():
-		_grow_pool(1)
-	var z: Zombie = _pool.pop_back()
+	var z: Zombie = _take(kind)
 	z.configure(row)
 	var r: float = row["radius"]
 	_max_radius = maxf(_max_radius, r)
@@ -208,6 +217,7 @@ func spawn(kind: StringName, at: Vector2) -> void:
 	_timer.append(0.0)
 	_rows.append(row)
 	_knock.append(Vector2.ZERO)
+	_aim.append(Vector2.DOWN)
 	_burn_left.append(0.0)
 	_burn_dps.append(0.0)
 	_burn_acc.append(0.0)
@@ -222,9 +232,9 @@ func spawn(kind: StringName, at: Vector2) -> void:
 
 
 ## Debug ve ölçüm için: üst sınıra bakmadan count kadar zombi doğurur.
-func spawn_many(count: int) -> void:
+func spawn_many(count: int, kind: StringName = EnemyData.WALKER) -> void:
 	for _i in count:
-		spawn(EnemyData.WALKER, pick_spawn_point())
+		spawn(kind, pick_spawn_point())
 
 
 ## Dalga sonu: count kadar canlı zombiyi öldürme sayılmadan devirir (ölüm animasyonu + solma).
@@ -252,6 +262,7 @@ func _move(delta: float) -> void:
 	var hittable: bool = player.is_hittable()
 	var solid: bool = not (Tuning.FEATURE_DASH_PASS_THROUGH and player.is_dashing())
 	var windup_attack: bool = Tuning.FEATURE_ZOMBIE_WINDUP_ATTACK
+	var target_vel: Vector2 = Vector2(player.velocity.x, player.velocity.z)
 	for i in _pos.size():
 		if _alive[i] == 0:
 			continue
@@ -263,7 +274,14 @@ func _move(delta: float) -> void:
 		var p: Vector2 = _pos[i]
 		var dir: Vector2 = Steering.seek(p, target)
 		var speed: float = _speed[i]
-		if ZombieRules.can_move(state):
+		var lunger: bool = _lunges(_rows[i])
+		if lunger and state == ZombieRules.State.WINDUP:
+			_aim_lunge(i, p, target, target_vel)
+		if lunger and state == ZombieRules.State.LUNGE:
+			var row: Dictionary = _rows[i]
+			_aim[i] = LungeRules.steer(_aim[i], dir, float(row["lunge_turn_rate"]) * delta)
+			p += _aim[i] * float(row["lunge_speed"]) * delta
+		elif ZombieRules.can_move(state):
 			var vel: Vector2 = dir * speed
 			if Tuning.FEATURE_SEPARATION:
 				vel += Steering.separation(i, _pos, _grid, _radius[i] * 2.0) * Tuning.ENEMY_SEPARATION_STRENGTH
@@ -277,6 +295,12 @@ func _move(delta: float) -> void:
 		var reach: float = Tuning.PLAYER_RADIUS + _radius[i]
 		var away: Vector2 = p - target
 		var dist: float = away.length()
+		if state == ZombieRules.State.LUNGE and player.is_exposed() and ZombieRules.strike_hits(dist, reach, _rows[i]["lunge_hit_range"]):
+			lunge_hits += 1
+			player.take_hit(_damage[i], target - p)
+			hittable = player.is_hittable()
+			_enter(i, ZombieRules.State.RECOVER, _rows[i]["attack_recover"])
+			state = ZombieRules.State.RECOVER
 		if solid and dist < reach:
 			if hittable and not windup_attack:
 				player.take_hit(_damage[i], -away)
@@ -288,20 +312,44 @@ func _move(delta: float) -> void:
 		_pos[i] = p
 		var node: Zombie = _nodes[i]
 		node.position = Vector3(p.x, 0.0, p.y)
+		if lunger and (state == ZombieRules.State.WINDUP or state == ZombieRules.State.LUNGE):
+			node.rotation.y = atan2(_aim[i].x, _aim[i].y)
 		if state != ZombieRules.State.CHASE:
 			continue
 		# Yalnız kovalarken döner; hazırlanırken yönü kilitlidir, yana kaçan asker ıskalatır.
 		if dir != Vector2.ZERO:
 			node.rotation.y = atan2(dir.x, dir.y)
-		if windup_attack and ZombieRules.wants_attack(dist, reach, _rows[i]["attack_range"]):
+		var attack_range: float = _rows[i]["lunge_range"] if lunger else _rows[i]["attack_range"]
+		if windup_attack and ZombieRules.wants_attack(dist, reach, attack_range):
 			_enter(i, ZombieRules.State.WINDUP, _rows[i]["attack_windup"])
+			if lunger:
+				_aim_lunge(i, p, target, target_vel)
+
+
+static func _lunges(row: Dictionary) -> bool:
+	return Tuning.FEATURE_ZOMBIE_LUNGE and EnemyData.lunges(row)
+
+
+## Hazırlıkta yön oyuncunun gideceği yere nişan alır; son lunge_lock_time saniyede kilitlenir.
+func _aim_lunge(index: int, from: Vector2, target: Vector2, target_vel: Vector2) -> void:
+	var row: Dictionary = _rows[index]
+	if LungeRules.is_aim_locked(_timer[index], float(row["lunge_lock_time"])):
+		return
+	_aim[index] = LungeRules.aim_direction(from, target, target_vel, float(row["lunge_speed"]), float(row["lunge_lead"]))
 
 
 ## Süresi dolan durumdan çıkar; hazırlık bittiyse vuruşu uygular. Dönüş: yeni durum.
 func _on_timer(index: int, state: ZombieRules.State, target: Vector2) -> ZombieRules.State:
 	var row: Dictionary = _rows[index]
-	var next: ZombieRules.State = ZombieRules.after_timer(state)
-	if state == ZombieRules.State.WINDUP:
+	var lunger: bool = _lunges(row)
+	var next: ZombieRules.State = ZombieRules.after_timer(state, lunger)
+	if state == ZombieRules.State.WINDUP and lunger:
+		# Atılış: yön hazırlığın sonunda kilitlenmişti; süre dolana ya da isabete kadar sürer.
+		lunge_starts += 1
+		_enter(index, next, row["lunge_time"])
+	elif state == ZombieRules.State.LUNGE:
+		_enter(index, next, row["attack_recover"])
+	elif state == ZombieRules.State.WINDUP:
 		var contact: float = Tuning.PLAYER_RADIUS + _radius[index]
 		if ZombieRules.strike_hits(_pos[index].distance_to(target), contact, row["attack_hit_range"]):
 			player.take_hit(_damage[index], target - _pos[index])
@@ -354,7 +402,7 @@ func _compact() -> void:
 			var last: int = _nodes.size() - 1
 			# Ölüm animasyonundaki düğüm CorpseList'te; havuza oradan döner.
 			if _nodes[i].state == ZombieRules.State.INACTIVE:
-				_pool.append(_nodes[i])
+				_give(_nodes[i])
 			if i != last:
 				_pos[i] = _pos[last]
 				_hp[i] = _hp[last]
@@ -366,6 +414,7 @@ func _compact() -> void:
 				_timer[i] = _timer[last]
 				_rows[i] = _rows[last]
 				_knock[i] = _knock[last]
+				_aim[i] = _aim[last]
 				_burn_left[i] = _burn_left[last]
 				_burn_dps[i] = _burn_dps[last]
 				_burn_acc[i] = _burn_acc[last]
@@ -380,6 +429,7 @@ func _compact() -> void:
 			_timer.resize(last)
 			_rows.resize(last)
 			_knock.resize(last)
+			_aim.resize(last)
 			_burn_left.resize(last)
 			_burn_dps.resize(last)
 			_burn_acc.resize(last)
@@ -388,8 +438,23 @@ func _compact() -> void:
 	_dead_count = 0
 
 
-func _grow_pool(count: int) -> void:
+func _grow_pool(kind: StringName, count: int) -> void:
 	for _i in count:
-		var z: Zombie = Zombie.new()
-		add_child(z)
-		_pool.append(z)
+		_give(_create(kind))
+
+
+func _create(kind: StringName) -> Zombie:
+	var z: Zombie = Zombie.new(kind)
+	add_child(z)
+	return z
+
+
+func _take(kind: StringName) -> Zombie:
+	var pool: Array = _pools.get(kind, [])
+	return pool.pop_back() if not pool.is_empty() else _create(kind)
+
+
+func _give(node: Zombie) -> void:
+	if not _pools.has(node.kind):
+		_pools[node.kind] = []
+	(_pools[node.kind] as Array).append(node)

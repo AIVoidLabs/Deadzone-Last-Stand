@@ -14,6 +14,8 @@ const ITEMS: Dictionary = {
 	&"magnet": {"name": "Mıknatıs", "price": 15, "effects": [{"stat": &"pickup_range", "value": 50.0}]},
 	&"regen_shot": {"name": "Yenileme Aşısı", "price": 30, "effects": [{"stat": &"hp_regen", "value": 3.0}, {"stat": &"damage", "value": -4.0}]},
 	&"dash_boots": {"name": "Dash Çizmesi", "price": 24, "effects": [{"stat": &"dash_cooldown", "value": 12.0}, {"stat": &"armor", "value": -1.0}]},
+	&"dash_coil": {"name": "Atılış Bobini", "price": 26, "effects": [{"stat": &"dash_distance", "value": 20.0}, {"stat": &"max_hp", "value": -5.0}]},
+	&"light_boots": {"name": "Hafif Çizme", "price": 22, "effects": [{"stat": &"move_speed", "value": 6.0}, {"stat": &"dash_cooldown", "value": 6.0}, {"stat": &"armor", "value": -1.0}]},
 }
 
 

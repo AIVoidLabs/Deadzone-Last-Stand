@@ -89,7 +89,8 @@ func _tick_wave(delta: float) -> void:
 	for _i in SpawnRules.wave_batch(row, t):
 		if enemies.active_count() >= cap:
 			break
-		enemies.spawn(SpawnRules.pick_kind(_rng, row["mix"]), enemies.pick_spawn_point())
+		var kind: StringName = SpawnRules.pick_kind(_rng, row["mix"]) if Tuning.FEATURE_ZOMBIE_VARIETY else EnemyData.WALKER
+		enemies.spawn(kind, enemies.pick_spawn_point())
 
 
 ## Kalanlar temizlik süresine yayılarak devrilir; son karede hepsi.

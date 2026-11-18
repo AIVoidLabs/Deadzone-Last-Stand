@@ -41,6 +41,11 @@ func dash_cooldown() -> float:
 	return Tuning.DASH_COOLDOWN * (1.0 - cut / 100.0)
 
 
+## Dash hızı (süre sabit, mesafe buna bağlı).
+func dash_speed() -> float:
+	return Tuning.DASH_SPEED * _percent(StatData.DASH_DISTANCE)
+
+
 func pickup_radius() -> float:
 	return Tuning.PICKUP_MAGNET_RADIUS * _percent(StatData.PICKUP_RANGE)
 

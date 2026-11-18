@@ -1,11 +1,12 @@
-"""Yürüyen zombi: low-poly, 25 kemikli ortak iskelette, tek dosyada birçok gövde çeşidi.
+"""Zombi modelleri: low-poly, 25 kemikli ortak iskelette, tek dosyada birçok gövde çeşidi.
+Üç takım var: walker (yürüyen), runner (koşucu: ince, çevik), tank (iri, zırhlı omuzlu).
 
-Çalıştırma (repo kökünden, Blender penceresi açılmaz):
-    blender --background --python tools/blender/build_zombie.py
+Çalıştırma (repo kökünden, Blender penceresi açılmaz; takım adı verilmezse walker):
+    blender --background --python tools/blender/build_zombie.py [-- walker|runner|tank|all]
 
 Girdi : assets/models/characters/mannequin.glb (iskelet ve dinlenme pozu kaynağı)
-Çıktı : assets/models/characters/zombie_walker.glb (her çeşit ayrı ağ: Variant_A, Variant_B ...)
-        build/blender/zombie_walker.blend
+Çıktı : assets/models/characters/zombie_<takım>.glb (her çeşit ayrı ağ: Variant_A, Variant_B ...)
+        build/blender/zombie_<takım>.blend
 
 Gövde, kemik hizalarına dizilen halkaların birleştirilmesiyle (loft) kurulur; ağırlıklar
 halka başına elle verilir. Yüzler renk değil ROL taşır (ten, üst, alt ...); palet dokusunun her
@@ -23,9 +24,12 @@ from mathutils import Vector
 
 REPO: str = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 SKELETON_SOURCE: str = os.path.join(REPO, "assets", "models", "characters", "mannequin.glb")
-OUTPUT: str = os.path.join(REPO, "assets", "models", "characters", "zombie_walker.glb")
-BLEND_OUTPUT: str = os.path.join(REPO, "build", "blender", "zombie_walker.blend")
-PALETTE_FILE: str = os.path.join(REPO, "build", "blender", "zombie_palette.png")
+CHARACTER_DIR: str = os.path.join(REPO, "assets", "models", "characters")
+BLEND_DIR: str = os.path.join(REPO, "build", "blender")
+# Takıma göre build_set() içinde ayarlanır.
+OUTPUT: str = ""
+BLEND_OUTPUT: str = ""
+PALETTE_FILE: str = ""
 
 # Palet: sütun = rol, satır = renk şeması. Oyun tarafı (ZombieLook) aynı sütun sayısını bilir.
 PALETTE_COLUMNS: int = 16
@@ -56,7 +60,7 @@ EYE_PALE: tuple = (0.80, 0.96, 0.92)
 SKIN_SHADE: float = 0.8
 
 # Renk şemaları (sRGB): ten, üst, alt, ayakkabı, saç/şapka, göz. İlk sekiz açık, son sekiz koyu tonlar.
-SCHEMES: list = [
+WALKER_SCHEMES: list = [
     ((0.47, 0.58, 0.42), (0.72, 0.70, 0.62), (0.20, 0.21, 0.26), (0.12, 0.10, 0.09), (0.20, 0.15, 0.10), EYE_YELLOW),
     ((0.55, 0.60, 0.38), (0.62, 0.52, 0.22), (0.33, 0.24, 0.17), (0.15, 0.12, 0.10), (0.16, 0.12, 0.09), EYE_YELLOW),
     ((0.56, 0.62, 0.55), (0.36, 0.40, 0.44), (0.36, 0.37, 0.36), (0.20, 0.18, 0.16), (0.22, 0.20, 0.17), EYE_YELLOW),
@@ -75,21 +79,46 @@ SCHEMES: list = [
     ((0.33, 0.28, 0.26), (0.34, 0.24, 0.12), (0.11, 0.10, 0.09), (0.07, 0.06, 0.06), (0.05, 0.04, 0.04), EYE_YELLOW),
 ]
 
+# Koşucu: soluk, kuru ten; parlak kırmızı ve rengi atmış spor giysiler (uzaktan "tehlikeli" okunur).
+RUNNER_SCHEMES: list = [
+    ((0.66, 0.62, 0.54), (0.72, 0.16, 0.14), (0.16, 0.16, 0.20), (0.85, 0.85, 0.82), (0.12, 0.08, 0.06), EYE_RED),
+    ((0.60, 0.64, 0.52), (0.85, 0.55, 0.12), (0.12, 0.14, 0.20), (0.10, 0.10, 0.10), (0.30, 0.20, 0.10), EYE_YELLOW),
+    ((0.70, 0.60, 0.55), (0.20, 0.20, 0.24), (0.50, 0.12, 0.12), (0.12, 0.10, 0.10), (0.06, 0.06, 0.06), EYE_RED),
+    ((0.58, 0.66, 0.60), (0.70, 0.70, 0.30), (0.14, 0.18, 0.26), (0.16, 0.14, 0.12), (0.22, 0.18, 0.10), EYE_YELLOW),
+    ((0.64, 0.58, 0.60), (0.55, 0.12, 0.30), (0.10, 0.10, 0.12), (0.70, 0.68, 0.64), (0.40, 0.12, 0.30), EYE_PALE),
+    ((0.52, 0.60, 0.56), (0.12, 0.34, 0.52), (0.18, 0.16, 0.14), (0.85, 0.82, 0.76), (0.10, 0.10, 0.12), EYE_RED),
+    ((0.72, 0.68, 0.62), (0.38, 0.10, 0.10), (0.26, 0.26, 0.28), (0.08, 0.08, 0.08), (0.80, 0.78, 0.74), EYE_RED),
+    ((0.56, 0.54, 0.50), (0.88, 0.80, 0.70), (0.30, 0.10, 0.08), (0.12, 0.10, 0.08), (0.14, 0.10, 0.06), EYE_YELLOW),
+]
+
+# Tank: koyu gri-yeşil, çamurlu ten; zırh parçaları koyu çelik (alt rolü) tonlarında.
+TANK_SCHEMES: list = [
+    ((0.34, 0.40, 0.32), (0.22, 0.24, 0.20), (0.30, 0.32, 0.36), (0.08, 0.08, 0.08), (0.10, 0.08, 0.06), EYE_RED),
+    ((0.40, 0.42, 0.36), (0.36, 0.20, 0.12), (0.22, 0.24, 0.28), (0.10, 0.09, 0.08), (0.06, 0.05, 0.05), EYE_YELLOW),
+    ((0.30, 0.34, 0.36), (0.16, 0.18, 0.22), (0.40, 0.34, 0.20), (0.07, 0.07, 0.08), (0.18, 0.18, 0.20), EYE_PALE),
+    ((0.44, 0.38, 0.34), (0.26, 0.10, 0.10), (0.26, 0.26, 0.30), (0.09, 0.08, 0.08), (0.12, 0.08, 0.06), EYE_RED),
+    ((0.28, 0.32, 0.26), (0.14, 0.18, 0.14), (0.34, 0.36, 0.32), (0.06, 0.06, 0.06), (0.05, 0.06, 0.05), EYE_YELLOW),
+    ((0.36, 0.36, 0.42), (0.28, 0.28, 0.32), (0.44, 0.22, 0.12), (0.08, 0.08, 0.10), (0.22, 0.22, 0.26), EYE_RED),
+]
+
+# Etkin renk şemaları (takıma göre build_set() ayarlar).
+SCHEMES: list = WALKER_SCHEMES
+
 
 def variant(name: str, **overrides) -> dict:
     """Gövde çeşidi. Ölçüler çarpan. arm_cut: dirsekten kopuk kol (+1 sol, -1 sağ, 0 yok).
     sleeve: kol giysisi (0 kolsuz, 1 bileğe kadar). pants_end: paça (0 bilek, 1 diz).
-    headgear: None, "hair", "long_hair", "mohawk", "cap", "hood"."""
+    headgear: None, "hair", "long_hair", "mohawk", "cap", "hood". pads: omuz zırhı + göğüs plakası (tank)."""
     row: dict = {
         "name": name, "torso": 1.0, "belly": 1.0, "limb": 1.0, "head": 1.25, "arm_cut": 0, "sleeve": 0.5,
         "pants_end": 0.2, "bare_chest": False, "bloody_top": False, "headgear": None, "skirt": False,
-        "barefoot": False, "head_wound": False,
+        "barefoot": False, "head_wound": False, "pads": False,
     }
     row.update(overrides)
     return row
 
 
-VARIANTS: list = [
+WALKER_VARIANTS: list = [
     variant("Variant_A", bloody_top=True, sleeve=0.55),
     variant("Variant_B", torso=1.18, belly=1.45, limb=1.2, head=1.22, sleeve=0.3, pants_end=0.32, headgear="hair"),
     variant("Variant_C", torso=0.86, belly=0.8, limb=0.82, head=1.22, arm_cut=1, sleeve=0.0, pants_end=0.42,
@@ -105,6 +134,35 @@ VARIANTS: list = [
     variant("Variant_J", torso=0.94, limb=0.9, arm_cut=1, sleeve=0.8, pants_end=0.3, bloody_top=True,
             headgear="long_hair", head_wound=True),
 ]
+
+# Koşucu: ince, uzun uzuvlu, çıplak göğüslü ya da yırtık giysili; siluet "kuru ve çevik".
+RUNNER_VARIANTS: list = [
+    variant("Variant_A", torso=0.80, belly=0.75, limb=0.78, head=1.18, sleeve=0.0, pants_end=0.5, bare_chest=True,
+            barefoot=True, headgear="hair"),
+    variant("Variant_B", torso=0.82, belly=0.8, limb=0.8, head=1.15, sleeve=0.3, pants_end=0.25, bloody_top=True,
+            headgear="mohawk"),
+    variant("Variant_C", torso=0.84, belly=0.85, limb=0.8, head=1.2, sleeve=1.0, pants_end=0.1, headgear="hood"),
+    variant("Variant_D", torso=0.80, belly=0.78, limb=0.78, head=1.18, arm_cut=-1, sleeve=0.0, pants_end=0.35,
+            bare_chest=True, head_wound=True, headgear="cap"),
+]
+
+# Tank: geniş gövde, kalın uzuvlar, küçük baş; omuz zırhı ve göğüs plakası siluetini ayırır.
+TANK_VARIANTS: list = [
+    variant("Variant_A", torso=1.42, belly=1.2, limb=1.4, head=0.95, sleeve=0.5, pants_end=0.15, bloody_top=True,
+            headgear="cap", pads=True),
+    variant("Variant_B", torso=1.5, belly=1.45, limb=1.45, head=0.92, arm_cut=1, sleeve=0.0, pants_end=0.55,
+            bare_chest=True, barefoot=True, head_wound=True),
+    variant("Variant_C", torso=1.38, belly=1.15, limb=1.35, head=0.98, sleeve=1.0, pants_end=0.1, headgear="hood",
+            pads=True),
+    variant("Variant_D", torso=1.46, belly=1.3, limb=1.42, head=0.94, sleeve=0.0, pants_end=0.6, bare_chest=True,
+            headgear="mohawk", pads=True),
+]
+
+SETS: dict = {
+    "walker": {"variants": WALKER_VARIANTS, "schemes": WALKER_SCHEMES},
+    "runner": {"variants": RUNNER_VARIANTS, "schemes": RUNNER_SCHEMES},
+    "tank": {"variants": TANK_VARIANTS, "schemes": TANK_SCHEMES},
+}
 
 
 def log(message: str) -> None:
@@ -240,6 +298,19 @@ def build_torso(body: Body, v: dict) -> None:
         # Etek: kalçadan dize doğru genişleyen, kalçaya bağlı çan.
         rings[0] = ring(0.62, 0.25, 0.20, {"pelvis": 1.0})
     body.loft(rings, [hips, hips, lower_top, ribs, top, top], TORSO_SIDES)
+    if v["pads"]:
+        build_armor(body, wide)
+
+
+def build_armor(body: Body, wide: float) -> None:
+    """Omuz zırhı (üzerinde küçük sivri çıkıntı) ve göğüs plakası; rol: koyu çelik (bottom) + kemik."""
+    for side in (1.0, -1.0):
+        upper: str = "upperarm_l" if side > 0.0 else "upperarm_r"
+        weights: dict = {"spine_03": 0.5, upper: 0.5}
+        body.box((side * 0.25 * wide, 0.01, 1.50), (0.11, 0.085, 0.04), "shoes", weights)
+        body.box((side * 0.25 * wide, 0.01, 1.565), (0.016, 0.016, 0.04), "bone", weights)
+    front: float = 0.01 - 0.135 * wide - 0.02
+    body.box((0.0, front, 1.22), (0.11 * wide, 0.022, 0.085), "shoes", {"spine_02": 0.5, "spine_03": 0.5})
 
 
 def build_head(body: Body, v: dict) -> None:
@@ -404,14 +475,28 @@ def export(objects: list, armature) -> None:
     log("yazıldı: %s (%.0f KB)" % (os.path.relpath(OUTPUT, REPO), os.path.getsize(OUTPUT) / 1024.0))
 
 
-def main() -> None:
+def build_set(name: str) -> None:
+    global OUTPUT, BLEND_OUTPUT, PALETTE_FILE, SCHEMES
+    row: dict = SETS[name]
+    SCHEMES = row["schemes"]
+    OUTPUT = os.path.join(CHARACTER_DIR, "zombie_%s.glb" % name)
+    BLEND_OUTPUT = os.path.join(BLEND_DIR, "zombie_%s.blend" % name)
+    PALETTE_FILE = os.path.join(BLEND_DIR, "zombie_%s_palette.png" % name)
     bpy.ops.wm.read_factory_settings(use_empty=True)
     armature = load_skeleton()
     material, texture = build_material()
-    objects: list = [build_variant(v, armature, material) for v in VARIANTS]
+    objects: list = [build_variant(v, armature, material) for v in row["variants"]]
     texture.image = build_palette_image()
-    log("%d çeşit x %d şema = %d görünüm" % (len(VARIANTS), len(SCHEMES), len(VARIANTS) * len(SCHEMES)))
+    log("%s: %d çeşit x %d şema = %d görünüm" % (name, len(row["variants"]), len(SCHEMES), len(row["variants"]) * len(SCHEMES)))
     export(objects, armature)
+
+
+def main() -> None:
+    args: list = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
+    choice: str = args[0] if args else "walker"
+    names: list = list(SETS) if choice == "all" else [choice]
+    for name in names:
+        build_set(name)
     log("bitti")
 
 

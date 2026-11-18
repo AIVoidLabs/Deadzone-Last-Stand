@@ -15,6 +15,23 @@ func test_attack_cycle_returns_to_chase() -> void:
 	assert_eq(ZombieRules.after_timer(S.DYING), S.INACTIVE)
 
 
+func test_lunge_cycle() -> void:
+	assert_eq(ZombieRules.after_timer(S.WINDUP, true), S.LUNGE)
+	assert_eq(ZombieRules.after_timer(S.LUNGE, true), S.RECOVER)
+	assert_false(ZombieRules.can_stagger(S.LUNGE))
+	assert_true(ZombieRules.can_take_damage(S.LUNGE))
+	assert_true(ZombieRules.is_timed(S.LUNGE))
+
+
+func test_runner_lunge_is_fair_but_not_trivial() -> void:
+	# Koşucu atılırken normal koşudan hızlı, ama dash (hız x süre) ve hazırlık süresi kaçışa yeter.
+	var row: Dictionary = EnemyData.get_row(EnemyData.RUNNER)
+	assert_gt(float(row["lunge_speed"]), Tuning.PLAYER_SPEED, "atılış koşudan hızlı")
+	assert_gt(Tuning.DASH_DURATION, 0.0)
+	assert_gt(float(row["attack_windup"]), 0.4, "tepki payı")
+	assert_lt(float(row["lunge_lock_time"]), float(row["attack_windup"]))
+
+
 func test_only_chase_moves_and_is_untimed() -> void:
 	for state: int in S.values():
 		assert_eq(ZombieRules.can_move(state), state == S.CHASE)

@@ -2,6 +2,10 @@
 
 Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar verilince "Açık kararlar"dan çıkarılıp tarihli bölüme yazılır.
 
+## 2026-11-18 — Aşama 7.2 koşucu ve tank (Taha)
+
+- İlk tür seti koşucu + tank (Taha onayladı; zıplayan ve sürünen sonra). Koşucu atılışı rastgele değil: hazırlıkta oyuncunun hızına göre önden nişan (`LungeRules`), son 0.22 sn yön kilitli, atılırken sınırlı dönüşle izler; kaçmak kolay olmamalı. Dash ve hız önemli: yeni istatistik `dash_mesafesi`, kart/eşya (`Atılış Bobini`, `Hafif Çizme`), hareket hızı kartları ×1.33, dash bekleme kartları büyüdü. Blender'da ek rötuş serbest.
+
 ## 2026-11-17 — Aşama 6.3 istatistikler ve kartlar (Taha)
 
 - **Kart seçimi dalga sonunda** (Brotato gibi), dalga içinde akış kesilmez.

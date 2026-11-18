@@ -13,6 +13,7 @@ const LUCK: StringName = &"luck"
 const HP_REGEN: StringName = &"hp_regen"
 const PICKUP_RANGE: StringName = &"pickup_range"
 const DASH_COOLDOWN: StringName = &"dash_cooldown"
+const DASH_DISTANCE: StringName = &"dash_distance"
 
 ## Gösterim sırası da budur.
 const TABLE: Dictionary = {
@@ -26,6 +27,7 @@ const TABLE: Dictionary = {
 	&"hp_regen": {"name": "Can yenileme", "format": "+%s can yenileme", "short": "+%s"},
 	&"pickup_range": {"name": "Toplama menzili", "format": "+%s%% toplama menzili", "short": "+%s%%"},
 	&"dash_cooldown": {"name": "Dash bekleme süresi", "format": "-%s%% dash bekleme", "short": "-%s%%"},
+	&"dash_distance": {"name": "Dash mesafesi", "format": "+%s%% dash mesafesi", "short": "+%s%%"},
 }
 
 

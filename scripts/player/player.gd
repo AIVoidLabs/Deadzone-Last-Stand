@@ -56,7 +56,7 @@ func _physics_process(delta: float) -> void:
 		_try_start_dash(input)
 	var planar: Vector2
 	if dash.is_active():
-		planar = _dash_direction * Tuning.DASH_SPEED
+		planar = _dash_direction * stats.dash_speed()
 	else:
 		planar = Locomotion.step(
 			Vector2(velocity.x, velocity.z), input, stats.move_speed(), Tuning.PLAYER_ACCEL, Tuning.PLAYER_FRICTION, delta)
@@ -84,7 +84,12 @@ func is_dashing() -> bool:
 
 
 func is_hittable() -> bool:
-	return state != State.DEAD and state != State.DASH and _iframes_left <= 0.0 and not god_mode
+	return is_exposed() and not god_mode
+
+
+## Dash, dokunulmazlık payı ve ölüm dışında vurulabilir durumda (ölümsüz modu hariç tutmadan; ölçümler için).
+func is_exposed() -> bool:
+	return state != State.DEAD and state != State.DASH and _iframes_left <= 0.0
 
 
 ## Klavye dışından dash isteği (debug araçları).

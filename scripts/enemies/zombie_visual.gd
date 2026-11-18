@@ -4,7 +4,15 @@ extends Node3D
 ## Görünüm (gövde çeşidi + renk şeması) ZombieLook ile rastgele seçilir; vuruş parlaması örnek başına.
 
 const FLASH_SHADER: Shader = preload("res://assets/shaders/flash_lit.gdshader")
-const MODEL: PackedScene = preload("res://assets/models/characters/zombie_walker.glb")
+## Tür satırındaki "model" alanı bu tablodan seçilir; her model aynı 25 kemikli iskeleti kullanır.
+const MODELS: Dictionary = {
+	&"walker": preload("res://assets/models/characters/zombie_walker.glb"),
+	&"runner": preload("res://assets/models/characters/zombie_runner.glb"),
+	&"tank": preload("res://assets/models/characters/zombie_tank.glb"),
+}
+## Atılma hazırlığı ve toparlanma: klip bu hızda (yavaş) oynar, çömelme duruşu uzunca okunur.
+const HOLD_ANIM_SPEED: float = 0.3
+const LUNGE_ANIM_SPEED: float = 1.25
 const BOX_WIDTH_FACTOR: float = 1.6
 
 static var _box_meshes: Dictionary = {}
@@ -19,9 +27,9 @@ var _dying: bool = false
 var _death_left: float = 0.0
 
 
-func _init() -> void:
+func _init(model_kind: StringName = &"walker") -> void:
 	if Tuning.FEATURE_ZOMBIE_MODEL:
-		_build_model()
+		_build_model(model_kind)
 	else:
 		_build_box()
 	set_process(false)
@@ -78,13 +86,20 @@ func _on_state_changed(new_state: int, _old_state: int) -> void:
 		ZombieRules.State.CHASE:
 			_start_walk()
 		ZombieRules.State.WINDUP:
-			# Klipteki vuruş anı hazırlığın sonuna denk gelsin.
-			_play_timed(&"anim_attack", _row.get("attack_anim_hit_time", 0.0), _body.state_duration)
+			if _is_lunger():
+				_play_loop(&"anim_attack", HOLD_ANIM_SPEED)
+			else:
+				# Klipteki vuruş anı hazırlığın sonuna denk gelsin.
+				_play_timed(&"anim_attack", _row.get("attack_anim_hit_time", 0.0), _body.state_duration)
+		ZombieRules.State.LUNGE:
+			_play_loop(&"anim_lunge", LUNGE_ANIM_SPEED)
 		ZombieRules.State.STAGGER:
 			_play_timed(&"anim_stagger", 0.0, _body.state_duration)
 		ZombieRules.State.RECOVER:
-			# Saldırı klibi kendi hızında tamamlanır.
-			if _animation != null:
+			if _is_lunger():
+				_play_loop(&"anim_attack", HOLD_ANIM_SPEED)
+			elif _animation != null:
+				# Saldırı klibi kendi hızında tamamlanır.
 				_animation.speed_scale = 1.0
 		ZombieRules.State.INACTIVE:
 			_set_burn(0.0)
@@ -111,8 +126,8 @@ func _set_flash(value: float) -> void:
 		mesh.set_instance_shader_parameter(&"flash", value)
 
 
-func _build_model() -> void:
-	var model: Node3D = MODEL.instantiate() as Node3D
+func _build_model(model_kind: StringName) -> void:
+	var model: Node3D = (MODELS[model_kind] as PackedScene).instantiate() as Node3D
 	add_child(model)
 	_meshes.append(ZombieLook.apply_random(model))
 	_animation = AnimationPlayer.new()
@@ -160,6 +175,19 @@ func _play_timed(row_key: StringName, marker_time: float, duration: float) -> vo
 	_animation.speed_scale = span / maxf(duration, 0.01)
 	_animation.play(clip, Tuning.ZOMBIE_ANIM_BLEND)
 	_animation.seek(0.0)
+
+
+func _is_lunger() -> bool:
+	return Tuning.FEATURE_ZOMBIE_LUNGE and not _row.is_empty() and EnemyData.lunges(_row)
+
+
+## Klibi sabit hızda baştan oynatır (süreye uydurmadan).
+func _play_loop(row_key: StringName, speed: float) -> void:
+	var clip: StringName = _pick_clip(row_key)
+	if clip == &"":
+		return
+	_animation.speed_scale = speed
+	_animation.play(clip, Tuning.ZOMBIE_ANIM_BLEND)
 
 
 func _pick_clip(row_key: StringName) -> StringName:
