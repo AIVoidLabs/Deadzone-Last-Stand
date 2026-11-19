@@ -123,10 +123,11 @@ def cloth_material(name, color, stain=(0.10, 0.07, 0.05), blood=0.0):
 
 
 def garment(body, name, keep, mat, offset=0.009, thickness=0.004,
-            hems=(), holes=0.0, hole_scale=9.0, seed=0.0):
+            hems=(), holes=0.0, hole_scale=9.0, seed=0.0, smooth_edges=0):
     """Gövde yüzeyinden kıyafet: `keep(co)` doğru olan yüzler kopyalanır, dışa itilir.
     hems: [(eksen, sınır, yön, genlik, ölçek)] — yırtık kenar: yön>0 ise sınırın üstü kalır.
-    holes: 0..1 yırtık delik yoğunluğu (gürültü eşiği)."""
+    holes: 0..1 yırtık delik yoğunluğu (gürültü eşiği).
+    smooth_edges: kesik kenar halkasını bu kadar tur gevşetir (voxel merdiveni yumuşar; 0 = eski)."""
     bm = bmesh.new()
     bm.from_mesh(body.data)
     bm.transform(body.matrix_world)
@@ -142,6 +143,8 @@ def garment(body, name, keep, mat, offset=0.009, thickness=0.004,
     dead = [f for f in bm.faces if not keep(f.calc_center_median()) or torn(f.calc_center_median())]
     bmesh.ops.delete(bm, geom=dead, context="FACES")
     bm.normal_update()
+    if smooth_edges > 0:
+        _relax_boundary(bm, smooth_edges)
     for v in bm.verts:
         v.co += v.normal * offset
     mesh = bpy.data.meshes.new(name)
@@ -154,6 +157,60 @@ def garment(body, name, keep, mat, offset=0.009, thickness=0.004,
     solid.thickness = thickness
     solid.offset = 1.0
     apply_all(obj)
+    for poly in obj.data.polygons:
+        poly.use_smooth = True
+    return obj
+
+
+def _relax_boundary(bm, iterations, weight=0.5) -> None:
+    """Açık kenar halkasındaki köşeleri komşu kenar köşelerinin ortasına çeker; iç köşelerin
+    ilk halkası da yarı oranda izler ki kenar boyunca kırışık kalmasın."""
+    ring = [v for v in bm.verts if v.is_boundary]
+    for _ in range(iterations):
+        moved = {}
+        for v in ring:
+            nbrs = [e.other_vert(v) for e in v.link_edges if e.is_boundary]
+            if len(nbrs) == 2:
+                avg = (nbrs[0].co + nbrs[1].co) * 0.5
+                moved[v] = v.co.lerp(avg, weight)
+        for v, co in moved.items():
+            v.co = co
+    inner = {e.other_vert(v) for v in ring for e in v.link_edges if not e.other_vert(v).is_boundary}
+    for v in inner:
+        nbrs = [e.other_vert(v) for e in v.link_edges]
+        avg = sum((n.co for n in nbrs), Vector()) / len(nbrs)
+        v.co = v.co.lerp(avg, 0.5)
+
+
+def metaball_oriented(name, blobs, mat, resolution=0.003, smooth=4):
+    """Döndürülmüş elipsoidlerden ağ (saç tutamı, ayakkabı gibi eğik kütleler).
+    blobs: [(merkez, (yarıçap_x, y, z), dönüş_quaternion, negatif_mi)]"""
+    mb = bpy.data.metaballs.new(name + "_mb")
+    mb.resolution = resolution
+    mb.render_resolution = resolution
+    for center, radii, quat, negative in blobs:
+        el = mb.elements.new(type="ELLIPSOID")
+        el.co = center
+        r = max(radii) / METABALL_SURFACE
+        el.radius = r
+        el.size_x, el.size_y, el.size_z = (q / (METABALL_SURFACE * r) for q in radii)
+        el.rotation = quat
+        el.use_negative = negative
+        el.stiffness = 1.8 if not negative else 3.0
+    tmp = bpy.data.objects.new(name + "_tmp", mb)
+    bpy.context.collection.objects.link(tmp)
+    depsgraph = bpy.context.evaluated_depsgraph_get()
+    depsgraph.update()
+    mesh = bpy.data.meshes.new_from_object(tmp.evaluated_get(depsgraph))
+    bpy.data.objects.remove(tmp)
+    bpy.data.metaballs.remove(mb)
+    obj = bpy.data.objects.new(name, mesh)
+    bpy.context.collection.objects.link(obj)
+    obj.data.materials.append(mat)
+    if smooth:
+        mod = obj.modifiers.new("Smooth", "CORRECTIVE_SMOOTH")
+        mod.iterations = smooth
+        apply_all(obj)
     for poly in obj.data.polygons:
         poly.use_smooth = True
     return obj
