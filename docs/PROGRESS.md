@@ -10,6 +10,13 @@ Oturum 8 (2026-11-19). Taha görsel kaliteden memnun değildi; yeni yön onaylan
 - **Taha (2026-11-19): "genel işleyişten memnunum".** Bu oturumun çalışma biçimi korunur: her adım tek sabitle kapatılabilir; Blender'da pozlar MCP içinde kemik konumu ölçülerek bulunur ve `look` görüntüsüyle yinelenir; oyunda ekran görüntüsü + kare özeti + video; ölçümler sayıyla raporlanır (TONGUE sayaçları); eklenen tasarım kuralı (ısırma) açıkça onaya sunulur.
 - **Yeni oturum başlangıcı:** ortam kontrolü → bu bölüm → ROADMAP V.5 satırı → V.5 için kararları sor (hangi türler önce, sıra, her türün imza hareketi: DECISIONS K5), kod yazma. Blender işinden önce `claude mcp list` + Blender'da BlenderMCP bağlantısı; MCP'de `read_factory_settings` çağırma. Küçük açıklar: ısırıp bırakmada da `break_free` oynuyor; 40 dilcide dil maliyeti ölçülmedi (`--bench`); `zombie_visual.gd` ve `enemy_manager.gd` 300 satırı aşıyor.
 
+- **V.5 başladı (Oturum 9, 2026-11-19, alt ajanlarla):** sıra yürüyen → koşucu → zıplayan → tank (imzalar DECISIONS). Yürüyen konsepti Blender'da üretiliyor (Opus alt ajan).
+  - V.4 borçları kapandı (Sonnet alt ajan, gözden geçirildi, 182 test geçiyor):
+    - `ec3b12e`: ısırıp bırakınca `break_free` oynamıyor (`TongueRules.player_broke_free`, `released` olayında `broke_free`).
+    - `b8fc08f`: `--bench --bench-kind=tongue|walker --bench-count=40` eklendi.
+    - `802d434`: `enemy_manager.gd` ve `zombie_visual.gd` 300 satırın altına indi (`enemy_queries/burn/pool/compactor/spawner`, `zombie_clip_player`, `zombie_jump_marker`).
+  - **Ölçüm (önemli):** 40 dilci 24 ms/kare (~41 FPS), 40 yürüyen 2.4 ms/kare (~410 FPS). Dilci başına ~0.55 ms. Bu maliyetin model + AnimationPlayer'dan mı, yordamsal dilden mi geldiği henüz ayrılmadı. Yeni hattaki yürüyen de aynı model yolunu kullanacağı için bütçeden önce ayrılmalı.
+
 - **V.4 2. kısım (2026-11-19, `09ea19e` + asker klipleri commit'i):**
   - **Model:** `FEATURE_DILCI_MODEL` açıkken `EnemyData` dilci satırındaki `look_v` alanları üste yazılır: model `ZombieVisual.VC_MODELS[&"dilci"]` (köşe renkli `zombie_vc.gdshader`, ZombieLook paleti yok, örnek başına hafif `tint`), klipler glb'nin kendi AnimationPlayer'ı (idle, walk, windup hazırlık süresine sığar, lash, pull, stagger, death_a, spawn). Model boyu AABB'den.
   - **Dil:** `DilciTongue` (TongueRope, Head kemiği + `MOUTH_REST` ofseti): dururken sarkar (0.42 m), hazırlıkta boğaza çekilir, olaylarla fırlar/tutunur/çekilir. Olay sözleşmesi `shoot/attach/to/off` (eski kutu dil `BeamTongue` aynı sözleşmeyle). Doku metre tabanlı (UV2 yay uzunluğu; sert halka çizgileri kalktı), uçuş boyunca düz çizgiye çekim (atış başı kıvrımı azaldı).

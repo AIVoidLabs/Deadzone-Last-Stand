@@ -2,6 +2,16 @@
 
 Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar verilince "Açık kararlar"dan çıkarılıp tarihli bölüme yazılır.
 
+## 2026-11-19 — V.5 sırası ve tür imzaları (Taha)
+
+- **Sıra:** yürüyen → koşucu → zıplayan → tank. Yürüyen önce, çünkü ekranda en çok o var; 3–5 bin üçgen bütçesi ve LOD ölçümü bu türle belirlenir.
+- **İmzalar (K5, Claude önerdi, Taha onayladı):**
+  - **Yürüyen:** sendeleyerek yürür, kollarını uzatıp kucaklar gibi saldırır. Oyuncuyu sürüde boşluk aramaya zorlar.
+  - **Koşucu ("Pençeli"):** ince yapılı, uzun pençeli. Sessizce çömelir, çığlık atar, pençeleriyle atılır. Dash'i doğru anda kullanmayı gerektirir.
+  - **Zıplayan:** iri uyluklu. Derin çömelir, yay çizerek atlar, indiği yerde şok yaratır. Oyuncunun iniş halkasından çıkması gerekir.
+  - **Tank:** iri yapılı, sırtında kemik plakalar var. İki eliyle yere çekiç gibi vurur. Hazırlık sırasında mesafe açmayı gerektirir.
+- **Çalışma biçimi:** alt ajanlarla. Ana döngü planı, briefleri ve doğrulamayı yapar; Blender işini Opus alt ajanlar, kod borcunu Sonnet alt ajan üstlenir.
+
 ## 2026-11-19 — Dilci dikey dilimi onaylandı; dil ısırması (Taha)
 
 - Taha V.4 oyun videolarını onayladı (`build/movies/tongue_game.avi`, `v4_break_close.avi`): yeni dilci modeli ve klipleri, sarkan / görünür hızla uçan yordamsal dil, yavaş çekiş, askerin Blender'da elle anahtarlanmış sürüklenme ve kurtulma klipleri.
