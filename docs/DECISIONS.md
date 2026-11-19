@@ -2,6 +2,11 @@
 
 Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar verilince "Açık kararlar"dan çıkarılıp tarihli bölüme yazılır.
 
+## 2026-11-19 — Yürüyen hızı ve video kuralı (Taha)
+
+- **Hız:** yürüyen oyunda 2.6 m/sn'de kalır, dalga dengesi değişmez. İlk `walk` klibi 0.7 m/sn'ye göre yapılmıştı; bu klip 2.6 m/sn'ye göre yeniden anahtarlanacak (uzun adım, öne yıkılır gibi sendeleme, ayak kaymaz).
+- **Video:** Taha'ya video gösterilmez, çünkü çok token tüketiyor. Video yalnız Claude geliştirmede gerçekten ihtiyaç duyarsa çekilir ve kare özetiyle değerlendirilir. Taha'ya ekran görüntüsü yeter. K6'daki "animasyon önizlemesi (video)" onayının yerine artık kare özeti + ekran görüntüsü geçer; Taha isterse oyunda kendisi dener.
+
 ## 2026-11-19 — V.5 sırası ve tür imzaları (Taha)
 
 - **Sıra:** yürüyen → koşucu → zıplayan → tank. Yürüyen önce, çünkü ekranda en çok o var; 3–5 bin üçgen bütçesi ve LOD ölçümü bu türle belirlenir.

@@ -10,6 +10,22 @@ Oturum 8 (2026-11-19). Taha görsel kaliteden memnun değildi; yeni yön onaylan
 - **Taha (2026-11-19): "genel işleyişten memnunum".** Bu oturumun çalışma biçimi korunur: her adım tek sabitle kapatılabilir; Blender'da pozlar MCP içinde kemik konumu ölçülerek bulunur ve `look` görüntüsüyle yinelenir; oyunda ekran görüntüsü + kare özeti + video; ölçümler sayıyla raporlanır (TONGUE sayaçları); eklenen tasarım kuralı (ısırma) açıkça onaya sunulur.
 - **Yeni oturum başlangıcı:** ortam kontrolü → bu bölüm → ROADMAP V.5 satırı → V.5 için kararları sor (hangi türler önce, sıra, her türün imza hareketi: DECISIONS K5), kod yazma. Blender işinden önce `claude mcp list` + Blender'da BlenderMCP bağlantısı; MCP'de `read_factory_settings` çağırma. Küçük açıklar: ısırıp bırakmada da `break_free` oynuyor; 40 dilcide dil maliyeti ölçülmedi (`--bench`); `zombie_visual.gd` ve `enemy_manager.gd` 300 satırı aşıyor.
 
+- **YENİ OTURUM BURADAN (Oturum 9 sonu, 2026-11-19):** V.5'te yürüyen. Konsept onaylı (`850f3d1`), oyun modeli (`1aa67c5`) ve klipler (`9ce5318`) hazır, **henüz oyunda değil**. Sırayla:
+  1. **Yürüyüşü 2.6 m/sn'ye göre yeniden anahtarla (Taha kararı):** oyun hızı değişmez. Uzun adımlı, öne yıkılır gibi giden bir sendeleme; ayaklar oyunun 2.6 m/sn hızında kaymamalı. Yalnız `walk` klibi değişir (`tools/blender/walker_anims.py` + `walker_pose.py`, `walker_game.py` ile dışa aktarım). Blender MCP gerekir.
+  2. **Oyuna bağla:**
+     - `FEATURE_WALKER_MODEL` bayrağı.
+     - `ZombieVisual.VC_MODELS` içinde walker için 4 GLB'lik dizi (`zombie_walker_{office,worker,skinny,civilian}.glb`); eski `zombie_walker.glb` bayrak kapalıyken kalır.
+     - WINDUP'ta attack klibi `play_timed(anim_attack, 0.7, 0.5)`, RECOVER'da klip tamamlansın.
+     - Walker satırında yalnız `death_a/b` olsun.
+     - Doğrulama: oyun görüntüsü + `--bench --bench-kind=walker` ile sürü ölçümü (100–300 zombi). LOD gerekirse bu ölçüm söyler.
+  3. Sonra sıradaki tür koşucu ("Pençeli"): konsept → model → klipler → Taha onayı → oyun.
+  - **Video kuralı (Taha, 2026-11-19):** video çekmek çok token tüketiyor. Taha'ya video gösterme. Video yalnız Claude'un geliştirmede gerçekten ihtiyacı varsa çekilir; o zaman da kare özetine bakılır. Taha'ya ekran görüntüsü yeter; isterse kendisi oyunda dener.
+  - **Çalışma biçimi:** fable-orchestration. Ana döngü plan, brief ve doğrulama yapar; Blender işini Opus alt ajan, kod işini Sonnet alt ajan yapar. Briefler dosyada, alt ajanlar yalnız kendi dosyalarını commit eder.
+  - **Küçük açıklar:**
+    - GLB'de `COLOR_0` alfasız, dilcinin parıltı maskesi çalışmıyor olabilir.
+    - `tongue_rope.gd` ~400 ve `walker_pose.py` 333 satır, bölünmeli.
+    - Yürüyen ölümlerinde 1–2 karede ~5 cm gömülme var.
+
 - **V.5 başladı (Oturum 9, 2026-11-19, alt ajanlarla):** sıra yürüyen → koşucu → zıplayan → tank (imzalar DECISIONS). Yürüyen konsepti Blender'da üretiliyor (Opus alt ajan).
   - V.4 borçları kapandı (Sonnet alt ajan, gözden geçirildi, 182 test geçiyor):
     - `ec3b12e`: ısırıp bırakınca `break_free` oynamıyor (`TongueRules.player_broke_free`, `released` olayında `broke_free`).
