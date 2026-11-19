@@ -371,3 +371,7 @@ const BENCH_TARGET_FPS: float = 60.0
 const BENCH_MAX_ENEMIES: int = 2000
 const BENCH_FAIL_STEPS: int = 2
 const BENCH_TURN_RATE: float = 0.6
+## Sabit sayı ölçümü (--bench-kind + --bench-count): ısınma ve ölçüm süresi (sn), türün askerin çevresine dizildiği yarıçap (m).
+const BENCH_FIXED_WARMUP: float = 4.0
+const BENCH_FIXED_TIME: float = 10.0
+const BENCH_FIXED_RING: float = 9.0
