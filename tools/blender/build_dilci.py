@@ -278,8 +278,9 @@ def build_clothes(body, v, suffix):
                 hems=[(2, v["pants_hem"], 1.0, 0.045, 10.0)], holes=0.25, seed=v["seed"] + 1.0)
 
 
-def build_variant(v, offset_x):
-    """Bir çeşidi kurar, kök nesneleri bir boşluğa bağlayıp yana kaydırır."""
+def build_variant(v, offset_x, with_tongue=True):
+    """Bir çeşidi kurar, kök nesneleri bir boşluğa bağlayıp yana kaydırır.
+    Oyunda dil yordamsal (TongueRope) olduğu için oyun ağında with_tongue=False."""
     before = set(bpy.data.objects)
     suffix = "_" + v["name"]
     skin = kit.skin_material("M_Dilci_Skin" + suffix, v["tone"], v["bruise"])
@@ -292,13 +293,16 @@ def build_variant(v, offset_x):
     build_jaw(head, skin, tooth_mat)
     build_throat_sac(head, sac_material("M_Dilci_Sac" + suffix))
     build_eyes(head, eye_mat)
-    build_tongue(head, tongue_material("M_Dilci_Tongue" + suffix))
+    if with_tongue:
+        build_tongue(head, tongue_material("M_Dilci_Tongue" + suffix))
+    created = list(set(bpy.data.objects) - before)
     root = bpy.data.objects.new("Dilci_" + v["name"], None)
     bpy.context.collection.objects.link(root)
-    for obj in set(bpy.data.objects) - before:
-        if obj.parent is None and obj is not root:
+    for obj in created:
+        if obj.parent is None:
             obj.parent = root
     root.location.x = offset_x
+    return root, created
 
 
 def build() -> None:
@@ -318,4 +322,6 @@ def build() -> None:
     print("DILCI built, variants:", count, "faces:", faces)
 
 
-build()
+# Modül olarak içe aktarılınca (dilci_game.py) kurulum çalışmaz; exec ile çalıştırınca çalışır.
+if __name__ != "build_dilci":
+    build()
