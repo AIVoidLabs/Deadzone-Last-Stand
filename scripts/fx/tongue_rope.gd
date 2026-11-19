@@ -65,6 +65,8 @@ var _side: Vector3 = Vector3.RIGHT
 ## Doğrusal uçuş: uç sabit hızla ilerler (oynanıştaki dil ucuyla aynı yerde olsun diye).
 var _linear: bool = false
 var _mesh: ArrayMesh = ArrayMesh.new()
+## Yalnız ölçüm (--bench-no-tongue-mesh): sim çalışır, ağ kurulmaz.
+var _skip_mesh: bool = Benchmark.flag("--bench-no-tongue-mesh")
 
 
 func _ready() -> void:
@@ -183,7 +185,7 @@ func _update(delta: float) -> void:
 			_step_attached(delta)
 		State.RETRACTING:
 			_step_retracting(delta)
-	if state != State.IDLE:
+	if state != State.IDLE and not _skip_mesh:
 		_build_mesh()
 
 

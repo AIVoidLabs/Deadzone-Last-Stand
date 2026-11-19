@@ -31,6 +31,11 @@ static func requested() -> bool:
 	return OS.get_cmdline_user_args().has("--bench")
 
 
+## Ölçüm bayrağı: `--bench --bench-no-tongue` dil düğümü hiç oluşmaz; `--bench-no-tongue-mesh` halat çalışır ama ağ kurulmaz.
+static func flag(name: String) -> bool:
+	return OS.is_debug_build() and OS.get_cmdline_user_args().has(name)
+
+
 func _ready() -> void:
 	name = "Benchmark"
 	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)

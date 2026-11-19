@@ -216,7 +216,7 @@ func _build_box() -> void:
 func _apply_kind(row: Dictionary) -> void:
 	_clips.row = row
 	var height: float = row["height"]
-	if _tongue == null and EnemyData.tongues(row) and SpecialAttacks.is_special(row):
+	if _tongue == null and EnemyData.tongues(row) and SpecialAttacks.is_special(row) and not Benchmark.flag("--bench-no-tongue"):
 		_make_tongue(height)
 	if _clips.animation == null:
 		var box: MeshInstance3D = _meshes[0]
