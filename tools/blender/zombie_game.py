@@ -65,8 +65,48 @@ def vein_color(base=(0.42, 0.37, 0.20), vein=(0.22, 0.03, 0.05)):
     return fn
 
 
+def layered_color(regions, fallback):
+    """Kabuk bölgeleri: regions = [(BVHTree, erişim_m, renk_fn)] öncelik sırasıyla. Nokta bir
+    kabuğa erişimden yakınsa onun rengi, değilse fallback. Kıyafeti ayrı kabuk yerine gövdenin
+    kendi köşelerine boyamak için (kabuk sonra silinir)."""
+    def fn(p):
+        for tree, reach, color_fn in regions:
+            if tree.find_nearest(p, reach)[0] is not None:
+                return color_fn(p)
+        return fallback(p)
+    return fn
+
+
+def world_bvh(obj):
+    """Nesnenin dünya koordinatlı BVH ağacı (kabuk bölgesi için)."""
+    from mathutils.bvhtree import BVHTree
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    bm.transform(obj.matrix_world)
+    tree = BVHTree.FromBMesh(bm)
+    bm.free()
+    return tree
+
+
+def paint_slots(obj, color_fns, glow: float = 0.0, dirt: float = 0.45) -> None:
+    """Malzeme yuvasına göre köşe rengi (ör. ayakkabı üstü / taban): köşe, bağlı yüzlerinin
+    çoğunluk yuvasının renk fonksiyonunu alır."""
+    votes = [[0] * len(color_fns) for _ in obj.data.vertices]
+    for poly in obj.data.polygons:
+        slot = min(poly.material_index, len(color_fns) - 1)
+        for vi in poly.vertices:
+            votes[vi][slot] += 1
+    slots = [max(range(len(color_fns)), key=lambda s, row=row: row[s]) for row in votes]
+    _paint_verts(obj, lambda i, p: color_fns[slots[i]](p), glow, dirt)
+
+
 def paint(obj, color_fn, glow: float = 0.0, dirt: float = 0.45) -> None:
     """Köşe rengi: renk fonksiyonu × oyuk koyulaşması; alfa = 1 - parıltı."""
+    _paint_verts(obj, lambda _i, p: color_fn(p), glow, dirt)
+
+
+def _paint_verts(obj, color_at, glow: float, dirt: float) -> None:
+    """color_at(köşe_indeksi, dünya_konumu) × oyuk koyulaşması; alfa = 1 - parıltı."""
     mesh = obj.data
     bm = bmesh.new()
     bm.from_mesh(mesh)
@@ -83,7 +123,7 @@ def paint(obj, color_fn, glow: float = 0.0, dirt: float = 0.45) -> None:
     bm.free()
     attr = mesh.color_attributes.get(COLOR_ATTR) or mesh.color_attributes.new(COLOR_ATTR, "FLOAT_COLOR", "POINT")
     for i, v in enumerate(mesh.vertices):
-        c = color_fn(matrix @ v.co)
+        c = color_at(i, matrix @ v.co)
         s = shades[i]
         attr.data[i].color = (c[0] * s, c[1] * s, c[2] * s, 1.0 - glow)
 
@@ -112,6 +152,47 @@ def weight_by_distance(obj, segments: dict, keep: int = 3, power: float = 4.0) -
         total = sum(w for w, _ in top)
         for w, name in top:
             groups[name].add([v.index], w / total, "REPLACE")
+
+
+def smooth_weights(obj, iterations: int = 3, keep: int = 4, factor: float = 0.5) -> None:
+    """Ağ komşuluğuyla ağırlık yumuşatma: uzaklık ağırlığının eklem çevresindeki sert geçişini
+    (bükülünce yırtılma bandı) açar. Köşe başına en çok `keep` kemik, toplam 1."""
+    mesh = obj.data
+    names = [g.name for g in obj.vertex_groups]
+    count = len(mesh.vertices)
+    weights = [dict() for _ in range(count)]
+    for v in mesh.vertices:
+        for ge in v.groups:
+            if ge.weight > 0.0:
+                weights[v.index][ge.group] = ge.weight
+    neighbors = [[] for _ in range(count)]
+    for e in mesh.edges:
+        a, b = e.vertices
+        neighbors[a].append(b)
+        neighbors[b].append(a)
+    for _ in range(iterations):
+        new = []
+        for i in range(count):
+            if not neighbors[i]:
+                new.append(weights[i])
+                continue
+            acc = {}
+            for j in neighbors[i]:
+                for g, w in weights[j].items():
+                    acc[g] = acc.get(g, 0.0) + w
+            n = len(neighbors[i])
+            mixed = {g: w * (1.0 - factor) for g, w in weights[i].items()}
+            for g, w in acc.items():
+                mixed[g] = mixed.get(g, 0.0) + factor * w / n
+            new.append(mixed)
+        weights = new
+    for i, row in enumerate(weights):
+        top = sorted(row.items(), key=lambda gw: gw[1], reverse=True)[:keep]
+        total = sum(w for _, w in top) or 1.0
+        for g in range(len(names)):
+            obj.vertex_groups[g].remove([i])
+        for g, w in top:
+            obj.vertex_groups[g].add([i], w / total, "REPLACE")
 
 
 def _override(active, selected):
