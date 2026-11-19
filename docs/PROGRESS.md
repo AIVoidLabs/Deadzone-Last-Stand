@@ -23,6 +23,14 @@ Oturum 8 (2026-11-19). Taha görsel kaliteden memnun değildi; yeni yön onaylan
   - **Dil ağı optimizasyonu (`125a374`, `FEATURE_TONGUE_MESH_FAST`):**
     - 40 dilci 23 ms → 5.7–6.1 ms/kare (Blender kapalıyken, temiz ölçüm). Görüntü kare özetinde aynı.
     - `tongue_rope.gd` ~400 satıra çıktı, bölünmeli.
+  - **Yürüyen oyun modeli (`1aa67c5`):** Taha konsept v2.1'i (`850f3d1`) onayladı.
+    - 4 ayrı GLB: `zombie_walker_{office,worker,skinny,civilian}.glb`. Eski `zombie_walker.glb` oyunda kullanıldığı için üzerine yazılmadı. Çeşitlerin kemik boyları farklı, bu yüzden her çeşidin kendi iskeleti var; kemik adları aynı.
+    - Her çeşit ~4.1 bin üçgen, 26 kemik (25 + `jaw`). Önizleme: `scenes/debug/walker_preview.tscn`.
+    - Kıyafet gövdenin üstüne boyalı renk; yırtık kenar ve kumaş kalınlığı gitti.
+    - **Açık:** GLB'de `COLOR_0` alfasız çıkıyor, dilcinin parıltı maskesi (`COLOR.a`) GLB üzerinden çalışmıyor olabilir.
+  - **Yürüyen klipleri (`9ce5318`):** idle, walk (1.1 sn), windup (0.5), attack (1.3, vuruş 0.7), stagger, death_a, death_b, spawn. Elle anahtarlandı, IK ile çözülüp dönüş olarak yazıldı. Betikler `walker_anims/falls/pose/check.py`. Videolar `build/movies/walker_*.avi`.
+    - **Açık karar: hız uyuşmazlığı.** Klibin adımı 0.7 m/sn hıza göre yapılmış, oyundaki walker hızı 2.6 m/sn. Taha'ya soruldu.
+    - **Entegrasyonda gerekecek:** WINDUP'ta attack klibi `play_timed(…, 0.7, 0.5)` ile oynamalı, RECOVER'da klip tamamlanmalı. Walker satırında `death_c` olmamalı.
   - Yürüyen konsepti v2: `b130705`.
     - Saç kask değil, ayakkabılar düzeldi, kumaş kenarları yumuşadı.
     - Kalan sorunlar: ağız içi kara top gibi, Skinny fazla pembe, yüz hâlâ kil gibi. Taha'nın yorumu bekleniyor.
