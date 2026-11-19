@@ -8,7 +8,9 @@ birleştir → iskelet → GLB. Farklar:
   her çeşit kendi iskeletiyle kendi GLB'sine gider (aynı kemik adları, aynı "Walker_Rig" düğümü).
 - İskelet: 25 standart kemik + `jaw` (sarkık tek parça çene, imza; ısırma/inleme için).
 Dinlenme pozu konseptin pozu (ağırlık sağda, sol omuz düşük, kollar yarı kalkık öne).
-Animasyon yok (sonraki adım).
+Klipler walker_anims.py (+ walker_falls.py, çekirdek walker_pose.py): her çeşidin kendi iskeletine
+ayrı anahtarlanır ve kendi GLB'sine (AnimationPlayer) gider; dışa aktarımdan sonra actionlar çeşit ekiyle
+yeniden adlandırılır, böylece sıradaki çeşit aynı klip adlarını alır ve yalnız kendi kliplerini taşır.
 
 Çalıştırma (Blender MCP içinden):
     exec(open(r"<repo>/tools/blender/walker_game.py", encoding="utf-8").read())
@@ -31,8 +33,10 @@ import zombie_game as zg  # noqa: E402
 import walker_head as wh  # noqa: E402
 import walker_clothes as wc  # noqa: E402
 import build_walker as bw  # noqa: E402
+import walker_pose as wpose  # noqa: E402
+import walker_anims as anims  # noqa: E402
 
-for _mod in (kit, zg, wh, wc, bw):
+for _mod in (kit, zg, wh, wc, bw, wpose, anims):
     importlib.reload(_mod)
 
 OUT_DIR = os.path.join(REPO, "assets", "models", "characters")
@@ -349,20 +353,50 @@ def out_path(v) -> str:
     return os.path.join(OUT_DIR, "zombie_walker_%s.glb" % v["name"].lower())
 
 
+# Klipler: yalnız anahtarlanan izler (dönüş + pelvis konumu) dışa aktarılır, sabit konum/ölçek izi yok.
+GLB_ANIM = {"export_optimize_animation_keep_anim_armature": False}
+
+
+def stash_clips(arm, clips, variant: str) -> None:
+    """Dışa aktarılmış çeşidin kliplerini siler: dışa aktarıcı dosyadaki tüm uyumlu actionları GLB'ye
+    koyduğu için (kemik adları aynı) sıradaki çeşide karışırlar. .blend için en sonda yeniden üretilir."""
+    for name in clips:
+        bpy.data.actions.remove(bpy.data.actions[name])
+
+
+def keep_clips_in_blend(rigs) -> None:
+    """İnceleme kopyası: her çeşidin klipleri çeşit ekiyle, sessiz NLA izinde (dışa aktarım bitti)."""
+    for variant, arm in rigs:
+        for name in anims.build_all(arm):
+            act = bpy.data.actions[name]
+            act.name = "%s_%s" % (name, variant)
+            track = arm.animation_data.nla_tracks.new()
+            track.name = act.name
+            track.mute = True
+            track.strips.new(act.name, int(act.frame_range[0]), act)
+        arm.animation_data.action = bpy.data.actions["idle_Loop_%s" % variant]
+    arm.animation_data.action = None
+
+
 def build_game(variants=None) -> dict:
     kit.reset_scene()
     mat = zg.vertex_color_material("M_Zombie_VC", glow_strength=0.0)
     variants = variants or bw.VARIANTS
     count = len(variants)
     report = {}
+    rigs = []
     for i, v in enumerate(variants):
         arm, mesh = build_variant_game(v, mat)
-        zg.export_glb(out_path(v), [arm, mesh])
+        clips = anims.build_all(arm)
+        zg.export_glb(out_path(v), [arm, mesh], **GLB_ANIM)
+        stash_clips(arm, clips, v["name"])
+        rigs.append((v["name"], arm))
         report[v["name"]] = (zg.tri_count(mesh), len(arm.data.bones))
         print("WALKER GAME", v["name"], "tris", report[v["name"]][0], "bones", report[v["name"]][1])
         arm.name = "%s_%s" % (RIG_NAME, v["name"])      # sıradaki çeşit aynı adı alsın
         arm.data.name = arm.name
         arm.location.x = (i - (count - 1) / 2) * LINEUP_SPACING
+    keep_clips_in_blend(rigs)
     kit.setup_look()
     os.makedirs(os.path.dirname(OUT_BLEND), exist_ok=True)
     bpy.ops.wm.save_as_mainfile(filepath=OUT_BLEND)

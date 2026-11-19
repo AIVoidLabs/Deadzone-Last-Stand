@@ -266,14 +266,14 @@ def vertex_color_material(name: str, glow_strength: float = 3.0):
     return mat
 
 
-def export_glb(path: str, objects) -> None:
-    # use_selection gerçek seçim durumuna bakar (override listesine değil)
+def export_glb(path: str, objects, **extra) -> None:
+    # use_selection gerçek seçim durumuna bakar (override listesine değil); extra: ek gltf seçenekleri
     for obj in bpy.context.view_layer.objects:
         obj.select_set(obj in objects)
     with _override(objects[0], objects):
         bpy.ops.export_scene.gltf(filepath=path, use_selection=True, export_format="GLB",
                                   export_animation_mode="ACTIONS", export_yup=True,
-                                  export_apply=False, export_skins=True)
+                                  export_apply=False, export_skins=True, **extra)
 
 
 def tri_count(obj) -> int:
