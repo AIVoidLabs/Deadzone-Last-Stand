@@ -75,6 +75,7 @@ PART_CLASS = {
 LINEUP_SPACING = 1.05
 CALF = 0.014              # baldır kütlesi (m, arkaya); varyant "calf" çarpanı
 KNEE = 0.006              # diz kapağı çıkıntısı (m, öne)
+SKIN_V21 = True           # v2.1 ten düzeltmesi (Skinny); False: v2 pembe-lila ten
 
 # Çeşitler. body: h boy, w genişlik, t uzuv kalınlığı, belly göbek, head kafa ölçeği,
 # leg bacak kalınlığı çarpanı, calf baldır çarpanı.
@@ -99,7 +100,9 @@ VARIANTS = [
      "seed": 3.3},
     {"name": "Skinny", "body": {"h": 1.06, "w": 0.86, "t": 0.98, "belly": 0.85, "head": 0.97,
                                 "leg": 1.14, "calf": 1.5},
-     "tone": (0.17, 0.15, 0.22), "bruise": (0.24, 0.05, 0.16),
+     # v2.1: diğerleriyle aynı ten ailesi (soluk gri-yeşil), morluk yalnız lekelerde (koyu mor-mavi)
+     "tone": (0.25, 0.27, 0.225), "bruise": (0.085, 0.075, 0.12), "bruise_band": (0.50, 0.70),
+     "skin_v2": {"tone": (0.17, 0.15, 0.22), "bruise": (0.24, 0.05, 0.16)},  # pembe-lila
      "top": "tank", "top_color": (0.45, 0.42, 0.34), "blood": 0.9, "vest": None,
      "tie": None, "bottom": "shorts", "bottom_color": (0.20, 0.17, 0.09), "hem": 0.42,
      "shoes": None, "hair": (0.035, 0.030, 0.024), "hair_style": "long", "seed": 7.1},
@@ -231,10 +234,22 @@ def classify(co, segments):
 
 # ---------------------------------------------------------------- çeşit
 
+def skin_for(v, name):
+    """Çeşidin teni. SKIN_V21=False: v2 renkleri (skin_v2) ve kit'in varsayılan morluk bandı."""
+    old = v.get("skin_v2") if not SKIN_V21 else None
+    tone, bruise = (old["tone"], old["bruise"]) if old else (v["tone"], v["bruise"])
+    mat = kit.skin_material(name, tone, bruise)
+    band = v.get("bruise_band") if SKIN_V21 else None
+    if band:  # morluk alanını daralt: yalnız lekeler
+        ramp = next(n for n in mat.node_tree.nodes if n.type == "VALTORGB")
+        ramp.color_ramp.elements[0].position, ramp.color_ramp.elements[1].position = band
+    return mat
+
+
 def build_variant(v, offset_x=0.0):
     before = set(bpy.data.objects)
     suffix = "_" + v["name"]
-    skin = kit.skin_material("M_Walker_Skin" + suffix, v["tone"], v["bruise"])
+    skin = skin_for(v, "M_Walker_Skin" + suffix)
     tooth_mat, _ = kit.material("M_Walker_Teeth" + suffix, (0.45, 0.40, 0.28), rough=0.4)
     style = wh.HAIR_STYLES.get(v["hair_style"])
     hair_mat = wh.hair_material("M_Walker_Hair" + suffix, v["hair"], style["rough"]) if style else None

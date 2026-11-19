@@ -1,4 +1,4 @@
-"""Yürüyen zombi konsept görselleri (V.5 v2): dizi, oyun kamerası, yakın, yüzler.
+"""Yürüyen zombi konsept görselleri (V.5 v2.1): dizi, oyun kamerası, yakın, yüzler.
 
 build_walker.py exec edildikten sonra (sahne kurulu):
     import walker_render as wr; wr.render_all()
@@ -17,7 +17,7 @@ import zombie_kit as kit
 importlib.reload(bw)
 CONCEPT_DIR = os.path.join(bw.REPO, "docs", "concept")
 SHOTS_DIR = os.path.join(bw.REPO, "build", "shots")
-VERSION = "v2"
+VERSION = "v21"
 
 
 def _out(name):

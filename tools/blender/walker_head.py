@@ -45,6 +45,18 @@ HEAD_ROLL_DEG = 22.0      # düşük omuza (+X) yatık
 HEAD_YAW_DEG = -8.0
 SKULL_CENTER = Vector((0.0, 0.012, 0.062))
 
+# Ağız içi (v2.1). "cavity": dişlerin arkasında iç bükey koyu boşluk + dil; "ball": v2 koyu küre.
+MOUTH_STYLE = "cavity"
+MOUTH_CENTER = Vector((0.0, -0.050, -0.040))   # kabuğun merkezi (kafa yereli, ölçek öncesi)
+MOUTH_RADII = Vector((0.042, 0.030, 0.040))    # yalnız arka yarısı kullanılır (açıklığa bakar)
+MOUTH_FRONT = (0.060, 0.015, 0.012)            # damak, ön (koyu kırmızı-kahve)
+MOUTH_BACK = (0.012, 0.0035, 0.003)            # boğaz, arka (koyu ama simsiyah değil)
+MOUTH_CUT = -0.05                              # ön kesim (birim küre y): kenar yanağa gömülür
+MOUTH_TONGUE = True
+TONGUE_POS = (0.0, -0.042, -0.039)             # çene yereli: U biçimli çenenin tabanında
+TONGUE_RADII = (0.018, 0.022, 0.0042)
+TONGUE_COLOR = (0.055, 0.015, 0.013)
+
 # Saç üslupları. Saç iki katman: (1) kafa derisinden kopyalanan ince taban (kenara doğru sıfıra
 # incelir, kask kenarı yok; dökülme yamalarında kafa derisi görünür), (2) tabandan çıkan,
 # kafa derisini izleyip uca doğru sivrilen yassı tutamlar (az sayıda kütle, ince şerit değil).
@@ -108,14 +120,11 @@ def build_head(v, mat, tooth_mat, hair_mat, neck, h):
         eye = kit.primitive("Walker_Eye", "sphere", pos, segments=12, rings=8, radius=EYE_RADIUS * s)
         eye.data.materials.append(eye_mat)
         eye.parent = head
-    # koyu ağız içi: sarkık çenenin açtığı boşluk karanlık okunsun
-    mouth_mat, _ = kit.material("M_Walker_Mouth_" + v["name"], (0.005, 0.0015, 0.0015), rough=1.0)
-    mouth = kit.metaball_mesh("Walker_Mouth", [((0.0, -0.042, -0.030), (0.030, 0.026, 0.032), False)],
-                              mouth_mat, resolution=0.004)
-    for vert in mouth.data.vertices:
-        vert.co *= s
-    mouth.parent = head
-    build_jaw(head, s, mat, tooth_mat)
+    jaw = build_jaw(head, s, mat, tooth_mat)
+    if MOUTH_STYLE == "cavity":
+        _mouth_cavity(head, jaw, s, v["name"])
+    else:  # "ball": v2 koyu küre
+        _mouth_ball(head, s, v["name"])
     head.location = neck + Vector((0.006, -0.022, 0.030)) * h
     head.rotation_euler = (math.radians(HEAD_PITCH_DEG), math.radians(HEAD_ROLL_DEG),
                            math.radians(HEAD_YAW_DEG))
@@ -151,6 +160,72 @@ def build_jaw(head, s, mat, tooth_mat):
     jaw.parent = head
     jaw.location = JAW_HINGE * s
     jaw.rotation_euler = (math.radians(JAW_OPEN_DEG), math.radians(JAW_SLACK_DEG), 0.0)
+    return jaw
+
+
+# ---------------------------------------------------------------- ağız içi
+
+def _mouth_ball(head, s, name):
+    """v2: sarkık çenenin arasında koyu küre (Taha: 'kara top' gibi; MOUTH_STYLE='ball')."""
+    mouth_mat, _ = kit.material("M_Walker_Mouth_" + name, (0.005, 0.0015, 0.0015), rough=1.0)
+    mouth = kit.metaball_mesh("Walker_Mouth", [((0.0, -0.042, -0.030), (0.030, 0.026, 0.032), False)],
+                              mouth_mat, resolution=0.004)
+    for vert in mouth.data.vertices:
+        vert.co *= s
+    mouth.parent = head
+
+
+def mouth_material(name, s):
+    """Ağız içi: koyu kırmızı-kahve (damak), derinlikle (yerel +Y, arkaya) koyulaşır; simsiyah değil."""
+    mat, bsdf = kit.material(name, MOUTH_FRONT, rough=0.45, sss=0.0)
+    bsdf.inputs["Specular IOR Level"].default_value = 0.35
+    nt = mat.node_tree
+    coord = nt.nodes.new("ShaderNodeTexCoord")
+    sep = nt.nodes.new("ShaderNodeSeparateXYZ")
+    rng = nt.nodes.new("ShaderNodeMapRange")
+    rng.inputs["From Min"].default_value = MOUTH_CENTER.y * s - MOUTH_RADII.y * s * 0.2
+    rng.inputs["From Max"].default_value = MOUTH_CENTER.y * s + MOUTH_RADII.y * s
+    ramp = nt.nodes.new("ShaderNodeValToRGB")
+    ramp.color_ramp.elements[0].color = (*MOUTH_FRONT, 1.0)
+    ramp.color_ramp.elements[1].position = 0.85
+    ramp.color_ramp.elements[1].color = (*MOUTH_BACK, 1.0)
+    nt.links.new(coord.outputs["Object"], sep.inputs["Vector"])
+    nt.links.new(sep.outputs["Y"], rng.inputs["Value"])
+    nt.links.new(rng.outputs["Result"], ramp.inputs["Fac"])
+    kit._ao_darken(nt, ramp.outputs["Color"], bsdf, crevice=MOUTH_BACK)
+    return mat
+
+
+def _mouth_cavity(head, jaw, s, name):
+    """Ağız boşluğu: dişlerin arkasında, açıklığa bakan iç bükey kabuk (arka yarı elipsoit,
+    normaller içe) + çene tabanında küçük koyu dil. Kenarı yanak ve çene içine gömülür."""
+    mat = mouth_material("M_Walker_Mouth_" + name, s)
+    bm = bmesh.new()
+    bmesh.ops.create_uvsphere(bm, u_segments=20, v_segments=12, radius=1.0)
+    bmesh.ops.delete(bm, geom=[vt for vt in bm.verts if vt.co.y < MOUTH_CUT], context="VERTS")
+    for vt in bm.verts:
+        vt.co = Vector((vt.co.x * MOUTH_RADII.x, vt.co.y * MOUTH_RADII.y,
+                        vt.co.z * MOUTH_RADII.z)) + MOUTH_CENTER
+        vt.co *= s
+    bmesh.ops.reverse_faces(bm, faces=bm.faces)
+    mesh = bpy.data.meshes.new("Walker_Mouth")
+    bm.to_mesh(mesh)
+    bm.free()
+    cavity = bpy.data.objects.new("Walker_Mouth", mesh)
+    bpy.context.collection.objects.link(cavity)
+    cavity.data.materials.append(mat)
+    for poly in cavity.data.polygons:
+        poly.use_smooth = True
+    cavity.parent = head
+    if MOUTH_TONGUE:
+        tongue_mat, _ = kit.material("M_Walker_Tongue_" + name, TONGUE_COLOR, rough=0.5)
+        tongue = kit.primitive("Walker_Tongue", "sphere", Vector(TONGUE_POS) * s,
+                               segments=14, rings=8, radius=1.0)
+        tongue.scale = Vector(TONGUE_RADII) * s
+        tongue.data.materials.append(tongue_mat)
+        for poly in tongue.data.polygons:
+            poly.use_smooth = True
+        tongue.parent = jaw
 
 
 # ---------------------------------------------------------------- saç
