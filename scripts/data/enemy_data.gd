@@ -76,8 +76,12 @@ const _OVERRIDES: Dictionary = {
 		"anim_attack": [&"pounce_windup"],
 		"anim_air": [&"leap"],
 	},
-	# Dilci: uzakta (tongue_range) durup 0.8 sn hazırlanır (son 0.3 sn yön kilitli), dilini fırlatır. İsabet ederse
-	# asker root_time sn bağlanır (hareket ve dash yok, silahlar çalışır); dilci ölürse bağ çözülür.
+	# Dilci: uzakta (tongue_range) durup 0.8 sn hazırlanır (son 0.3 sn yön kilitli), dilini fırlatır.
+	# Yeni mekanik (Tuning.FEATURE_TONGUE_PULL): dil tongue_speed m/sn ile düz uçar; ucun yolu askere
+	# (yarıçap + tongue_hit_radius) değerse yakalar (dash dokunulmazlığı kaçırır). Yakalanan asker dilciye
+	# tongue_pull_speed m/sn ile çekilir (hareket ve dash yok, silahlar çalışır); dilci ölünce, tongue_pull_time
+	# dolunca ya da asker temas + tongue_release_gap'e gelince bırakır (yakına geldiyse ısırır: contact_damage).
+	# Eski mekanik: anlık ışın, isabette root_time sn bağ.
 	&"tongue": {
 		"id": &"tongue",
 		"model": &"tongue",
@@ -91,6 +95,11 @@ const _OVERRIDES: Dictionary = {
 		"tongue_lock_time": 0.3,
 		"tongue_hit_radius": 0.35,
 		"root_time": 1.0,
+		"tongue_speed": 16.0,
+		"tongue_lead": 0.0,
+		"tongue_pull_speed": 1.8,
+		"tongue_pull_time": 3.0,
+		"tongue_release_gap": 0.25,
 		"attack_recover": 5.0,
 		"tongue_miss_recover": 2.0,
 		"attack_anim_hit_time": 0.0,
@@ -101,6 +110,19 @@ const _OVERRIDES: Dictionary = {
 		"height": 1.7,
 		"color": Color(0.7, 0.35, 0.5),
 		"anim_attack": [&"tongue_windup"],
+		# Yeni hat (Tuning.FEATURE_DILCI_MODEL): model ZombieVisual.VC_MODELS'tan, klipler modelin kendi
+		# klipleri (tools/blender/dilci_anims.py). Açıkken bu alanlar satırın üstüne yazılır.
+		"look_v": {
+			"model": &"dilci",
+			"anim_idle": [&"idle"],
+			"anim_walk": [&"walk"],
+			"anim_attack": [&"windup"],
+			"anim_lash": [&"lash"],
+			"anim_pull": [&"pull"],
+			"anim_stagger": [&"stagger"],
+			"anim_death": [&"death_a"],
+			"anim_spawn": [&"spawn"],
+		},
 	},
 	# Koşucu: zayıf ama hızlı. Yaklaşınca çömelip (belirgin hazırlık) askerin gideceği yere atılır.
 	# Atılış: hazırlığın başında oyuncunun hızını önceden hesaplar (lead), son lunge_lock_time saniyede yönü kilitler,
@@ -166,6 +188,8 @@ static func _build() -> Dictionary:
 	for id: StringName in _OVERRIDES:
 		var row: Dictionary = _WALKER_ROW.duplicate()
 		row.merge(_OVERRIDES[id], true)
+		if Tuning.FEATURE_DILCI_MODEL and row.has("look_v"):
+			row.merge(row["look_v"], true)
 		table[id] = row
 	return table
 

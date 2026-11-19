@@ -28,6 +28,8 @@ var _knock: Vector2 = Vector2.ZERO
 ## Dilciyle bağlıyken kalan süre (sn): hareket ve dash yok, silahlar çalışır.
 var _root_left: float = 0.0
 var _rooted: bool = false
+## Bağlıyken dilcinin bu kare uyguladığı çekiş hızı (XZ); her karede yeniden verilir.
+var _pull: Vector2 = Vector2.ZERO
 
 
 func _init() -> void:
@@ -65,6 +67,13 @@ func _physics_process(delta: float) -> void:
 	var planar: Vector2
 	if dash.is_active():
 		planar = _dash_direction * stats.dash_speed()
+	elif _rooted:
+		# Dil çekerken: yürüme yok, asker dilciye dönük sürüklenir.
+		planar = _pull + _knock
+		if _pull != Vector2.ZERO:
+			facing = _pull.normalized()
+		_pull = Vector2.ZERO
+		_knock = Knockback.decay(_knock, Tuning.PLAYER_KNOCKBACK_DAMPING, delta)
 	else:
 		planar = Locomotion.step(
 			Vector2(velocity.x, velocity.z), input, stats.move_speed(), Tuning.PLAYER_ACCEL, Tuning.PLAYER_FRICTION, delta)
@@ -132,11 +141,18 @@ func root(duration: float) -> void:
 	event.emit(&"rooted", {"duration": duration})
 
 
+## Bağlıyken bu karenin çekiş hızı (m/sn, XZ); dilci her karede verir, verilmezse asker durur.
+func pull(planar_velocity: Vector2) -> void:
+	if _rooted:
+		_pull = planar_velocity
+
+
 ## Bağ çözülür (süre doldu ya da dilci öldü).
 func release_root() -> void:
 	if not _rooted:
 		return
 	_rooted = false
+	_pull = Vector2.ZERO
 	_root_left = 0.0
 	event.emit(&"released", {})
 

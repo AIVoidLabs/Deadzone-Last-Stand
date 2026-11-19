@@ -5,7 +5,7 @@ extends Node
 ## --capture-dash=S: görüntüden S saniye önce dash attırır.
 ## --capture-kill=S: görüntüden S saniye önce askeri öldürür (ölüm animasyonu denetimi).
 ## --camera-distance=M: kamera uzaklığını dener (karşılaştırma görüntüleri için).
-## --weapons=N: toplam N silahla başlar (debug silahı eklenir).
+## --weapons=N: toplam N silahla başlar (debug silahı eklenir). --no-weapons: silahlar ateş etmez (saldırı ölçümü).
 ## --levels=N: N seviye atlatır (kart seçimi dalga arasında açılır). --capture-pick: açılan kart ekranında 1'e basar. --wave=N: N. dalgadan başlar. --capture-wave-end=S: görüntüden S saniye önce dalgayı bitirir.
 ## --autopilot: asker ölümsüz, daire çizerek yürür. --god: asker ölümsüz ama yerinde durur.
 ## --capture-kind=runner|tank: --capture-spawn ile bu türden doğurur (varsayılan walker).
@@ -69,6 +69,8 @@ func _ready() -> void:
 			camera.set_distance(arg.trim_prefix("--camera-distance=").to_float())
 		elif arg == "--autopilot":
 			_autopilot = true
+		elif arg == "--no-weapons":
+			weapons.process_mode = Node.PROCESS_MODE_DISABLED
 		elif arg.begins_with("--weapons="):
 			for _i in arg.trim_prefix("--weapons=").to_int() - weapons.count():
 				weapons.add_debug_weapon()
@@ -147,8 +149,9 @@ func _process(delta: float) -> void:
 		_tick_auto_pick(delta)
 	if _time < _seconds:
 		return
-	print("LUNGE starts=%d hits=%d  JUMP lands=%d hits=%d  TONGUE shots=%d hits=%d" % [
-		enemies.lunge_starts, enemies.lunge_hits, enemies.jump_lands, enemies.jump_hits, enemies.tongue_shots, enemies.tongue_hits])
+	print("LUNGE starts=%d hits=%d  JUMP lands=%d hits=%d  TONGUE shots=%d hits=%d bites=%d timeouts=%d" % [
+		enemies.lunge_starts, enemies.lunge_hits, enemies.jump_lands, enemies.jump_hits, enemies.tongue_shots, enemies.tongue_hits,
+		enemies.tongue_bites, enemies.tongue_timeouts])
 	var image: Image = get_viewport().get_texture().get_image()
 	if image != null:
 		var path: String = ProjectSettings.globalize_path("res://").path_join(_out)

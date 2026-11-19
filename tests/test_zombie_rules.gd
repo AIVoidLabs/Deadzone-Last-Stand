@@ -32,6 +32,9 @@ func test_jump_and_lash_cycles() -> void:
 	assert_true(ZombieRules.can_take_damage(S.LASH))
 	assert_false(ZombieRules.can_stagger(S.JUMP))
 	assert_false(ZombieRules.can_stagger(S.LASH))
+	assert_eq(ZombieRules.after_timer(S.PULL), S.RECOVER, "çekiş süresi dolunca bırakır")
+	assert_true(ZombieRules.can_take_damage(S.PULL), "çekerken vurulup öldürülebilir")
+	assert_false(ZombieRules.can_stagger(S.PULL), "çekiş sendelemeyle bozulmaz")
 
 
 func test_runner_lunge_is_fair_but_not_trivial() -> void:

@@ -12,12 +12,20 @@ const PER_ROW: int = 4
 const ROW_GAP: float = 2.4
 
 const SHADER: Shader = preload("res://assets/shaders/zombie_vc.gdshader")
+## Önizlemede dilin uzandığı mesafe (m).
+const TONGUE_REACH: float = 2.5
+
+var _pull_started: Dictionary = {}
 
 var _shared: ShaderMaterial
 ## --focus=N: kamera N. klibin modeline yakından bakar (-1 hepsi).
 var _focus: int = -1
 var _positions: Array[Vector3] = []
 var _players: Array[AnimationPlayer] = []
+var _tongues: Array[DilciTongue] = []
+var _models: Array[Node3D] = []
+## --no-tongue: yordamsal dil eklenmez.
+var _with_tongue: bool = true
 var _capture_path: String = ""
 var _capture_seconds: float = 2.0
 var _time: float = 0.0
@@ -31,6 +39,8 @@ func _ready() -> void:
 			_capture_seconds = arg.trim_prefix("--capture-seconds=").to_float()
 		elif arg.begins_with("--focus="):
 			_focus = arg.trim_prefix("--focus=").to_int()
+		elif arg == "--no-tongue":
+			_with_tongue = false
 	# iki sıra: üstte hareket, altta saldırı ve tepkiler
 	for i: int in CLIPS.size():
 		var column: int = i % PER_ROW
@@ -51,9 +61,16 @@ func _add_model(index: int, at: Vector3) -> void:
 		mesh.visible = m == index % meshes.size()
 		mesh.material_override = _material()
 	var player: AnimationPlayer = model.find_child("AnimationPlayer", true, false) as AnimationPlayer
-	player.play(CLIPS[index])
-	player.animation_finished.connect(_on_finished.bind(player))
 	_players.append(player)
+	_models.append(model)
+	if _with_tongue:
+		var tongue: DilciTongue = DilciTongue.new()
+		add_child(tongue)
+		tongue.setup(model, model.find_child("GeneralSkeleton", true, false) as Skeleton3D)
+		tongue.set_active(true)
+		_tongues.append(tongue)
+	player.animation_finished.connect(_on_finished.bind(player))
+	_play(index)
 	var label: Label3D = Label3D.new()
 	label.text = CLIPS[index]
 	label.position = at + Vector3(0.0, 0.02, 0.7)
@@ -69,9 +86,29 @@ func _material() -> ShaderMaterial:
 	return _shared
 
 
-func _on_finished(clip: StringName, player: AnimationPlayer) -> void:
+func _on_finished(_clip: StringName, player: AnimationPlayer) -> void:
 	await get_tree().create_timer(ONE_SHOT_GAP).timeout
-	player.play(clip)
+	_play(_players.find(player))
+
+
+## Klibi başlatır; dil klibe uyar (hazırlıkta boğaza çekilir, şaklamada fırlar, çekişte tutunur).
+func _play(index: int) -> void:
+	_players[index].play(CLIPS[index])
+	if not _with_tongue:
+		return
+	var tongue: DilciTongue = _tongues[index]
+	var model: Node3D = _models[index]
+	var ahead: Vector3 = model.global_position + model.global_transform.basis.z * TONGUE_REACH + Vector3(0.0, 1.0, 0.0)
+	match CLIPS[index]:
+		&"windup":
+			tongue.set_windup(true)
+		&"lash":
+			tongue.set_windup(false)
+			tongue.on_event({"shoot": true, "to": ahead, "time": TONGUE_REACH / 16.0, "hold": 0.3})
+		&"pull":
+			if not _pull_started.has(index):
+				_pull_started[index] = true
+				tongue.on_event({"shoot": true, "to": ahead, "time": TONGUE_REACH / 16.0})
 
 
 func _add_environment() -> void:

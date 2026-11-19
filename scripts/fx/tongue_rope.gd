@@ -62,6 +62,8 @@ var _up_time: float = 0.0
 var _retract_len: float = 0.0
 var _dangle_len: float = 0.0
 var _side: Vector3 = Vector3.RIGHT
+## Doğrusal uçuş: uç sabit hızla ilerler (oynanıştaki dil ucuyla aynı yerde olsun diye).
+var _linear: bool = false
 var _mesh: ArrayMesh = ArrayMesh.new()
 
 
@@ -88,7 +90,9 @@ func set_dangle(length: float) -> void:
 		visible = false
 
 
-func shoot(from: Vector3, to: Vector3, travel_time: float) -> void:
+## linear: uç sabit hızla gider (oynanış ucuyla eşleşir); değilse hızlı başlayıp yavaşlar.
+func shoot(from: Vector3, to: Vector3, travel_time: float, linear: bool = false) -> void:
+	_linear = linear
 	_anchor = from
 	_target = to
 	_dur = maxf(travel_time, 0.05)
@@ -133,6 +137,12 @@ func retract() -> void:
 	_sim.iterations = RETRACT_ITERATIONS
 	state = State.RETRACTING
 	_t = 0.0
+
+
+## Anında gizle (havuza dönüş); sonraki set_dangle dili yeniden kurar.
+func hide_now() -> void:
+	state = State.IDLE
+	visible = false
 
 
 func _enter_dangle(reset: bool) -> void:
@@ -198,14 +208,21 @@ func _step_dangle(delta: float) -> void:
 func _step_shooting(delta: float) -> void:
 	var u: float = clampf(_t / _dur, 0.0, 1.0)
 	var dist: float = _anchor.distance_to(_target)
-	var ease_out: float = 1.0 - pow(1.0 - u, 3.0)
 	var start_len: float = maxf(_dangle_len, 0.05)
-	var length: float = lerpf(start_len, dist, ease_out) + dist * OVERSHOOT * sin(PI * u) * u
+	var length: float
+	if _linear:
+		length = lerpf(start_len, dist, u)
+	else:
+		var ease_out: float = 1.0 - pow(1.0 - u, 3.0)
+		length = lerpf(start_len, dist, ease_out) + dist * OVERSHOOT * sin(PI * u) * u
 	_sim.set_rest_length(length)
 	var dir: Vector3 = (_target - _anchor).normalized()
+	# Uçuş boyunca düz çizgiye güçlü çekim: hızla uzayan halat sıkışık noktalardan rastgele yöne
+	# açılıp (atış başı kıvrımı) başın üstünden dolanmasın; canlılığı yanal dalga verir.
+	var seed_dir: Vector3 = dir
 	if _t < SEED_BLEND_TIME:
-		var seed_dir: Vector3 = _forward.slerp(dir, smoothstep(0.0, SEED_BLEND_TIME, _t))
-		_sim.blend_toward_line(seed_dir, length, clampf(delta / SEED_BLEND_RATE, 0.0, 1.0))
+		seed_dir = _forward.slerp(dir, smoothstep(0.0, SEED_BLEND_TIME, _t))
+	_sim.blend_toward_line(seed_dir, length, clampf(delta / SEED_BLEND_RATE, 0.0, 1.0))
 	_sim.drive_tip(_anchor + dir * length, TIP_DRIVE_SHOOT * smoothstep(0.0, TIP_DRIVE_RAMP, u))
 	var amp: float = minf(length * WAVE_AMP_RATIO, WAVE_AMP_MAX) * pow(1.0 - u, 1.3)
 	_sim.add_lateral_wave(_wave_axis(), amp, maxf(length * WAVE_LENGTH_RATIO, WAVE_LENGTH_MIN), _clock * WAVE_SPEED * TAU * 0.5)
@@ -289,6 +306,9 @@ func _build_mesh() -> void:
 	var verts: PackedVector3Array = PackedVector3Array()
 	var norms: PackedVector3Array = PackedVector3Array()
 	var uvs: PackedVector2Array = PackedVector2Array()
+	# UV2.x: kökten metre (shader dokusu dilin boyuyla gerilmesin).
+	var uv2s: PackedVector2Array = PackedVector2Array()
+	var arc: float = 0.0
 	var idx: PackedInt32Array = PackedInt32Array()
 	var normal_ref: Vector3 = Vector3.UP
 	var tan0: Vector3 = (centers[1] - centers[0]).normalized()
@@ -308,6 +328,8 @@ func _build_mesh() -> void:
 			nrm = nrm.rotated(axis.normalized(), prev_tan.angle_to(tan))
 		nrm = (nrm - tan * tan.dot(nrm)).normalized()
 		prev_tan = tan
+		if i > 0:
+			arc += centers[i].distance_to(centers[i - 1])
 		var bin: Vector3 = tan.cross(nrm)
 		var v: float = minf(float(i) / float(SAMPLES - 1), 1.0)
 		var cap: float = 0.0
@@ -319,6 +341,7 @@ func _build_mesh() -> void:
 			verts.append(centers[i] + radial * radii[i])
 			norms.append((radial * cos(cap) + tan * sin(cap)).normalized())
 			uvs.append(Vector2(float(j) / float(RADIAL), v))
+			uv2s.append(Vector2(arc, 0.0))
 	for i: int in rings - 1:
 		for j: int in RADIAL:
 			var a0: int = i * (RADIAL + 1) + j
@@ -329,6 +352,7 @@ func _build_mesh() -> void:
 	arrays[Mesh.ARRAY_VERTEX] = verts
 	arrays[Mesh.ARRAY_NORMAL] = norms
 	arrays[Mesh.ARRAY_TEX_UV] = uvs
+	arrays[Mesh.ARRAY_TEX_UV2] = uv2s
 	arrays[Mesh.ARRAY_INDEX] = idx
 	_mesh.clear_surfaces()
 	_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)

@@ -29,6 +29,9 @@ var jump_lands: int = 0
 var jump_hits: int = 0
 var tongue_shots: int = 0
 var tongue_hits: int = 0
+## Yeni dil mekaniği: çekişin bitişi (yakında ısırdı / süre doldu).
+var tongue_bites: int = 0
+var tongue_timeouts: int = 0
 ## Askeri dille bağlayan dilci (yoksa null); ölürse bağ çözülür.
 var latched: Zombie
 
@@ -288,7 +291,7 @@ func _move(delta: float) -> void:
 		var dir: Vector2 = Steering.seek(p, target)
 		var speed: float = _speed[i]
 		var special: bool = SpecialAttacks.is_special(_rows[i])
-		if special and (state == ZombieRules.State.WINDUP or state == ZombieRules.State.LUNGE or state == ZombieRules.State.JUMP or state == ZombieRules.State.LASH):
+		if special and SpecialAttacks.acts_in(state):
 			p = _special.act(i, state, p, dir, delta, target, target_vel)
 		elif ZombieRules.can_move(state):
 			var vel: Vector2 = dir * speed
@@ -340,7 +343,7 @@ func _on_timer(index: int, state: ZombieRules.State, target: Vector2) -> ZombieR
 	var special: bool = SpecialAttacks.is_special(row)
 	if special and state == ZombieRules.State.WINDUP:
 		return _special.end_windup(index, target)
-	if special and (state == ZombieRules.State.LUNGE or state == ZombieRules.State.JUMP or state == ZombieRules.State.LASH):
+	if special and SpecialAttacks.acts_in(state) and state != ZombieRules.State.WINDUP:
 		return _special.finish(index, state, target)
 	var next: ZombieRules.State = ZombieRules.after_timer(state)
 	if state == ZombieRules.State.WINDUP:

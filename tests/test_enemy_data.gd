@@ -4,7 +4,8 @@ const KIND_KEYS: Dictionary = {
 	&"melee": [],
 	&"lunge": ["lunge_range", "lunge_speed", "lunge_time", "lunge_lead", "lunge_lock_time", "lunge_turn_rate", "lunge_hit_range"],
 	&"jump": ["jump_range", "jump_time", "jump_height", "jump_lock_time", "jump_lead", "jump_max_range", "land_radius"],
-	&"tongue": ["tongue_range", "tongue_lock_time", "tongue_hit_radius", "root_time", "tongue_miss_recover"],
+	&"tongue": ["tongue_range", "tongue_lock_time", "tongue_hit_radius", "root_time", "tongue_miss_recover",
+		"tongue_speed", "tongue_lead", "tongue_pull_speed", "tongue_pull_time", "tongue_release_gap"],
 }
 
 
@@ -14,7 +15,7 @@ func test_every_row_has_its_attack_keys_and_a_model() -> void:
 		assert_true(KIND_KEYS.has(row["attack_kind"]), "%s: bilinmeyen saldırı türü" % id)
 		for key: String in KIND_KEYS[row["attack_kind"]]:
 			assert_true(row.has(key), "%s: %s eksik" % [id, key])
-		assert_true(ZombieVisual.MODELS.has(row["model"]), "%s: model yok" % id)
+		assert_true(ZombieVisual.MODELS.has(row["model"]) or ZombieVisual.VC_MODELS.has(row["model"]), "%s: model yok" % id)
 
 
 func test_special_attack_timings_leave_a_reaction_window() -> void:

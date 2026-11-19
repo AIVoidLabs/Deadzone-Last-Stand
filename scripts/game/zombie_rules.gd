@@ -3,10 +3,10 @@ extends RefCounted
 ## Zombi durum makinesinin saf kuralları. Süreler ve menziller veri tablosundan parametreyle gelir.
 ## Akış: SPAWN -> CHASE -> WINDUP -> (vuruş) -> RECOVER -> CHASE; STAGGER araya girer; DYING son.
 ## Atılan türlerde (koşucu): WINDUP -> LUNGE -> RECOVER; zıplayanda WINDUP -> JUMP (havada) -> RECOVER;
-## dilcide WINDUP -> LASH (dil bağda) -> RECOVER. Bu durumlarda sendeleme olmaz (kararlı saldırı);
-## havadaki zombi hasar da almaz.
+## dilcide WINDUP -> LASH (dil uçuyor; eski mekanikte bağ) -> PULL (yakaladı, çekiyor) -> RECOVER.
+## Bu durumlarda sendeleme olmaz (kararlı saldırı); havadaki zombi hasar da almaz.
 
-enum State { INACTIVE, SPAWN, CHASE, WINDUP, RECOVER, STAGGER, DYING, LUNGE, JUMP, LASH }
+enum State { INACTIVE, SPAWN, CHASE, WINDUP, RECOVER, STAGGER, DYING, LUNGE, JUMP, LASH, PULL }
 
 
 ## Süreli bir durumun süresi dolunca geçilecek durum. windup_next: hazırlıktan sonra gelen durum
@@ -15,7 +15,7 @@ static func after_timer(state: State, windup_next: State = State.RECOVER) -> Sta
 	match state:
 		State.WINDUP:
 			return windup_next
-		State.LUNGE, State.JUMP, State.LASH:
+		State.LUNGE, State.JUMP, State.LASH, State.PULL:
 			return State.RECOVER
 		State.DYING, State.INACTIVE:
 			return State.INACTIVE

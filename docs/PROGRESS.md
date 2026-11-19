@@ -5,7 +5,7 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 
 ## Şu an
 
-Oturum 8 (2026-11-19). Taha görsel kaliteden memnun değildi; yeni yön onaylandı (DECISIONS 2026-11-19). Aşama 7.3+ dondu, araya **V — Görsel yeniden yön** girdi. V.1 ve V.2 bitti. **V.4 sürüyor: dilci oyun modeli + 8 klip + yordamsal dil prototipi hazır, Taha'nın video onayı bekleniyor; onaydan sonra oyuna bağlama (ZombieVisual, yeni dil mekaniği, asker sürüklenme).**
+Oturum 8 (2026-11-19). Taha görsel kaliteden memnun değildi; yeni yön onaylandı (DECISIONS 2026-11-19). Aşama 7.3+ dondu, araya **V — Görsel yeniden yön** girdi. V.1 ve V.2 bitti. **V.4 sürüyor: Taha dilci videolarını ve gırtlak B'yi onayladı (2026-11-19); V.4 2. kısım bu oturumda: oyuna bağlama (ZombieVisual, TongueRope, yeni dil mekaniği, asker sürüklenme/kurtulma klipleri).**
 
 - **V.4 1. kısım (2026-11-19, Taha V.3'ü onayladı: "planladığın gibi devam et"):**
   - **Oyun modeli:** `tools/blender/dilci_game.py` (görünüş `build_dilci.py`'den) + ortak `tools/blender/zombie_game.py` (incelt, köşe rengi, birleştir, iskelet, uzaklıkla ağırlık, GLB). Çıktı `assets/models/characters/zombie_dilci.glb`: 3 çeşit (A 8.7k, B 8.7k, C 7.6k üçgen) tek iskelette. Doku/UV yok: renk köşelerde, `COLOR.a` = parıltı maskesi (göz, kese); Godot shader `assets/shaders/zombie_vc.gdshader` (flash/fade/burn sözleşmesi flash_lit ile aynı + `tint` + ince alaca). Dil ağda yok (oyunda TongueRope).

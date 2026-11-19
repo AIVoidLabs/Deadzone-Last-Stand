@@ -39,6 +39,12 @@ const FEATURE_ZOMBIE_JUMP: bool = true
 const FEATURE_ZOMBIE_TONGUE: bool = true
 ## Dil ıskalayınca ekranda kalma süresi (sn) ve bağlıyken dilin askerde bittiği yükseklik (m).
 const TONGUE_MISS_SHOW_TIME: float = 0.25
+## Dilci Blender'da üretilen yeni modeliyle (köşe renkli, kendi klipleri, yordamsal dil) çizilir;
+## kapalıyken eski düz low-poly model ve kutu dil (V.4).
+const FEATURE_DILCI_MODEL: bool = true
+## Yeni dil mekaniği (V.4): dil görünür hızla uçar (kaçılabilir), yakalarsa askeri dilciye doğru yavaşça
+## çeker; kapalıyken eski anlık ışın + tam 1 sn bağ (7.3).
+const FEATURE_TONGUE_PULL: bool = true
 const TONGUE_PLAYER_HEIGHT: float = 1.1
 ## Bağlıyken asker titremesi: genlik (m) ve hız (rad/sn).
 const PLAYER_STRUGGLE_SHAKE: float = 0.05
