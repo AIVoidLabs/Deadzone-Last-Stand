@@ -30,3 +30,4 @@ desktop.ini
 # Ham model kaynakları (Tripo çıktısı; temizlenmiş model repoda)
 assets/models/source/
 *.blend1
+__pycache__/

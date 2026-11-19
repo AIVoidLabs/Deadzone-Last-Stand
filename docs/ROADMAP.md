@@ -75,8 +75,8 @@ Arayüz bu aşamada işlevsel ve sade; son görünüm Aşama 9'da. Taha her alt 
 |---|---|---|---|
 | 7.1 | Silah davranış seti | Veri satırından seçilen davranışlar: tek mermi, saçılma, delip geçme, patlama (alan hasarı), yakın dövüş savurma (ışın kılıcı gibi; çemberden fırlayıp savrulur), yanma | Oynayıp yorum |
 | 7.2 | Hareket türleri: koşucu, zıplayan, sürünen, tank | Blender'dan; her tür siluet ve hareketle uzaktan ayırt ediliyor ve oyuncuya ayrı bir karar çıkarıyor (tablo `GAME_DESIGN.md`). Koşucu hazırlık animasyonundan sonra atılır; zıplayanın düşeceği yer belli; her türün kendi gövde çeşitleri ve renk şemaları var | Görünüm onayı |
-| 7.3 | Özel türler: zıplayan, dilci (Taha 2026-11-18), zırhlı, çığlıkçı, tükürücü, taş fırlatan, patlayıcı | Zıplayan gerçekten havada (yay, gölge, yer halkası, iniş şoku). Dilci 1 sn bağlar: dash yok, asker çırpınır, sonra kollarını açarak kurtulur. Zırhlı önden dayanıklı, yandan/arkadan zayıf. Çığlıkçı uzaktan zombi çağırır. Tükürücü yerde süre kalan asit alanı bırakır. Taş fırlatanın atışı görülüp kaçılabilir. Patlayıcı uyarı verip patlar, çevresindeki zombilere de zarar verir | Tripo'da özel zombi modelleri (istenirse) |
-| 7.4 | Boss | Kendi saldırı düzenleri, can çubuğu, boss dalgası | Tripo'da boss modeli |
+| 7.3 | Özel türler: zıplayan, dilci (Taha 2026-11-18), zırhlı, çığlıkçı, tükürücü, taş fırlatan, patlayıcı | Zıplayan gerçekten havada (yay, gölge, yer halkası, iniş şoku). Dilci 1 sn bağlar: dash yok, asker çırpınır, sonra kollarını açarak kurtulur. Zırhlı önden dayanıklı, yandan/arkadan zayıf. Çığlıkçı uzaktan zombi çağırır. Tükürücü yerde süre kalan asit alanı bırakır. Taş fırlatanın atışı görülüp kaçılabilir. Patlayıcı uyarı verip patlar, çevresindeki zombilere de zarar verir | Blender açık ve MCP bağlı; onay |
+| 7.4 | Boss | Kendi saldırı düzenleri, can çubuğu, boss dalgası | Blender açık ve MCP bağlı; onay (boss modeli varsayılan Blender) |
 | 7.5 | Yeniden ölçüm | Karışık türlerle sürü ölçümü; profil sınırları güncel | — |
 
 ### V — Görsel yeniden yön (ara aşama, 2026-11-19 kararı; 7 ile 8 arasında, önce yapılır)
@@ -86,9 +86,9 @@ Amaç: düz low-poly zombiden, askerle uyumlu stilize-gerçekçi dokulu modeller
 |---|---|---|---|
 | V.1 | Kurtulma hatası düzeltmesi | Asker dil bağından kurtulunca pozda kalmıyor. Kök neden: `break_free`/`struggle` klipleri döngülü `Idle`'dan türetildiği için döngü bayrağı miras kalıyor, tek-sefer düğümü bitmiyor | — |
 | V.2 | Animasyon önizleme video aracı | Movie Maker ile kare dizisi + kare özeti görseli + izlenebilir video üretiliyor; komut `tools/preview_movie.ps1` (CLAUDE.md doğrulama araçları) | — |
-| V.3 | Üslup rehberi + konsept galerisi + Blender deneme modeli | Yeni üslup yazılı; dilci büstü ve dili Blender MCP ile denendi; kalite görüldü ve Tripo ihtiyacı belirlendi | Blender açık ve MCP bağlı; onay |
-| V.4 | Dilci uçtan uca dikey dilim | Model (Tripo temeli + Blender), 25 kemik + dil kemik zinciri, elle anahtarlanmış imza animasyonlar, yordamsal dil, yeni dil mekaniği (hazırlık → görünür fırlama → yavaş çekme → öldürünce kurtulma), asker sürüklenme ve kurtulma animasyonları; önizleme videosu onaylandı, sonra oyunda | Tripo üretimi (istemler Claude'dan), onay |
-| V.5 | Yeni hattın diğer türlere yayılması | Koşucu, zıplayan, tank ve sürü (yürüyen) gövdeleri yeni hatla; her türün kendi kimliği; sürü performans ölçümü (yeni bütçelerle, LOD) | Tripo üretimi, onay |
+| V.3 | Üslup rehberi + konsept galerisi + Blender deneme modeli | Yeni üslup yazılı; dilci büstü ve dili Blender MCP ile denendi; kalite görüldü ve Tripo ihtiyacı belirlendi → sonuç: Tripo gerekmez (2026-11-19) | Blender açık ve MCP bağlı; onay |
+| V.4 | Dilci uçtan uca dikey dilim | Model (tamamen Blender, kıyafet ve renk çeşitleri), 25 kemik + dil kemik zinciri, elle anahtarlanmış imza animasyonlar, yordamsal dil, yeni dil mekaniği (hazırlık → görünür fırlama → yavaş çekme → öldürünce kurtulma), asker sürüklenme ve kurtulma animasyonları; önizleme videosu onaylandı, sonra oyunda | Blender açık ve MCP bağlı; onay |
+| V.5 | Yeni hattın diğer türlere yayılması | Koşucu, zıplayan, tank ve sürü (yürüyen) gövdeleri yeni hatla; her türün kendi kimliği; sürü performans ölçümü (yeni bütçelerle, LOD) | Blender açık ve MCP bağlı; onay |
 | V.6 | Asker animasyon cilası | Dash, vurulma, ölüm yeni kaliteye getirildi | Onay |
 
 ### 8 — Arena, atmosfer, ses

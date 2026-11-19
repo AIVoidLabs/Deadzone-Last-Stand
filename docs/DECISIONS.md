@@ -2,12 +2,20 @@
 
 Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar verilince "Açık kararlar"dan çıkarılıp tarihli bölüme yazılır.
 
+## 2026-11-19 — Zombiler tamamen Blender'da (Taha)
+
+Taha, dilcinin yalnız Blender Python ile yapılan denemesini (skin modifier gövde, metaball kafa ve çene, bölünmüş çene, boğaz kesesi, ıslak dil; `docs/concept/dilci_trial_v1_*.png`) görünce: "oluşturduğun modeli çok sevdim". Devam tamamen Blender'da; zombiler için Tripo yok.
+
+- **Karar:** tüm zombiler tamamen Blender'da Claude'un scriptleriyle üretilir. Zombiler için K2'nin (Tripo temeli + Claude bitirir) yerine geçer. Asker mevcut Tripo modeli olarak kalır. Boss: sonra karar verilir (varsayılan yine Blender).
+- **Hat:** Blender MCP ile çalıştırılan Blender Python scriptleri. Gövdeler skin modifier + voxel remesh; kafa ve imza parçalar metaball; kıyafet (pantolon, yırtık tişört vb.) gövde yüzeyinden üretilir, yırtık etek ve delikli; her zombi için renk ve kıyafet çeşitleri veriyle; animasyonlar elle anahtarlanan scriptlerle (K3).
+- **Detay:** ince detay aranmıyor (Brotato tarzı oyun, yukarıdan kamera); çeşitlilik kıyafet, renk şeması ve gövde çeşitlerinden gelir.
+
 ## 2026-11-19 — Görsel yeniden yön (Taha)
 
 Taha görsel kaliteden memnun değil: zombiler düz low-poly (`build_zombie.py`, ~650 üçgen, kutu kafa, palet renkleri), asker ise dokulu Tripo modeli; özel hareketler (atılış, zıplama, dil hazırlığı, çırpınma/kurtulma) gerçek animasyon değil, kütüphane kliplerine koddan eklenen sabit kemik açıları; dil 8 cm'lik kutu, 0.12 sn'de uzar ve ışın gibi anında vurur. Aşağıdaki yön onaylandı.
 
 - **K1 Üslup:** düz low-poly bırakıldı. Zombiler askerle uyumlu: stilize-gerçekçi, dokulu, orta poligon. Kamera ~17 m yukarıdan baktığı için siluet, imza parça (dil, pençe, kambur duruş) ve hareket okunmalı. Yeni bütçeler: sıradan zombi 3–5 bin üçgen, özel zombi 8–15 bin, boss ~20 bin, uzaklık için LOD; sürü ölçüm aracıyla yeniden ölçülür. "Tek palet malzemesi" kuralı kalktı.
-- **K2 Modeller:** temel modeli Taha Tripo'da üretir (istem ve konsepti Claude yazar); Claude blender-mcp ile Blender'da bitirir: temizlik, 25 kemikli iskelete bağlama, imza parçalar (dil kemik zinciri, pençeler), malzeme. Yordamsal `build_zombie.py` emekli (eski; yenisi gelene kadar repoda kalır). Tasarımlar özgün: referanslar yalnız his verir, başka oyunların karakterleri kopyalanmaz.
+- **K2 Modeller:** temel modeli Taha Tripo'da üretir (istem ve konsepti Claude yazar); Claude blender-mcp ile Blender'da bitirir: temizlik, 25 kemikli iskelete bağlama, imza parçalar (dil kemik zinciri, pençeler), malzeme. Yordamsal `build_zombie.py` emekli (eski; yenisi gelene kadar repoda kalır). Tasarımlar özgün: referanslar yalnız his verir, başka oyunların karakterleri kopyalanmaz. — aynı gün değişti: zombiler tamamen Blender'da (üstteki karar)
 - **K3 Animasyon üç katman:** (1) temel hareket CC0 Quaternius kütüphanesinden; (2) imza hareketler Blender'da elle anahtarlanır, yeniden üretilebilir script olarak saklanır (hazırlık, abartı, devam hareketi, oturma); (3) Godot'da yordamsal katman (yay/verlet dil zinciri, ikincil hareket). İmza hareketi koddan sabit kemik açısı ekleyerek türetmek artık yasak (ofset yalnız yürüyüş çeşitleri gibi küçük farklar için).
 - **K4 Dil mekaniği yeniden tasarımı:** hazırlık (kafa geriye gider, çene açılır, boğaz şişer) → dil görülür hızda fırlar ve dalgalanır, dash ile kaçılabilir → isabette asker yavaşça zombiye doğru çekilir → dilci vurulup öldürülürse asker kurtulur. Dil: yordamsal, eğri, uca doğru incelen ıslak tüp; geri çekilirken kırbaç gibi savrulur. Askerin gerçek sürüklenme/çırpınma ve kurtulma animasyonları olur. (Bu, 2026-11-18'deki "tam 1 sn bağlı" tasarımının yerine geçer.)
 - **K5 Her türün kimliği:** ayrı siluet, tek imza hareket ve oyuncuya zorlattığı bir karar. Örnek: uzun pençeli, ince "Pençeli": sessizce çömelir, yaklaşınca çığlık atar ve pençeleriyle atılır.
