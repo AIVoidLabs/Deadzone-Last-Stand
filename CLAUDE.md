@@ -1,6 +1,6 @@
 # Deadzone Last Stand — Claude Code Talimatları
 
-3D low-poly, dalga tabanlı hayatta kalma oyunu. Zırhlı ve kasklı bir asker, kapalı bir şehir arenasında zombi sürülerine karşı otomatik ateş eden silahlarla ve dash ile ayakta kalmaya çalışır. Brotato'nun tur yapısı (dalga + mağaza + silah yuvaları), Vampire Survivors'ın sürü hissi; kendi adı, karakterleri ve görselleriyle özgün bir oyun.
+3D stilize, dalga tabanlı hayatta kalma oyunu. Zırhlı ve kasklı bir asker, kapalı bir şehir arenasında zombi sürülerine karşı otomatik ateş eden silahlarla ve dash ile ayakta kalmaya çalışır. Brotato'nun tur yapısı (dalga + mağaza + silah yuvaları), Vampire Survivors'ın sürü hissi; kendi adı, karakterleri ve görselleriyle özgün bir oyun.
 
 - **Motor:** Godot 4.7.2 (Standard sürüm, .NET DEĞİL) — **Dil:** GDScript
 - **Renderer:** Forward+
@@ -52,7 +52,8 @@ Blender tarafı: Blender açık olmalı, 3D görünümde N → BlenderMCP sekmes
 6. **Web hiçbir kararı sınırlamaz.** Web gerekçesiyle özellik, efekt ya da zombi sayısı kısma. Platforma bağlı her değer kalite profilinden okunur (bölüm 3).
 7. **Her yeni özellik tek sabitle kapatılabilir olmalı.** Kullanıcı beğenmezse anında çıkarılabilmeli.
 8. Onay almadan kod yazma. Birden çok görsel seçenek varsa önce galeri görseliyle göster. Sessizce karar verme; kısa gerekçe ver.
-9. **Görsel kalite önceliklidir.** Model, malzeme, ışık, efekt veya arena işi yaparken ilgili Blender skill'lerini kullan, Blender'ı blender-mcp ile aktif olarak açıp düzenle ve viewport görüntüsüyle yinele. Sonuç yalnız teknik olarak çalışan değil, Deadzone'un görsel diline uyan ve oyunda okunaklı olmalı. Tek seferde bir görsel yön göster; Taha'nın geri bildirimiyle cilala.
+9. **Görsel kalite önceliklidir.** Model, malzeme, ışık, efekt veya arena işi yaparken ilgili Blender skill'lerini kullan, Blender'ı blender-mcp ile aktif olarak açıp düzenle ve viewport görüntüsüyle yinele. Sonuç yalnız teknik olarak çalışan değil, Deadzone'un görsel diline uyan ve oyunda okunaklı olmalı. Tek seferde bir görsel yön göster; Taha'nın geri bildirimiyle cilala. Görsel iş 'çalışıyor' ile bitmez: konsept → model → animasyon önizlemesi → Taha onayı → oynanış. İmza hareketler koddan sabit açı eklenerek türetilmez; Blender'da elle anahtarlanır.
+10. İyi tanımlanmış işler model açıkça belirtilerek Sonnet alt ajanlara verilebilir; tasarım kararı ve doğrulama ana döngüde.
 
 ---
 
@@ -69,7 +70,8 @@ Tam plan `docs/ROADMAP.md`'de: her ana aşama alt aşamalara (2.1, 2.2 …) böl
 | 4 | Dikey dilim: zombi | Blender zombisi, animasyonlar, durum makinesi ve saldırı, itme ve sendeleme, ölüm |
 | 5 | Dikey dilim: silah ve vuruş hissi | Süzülen silahlar, atış görseli, vuruş geri bildirimi, ilk sesler, pompalı, **dikey dilim onayı** |
 | 6 | Tur döngüsü | Dalgalar, düşenler, istatistik ve kartlar, yuvalar ve birleştirme, mağaza, tam tur |
-| 7 | Silah ve zombi çeşitliliği | Silah davranış seti, koşan, tank, tüküren, patlayan, boss |
+| 7 | Silah ve zombi çeşitliliği (7.3+ dondu) | Silah davranış seti, koşan, tank, tüküren, patlayan, boss |
+| V | Görsel yeniden yön | Kurtulma hatası, önizleme aracı, üslup + deneme modeli, dilci dilimi, türlere yayılma, asker cilası |
 | 8 | Arena, atmosfer, ses | Şehir sokağı, engeller, ışık ve sis, tam ses seti, müzik |
 | 9 | Arayüz ve akış | Menü, duraklatma, ayarlar, HUD, son ekranlar, kayıt |
 | 10 | Kalıcı ilerleme | Kalıcı para, asker sınıfları, açılımlar, yükseltmeler |
@@ -171,6 +173,7 @@ docs/          GAME_DESIGN.md, PROGRESS.md, concept/
 - Sürü ölçümü: `godot --path . -- --bench` → vsync kapalı, 50'şer zombi ekler, 60 FPS altına düşünce durur; sonuç stdout'ta `BENCH` satırları ve `user://bench_result.txt`.
 - `-s` ile çalışan SceneTree betikleri autoload'ları göremez; oyun sınıflarına dokunan araçları bu yüzden betik olarak değil, debug düğümü olarak yaz.
 - Animasyon önizleme: `godot --path . res://scenes/debug/anim_preview.tscn [-- --model=soldier] [--capture=build/shots/anim.png]` → her klip bir modelde.
+- **Hareketli önizleme (animasyon değerlendirmesi için zorunlu):** `powershell -File tools/preview_movie.ps1 -Name <ad> [-Seconds 6] [-Fps 30] [-Scene res://...] [-GameArgs "<oyun argümanları>"] [-Cols 4] [-Rows 3] [-Skip 0]` → `build/movies/<ad>_sheet.png` (kare özeti, Read ile bak) + `build/movies/<ad>.avi` (Taha izler; ffmpeg varsa `.mp4`). Pencere açılır; ana sahne argümanlarına `--capture` kendiliğinden eklenir. Örnek dilci: `-GameArgs "--capture-spawn=40 --capture-kind=tongue --god --capture-near=7"`.
 - Model inceleme: `blender --background --python tools/blender/inspect_model.py -- <model> build/shots/<ad>` → üç yönden görüntü + ölçüler.
 - Zombi galerisi: `godot --path . res://scenes/debug/zombie_gallery.tscn [-- --clips] [--capture=build/shots/zombies.png]` → gövde çeşitleri ve renk şemaları; `--clips` ile zombi klip seti (her klip adıyla).
 - `--import` çıktısındaki `ERROR` satırlarını süzmeden oku; doku ve model hataları yalnız orada görünür.
@@ -182,6 +185,7 @@ docs/          GAME_DESIGN.md, PROGRESS.md, concept/
 - **Yeniden üretilebilirlik şartı:** MCP ile bulunan ve Taha'nın beğendiği son görünüm, `tools/blender/<asset>.py` içinde temiz ve tekrar çalıştırılabilir üretim adımı olarak saklanır. Son doğrulamayı bu scripti Blender MCP üzerinden yeniden çalıştırarak yap; elle yapılan kalıcı değişiklikleri scriptte karşılığı olmadan bırakma. MCP canlı Blender oturumu ve script birbirini tamamlar: MCP görsel keşif/cila için, script kaynak gerçekliği ve yeniden üretim için kullanılır.
 - Model dışa aktarımından sonra `godot --headless --path . --import` ve `godot --headless --path . -s res://tools/godot/check_anim_import.gd` ile içe aktarımı doğrula; oyunda veya model inceleme sahnesinde görüntü alıp gerçek sonucu kontrol et. Görsel kaliteyi viewport/oyun görüntüsünden değerlendir; ölçüler, topoloji, animasyon ve export için ilgili Blender skill'lerinin QA adımlarını da uygula.
 - İskelet standardı, kemik eşlemesi ve komutların açıklaması `docs/TECH.md`'de. Her karakter 25 kemikli ortak iskelete bağlanır.
+- Model kaynağı: özel ve sürü zombileri Tripo temeli (Taha) + Blender MCP ile Claude'un temizlik, iskelet, imza parça ve malzeme işi; bütçeler `docs/TECH.md`.
 - Ham Tripo dosyası ve ham kütüphane paketleri (`assets/models/source/`) git'e girmez.
 - Blender skill'leri `.claude/skills/` altında (arjun988/blender-skills'ten seçilmiş 35 skill + ortak `references/`, MIT). İşe başlamadan ilgili skill'leri aç ve kullan: genelde `blender-director` + `lowpoly-style`/`stylized-style`; karakterde `character-artist`/`creature-artist` ve `rigging`/`animation`; silah/prop'ta `hard-surface`/`prop-artist`; arenada `environment-artist`, `apocalypse-worlds`, `lighting`, `set-dressing`; her işte gerektiğinde `materials`, `uv-workflow`, `asset-optimization`, `godot-export`, `qa-review`. Skill seçimini ihtiyaca göre dar tut; ilgisiz skill'leri topluca yükleme. Skill'ler kalite ve Blender iş akışını yönlendirir; yukarıdaki MCP + script sözleşmesi Deadzone'un kalıcı üretim kuralıdır. Export her zaman GLB'dir (`godot-export`); polycount ve doku sınırları `docs/TECH.md` ile çelişirse `docs/TECH.md` geçerlidir.
 
@@ -197,6 +201,7 @@ docs/          GAME_DESIGN.md, PROGRESS.md, concept/
 
 ## 6. Lisans ve asset'ler
 
+- Repo herkese açık, oyun itch.io'da ücretsiz: yalnız açık dağıtıma izin veren asset (CC0 / atıflı CC-BY); Mixamo yok.
 - Dışarıdan gelen her asset ve araç için `CREDITS.md`'ye kaynak + lisans satırı ekle.
 - Kod lisansı henüz kararlaştırılmadı; kullanıcıya sor, kendiliğinden LICENSE ekleme.
 

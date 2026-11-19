@@ -69,7 +69,7 @@ Amaç: gerçek karakter üretmeden önce hattın ve performansın kanıtlanması
 
 Arayüz bu aşamada işlevsel ve sade; son görünüm Aşama 9'da. Taha her alt aşamayı oynar.
 
-### 7 — Silah ve zombi çeşitliliği
+### 7 — Silah ve zombi çeşitliliği (dondu: V bitince devam; 7.1 ve 7.2 bitti, 7.3 kodu var, kalan alt aşamalar aşağıda korunuyor)
 
 | # | Alt aşama | Bitti sayılır, eğer… | Taha |
 |---|---|---|---|
@@ -78,6 +78,18 @@ Arayüz bu aşamada işlevsel ve sade; son görünüm Aşama 9'da. Taha her alt 
 | 7.3 | Özel türler: zıplayan, dilci (Taha 2026-11-18), zırhlı, çığlıkçı, tükürücü, taş fırlatan, patlayıcı | Zıplayan gerçekten havada (yay, gölge, yer halkası, iniş şoku). Dilci 1 sn bağlar: dash yok, asker çırpınır, sonra kollarını açarak kurtulur. Zırhlı önden dayanıklı, yandan/arkadan zayıf. Çığlıkçı uzaktan zombi çağırır. Tükürücü yerde süre kalan asit alanı bırakır. Taş fırlatanın atışı görülüp kaçılabilir. Patlayıcı uyarı verip patlar, çevresindeki zombilere de zarar verir | Tripo'da özel zombi modelleri (istenirse) |
 | 7.4 | Boss | Kendi saldırı düzenleri, can çubuğu, boss dalgası | Tripo'da boss modeli |
 | 7.5 | Yeniden ölçüm | Karışık türlerle sürü ölçümü; profil sınırları güncel | — |
+
+### V — Görsel yeniden yön (ara aşama, 2026-11-19 kararı; 7 ile 8 arasında, önce yapılır)
+Amaç: düz low-poly zombiden, askerle uyumlu stilize-gerçekçi dokulu modellere ve gerçek elle anahtarlı imza animasyonlara geçmek. Süreç kapısı: konsept → model → animasyon önizlemesi (video / kare özeti) → Taha onayı → oynanış. Bitiş ölçütü: Taha'nın yeni görsel dili ve dilci dilimini onaylaması. Karar ayrıntısı: `DECISIONS.md` 2026-11-19.
+
+| # | Alt aşama | Bitti sayılır, eğer… | Taha |
+|---|---|---|---|
+| V.1 | Kurtulma hatası düzeltmesi | Asker dil bağından kurtulunca pozda kalmıyor. Kök neden: `break_free`/`struggle` klipleri döngülü `Idle`'dan türetildiği için döngü bayrağı miras kalıyor, tek-sefer düğümü bitmiyor | — |
+| V.2 | Animasyon önizleme video aracı | Movie Maker ile kare dizisi + kare özeti görseli + izlenebilir video üretiliyor; komut `tools/preview_movie.ps1` (CLAUDE.md doğrulama araçları) | — |
+| V.3 | Üslup rehberi + konsept galerisi + Blender deneme modeli | Yeni üslup yazılı; dilci büstü ve dili Blender MCP ile denendi; kalite görüldü ve Tripo ihtiyacı belirlendi | Blender açık ve MCP bağlı; onay |
+| V.4 | Dilci uçtan uca dikey dilim | Model (Tripo temeli + Blender), 25 kemik + dil kemik zinciri, elle anahtarlanmış imza animasyonlar, yordamsal dil, yeni dil mekaniği (hazırlık → görünür fırlama → yavaş çekme → öldürünce kurtulma), asker sürüklenme ve kurtulma animasyonları; önizleme videosu onaylandı, sonra oyunda | Tripo üretimi (istemler Claude'dan), onay |
+| V.5 | Yeni hattın diğer türlere yayılması | Koşucu, zıplayan, tank ve sürü (yürüyen) gövdeleri yeni hatla; her türün kendi kimliği; sürü performans ölçümü (yeni bütçelerle, LOD) | Tripo üretimi, onay |
+| V.6 | Asker animasyon cilası | Dash, vurulma, ölüm yeni kaliteye getirildi | Onay |
 
 ### 8 — Arena, atmosfer, ses
 8.1 Şehir sokağı parçaları (yol, kaldırım, binalar, barikat, enkaz; Blender) · 8.2 Engeller ve zombilerin engel çevresinden dolaşması (yol bulma yok, basit kaçınma) · 8.3 Işık, sis, ekran efektleri; karakterler zeminden net ayrışıyor · 8.4 Tam ses seti · 8.5 Müzik kararı. — Taha: görünüm ve ses onayı, müzik kararı.

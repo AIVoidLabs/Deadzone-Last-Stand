@@ -5,6 +5,11 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 
 ## Şu an
 
+Oturum 8 (2026-11-19). Taha görsel kaliteden memnun değildi; yeni yön onaylandı (DECISIONS 2026-11-19). Aşama 7.3+ dondu, araya **V — Görsel yeniden yön** girdi. V.1 ve V.2 bitti. **V.3 sürüyor: dilci deneme modeli (ilk tur) Taha'nın yorumunu bekliyor.**
+
+- **V.3 dilci denemesi (`tools/blender/dilci_trial.py`, Blender MCP ile çalıştırılır → `build/blender/dilci_trial.blend`):** oyun modeli değil, kalite denemesi. Gövde: iskelet noktaları + skin modifier + voxel remesh + gürültülü yer değiştirme; kafa ve çene: metaball kütleleri (negatifler göz çukuru/damak oyar); dil: incelen NURBS boru. İmza: ortadan yarılmış, dişli alt çene; yarıkların arasında damarlı, içten parlayan boğaz kesesi (dil burada durur, saldırı öncesi şişer = önsezi); ağızdan sarkan ıslak dil, kanca uçlu. Görüntüler `docs/concept/dilci_trial_v1_*.png` (tam boy, kafa, oyun kamerası). Claude'un değerlendirmesi: siluet ve dil oyun kamerasından okunuyor; yakında "kil/hamur" görünüyor (anatomi kaba, ayaklar topak, ten plastik), AAA seviyesi değil. Kodla heykel yapılamadığı için insansı gövde için Tripo temeli + Blender'da imza parça/malzeme/animasyon önerisi sürüyor; Taha'nın kararı bekleniyor. Yaklaşık 77 bin yüz (deneme, optimize değil).
+- **V.2 önizleme aracı:** `tools/preview_movie.ps1` + `tools/godot/contact_sheet.gd`; ffmpeg yok, video AVI (MJPEG).
+
 Oturum 7 (2026-11-18). Aşama 7.1 onaylı. **7.2 kod bitti, Taha'nın oynayıp yorumu bekliyor: koşucu + tank zombi** (zıplayan ve sürünen sonraya). Aşama 6 onayı hâlâ bekliyor. 154 test, push yok.
 
 - **7.2 (koşucu + tank):** `EnemyData` satırları (eksik alanlar yürüyenden gelir; `attack_kind` `melee`/`lunge`), tür başına model (`zombie_runner.glb` 4 çeşit × 8 şema, `zombie_tank.glb` 4 çeşit × 6 şema; `build_zombie.py -- runner|tank|all`, tank için omuz zırhı + göğüs plakası), tür başına havuz (`Zombie.kind`). **Koşucu (can 18, hız 3.8, atılış 9 m/sn):** yaklaşınca çömelir (0.65 sn), `LungeRules` ile oyuncunun gideceği yere nişan alır (lead 0.9), son 0.22 sn yön kilitli, atılırken 2.0 rad/sn ile izler; ıskalayınca 0.9 sn toparlanır; atılırken sendelemez, hazırlıkta vurulursa atılış bozulur. **Tank (can 220, hız 1.5, ağırlık 4, vuruş 35, sendelemez):** 0.9 sn hazırlık, 1.5 m erişim. Dalga 2'den runner, 4'ten tank (`WaveData.mix`). `FEATURE_ZOMBIE_VARIETY`, `FEATURE_ZOMBIE_LUNGE`. Ölçüm: ayakta duran asker %100 vurulur, daire çizerek kaçan ~%14 (`--capture-kind=runner --god --circle --headless --fixed-fps 60` → `LUNGE starts/hits`). Gerçek kaçış zorluğu Taha'nın elinde ayarlanır. Bot 5/5 tur kazandı.
@@ -36,7 +41,8 @@ Oturum 7 (2026-11-18). Aşama 7.1 onaylı. **7.2 kod bitti, Taha'nın oynayıp y
 | 4 | Dikey dilim: zombi | ✔ bitti (2026-11-16) |
 | 5 | Dikey dilim: silah ve vuruş hissi | ✔ bitti (2026-11-17, dikey dilim onaylandı) |
 | 6 | Tur döngüsü | ✔ kod bitti 2026-11-18 (Taha'nın oynayıp onayı bekleniyor: 6.4–6.6) |
-| 7 | Silah ve zombi çeşitliliği | 7.1 ✔ (Taha onayladı), 7.2 sırada |
+| 7 | Silah ve zombi çeşitliliği | 7.1 ✔, 7.2–7.3 kod var, dondu (V bitince devam) |
+| V | Görsel yeniden yön | sürüyor |
 | 8 | Arena, atmosfer, ses | — |
 | 9 | Arayüz ve akış | — |
 | 10 | Kalıcı ilerleme | — |
@@ -91,6 +97,14 @@ Bitiş ölçütleri `ROADMAP.md`'de. Biten kutunun yanına tarih ve commit yazı
 - [ ] 7.3 Tüküren ve patlayan
 - [ ] 7.4 Boss
 - [ ] 7.5 Yeniden ölçüm
+
+### V — Görsel yeniden yön
+- [x] V.1 Kurtulma hatası düzeltmesi — 2026-11-19 (`79ca05a`; `break_free` tek sefer, `ZombieClipData`/`PlayerClipData` satırında `loop` alanı, 3 yeni test; oyunda kurtulma sonrası koşu görüntüyle doğrulandı)
+- [x] V.2 Animasyon önizleme video aracı — 2026-11-19 (`tools/preview_movie.ps1`: kare dizisi + kare özeti + AVI; iki deneme: anim_preview ve dilci saldırısı)
+- [ ] V.3 Üslup rehberi + konsept galerisi + Blender deneme modeli
+- [ ] V.4 Dilci uçtan uca dikey dilim
+- [ ] V.5 Yeni hattın diğer türlere yayılması
+- [ ] V.6 Asker animasyon cilası
 
 ### 8 — Arena, atmosfer, ses
 - [ ] 8.1 Şehir sokağı parçaları

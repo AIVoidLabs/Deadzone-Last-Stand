@@ -2,6 +2,22 @@
 
 Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar verilince "Açık kararlar"dan çıkarılıp tarihli bölüme yazılır.
 
+## 2026-11-19 — Görsel yeniden yön (Taha)
+
+Taha görsel kaliteden memnun değil: zombiler düz low-poly (`build_zombie.py`, ~650 üçgen, kutu kafa, palet renkleri), asker ise dokulu Tripo modeli; özel hareketler (atılış, zıplama, dil hazırlığı, çırpınma/kurtulma) gerçek animasyon değil, kütüphane kliplerine koddan eklenen sabit kemik açıları; dil 8 cm'lik kutu, 0.12 sn'de uzar ve ışın gibi anında vurur. Aşağıdaki yön onaylandı.
+
+- **K1 Üslup:** düz low-poly bırakıldı. Zombiler askerle uyumlu: stilize-gerçekçi, dokulu, orta poligon. Kamera ~17 m yukarıdan baktığı için siluet, imza parça (dil, pençe, kambur duruş) ve hareket okunmalı. Yeni bütçeler: sıradan zombi 3–5 bin üçgen, özel zombi 8–15 bin, boss ~20 bin, uzaklık için LOD; sürü ölçüm aracıyla yeniden ölçülür. "Tek palet malzemesi" kuralı kalktı.
+- **K2 Modeller:** temel modeli Taha Tripo'da üretir (istem ve konsepti Claude yazar); Claude blender-mcp ile Blender'da bitirir: temizlik, 25 kemikli iskelete bağlama, imza parçalar (dil kemik zinciri, pençeler), malzeme. Yordamsal `build_zombie.py` emekli (eski; yenisi gelene kadar repoda kalır). Tasarımlar özgün: referanslar yalnız his verir, başka oyunların karakterleri kopyalanmaz.
+- **K3 Animasyon üç katman:** (1) temel hareket CC0 Quaternius kütüphanesinden; (2) imza hareketler Blender'da elle anahtarlanır, yeniden üretilebilir script olarak saklanır (hazırlık, abartı, devam hareketi, oturma); (3) Godot'da yordamsal katman (yay/verlet dil zinciri, ikincil hareket). İmza hareketi koddan sabit kemik açısı ekleyerek türetmek artık yasak (ofset yalnız yürüyüş çeşitleri gibi küçük farklar için).
+- **K4 Dil mekaniği yeniden tasarımı:** hazırlık (kafa geriye gider, çene açılır, boğaz şişer) → dil görülür hızda fırlar ve dalgalanır, dash ile kaçılabilir → isabette asker yavaşça zombiye doğru çekilir → dilci vurulup öldürülürse asker kurtulur. Dil: yordamsal, eğri, uca doğru incelen ıslak tüp; geri çekilirken kırbaç gibi savrulur. Askerin gerçek sürüklenme/çırpınma ve kurtulma animasyonları olur. (Bu, 2026-11-18'deki "tam 1 sn bağlı" tasarımının yerine geçer.)
+- **K5 Her türün kimliği:** ayrı siluet, tek imza hareket ve oyuncuya zorlattığı bir karar. Örnek: uzun pençeli, ince "Pençeli": sessizce çömelir, yaklaşınca çığlık atar ve pençeleriyle atılır.
+- **K6 Süreç kapısı:** konsept → model → animasyon önizlemesi (video / kare özeti) → Taha onayı → oynanış. Bu sıra bitmeden yeni görsel içerik oyuna girmez. Ekran görüntüsü animasyonu yargılamaya yetmez. Önizleme video aracı yapılıyor.
+- **K7 Plan:** Aşama 7.3 ve 7'nin kalanı dondu. 7 ile 8 arasına ara ana aşama **V — Görsel yeniden yön** eklendi (V.1 kurtulma hatası, V.2 önizleme video aracı, V.3 üslup rehberi + konsept galerisi + Blender deneme modeli, V.4 dilci dikey dilimi, V.5 yeni hattın türlere yayılması, V.6 asker animasyon cilası). Bitiş ölçütü: Taha'nın yeni görsel dili ve dilci dilimini onaylaması. V bitince 7 kaldığı yerden devam eder.
+- **Yayın ve lisans:** repo GitHub'da herkese açık olacak, oyun itch.io'da ücretsiz indirilecek. Repodaki her asset açık dağıtıma izin vermeli (CC0 ya da `CREDITS.md` satırlı CC-BY). Mixamo kullanılamaz (ham dosya dağıtımını yasaklıyor). Kod lisansı (MIT önerisi) hâlâ açık; yayından önce sorulur.
+- **Eksik animasyon sorusu çözüldü:** Claude Blender'da elle anahtarlar + CC0 kütüphane; ücretli paketler yalnız Taha lisansı kontrol ettikten sonra.
+- **Blender MCP durumu:** Blender 5.3 bağlı; eklentide yalnız bpy kod çalıştırma ve viewport görüntüsü açık; üreticiler (Tripo/Hyper3D/Hunyuan/Meshy) ve kütüphaneler (Poly Haven/Sketchfab/Poly Pizza) kapalı.
+- **Çalışma biçimi:** Claude iyi tanımlanmış işleri model açıkça belirtilerek Sonnet alt ajanlara verebilir (hız ve jeton tasarrufu); tasarım kararı ve doğrulama ana döngüde kalır.
+
 ## 2026-11-18 — Sıradaki zombi türleri: zıplayan ve dilci (Taha)
 
 - Koşucu + tank onaylandı ("okey"). **Sıraya eklendi, hemen başlanmayacak** (Taha: aklına geldi, yazdırdı).
@@ -112,7 +128,7 @@ Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar v
 
 - **Repo herkese açık olacak** (GitHub'da public). Sonuç: repoya giren her asset açık dağıtıma izin veren lisansta olmalı (CC0 ya da benzeri); Mixamo gibi ham dosya dağıtımı kısıtlı kaynaklar kullanılmaz.
 - **Animasyon kütüphanesi:** Quaternius Universal Animation Library 1 + 2, ücretsiz Standard sürümleri (CC0). Taha indirdi; lisans metni paketin içinden doğrulandı.
-- **Blender işleri penceresiz çalışır** (`blender --background --python <script>`); Taha'nın Blender'ı açıp bağlaması yalnız canlı önizleme istenirse gerekir. (Claude'un önerisi; 5.3.0 ile denendi.)
+- **Blender işleri penceresiz çalışır** (`blender --background --python <script>`); Taha'nın Blender'ı açıp bağlaması yalnız canlı önizleme istenirse gerekir. (Claude'un önerisi; 5.3.0 ile denendi.) — 2026-11-19: geçersiz, Blender MCP etkileşimli hattın parçası
 
 ## 2026-11-16 — Ana plan (Taha)
 
@@ -144,7 +160,6 @@ Aşama 1 geri bildirimi (Taha): vuruş hissi yok, hareket cansız, zombiler tehd
 
 | Karar | Ne zaman |
 |---|---|
-| Eksik animasyonlar (ek zombi yürüyüşleri, yönlü ölümler): Claude Blender'da mı üretsin, ücretli Pro sürüm mü alınsın | 4.2 |
 | İçerik hedefi sayıları | 6 ve 11 |
 | Arenada engel yoğunluğu | 8.2 |
 | Müzik | 8.5 |
