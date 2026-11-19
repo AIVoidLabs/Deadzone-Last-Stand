@@ -1,8 +1,9 @@
 class_name PlayerAnimator
 extends RefCounted
 ## Askerin animasyon ağacını kodla kurar ve sürer:
-## bekleme<->koşu harmanı -> koşu hızı -> vurulma (yalnız üst gövde) -> takla -> çırpınma (bağlıyken) ->
-## kurtulma (bağ çözülünce) -> hayatta/ölü.
+## bekleme<->koşu harmanı -> koşu hızı -> vurulma (yalnız üst gövde) -> takla -> sürüklenme (dil bağında) ->
+## kurtulma (bağ çözülünce) -> hayatta/ölü. Sürüklenme ve kurtulma Blender'da elle anahtarlanmış
+## klipler (player_anims.glb); FEATURE_PLAYER_DRAG_CLIPS kapalıysa eski türetilmiş klipler.
 
 const LIBRARY_NAME: StringName = &"ual1"
 const LIBRARY: AnimationLibrary = preload("res://assets/models/anim/ual1.glb")
@@ -12,7 +13,9 @@ const CLIP_HIT: StringName = &"ual1/Hit_Chest"
 const CLIP_ROLL: StringName = &"ual1/Roll"
 const CLIP_DEATH: StringName = &"ual1/Death01"
 const SKELETON_PATH: String = "%GeneralSkeleton"
-## Çırpınma döngüsünün hızı ve kurtulma klibinin süresi (sn).
+const DRAG_LIBRARY_NAME: StringName = &"player_v"
+const DRAG_LIBRARY: AnimationLibrary = preload("res://assets/models/anim/player_anims.glb")
+## Eski (türetilmiş) çırpınma döngüsünün hızı ve kurtulma klibinin süresi (sn); yeni klipler kendi hızında.
 const STRUGGLE_SPEED: float = 1.8
 const BREAK_FREE_TIME: float = 0.5
 ## Vurulma klibi yalnız bu kemikleri oynatır; bacaklar koşmayı sürdürür.
@@ -35,11 +38,14 @@ func _init(model: Node3D) -> void:
 	var skeleton: Skeleton3D = model.find_child("GeneralSkeleton", true, false) as Skeleton3D
 	var extra: AnimationLibrary = PlayerClipData.library(skeleton)
 	_tree.add_animation_library(PlayerClipData.LIBRARY_NAME, extra)
+	if Tuning.FEATURE_PLAYER_DRAG_CLIPS:
+		_tree.add_animation_library(DRAG_LIBRARY_NAME, DRAG_LIBRARY)
 	_tree.tree_root = _build_graph()
 	model.add_child(_tree)
 	_tree.active = true
-	_tree.set(&"parameters/struggle_scale/scale", STRUGGLE_SPEED)
-	_tree.set(&"parameters/free_scale/scale", extra.get_animation(&"break_free").length / BREAK_FREE_TIME)
+	if not Tuning.FEATURE_PLAYER_DRAG_CLIPS:
+		_tree.set(&"parameters/struggle_scale/scale", STRUGGLE_SPEED)
+		_tree.set(&"parameters/free_scale/scale", extra.get_animation(&"break_free").length / BREAK_FREE_TIME)
 	# Geçiş düğümü kendiliğinden bir girişle başlamaz; ilk durumu açıkça iste.
 	set_dead(false)
 
@@ -58,7 +64,7 @@ func play_roll() -> void:
 	_tree.set(&"parameters/roll/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_FIRE)
 
 
-## Dilciyle bağlanınca: çırpınma döngüsü başlar.
+## Dil bağında: sürüklenme (eski: çırpınma) döngüsü başlar.
 func play_struggle() -> void:
 	_tree.set(&"parameters/struggle/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_FIRE)
 
@@ -101,14 +107,14 @@ func _build_graph() -> AnimationNodeBlendTree:
 	graph.connect_node(&"roll", 0, &"hit")
 	graph.connect_node(&"roll", 1, &"roll_scale")
 
-	graph.add_node(&"struggle_clip", _clip(PlayerClipData.full_name(&"struggle")))
+	graph.add_node(&"struggle_clip", _clip(struggle_clip()))
 	graph.add_node(&"struggle_scale", AnimationNodeTimeScale.new())
 	graph.connect_node(&"struggle_scale", 0, &"struggle_clip")
 	graph.add_node(&"struggle", _one_shot(Tuning.PLAYER_ANIM_BLEND))
 	graph.connect_node(&"struggle", 0, &"roll")
 	graph.connect_node(&"struggle", 1, &"struggle_scale")
 
-	graph.add_node(&"free_clip", _clip(PlayerClipData.full_name(&"break_free")))
+	graph.add_node(&"free_clip", _clip(break_free_clip()))
 	graph.add_node(&"free_scale", AnimationNodeTimeScale.new())
 	graph.connect_node(&"free_scale", 0, &"free_clip")
 	graph.add_node(&"free", _one_shot(Tuning.PLAYER_ANIM_BLEND))
@@ -125,6 +131,26 @@ func _build_graph() -> AnimationNodeBlendTree:
 	graph.connect_node(&"life", 1, &"death_clip")
 	graph.connect_node(&"output", 0, &"life")
 	return graph
+
+
+## Bağlıyken oynayan döngü: Blender klibi ya da eski türetilmiş çırpınma.
+static func struggle_clip() -> StringName:
+	if Tuning.FEATURE_PLAYER_DRAG_CLIPS:
+		return StringName("%s/drag" % DRAG_LIBRARY_NAME)
+	return PlayerClipData.full_name(&"struggle")
+
+
+static func break_free_clip() -> StringName:
+	if Tuning.FEATURE_PLAYER_DRAG_CLIPS:
+		return StringName("%s/break_free" % DRAG_LIBRARY_NAME)
+	return PlayerClipData.full_name(&"break_free")
+
+
+## Kurtulma klibinin ekrandaki süresi (sn).
+func break_free_time() -> float:
+	if Tuning.FEATURE_PLAYER_DRAG_CLIPS:
+		return DRAG_LIBRARY.get_animation(&"break_free").length
+	return BREAK_FREE_TIME
 
 
 ## Takla klibini verilen süreye sığdırır (dash süresi Tuning'den gelir).

@@ -101,7 +101,8 @@ func _set_dust(emitting: bool) -> void:
 ## Bağlıyken gövde hızlıca titrer (çırpınma); serbestken yerine döner.
 func _update_struggle_shake() -> void:
 	var t: float = Time.get_ticks_msec() * 0.001
-	var strength: float = Tuning.PLAYER_STRUGGLE_SHAKE if _player.is_rooted() else 0.0
+	var shaking: bool = _player.is_rooted() and not Tuning.FEATURE_PLAYER_DRAG_CLIPS
+	var strength: float = Tuning.PLAYER_STRUGGLE_SHAKE if shaking else 0.0
 	_pivot.position.x = sin(t * Tuning.PLAYER_STRUGGLE_RATE) * strength
 	_pivot.position.z = cos(t * Tuning.PLAYER_STRUGGLE_RATE * 0.83) * strength * 0.6
 

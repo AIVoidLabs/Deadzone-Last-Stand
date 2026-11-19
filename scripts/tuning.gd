@@ -46,7 +46,10 @@ const FEATURE_DILCI_MODEL: bool = true
 ## çeker; kapalıyken eski anlık ışın + tam 1 sn bağ (7.3).
 const FEATURE_TONGUE_PULL: bool = true
 const TONGUE_PLAYER_HEIGHT: float = 1.1
-## Bağlıyken asker titremesi: genlik (m) ve hız (rad/sn).
+## Asker dilde sürüklenme ve kurtulma: Blender'da elle anahtarlanmış klipler (tools/blender/player_anims.py);
+## kapalıyken eski türetilmiş çırpınma + kodla titreme (V.4).
+const FEATURE_PLAYER_DRAG_CLIPS: bool = true
+## Bağlıyken asker titremesi (yalnız FEATURE_PLAYER_DRAG_CLIPS kapalıyken): genlik (m) ve hız (rad/sn).
 const PLAYER_STRUGGLE_SHAKE: float = 0.05
 const PLAYER_STRUGGLE_RATE: float = 60.0
 ## Zıplayanın inişinde kamera sarsıntısı.

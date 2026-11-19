@@ -22,8 +22,13 @@ func _advance(seconds: float) -> void:
 
 
 func test_break_free_clip_does_not_loop() -> void:
-	var clip: Animation = _tree.get_animation(PlayerClipData.full_name(&"break_free"))
+	var clip: Animation = _tree.get_animation(PlayerAnimator.break_free_clip())
 	assert_eq(clip.loop_mode, Animation.LOOP_NONE)
+
+
+func test_drag_clip_loops() -> void:
+	var clip: Animation = _tree.get_animation(PlayerAnimator.struggle_clip())
+	assert_eq(clip.loop_mode, Animation.LOOP_LINEAR, "sürüklenme bağ sürdükçe döner")
 
 
 func test_struggle_runs_until_released() -> void:
@@ -36,6 +41,6 @@ func test_break_free_ends_and_returns_to_locomotion() -> void:
 	_animator.play_struggle()
 	_advance(1.0)
 	_animator.play_break_free()
-	_advance(PlayerAnimator.BREAK_FREE_TIME + Tuning.PLAYER_ANIM_BLEND * 2.0 + 0.2)
+	_advance(_animator.break_free_time() + Tuning.PLAYER_ANIM_BLEND * 2.0 + 0.2)
 	assert_false(_tree.get(&"parameters/struggle/active"))
 	assert_false(_tree.get(&"parameters/free/active"))

@@ -5,7 +5,16 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 
 ## Şu an
 
-Oturum 8 (2026-11-19). Taha görsel kaliteden memnun değildi; yeni yön onaylandı (DECISIONS 2026-11-19). Aşama 7.3+ dondu, araya **V — Görsel yeniden yön** girdi. V.1 ve V.2 bitti. **V.4 sürüyor: Taha dilci videolarını ve gırtlak B'yi onayladı (2026-11-19); V.4 2. kısım bu oturumda: oyuna bağlama (ZombieVisual, TongueRope, yeni dil mekaniği, asker sürüklenme/kurtulma klipleri).**
+Oturum 8 (2026-11-19). Taha görsel kaliteden memnun değildi; yeni yön onaylandı (DECISIONS 2026-11-19). Aşama 7.3+ dondu, araya **V — Görsel yeniden yön** girdi. V.1 ve V.2 bitti. **V.4 sürüyor: Taha dilci videolarını ve gırtlak B'yi onayladı (2026-11-19). V.4 2. kısım kod bitti: dilci oyunda; Taha'nın oyun videosu onayı bekleniyor (`build/movies/tongue_game.avi`).**
+
+- **V.4 2. kısım (2026-11-19, `09ea19e` + asker klipleri commit'i):**
+  - **Model:** `FEATURE_DILCI_MODEL` açıkken `EnemyData` dilci satırındaki `look_v` alanları üste yazılır: model `ZombieVisual.VC_MODELS[&"dilci"]` (köşe renkli `zombie_vc.gdshader`, ZombieLook paleti yok, örnek başına hafif `tint`), klipler glb'nin kendi AnimationPlayer'ı (idle, walk, windup hazırlık süresine sığar, lash, pull, stagger, death_a, spawn). Model boyu AABB'den.
+  - **Dil:** `DilciTongue` (TongueRope, Head kemiği + `MOUTH_REST` ofseti): dururken sarkar (0.42 m), hazırlıkta boğaza çekilir, olaylarla fırlar/tutunur/çekilir. Olay sözleşmesi `shoot/attach/to/off` (eski kutu dil `BeamTongue` aynı sözleşmeyle). Doku metre tabanlı (UV2 yay uzunluğu; sert halka çizgileri kalktı), uçuş boyunca düz çizgiye çekim (atış başı kıvrımı azaldı).
+  - **Mekanik (`FEATURE_TONGUE_PULL`):** dil `tongue_speed` 16 m/sn düz uçar (yön hazırlığın son 0.3 sn'sinde kilitli, `tongue_lead` 0), ucun süpürdüğü yol askere değerse yakalar (dash/dokunulmazlık kaçırır, asker zaten bağlıysa geçer). Yeni durum `PULL`: asker `tongue_pull_speed` 1.8 m/sn ile çekilir (`Player.pull`, hareket+dash kilitli, silahlar ateş eder, asker dilciye döner); dilci ölünce, `tongue_pull_time` 3 sn dolunca ya da temas + `tongue_release_gap`'e gelince bırakır. **Yakına gelince ısırır (contact_damage) — Claude ekledi, Taha onayı bekliyor.** Kurallar `TongueRules` (7 test). Kapalıyken eski anlık ışın + 1 sn bağ.
+  - **Ölçüm (`--capture-kind=tongue --god --no-weapons --capture-spawn=1 --capture-near=7`, 8 tekrar):** ayakta %100, daire %0, zigzag 0.7 sn %50, zigzag 1.5 sn %100 (dilciye doğru yürüyor). Yeni `--no-weapons` seçeneği; sonda `TONGUE shots/hits/bites/timeouts`.
+  - **Asker klipleri (`FEATURE_PLAYER_DRAG_CLIPS`):** `tools/blender/player_anims.py` (Blender MCP'de mankende elle anahtarlandı, pozlar ölçülerek bulundu) → `assets/models/anim/player_anims.glb` (AnimationLibrary, ual1 ile aynı kemik eşlemesi): `drag` (0.8 sn döngü: halat çeker gibi geriye yaslanma, eller göğüste dili tutar, ön topuk gömülü, arka ayak tökezler, dilcinin çekişiyle silkelenme), `break_free` (0.8 sn: son asılış, kollar dışa fırlar, geriye sendeleme adımı, bekleme duruşu). Kodla titreme ve türetilmiş struggle/break_free yalnız bayrak kapalıyken.
+  - **Öğrenim:** Blender MCP'de `read_factory_settings` çağırma (eklentiyi kapatır, bağlantı kopar); PowerShell 5.1 `Get-Content/Set-Content` UTF-8 dosyaları bozar.
+  - **Açık:** ısırıp bırakınca da `break_free` oynuyor (asker koparmadı, dilci bıraktı); kaçış zorluğu Taha'nın elinde ayarlanacak; dilci dosya boyutları (`zombie_visual.gd` ~330, `enemy_manager.gd` ~460 satır) bölünmeli.
 
 - **V.4 1. kısım (2026-11-19, Taha V.3'ü onayladı: "planladığın gibi devam et"):**
   - **Oyun modeli:** `tools/blender/dilci_game.py` (görünüş `build_dilci.py`'den) + ortak `tools/blender/zombie_game.py` (incelt, köşe rengi, birleştir, iskelet, uzaklıkla ağırlık, GLB). Çıktı `assets/models/characters/zombie_dilci.glb`: 3 çeşit (A 8.7k, B 8.7k, C 7.6k üçgen) tek iskelette. Doku/UV yok: renk köşelerde, `COLOR.a` = parıltı maskesi (göz, kese); Godot shader `assets/shaders/zombie_vc.gdshader` (flash/fade/burn sözleşmesi flash_lit ile aynı + `tint` + ince alaca). Dil ağda yok (oyunda TongueRope).
@@ -110,7 +119,7 @@ Bitiş ölçütleri `ROADMAP.md`'de. Biten kutunun yanına tarih ve commit yazı
 - [x] V.1 Kurtulma hatası düzeltmesi — 2026-11-19 (`79ca05a`; `break_free` tek sefer, `ZombieClipData`/`PlayerClipData` satırında `loop` alanı, 3 yeni test; oyunda kurtulma sonrası koşu görüntüyle doğrulandı)
 - [x] V.2 Animasyon önizleme video aracı — 2026-11-19 (`tools/preview_movie.ps1`: kare dizisi + kare özeti + AVI; iki deneme: anim_preview ve dilci saldırısı)
 - [ ] V.3 Üslup rehberi + konsept galerisi + Blender deneme modeli
-- [ ] V.4 Dilci uçtan uca dikey dilim
+- [ ] V.4 Dilci uçtan uca dikey dilim — kod bitti 2026-11-19 (`09ea19e` + asker klipleri), Taha video onayı bekliyor
 - [ ] V.5 Yeni hattın diğer türlere yayılması
 - [ ] V.6 Asker animasyon cilası
 
