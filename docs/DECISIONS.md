@@ -2,6 +2,12 @@
 
 Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar verilince "Açık kararlar"dan çıkarılıp tarihli bölüme yazılır.
 
+## 2026-11-19 — Dilci dikey dilimi onaylandı; dil ısırması (Taha)
+
+- Taha V.4 oyun videolarını onayladı (`build/movies/tongue_game.avi`, `v4_break_close.avi`): yeni dilci modeli ve klipleri, sarkan / görünür hızla uçan yordamsal dil, yavaş çekiş, askerin Blender'da elle anahtarlanmış sürüklenme ve kurtulma klipleri.
+- **Isırma:** çekilen asker dilcinin yanına (temas + `tongue_release_gap`) gelirse dilci ısırır (`contact_damage`) ve bırakır. Claude ekledi (çekişin bir sonucu olsun diye), Taha onayladı.
+- Sayılar ilk değer: dil 16 m/sn, çekiş 1.8 m/sn, en çok 3 sn, `tongue_lead` 0 (ayakta %100, daire %0, zigzag 0.7 sn %50 isabet). Zorluk Taha'nın oynayışıyla ayarlanır.
+
 ## 2026-11-19 — Dilcinin boğaz kesesi: B, gırtlak (Taha)
 
 - Taha çene altındaki sarı, köşeli keseyi beğenmedi ("çok hoşuma gitmedi"). Üç seçenek gösterildi (`docs/concept/dilci_sac_a_kese.png`, `_b_girtlak.png`, `_c_yok.png`); Claude C'yi (kesesiz) önerdi, **Taha B'yi seçti: tenle aynı renkte, damarlı, boyna gömülü gırtlak.**
