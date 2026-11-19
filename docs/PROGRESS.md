@@ -15,7 +15,12 @@ Oturum 8 (2026-11-19). Taha görsel kaliteden memnun değildi; yeni yön onaylan
     - `ec3b12e`: ısırıp bırakınca `break_free` oynamıyor (`TongueRules.player_broke_free`, `released` olayında `broke_free`).
     - `b8fc08f`: `--bench --bench-kind=tongue|walker --bench-count=40` eklendi.
     - `802d434`: `enemy_manager.gd` ve `zombie_visual.gd` 300 satırın altına indi (`enemy_queries/burn/pool/compactor/spawner`, `zombie_clip_player`, `zombie_jump_marker`).
-  - **Ölçüm (önemli):** 40 dilci 24 ms/kare (~41 FPS), 40 yürüyen 2.4 ms/kare (~410 FPS). Dilci başına ~0.55 ms. Bu maliyetin model + AnimationPlayer'dan mı, yordamsal dilden mi geldiği henüz ayrılmadı. Yeni hattaki yürüyen de aynı model yolunu kullanacağı için bütçeden önce ayrılmalı.
+  - **Ölçüm (önemli):** 40 dilci 24 ms/kare (~41 FPS), 40 yürüyen 2.4 ms/kare (~410 FPS). Dilci başına ~0.55 ms. **Ayrıldı (`777e8f6`, `--bench-no-tongue` / `--bench-no-tongue-mesh`):**
+    - Yeni model, shader ve glb klipleri: 40 zombide ~0.1–0.3 ms, yani bedava. Yürüyen bu yola güvenle geçebilir.
+    - Verlet simülasyonu: ~1.4 ms.
+    - Maliyetin ~19 ms'i `TongueRope._build_mesh()`'ten geliyor: ağ her karede, dil sarkarken de GDScript'te yeniden kuruluyor (528 köşe, indeksler her kare yeniden üretiliyor, `clear_surfaces` + `add_surface_from_arrays`).
+    - Öneri: indeksleri bir kez üret; köşe sayısını 528'den ~150'ye indir; sarkarken ve ekran dışındayken ağı seyrek kur ya da hiç kurma.
+  - Yürüyen konsepti v1: `9a053b6` (`build_walker.py`, `docs/concept/walker_v1_*.png`). Taha'nın yorumu bekleniyor. Zayıf yanlar: saç kask gibi, yüz karikatür, ayakkabı takunya.
 
 - **V.4 2. kısım (2026-11-19, `09ea19e` + asker klipleri commit'i):**
   - **Model:** `FEATURE_DILCI_MODEL` açıkken `EnemyData` dilci satırındaki `look_v` alanları üste yazılır: model `ZombieVisual.VC_MODELS[&"dilci"]` (köşe renkli `zombie_vc.gdshader`, ZombieLook paleti yok, örnek başına hafif `tint`), klipler glb'nin kendi AnimationPlayer'ı (idle, walk, windup hazırlık süresine sığar, lash, pull, stagger, death_a, spawn). Model boyu AABB'den.
