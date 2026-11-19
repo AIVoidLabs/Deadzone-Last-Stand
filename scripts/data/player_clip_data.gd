@@ -20,7 +20,8 @@ const TABLE: Dictionary = {
 		"RightUpperLeg": Vector3(14.0, 0.0, 0.0),
 	}},
 	# Kurtulma: kollar iki yana açık, göğüs ileri gergin (bağı koparmış duruş).
-	&"break_free": {"source": &"ual1/Idle", "offsets": {
+	# loop false: kaynak Idle döngülü; döngülü kalırsa tek-sefer düğümü hiç bitmez, asker bu pozda kalır.
+	&"break_free": {"source": &"ual1/Idle", "loop": false, "offsets": {
 		"Spine": Vector3(-12.0, 0.0, 0.0),
 		"Chest": Vector3(-10.0, 0.0, 0.0),
 		"Head": Vector3(-10.0, 0.0, 0.0),

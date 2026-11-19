@@ -34,9 +34,12 @@ static func _derive(row: Dictionary, skeleton: Skeleton3D) -> Animation:
 	var parts: PackedStringArray = String(row["source"]).split("/")
 	var source: Animation = (SOURCES[StringName(parts[0])] as AnimationLibrary).get_animation(StringName(parts[1]))
 	assert(source != null, "Klip bulunamadı: %s" % row["source"])
-	if not (row.get("mirror", false) or row.get("reverse", false) or row.has("offsets")):
+	if not (row.get("mirror", false) or row.get("reverse", false) or row.has("offsets") or row.has("loop")):
 		return source
 	var clip: Animation = source.duplicate(true) as Animation
+	# Kaynak klibin döngü bayrağı kopyayla gelir; tek-sefer klipte açıkça kapatılmalı.
+	if row.has("loop"):
+		clip.loop_mode = Animation.LOOP_LINEAR if row["loop"] else Animation.LOOP_NONE
 	if row.get("mirror", false):
 		_mirror(clip, source)
 	if row.has("offsets"):
