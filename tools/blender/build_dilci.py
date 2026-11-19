@@ -197,15 +197,51 @@ def build_jaw(head, mat, tooth_mat):
                               math.radians(JAW_SPLAY_DEG * sx))
 
 
-def build_throat_sac(head, mat):
-    """Boğaz kesesi: dil burada kıvrılı durur; saldırıdan önce şişer (oyunda önsezi işareti)."""
-    blobs = [((0.0, 0.0, 0.0), (0.048, 0.052, 0.066), False),
-             ((0.022, -0.020, -0.030), (0.026, 0.026, 0.030), False),
-             ((-0.020, -0.012, -0.040), (0.024, 0.024, 0.028), False),
-             ((0.004, -0.030, 0.020), (0.022, 0.020, 0.022), False)]
-    sac = kit.metaball_mesh("Dilci_ThroatSac", blobs, mat, resolution=0.003)
+# Kese biçimi: "sac" sarı sarkan kese (ilk tasarım), "throat" tenle bütün şişkin gırtlak,
+# "none" yok (önsezi yalnız gövde, çene ve dil ucuyla).
+SAC_STYLE = "throat"  # Taha 2026-11-19: B (sarı kese beğenilmedi)
+THROAT_LOCAL = Vector((0.0, 0.012, -0.100))
+
+
+def build_throat_sac(head, mat, style=None):
+    """Boğaz: dil burada kıvrılı durur; saldırıdan önce şişer (oyunda önsezi işareti)."""
+    style = style or SAC_STYLE
+    if style == "none":
+        return None
+    if style == "throat":
+        # gırtlağa gömülü, boyun boyunca uzanan yumuşak şişlik; çenenin altından taşmaz
+        blobs = [((0.0, 0.0, 0.0), (0.032, 0.030, 0.048), False),
+                 ((0.0, 0.022, -0.038), (0.028, 0.027, 0.036), False),
+                 ((0.015, -0.008, -0.010), (0.016, 0.016, 0.021), False),
+                 ((-0.013, -0.007, -0.016), (0.015, 0.015, 0.019), False)]
+        location = THROAT_LOCAL
+    else:
+        blobs = [((0.0, 0.0, 0.0), (0.048, 0.052, 0.066), False),
+                 ((0.022, -0.020, -0.030), (0.026, 0.026, 0.030), False),
+                 ((-0.020, -0.012, -0.040), (0.024, 0.024, 0.028), False),
+                 ((0.004, -0.030, 0.020), (0.022, 0.020, 0.022), False)]
+        location = SAC_LOCAL
+    sac = kit.metaball_mesh("Dilci_ThroatSac", blobs, mat, resolution=0.0025)
     sac.parent = head
-    sac.location = SAC_LOCAL
+    sac.location = location
+    return sac
+
+
+def throat_material(name, tone):
+    """Tenle aynı tonda, gerilmiş ve hafif ıslak gırtlak; mor-kırmızı damar ağı, parıltı yok."""
+    skin = tuple(c * 0.92 for c in tone)
+    mat, bsdf = kit.material(name, skin, rough=0.38, sss=0.3, coat=0.3)
+    nt = mat.node_tree
+    vor = nt.nodes.new("ShaderNodeTexVoronoi")
+    vor.feature = "DISTANCE_TO_EDGE"
+    vor.inputs["Scale"].default_value = 11.0
+    ramp = nt.nodes.new("ShaderNodeValToRGB")
+    ramp.color_ramp.elements[0].color = (0.20, 0.05, 0.08, 1.0)
+    ramp.color_ramp.elements[1].position = 0.05
+    ramp.color_ramp.elements[1].color = (*skin, 1.0)
+    nt.links.new(vor.outputs["Distance"], ramp.inputs["Fac"])
+    nt.links.new(ramp.outputs["Color"], bsdf.inputs["Base Color"])
+    return mat
 
 
 def build_tongue(head, mat):
@@ -278,6 +314,15 @@ def build_clothes(body, v, suffix):
                 hems=[(2, v["pants_hem"], 1.0, 0.045, 10.0)], holes=0.25, seed=v["seed"] + 1.0)
 
 
+def build_sac_gallery() -> None:
+    """Kese biçimleri yan yana (aynı çeşit A, kafa yakın çekim için): sac | throat | none."""
+    kit.reset_scene()
+    for i, style in enumerate(("sac", "throat", "none")):
+        v = dict(VARIANTS[0], name="A" + style, sac_style=style)
+        build_variant(v, (i - 1) * 0.75)
+    kit.setup_look()
+
+
 def build_variant(v, offset_x, with_tongue=True):
     """Bir çeşidi kurar, kök nesneleri bir boşluğa bağlayıp yana kaydırır.
     Oyunda dil yordamsal (TongueRope) olduğu için oyun ağında with_tongue=False."""
@@ -291,7 +336,10 @@ def build_variant(v, offset_x, with_tongue=True):
     build_clothes(body, v, suffix)
     head = build_head(skin, tooth_mat)
     build_jaw(head, skin, tooth_mat)
-    build_throat_sac(head, sac_material("M_Dilci_Sac" + suffix))
+    style = v.get("sac_style", SAC_STYLE)
+    sac_mat = throat_material("M_Dilci_Throat" + suffix, v["tone"]) if style == "throat" \
+        else sac_material("M_Dilci_Sac" + suffix)
+    build_throat_sac(head, sac_mat, style)
     build_eyes(head, eye_mat)
     if with_tongue:
         build_tongue(head, tongue_material("M_Dilci_Tongue" + suffix))

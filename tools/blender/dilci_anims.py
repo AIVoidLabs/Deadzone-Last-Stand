@@ -13,6 +13,8 @@ from mathutils import Euler, Vector
 
 FPS = 30
 STEP = 2  # örnekleme aralığı (kare)
+# Gırtlak (B, 2026-11-19) kese kadar şişmez: kliplerdeki ölçek sapması bu oranla uygulanır.
+SAC_GAIN = 0.25
 TAU = math.tau
 
 
@@ -104,8 +106,8 @@ def windup_pose(p: float, t: float) -> dict:
         "pelvis": {"loc": (0.0, 0.03 * q, -0.03 * dip - 0.05 * q)},
         "spine_01": {"rot": (6 * dip - 14 * q, 0, 0)},
         "spine_02": {"rot": (4 * dip - 12 * q, 0, 0)},
-        "neck_01": {"rot": (-16 * q, 0, 0)},
-        "Head": {"rot": (8 * dip - 26 * q + 1.5 * quiver, 0, 0)},
+        "neck_01": {"rot": (-12 * q, 0, 0)},
+        "Head": {"rot": (8 * dip - 17 * q + 1.5 * quiver, 0, 0)},
         "jaw_l": {"rot": (22 * q + 2 * quiver, 0, 18 * q)},
         "jaw_r": {"rot": (22 * q - 2 * quiver, 0, -18 * q)},
         "sac": {"scale": 1.0 + 0.75 * q + 0.06 * quiver},
@@ -264,7 +266,7 @@ def _apply(arm, pose: dict, frame: int) -> None:
         q = Euler(tuple(math.radians(a) for a in rot), "XYZ").to_quaternion()
         pb.rotation_quaternion = rest.inverted() @ q @ rest
         pb.location = rest.inverted() @ Vector(ch.get("loc", (0, 0, 0)))
-        sc = ch.get("scale", 1.0)
+        sc = 1.0 + (ch.get("scale", 1.0) - 1.0) * SAC_GAIN
         pb.scale = (sc, sc, sc)
         pb.keyframe_insert("rotation_quaternion", frame=frame, group=pb.name)
         pb.keyframe_insert("location", frame=frame, group=pb.name)

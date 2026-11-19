@@ -14,6 +14,9 @@ const ROW_GAP: float = 2.4
 const SHADER: Shader = preload("res://assets/shaders/zombie_vc.gdshader")
 
 var _shared: ShaderMaterial
+## --focus=N: kamera N. klibin modeline yakından bakar (-1 hepsi).
+var _focus: int = -1
+var _positions: Array[Vector3] = []
 var _players: Array[AnimationPlayer] = []
 var _capture_path: String = ""
 var _capture_seconds: float = 2.0
@@ -26,6 +29,8 @@ func _ready() -> void:
 			_capture_path = arg.trim_prefix("--capture=")
 		elif arg.begins_with("--capture-seconds="):
 			_capture_seconds = arg.trim_prefix("--capture-seconds=").to_float()
+		elif arg.begins_with("--focus="):
+			_focus = arg.trim_prefix("--focus=").to_int()
 	# iki sıra: üstte hareket, altta saldırı ve tepkiler
 	for i: int in CLIPS.size():
 		var column: int = i % PER_ROW
@@ -38,6 +43,7 @@ func _add_model(index: int, at: Vector3) -> void:
 	var model: Node3D = MODEL.instantiate() as Node3D
 	add_child(model)
 	model.position = at
+	_positions.append(at)
 	# çeşitler: her modelde birini bırak
 	var meshes: Array[Node] = model.find_children("*", "MeshInstance3D", true, false)
 	for m: int in meshes.size():
@@ -74,6 +80,10 @@ func _add_environment() -> void:
 	cam.rotation_degrees.x = -30.0
 	cam.fov = 52.0
 	add_child(cam)
+	if _focus >= 0 and _focus < _positions.size():
+		var target: Vector3 = _positions[_focus] + Vector3(0.0, 1.35, 0.0)
+		cam.position = target + Vector3(0.7, 0.15, 1.1)
+		cam.look_at(target)
 	var sun: DirectionalLight3D = DirectionalLight3D.new()
 	sun.rotation_degrees = Vector3(-50.0, 35.0, 0.0)
 	sun.light_energy = 1.2

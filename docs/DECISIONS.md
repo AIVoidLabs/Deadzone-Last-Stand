@@ -2,6 +2,11 @@
 
 Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar verilince "Açık kararlar"dan çıkarılıp tarihli bölüme yazılır.
 
+## 2026-11-19 — Dilcinin boğaz kesesi: B, gırtlak (Taha)
+
+- Taha çene altındaki sarı, köşeli keseyi beğenmedi ("çok hoşuma gitmedi"). Üç seçenek gösterildi (`docs/concept/dilci_sac_a_kese.png`, `_b_girtlak.png`, `_c_yok.png`); Claude C'yi (kesesiz) önerdi, **Taha B'yi seçti: tenle aynı renkte, damarlı, boyna gömülü gırtlak.**
+- Uygulama: `build_dilci.SAC_STYLE = "throat"` (tek sabitle A/B/C arası geçilir), gırtlak ~%20 küçük ve boyna yakın, oyun ağında 700 üçgen (köşeli görünmesin), parıltı yok. Uyarıdaki şişme kese kadar değil (`dilci_anims.SAC_GAIN = 0.25`); hazırlıkta kafa daha az geriye atılır. Oyun görüntüsü `docs/concept/dilci_girtlak_oyun.png`.
+
 ## 2026-11-19 — Zombiler tamamen Blender'da (Taha)
 
 Taha, dilcinin yalnız Blender Python ile yapılan denemesini (skin modifier gövde, metaball kafa ve çene, bölünmüş çene, boğaz kesesi, ıslak dil; `docs/concept/dilci_trial_v1_*.png`) görünce: "oluşturduğun modeli çok sevdim". Devam tamamen Blender'da; zombiler için Tripo yok.

@@ -32,7 +32,7 @@ OUT_BLEND = os.path.join(REPO, "build", "blender", "dilci_game.blend")
 # Parça başına yüz hedefi (incelme sonrası üçgen sayısı ~ bu); toplam ~11 bin üçgen.
 # Kıyafet solidify ile çift kat olduğu için hedefi gövdeden düşük.
 BUDGET = {"Dilci_Body": 4200, "Dilci_Top": 1100, "Dilci_Pants": 1100, "Dilci_Head": 1300,
-          "Dilci_Jaw_L": 160, "Dilci_Jaw_R": 160, "Dilci_ThroatSac": 360,
+          "Dilci_Jaw_L": 160, "Dilci_Jaw_R": 160, "Dilci_ThroatSac": 700,
           "Dilci_Eye_L": 40, "Dilci_Eye_R": 40}
 TEETH_COLOR = (0.55, 0.48, 0.32)
 EYE_COLOR = (1.0, 0.7, 0.2)
@@ -43,6 +43,10 @@ def _p(name: str, side: str = "") -> Vector:
         return Vector(dil.BODY_POINTS[name][0])
     x, y, z = dil.SIDE_POINTS[name][0]
     return Vector((x if side == "l" else -x, y, z))
+
+
+def _sac_local() -> Vector:
+    return dil.THROAT_LOCAL if dil.SAC_STYLE == "throat" else dil.SAC_LOCAL
 
 
 def head_matrix() -> Matrix:
@@ -59,7 +63,7 @@ def bones() -> list:
            ("spine_03", _p("upchest"), _p("neck0"), "spine_02"),
            ("neck_01", _p("neck0"), _p("neck1"), "spine_03"),
            ("Head", _p("neck1"), hm @ Vector((0.0, -0.01, 0.13)), "neck_01"),
-           ("sac", hm @ dil.SAC_LOCAL, hm @ (dil.SAC_LOCAL + Vector((0.0, -0.02, -0.08))), "Head")]
+           ("sac", hm @ _sac_local(), hm @ (_sac_local() + Vector((0.0, -0.02, -0.08))), "Head")]
     for side, sx in (("l", 1.0), ("r", -1.0)):
         hinge = hm @ Vector((dil.JAW_HINGE[0] * sx, dil.JAW_HINGE[1], dil.JAW_HINGE[2]))
         jaw_rot = Euler((zg.deg(dil.JAW_OPEN_DEG), zg.deg(-10 * sx), zg.deg(dil.JAW_SPLAY_DEG * sx))).to_matrix()
@@ -107,7 +111,11 @@ def prepare_part(obj, v, segments) -> None:
         zg.paint(obj, zg.skin_color(v["tone"], v["bruise"]))
         zg.weight_to(obj, "jaw_" + name[-1].lower())
     elif name == "Dilci_ThroatSac":
-        zg.paint(obj, zg.vein_color(), glow=0.3, dirt=0.2)
+        if dil.SAC_STYLE == "throat":
+            skin = tuple(c * 0.92 for c in v["tone"])
+            zg.paint(obj, zg.vein_color(base=skin, vein=(0.20, 0.05, 0.08)), dirt=0.3)
+        else:
+            zg.paint(obj, zg.vein_color(), glow=0.3, dirt=0.2)
         zg.weight_to(obj, "sac")
     elif name.startswith("Dilci_Eye_"):
         zg.paint(obj, zg.flat_color(EYE_COLOR), glow=1.0, dirt=0.0)
