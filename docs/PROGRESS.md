@@ -20,6 +20,12 @@ Oturum 8 (2026-11-19). Taha görsel kaliteden memnun değildi; yeni yön onaylan
     - Verlet simülasyonu: ~1.4 ms.
     - Maliyetin ~19 ms'i `TongueRope._build_mesh()`'ten geliyor: ağ her karede, dil sarkarken de GDScript'te yeniden kuruluyor (528 köşe, indeksler her kare yeniden üretiliyor, `clear_surfaces` + `add_surface_from_arrays`).
     - Öneri: indeksleri bir kez üret; köşe sayısını 528'den ~150'ye indir; sarkarken ve ekran dışındayken ağı seyrek kur ya da hiç kurma.
+  - **Dil ağı optimizasyonu (`125a374`, `FEATURE_TONGUE_MESH_FAST`):**
+    - 40 dilci 23 ms → 5.7–6.1 ms/kare (Blender kapalıyken, temiz ölçüm). Görüntü kare özetinde aynı.
+    - `tongue_rope.gd` ~400 satıra çıktı, bölünmeli.
+  - Yürüyen konsepti v2: `b130705`.
+    - Saç kask değil, ayakkabılar düzeldi, kumaş kenarları yumuşadı.
+    - Kalan sorunlar: ağız içi kara top gibi, Skinny fazla pembe, yüz hâlâ kil gibi. Taha'nın yorumu bekleniyor.
   - Yürüyen konsepti v1: `9a053b6` (`build_walker.py`, `docs/concept/walker_v1_*.png`). Taha'nın yorumu bekleniyor. Zayıf yanlar: saç kask gibi, yüz karikatür, ayakkabı takunya.
 
 - **V.4 2. kısım (2026-11-19, `09ea19e` + asker klipleri commit'i):**
