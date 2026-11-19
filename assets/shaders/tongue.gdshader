@@ -12,6 +12,8 @@ uniform float roughness_value : hint_range(0.0, 1.0) = 0.22;
 uniform float papilla_per_m = 26.0;
 uniform float bump_strength = 0.35;
 uniform float rim_amount : hint_range(0.0, 1.0) = 0.6;
+// > 0 ise kökten metre UV.y * arc_scale (hızlı ağ yolu UV2'yi güncellemez); 0 ise UV2.x.
+uniform float arc_scale = 0.0;
 
 float hash21(vec2 p) {
 	p = fract(p * vec2(123.34, 456.21));
@@ -34,7 +36,7 @@ float vnoise(vec2 p, float period) {
 }
 
 void fragment() {
-	float m = UV2.x;
+	float m = arc_scale > 0.0 ? UV.y * arc_scale : UV2.x;
 	float blotch = vnoise(vec2(UV.x * 6.0, m * 3.0), 6.0);
 	float papilla = vnoise(vec2(UV.x * 18.0, m * papilla_per_m), 18.0);
 	vec3 col = mix(color_a, color_b, smoothstep(0.3, 0.75, blotch));

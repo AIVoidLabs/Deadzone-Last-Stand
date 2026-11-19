@@ -46,6 +46,15 @@ const FEATURE_DILCI_MODEL: bool = true
 ## çeker; kapalıyken eski anlık ışın + tam 1 sn bağ (7.3).
 const FEATURE_TONGUE_PULL: bool = true
 const TONGUE_PLAYER_HEIGHT: float = 1.1
+## Dil ağı hızlı yol: indeks/UV bir kez, köşe tamponu yerinde güncellenir, az köşe, sarkarken seyrek kurma,
+## ekran dışında kurma yok, sıkı AABB. Kapalıyken eski her-kare-yeniden-kurma yolu (V.4).
+const FEATURE_TONGUE_MESH_FAST: bool = true
+## Hızlı yolda halka sayısı (uzunluk boyunca), halka başına köşe aralığı (çevre) ve uç kapağı halkası.
+const TONGUE_MESH_SAMPLES: int = 24
+const TONGUE_MESH_RADIAL: int = 7
+const TONGUE_MESH_CAP_RINGS: int = 3
+## Sarkan dilde ağ her N karede bir kurulur (fırlatma, bağ ve geri çekilmede her karede).
+const TONGUE_MESH_DANGLE_EVERY: int = 2
 ## Asker dilde sürüklenme ve kurtulma: Blender'da elle anahtarlanmış klipler (tools/blender/player_anims.py);
 ## kapalıyken eski türetilmiş çırpınma + kodla titreme (V.4).
 const FEATURE_PLAYER_DRAG_CLIPS: bool = true

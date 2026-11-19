@@ -67,6 +67,12 @@ var _linear: bool = false
 var _mesh: ArrayMesh = ArrayMesh.new()
 ## Yalnız ölçüm (--bench-no-tongue-mesh): sim çalışır, ağ kurulmaz.
 var _skip_mesh: bool = Benchmark.flag("--bench-no-tongue-mesh")
+## Hızlı ağ yolu (TongueMeshBuilder); yalnız ölçüm bayrakları: ara adımları ayrı ölçmek için.
+var _builder: TongueMeshBuilder = null
+var _mat: ShaderMaterial = null
+var _bench_rebuild: bool = Benchmark.flag("--bench-tongue-rebuild")
+var _bench_every1: bool = Benchmark.flag("--bench-tongue-every1")
+var _bench_no_cull: bool = Benchmark.flag("--bench-tongue-no-cull")
 
 
 func _ready() -> void:
@@ -75,9 +81,9 @@ func _ready() -> void:
 	mesh = _mesh
 	custom_aabb = AABB(Vector3(-200, -50, -200), Vector3(400, 100, 400))
 	cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	var mat: ShaderMaterial = ShaderMaterial.new()
-	mat.shader = SHADER
-	material_override = mat
+	_mat = ShaderMaterial.new()
+	_mat.shader = SHADER
+	material_override = _mat
 	_sim.setup(Vector3.ZERO, ROPE_POINTS)
 	visible = false
 
@@ -186,7 +192,10 @@ func _update(delta: float) -> void:
 		State.RETRACTING:
 			_step_retracting(delta)
 	if state != State.IDLE and not _skip_mesh:
-		_build_mesh()
+		if Tuning.FEATURE_TONGUE_MESH_FAST:
+			_build_mesh_fast()
+		else:
+			_build_mesh()
 
 
 func _wave_axis() -> Vector3:
@@ -287,6 +296,47 @@ func _curve(pts: PackedVector3Array, f: float) -> Vector3:
 	var p2: Vector3 = pts[i + 1]
 	var p3: Vector3 = pts[mini(i + 2, n - 1)]
 	return 0.5 * ((2.0 * p1) + (p2 - p0) * s + (2.0 * p0 - 5.0 * p1 + 4.0 * p2 - p3) * s * s + (-p0 + 3.0 * p1 - 3.0 * p2 + p3) * s * s * s)
+
+
+## Hızlı yol (FEATURE_TONGUE_MESH_FAST): sarkarken seyrek, ekran dışında hiç kurmaz; yüzey bir kez yaratılır.
+func _build_mesh_fast() -> void:
+	var every: int = 1 if _bench_every1 else Tuning.TONGUE_MESH_DANGLE_EVERY
+	if state == State.DANGLE and every > 1 and _mesh.get_surface_count() > 0:
+		if (Engine.get_process_frames() + get_instance_id()) % every != 0:
+			return
+	var pts: PackedVector3Array = _sim.points()
+	if not _bench_no_cull and _mesh.get_surface_count() > 0 and not _maybe_on_screen(pts):
+		return
+	var length: float = _sim.rest_length()
+	if _builder == null:
+		_builder = _make_builder()
+	if _bench_rebuild:
+		_builder.rebuild_surface(_mesh, pts, length)
+	elif _mesh.get_surface_count() == 0:
+		_builder.create_surface(_mesh, pts, length)
+	else:
+		_builder.update_surface(_mesh, pts, length)
+	_mat.set_shader_parameter(&"arc_scale", maxf(length, 0.01))
+	var e: float = length * 1.25 + 1.0
+	custom_aabb = AABB(pts[0] - Vector3.ONE * e, Vector3.ONE * (2.0 * e))
+
+
+func _make_builder() -> TongueMeshBuilder:
+	var n: int = Tuning.TONGUE_MESH_SAMPLES
+	var radii: PackedFloat32Array = PackedFloat32Array()
+	for i: int in n:
+		radii.append(_radius_at(float(i) / float(n - 1), 1.0))
+	var b: TongueMeshBuilder = TongueMeshBuilder.new()
+	b.setup(n, Tuning.TONGUE_MESH_RADIAL, Tuning.TONGUE_MESH_CAP_RINGS, radii, ROPE_POINTS)
+	return b
+
+
+## Dilin başı, ortası ya da ucu kameranın görüş hacminde mi (yoksa ağı kurmaya gerek yok).
+func _maybe_on_screen(pts: PackedVector3Array) -> bool:
+	var cam: Camera3D = get_viewport().get_camera_3d()
+	if cam == null:
+		return true
+	return cam.is_position_in_frustum(pts[0]) or cam.is_position_in_frustum(pts[pts.size() >> 1]) or cam.is_position_in_frustum(pts[pts.size() - 1])
 
 
 func _build_mesh() -> void:
