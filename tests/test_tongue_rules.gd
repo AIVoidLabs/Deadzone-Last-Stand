@@ -47,6 +47,12 @@ func test_pull_never_overshoots_stop_distance() -> void:
 	assert_eq(TongueRules.pull_velocity(Vector2(0.9, 0.0), Vector2.ZERO, 1.8, 1.0, delta), Vector2.ZERO)
 
 
+func test_bite_release_is_not_break_free() -> void:
+	assert_false(TongueRules.player_broke_free(TongueRules.Release.NEAR))
+	assert_true(TongueRules.player_broke_free(TongueRules.Release.TIMEOUT))
+	assert_true(TongueRules.player_broke_free(TongueRules.Release.NONE))
+
+
 func test_release_reasons() -> void:
 	assert_eq(TongueRules.release(3.0, 1.0, 1.0), TongueRules.Release.NONE)
 	assert_eq(TongueRules.release(1.0, 1.0, 1.0), TongueRules.Release.NEAR)

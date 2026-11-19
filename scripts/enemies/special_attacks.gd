@@ -226,7 +226,7 @@ func _tongue_pull(i: int, row: Dictionary, p: Vector2, delta: float, target: Vec
 	var node: Zombie = _m._nodes[i]
 	if _m.latched != node or not _m.player.is_rooted():
 		# Asker öldü ya da bağ başka yoldan çözüldü.
-		_release(i)
+		_release(i, true)
 		node.event.emit(&"tongue", {"off": true})
 		_m._enter(i, S.RECOVER, row["attack_recover"])
 		return
@@ -234,7 +234,7 @@ func _tongue_pull(i: int, row: Dictionary, p: Vector2, delta: float, target: Vec
 	var reason: TongueRules.Release = TongueRules.release(p.distance_to(target), stop, _m._timer[i])
 	if reason == TongueRules.Release.NEAR:
 		_m.tongue_bites += 1
-		_release(i)
+		_release(i, TongueRules.player_broke_free(reason))
 		_m.player.take_hit(_m._damage[i], target - p)
 		node.event.emit(&"tongue", {"off": true})
 		_m._enter(i, S.RECOVER, row["attack_recover"])
@@ -266,10 +266,10 @@ func _fire_tongue(i: int, row: Dictionary, target: Vector2) -> ZombieRules.State
 	return S.RECOVER
 
 
-func _release(i: int) -> void:
+func _release(i: int, broke_free: bool = true) -> void:
 	if _m.latched == _m._nodes[i]:
 		_m.latched = null
-		_m.player.release_root()
+		_m.player.release_root(broke_free)
 
 
 static func _player_point(target: Vector2) -> Vector3:

@@ -147,14 +147,14 @@ func pull(planar_velocity: Vector2) -> void:
 		_pull = planar_velocity
 
 
-## Bağ çözülür (süre doldu ya da dilci öldü).
-func release_root() -> void:
+## Bağ çözülür. broke_free=false: asker kendini koparmadı (dilci ısırıp bıraktı), break_free klibi oynamaz.
+func release_root(broke_free: bool = true) -> void:
 	if not _rooted:
 		return
 	_rooted = false
 	_pull = Vector2.ZERO
 	_root_left = 0.0
-	event.emit(&"released", {})
+	event.emit(&"released", {"broke_free": broke_free})
 
 
 func is_rooted() -> bool:

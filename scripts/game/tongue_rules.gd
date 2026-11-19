@@ -35,6 +35,11 @@ static func pull_velocity(player: Vector2, zombie: Vector2, speed: float, stop_d
 	return to_zombie / dist * minf(speed, room / maxf(delta, 0.0001))
 
 
+## Bırakma sonrası asker kendini koparmış sayılır mı (break_free klibi): ısırıp bırakmada (NEAR) hayır.
+static func player_broke_free(reason: Release) -> bool:
+	return reason != Release.NEAR
+
+
 ## Çekiş bitti mi: asker stop_dist'e geldiyse NEAR (dilci ısırır), süre dolduysa TIMEOUT.
 static func release(dist: float, stop_dist: float, time_left: float) -> Release:
 	if dist <= stop_dist + 0.01:
