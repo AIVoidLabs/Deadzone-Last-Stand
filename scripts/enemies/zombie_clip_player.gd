@@ -90,6 +90,32 @@ func play_rush(state: ZombieRules.State, duration: float, lunge_speed: float) ->
 			play_loop(&"anim_lunge", lunge_speed)
 
 
+## Zıplayan havada: yeni modelde leap klibi jump_time'a uydurulur (çömelmeden kısa harmanla); eskide döngü.
+func play_air(duration: float) -> void:
+	if not own_clips:
+		play_loop(&"anim_air", 1.0)
+		return
+	var clip: StringName = pick_clip(&"anim_air")
+	if clip == &"":
+		return
+	animation.speed_scale = animation.get_animation(clip).length / maxf(duration, 0.01)
+	animation.play(clip, Tuning.JUMPER_LEAP_BLEND)
+	animation.seek(0.0)
+
+
+## Zıplayan inişi: land klibi bir kez, ardından idle döngüsü.
+func play_land() -> void:
+	var clip: StringName = pick_clip(&"anim_land")
+	if clip == &"":
+		return
+	animation.speed_scale = 1.0
+	animation.play(clip, Tuning.ZOMBIE_ANIM_BLEND * 0.5)
+	animation.seek(0.0)
+	var idle: StringName = pick_clip(&"anim_idle")
+	if idle != &"":
+		animation.queue(idle)
+
+
 ## Klibi sabit hızda baştan oynatır (süreye uydurmadan).
 func play_loop(row_key: StringName, speed: float) -> void:
 	var clip: StringName = pick_clip(row_key)

@@ -58,6 +58,9 @@ const FEATURE_WALKER_MODEL: bool = true
 ## Koşucu Blender'da üretilen yeni modelleriyle (4 çeşit, köşe renkli, kendi klipleri) çizilir; yalnız
 ## FEATURE_RUNNER_SPRINT açıkken (yeni modelde atılış klibi yok). Kapalıyken eski zombie_runner.glb (V.5).
 const FEATURE_RUNNER_MODEL: bool = true
+## Zıplayan Blender'da üretilen yeni modelleriyle (3 çeşit, köşe renkli, kendi klipleri) çizilir (boy 1.38 m);
+## kapalıyken eski zombie_jumper.glb ve paylaşılan klip kütüphanesi (V.5).
+const FEATURE_JUMPER_MODEL: bool = true
 ## Yeni dil mekaniği (V.4): dil görünür hızla uçar (kaçılabilir), yakalarsa askeri dilciye doğru yavaşça
 ## çeker; kapalıyken eski anlık ışın + tam 1 sn bağ (7.3).
 const FEATURE_TONGUE_PULL: bool = true
@@ -231,6 +234,9 @@ const WALK_REF_SPEED: float = 2.6
 ## Yeni koşucu klipleri (walk, sprint) anahtarlandığı ilerleme hızları (m/sn, 1.3 m boyda model için).
 const RUNNER_WALK_REF_SPEED: float = 3.0
 const RUNNER_SPRINT_REF_SPEED: float = 5.2
+## Yeni zıplayan walk klibinin anahtarlandığı hız (m/sn, 1.38 m boyda); çömelme -> leap harman süresi (sn).
+const JUMPER_WALK_REF_SPEED: float = 2.4
+const JUMPER_LEAP_BLEND: float = 0.05
 ## Senkron klip hızı sınırları ve kare başına yumuşatma payı (0-1).
 const WALK_SPEED_SCALE_MIN: float = 0.3
 const WALK_SPEED_SCALE_MAX: float = 1.8

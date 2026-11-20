@@ -13,24 +13,8 @@ const MODELS: Dictionary = {
 	&"jumper": preload("res://assets/models/characters/zombie_jumper.glb"),
 	&"tongue": preload("res://assets/models/characters/zombie_tongue.glb"),
 }
-## Yeni hat modelleri: renk köşelerde (VC_SHADER), klipler dosyanın kendi AnimationPlayer'ında;
-## satırdaki anim_* adları bu kliplerdir. Birden çok ağ = çeşit (ModelVariants).
-const VC_MODELS: Dictionary = {
-	&"dilci": preload("res://assets/models/characters/zombie_dilci.glb"),
-	# Dizi = ayrı dosyalarda çeşitler; örnek başına biri rastgele seçilir.
-	&"walker_v": [
-		preload("res://assets/models/characters/zombie_walker_office.glb"),
-		preload("res://assets/models/characters/zombie_walker_worker.glb"),
-		preload("res://assets/models/characters/zombie_walker_skinny.glb"),
-		preload("res://assets/models/characters/zombie_walker_civilian.glb"),
-	],
-	&"runner_v": [
-		preload("res://assets/models/characters/zombie_runner_jogger.glb"),
-		preload("res://assets/models/characters/zombie_runner_torn.glb"),
-		preload("res://assets/models/characters/zombie_runner_bare.glb"),
-		preload("res://assets/models/characters/zombie_runner_marathon.glb"),
-	],
-}
+## Yeni hat modelleri (ZombieModelData): satırdaki anim_* adları modelin kendi klipleridir.
+const VC_MODELS: Dictionary = ZombieModelData.VC_MODELS
 const VC_SHADER: Shader = preload("res://assets/shaders/zombie_vc.gdshader")
 ## Örnek başına hafif ton farkı (±); sürüde aynı ağ aynı görünmesin.
 const VC_TINT_VARIANCE: float = 0.08
@@ -144,7 +128,7 @@ func _on_state_changed(new_state: int, old_state: int) -> void:
 			_jump_age = 0.0
 			_jump_total = maxf(_body.state_duration, 0.01)
 			set_process(true)
-			_clips.play_loop(&"anim_air", 1.0)
+			_clips.play_air(_body.state_duration)
 		ZombieRules.State.LASH:
 			if _clips.own_clips:
 				_clips.play_lash()
@@ -158,7 +142,9 @@ func _on_state_changed(new_state: int, old_state: int) -> void:
 		ZombieRules.State.STAGGER:
 			_clips.play_timed(&"anim_stagger", 0.0, _body.state_duration)
 		ZombieRules.State.RECOVER:
-			if _clips.own_clips and _clips.row.get("recover_finishes_attack", false) and _clips.animation != null:
+			if _clips.own_clips and _clips.row.has("anim_land"):
+				_clips.play_land()
+			elif _clips.own_clips and _clips.row.get("recover_finishes_attack", false) and _clips.animation != null:
 				# Saldırı klibi kendi hızında sonuna dek tamamlanır.
 				_clips.animation.speed_scale = 1.0
 			elif _clips.own_clips:

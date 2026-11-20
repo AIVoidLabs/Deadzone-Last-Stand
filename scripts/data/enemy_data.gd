@@ -81,6 +81,22 @@ const _RUNNER_LOOK_V: Dictionary = {
 	"sprint_ref_speed": Tuning.RUNNER_SPRINT_REF_SPEED,
 }
 
+# Yeni zıplayan (Tuning.FEATURE_JUMPER_MODEL): 3 çeşit GLB (ZombieVisual.VC_MODELS[jumper_v]). Çömelme (0.7 sn) WINDUP'a,
+# leap (0.9 sn) JUMP'a, land (0.8 sn, bir kez; sonra idle) RECOVER'a oturur. Boy 1.38 m (walk 2.4 m/sn bu boya göre).
+const _JUMPER_LOOK_V: Dictionary = {
+	"model": &"jumper_v",
+	"height": 1.38,
+	"anim_idle": [&"idle"],
+	"anim_walk": [&"walk"],
+	"anim_attack": [&"crouch"],
+	"anim_air": [&"leap"],
+	"anim_land": [&"land"],
+	"anim_stagger": [&"stagger"],
+	"anim_death": [&"death_a", &"death_b"],
+	"anim_spawn": [&"spawn"],
+	"walk_ref_speed": Tuning.JUMPER_WALK_REF_SPEED,
+}
+
 const _OVERRIDES: Dictionary = {
 	# Zıplayan: askere 7 m kala çömelir, yerde işaret çıkar (ilk 0.4 sn askeri önden izler, son 0.3 sn kilitli),
 	# yay çizerek havalanıp işaretli yere iner. Havadayken vurulamaz. İniş: alan hasarı (land_radius).
@@ -268,6 +284,8 @@ static func _build() -> Dictionary:
 			row["attack_windup"] = row["scream_time"]
 			if id == RUNNER and Tuning.FEATURE_RUNNER_MODEL:
 				row.merge(_RUNNER_LOOK_V, true)
+		if id == JUMPER and Tuning.FEATURE_JUMPER_MODEL:
+			row.merge(_JUMPER_LOOK_V, true)
 		table[id] = _paced(row)
 	return table
 
