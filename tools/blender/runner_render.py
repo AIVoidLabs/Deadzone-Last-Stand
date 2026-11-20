@@ -1,10 +1,10 @@
-"""Koşucu (Pençeli) konsept görselleri (V.5 v1): dizi, imza pozu, oyun kamerası, siluet, yakın.
+"""Koşucu (Pençeli) konsept görselleri (V.5 v2): dizi, imza pozu, oyun kamerası, siluet, yakın.
 
 Arka plan Blender ile (her görsel sahneyi kendi kurar):
     blender --background --python tools/blender/runner_render.py -- all
     blender --background --python tools/blender/runner_render.py -- lineup signature   # seçerek
 Seçenekler: lineup, signature, gamecam, silhouette, close, all. Ayrıca --samples=N.
-Çıktılar docs/concept/runner_v1_<ad>.png; ara görüntüler build/shots/runner_*.png.
+Çıktılar docs/concept/runner_v2_<ad>.png; ara görüntüler build/shots/runner_*.png.
 """
 import importlib
 import math
@@ -24,7 +24,7 @@ import walker_render as wr  # noqa: E402
 importlib.reload(br)
 CONCEPT_DIR = os.path.join(br.REPO, "docs", "concept")
 SHOTS_DIR = os.path.join(br.REPO, "build", "shots")
-VERSION = "v1"
+VERSION = "v2"
 SAMPLES = 64
 
 
@@ -89,7 +89,7 @@ def render_close():
     root = br.build_variant(br.VARIANTS[1], "crouch")
     kit.setup_look(target_height=0.6)
     scene = _setup((800, 900), 70, 96)
-    head = next(o for o in root.children_recursive if o.name.startswith("Walker_Head"))
+    head = next(o for o in root.children_recursive if o.name.startswith("Runner_Head"))
     hc = head.matrix_world @ Vector((0.0, -0.035, 0.035))
     face = (head.matrix_world.to_3x3() @ Vector((0.45, -1.0, 0.20))).normalized()
     wr._aim(scene.camera, hc + face * 0.80, hc)
