@@ -98,10 +98,11 @@ const _JUMPER_LOOK_V: Dictionary = {
 }
 
 # Yeni tank (Tuning.FEATURE_TANK_MODEL): 4 çeşit GLB (ZombieVisual.VC_MODELS[tank_v]). Saldırı klibi (1.6 sn) vuruşu
-# 0.90 sn'de: attack_windup (0.9) ile birebir; WINDUP'ta hızı ~1.0, RECOVER'da sonuna dek tamamlanır. Boy 1.85 m.
+# 0.90 sn'de: attack_windup (0.9) ile birebir; WINDUP'ta hızı ~1.0, RECOVER'da sonuna dek tamamlanır.
+# Boy 2.3 m (Taha 2026-11-20: 1.85 küçük kaldı; yarıçap 0.75 ve erişim 1.5 eski 2.4 m tanka göreydi, uyar).
 const _TANK_LOOK_V: Dictionary = {
 	"model": &"tank_v",
-	"height": 1.85,
+	"height": 2.3,
 	"anim_idle": [&"idle"],
 	"anim_walk": [&"walk"],
 	"anim_attack": [&"attack"],
