@@ -70,6 +70,7 @@ var _queries: EnemyQueries
 var _burn: EnemyBurn
 var _compactor: EnemyCompactor
 var _spawner: EnemySpawner
+var _combat: EnemyCombat
 var _dead_count: int = 0
 var _corpses: CorpseList = CorpseList.new()
 
@@ -86,6 +87,7 @@ func _ready() -> void:
 	_burn = EnemyBurn.new(self)
 	_compactor = EnemyCompactor.new(self)
 	_spawner = EnemySpawner.new(self)
+	_combat = EnemyCombat.new(self)
 	for kind: StringName in EnemyData.TABLE:
 		var prewarm: int = Quality.max_enemies() if kind == EnemyData.WALKER else int(EnemyData.TABLE[kind].get("prewarm", 0))
 		_pool.grow(kind, prewarm)
@@ -145,21 +147,7 @@ func find_segment_hit(a: Vector2, b: Vector2, radius: float, exclude: PackedInt3
 
 ## direction: vuruşun geldiği yön (itme bu yöne). knockback: ağırlığı 1 olana verilen ilk hız.
 func damage(index: int, amount: float, direction: Vector2 = Vector2.ZERO, knockback: float = 0.0) -> void:
-	var state: ZombieRules.State = _state[index] as ZombieRules.State
-	if _alive[index] == 0 or not ZombieRules.can_take_damage(state):
-		return
-	_hp[index] -= amount
-	_nodes[index].notify_hit(amount)
-	var row: Dictionary = _rows[index]
-	var at: Vector3 = Vector3(_pos[index].x, 0.0, _pos[index].y)
-	enemy_damaged.emit(at, direction, amount, _hp[index] <= 0.0)
-	if _hp[index] <= 0.0:
-		_kill(index, Knockback.impulse(direction, knockback * Tuning.ZOMBIE_DEATH_KNOCKBACK_FACTOR, row["weight"]))
-		return
-	if Tuning.FEATURE_KNOCKBACK:
-		_knock[index] += Knockback.impulse(direction, knockback, row["weight"])
-	if Tuning.FEATURE_STAGGER and float(row["stagger_time"]) > 0.0 and ZombieRules.can_stagger(state):
-		_enter(index, ZombieRules.State.STAGGER, row["stagger_time"], true)
+	_combat.damage(index, amount, direction, knockback)
 
 
 func spawn(kind: StringName, at: Vector2) -> void:
@@ -177,7 +165,7 @@ func dismiss(count: int) -> void:
 	var i: int = _pos.size() - 1
 	while i >= 0 and count > 0:
 		if _alive[i] != 0:
-			_kill(i, Vector2.ZERO, false)
+			_combat.kill(i, Vector2.ZERO, false)
 			count -= 1
 		i -= 1
 
@@ -196,7 +184,7 @@ func debug_state(index: int) -> ZombieRules.State:
 
 func debug_kill(index: int) -> void:
 	if _alive[index] != 0:
-		_kill(index)
+		_combat.kill(index)
 
 
 func pick_spawn_point() -> Vector2:
@@ -217,7 +205,7 @@ func _move(delta: float) -> void:
 		if ZombieRules.is_timed(state):
 			_timer[i] -= delta
 			if _timer[i] <= 0.0:
-				state = _on_timer(i, state, target)
+				state = _combat.on_timer(i, state, target)
 		var p: Vector2 = _pos[i]
 		var prev: Vector2 = p
 		var dir: Vector2 = Steering.seek(p, target)
@@ -274,49 +262,7 @@ func _move(delta: float) -> void:
 				_special.begin_windup(i, p, target, target_vel)
 
 
-## Süresi dolan durumdan çıkar; hazırlık bittiyse vuruşu uygular. Dönüş: yeni durum.
-func _on_timer(index: int, state: ZombieRules.State, target: Vector2) -> ZombieRules.State:
-	var row: Dictionary = _rows[index]
-	var special: bool = SpecialAttacks.is_special(row)
-	if special and state == ZombieRules.State.WINDUP:
-		return _special.end_windup(index, target)
-	if special and SpecialAttacks.acts_in(state) and state != ZombieRules.State.WINDUP:
-		return _special.finish(index, state, target)
-	var next: ZombieRules.State = ZombieRules.after_timer(state)
-	if state == ZombieRules.State.WINDUP:
-		var contact: float = Tuning.PLAYER_RADIUS + _radius[index]
-		if ZombieRules.strike_hits(_pos[index].distance_to(target), contact, row["attack_hit_range"]):
-			player.take_hit(_damage[index], target - _pos[index])
-		_enter(index, next, row["attack_recover"])
-	else:
-		_enter(index, next, 0.0)
-	return next
-
-
 func _enter(index: int, state: ZombieRules.State, duration: float, restart: bool = false) -> void:
 	_state[index] = state
 	_timer[index] = duration
 	_nodes[index].enter_state(state, duration, restart)
-
-
-## push: öldüren vuruşun itmesi; ceset bu yöne düşer ve kayar.
-## credit: öldürme sayılır ve enemy_killed yayılır (dalga sonu devrilmelerde kapalı).
-func _kill(index: int, push: Vector2 = Vector2.ZERO, credit: bool = true) -> void:
-	if _burn_left[index] > 0.0:
-		_burn.extinguish(index)
-	_special.on_removed(index)
-	_alive[index] = 0
-	_dead_count += 1
-	var node: Zombie = _nodes[index]
-	if credit:
-		kills += 1
-		enemy_killed.emit(node.position, _rows[index])
-	if not Tuning.FEATURE_ZOMBIE_DEATH_ANIM:
-		node.deactivate()
-		return
-	# Ölüm klipleri arkaya düşer: yüzü vuruşun geldiği yöne çevir, sırtüstü vuruş yönüne düşsün.
-	if push != Vector2.ZERO:
-		node.rotation.y = atan2(-push.x, -push.y)
-	var duration: float = Tuning.ZOMBIE_CORPSE_TIME + Tuning.ZOMBIE_FADE_TIME
-	node.enter_state(ZombieRules.State.DYING, duration)
-	_corpses.add(node, push if Tuning.FEATURE_KNOCKBACK else Vector2.ZERO, duration)
