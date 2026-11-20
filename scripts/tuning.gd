@@ -42,6 +42,9 @@ const TONGUE_MISS_SHOW_TIME: float = 0.25
 ## Dilci Blender'da üretilen yeni modeliyle (köşe renkli, kendi klipleri, yordamsal dil) çizilir;
 ## kapalıyken eski düz low-poly model ve kutu dil (V.4).
 const FEATURE_DILCI_MODEL: bool = true
+## Yürüyen Blender'da üretilen yeni modelleriyle (4 çeşit, köşe renkli, kendi klipleri) çizilir;
+## kapalıyken eski zombie_walker.glb ve paylaşılan klip kütüphanesi (V.5).
+const FEATURE_WALKER_MODEL: bool = true
 ## Yeni dil mekaniği (V.4): dil görünür hızla uçar (kaçılabilir), yakalarsa askeri dilciye doğru yavaşça
 ## çeker; kapalıyken eski anlık ışın + tam 1 sn bağ (7.3).
 const FEATURE_TONGUE_PULL: bool = true
@@ -384,3 +387,9 @@ const BENCH_TURN_RATE: float = 0.6
 const BENCH_FIXED_WARMUP: float = 4.0
 const BENCH_FIXED_TIME: float = 10.0
 const BENCH_FIXED_RING: float = 9.0
+
+## 1v1 debug arenası (--arena[=tür] ya da scenes/debug/arena.tscn): kapatılırsa normal oyun açılır.
+const FEATURE_DEBUG_ARENA: bool = true
+## Zombinin askerden doğma uzaklığı (m) ve ölümden sonra yenisinin doğma gecikmesi (sn).
+const DEBUG_ARENA_SPAWN_DIST: float = 6.5
+const DEBUG_ARENA_RESPAWN_DELAY: float = 2.0

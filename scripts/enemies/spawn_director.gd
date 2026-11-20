@@ -21,7 +21,7 @@ func _ready() -> void:
 	# Zombiler yürümeden önce doğsun.
 	process_physics_priority = EnemyManager.PHYSICS_PRIORITY - 1
 	_rng.randomize()
-	if Tuning.FEATURE_WAVES:
+	if Tuning.FEATURE_WAVES and not DebugArena.active:
 		run = WaveRun.new(WaveData.WAVES, Tuning.WAVE_CLEAR_TIME, Tuning.WAVE_BREAK_TIME)
 		_announce.call_deferred()
 	else:

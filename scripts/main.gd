@@ -3,6 +3,9 @@ extends Node3D
 
 
 func _ready() -> void:
+	# 1v1 debug arenası: dalga, kart ve mağaza kapalı (DebugArena.active SpawnDirector'u da etkiler).
+	var arena_mode: bool = DebugArena.requested()
+	DebugArena.active = arena_mode
 	add_child(Arena.new())
 
 	var player: Player = Player.new()
@@ -14,6 +17,7 @@ func _ready() -> void:
 
 	var director: SpawnDirector = SpawnDirector.new()
 	director.enemies = enemies
+	enemies.spawning_enabled = not arena_mode
 	add_child(director)
 
 	var loot: RunLoot = RunLoot.new()
@@ -68,7 +72,7 @@ func _ready() -> void:
 	add_child(hud)
 
 	var level_up: LevelUpFlow = null
-	if Tuning.FEATURE_LEVEL_CARDS:
+	if Tuning.FEATURE_LEVEL_CARDS and not arena_mode:
 		level_up = LevelUpFlow.new()
 		level_up.loot = loot
 		level_up.stats = player.stats
@@ -77,7 +81,7 @@ func _ready() -> void:
 		add_child(level_up)
 
 	var shop: ShopFlow = null
-	if Tuning.FEATURE_SHOP and Tuning.FEATURE_WAVES:
+	if Tuning.FEATURE_SHOP and Tuning.FEATURE_WAVES and not arena_mode:
 		shop = ShopFlow.new()
 		shop.loot = loot
 		shop.stats = player.stats
@@ -92,6 +96,12 @@ func _ready() -> void:
 
 	if OS.is_debug_build():
 		_add_debug_tools(player, enemies, projectiles, camera, weapons, director, pickups, loot)
+		if arena_mode:
+			var arena_tool: DebugArena = DebugArena.new()
+			arena_tool.player = player
+			arena_tool.enemies = enemies
+			arena_tool.weapons = weapons
+			add_child(arena_tool)
 		if Autoplay.requested() and shop != null:
 			var bot: Autoplay = Autoplay.new()
 			bot.player = player

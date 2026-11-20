@@ -33,6 +33,8 @@ var tongue_bites: int = 0
 var tongue_timeouts: int = 0
 ## Askeri dille bağlayan dilci (yoksa null); ölürse bağ çözülür.
 var latched: Zombie
+## Debug arenası: true iken canlı zombiler donar (hareket ve saldırı durur).
+var debug_freeze: bool = false
 
 var _grid: SpatialGrid
 var _half: float
@@ -179,6 +181,23 @@ func dismiss(count: int) -> void:
 		i -= 1
 
 
+## Debug arenası: ilk canlı zombinin indeksi (yoksa -1), durumu ve öldürme.
+func debug_alive_index() -> int:
+	for i in _pos.size():
+		if _alive[i] != 0:
+			return i
+	return -1
+
+
+func debug_state(index: int) -> ZombieRules.State:
+	return _state[index] as ZombieRules.State
+
+
+func debug_kill(index: int) -> void:
+	if _alive[index] != 0:
+		_kill(index)
+
+
 func pick_spawn_point() -> Vector2:
 	return _spawner.pick_spawn_point()
 
@@ -190,7 +209,7 @@ func _move(delta: float) -> void:
 	var windup_attack: bool = Tuning.FEATURE_ZOMBIE_WINDUP_ATTACK
 	var target_vel: Vector2 = Vector2(player.velocity.x, player.velocity.z)
 	for i in _pos.size():
-		if _alive[i] == 0:
+		if _alive[i] == 0 or debug_freeze:
 			continue
 		var state: ZombieRules.State = _state[i] as ZombieRules.State
 		if ZombieRules.is_timed(state):
