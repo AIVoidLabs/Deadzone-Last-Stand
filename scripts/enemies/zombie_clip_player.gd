@@ -9,6 +9,9 @@ var row: Dictionary = {}
 var own_clips: bool = false
 ## Örneğin boy ölçeği (yürüme hızı senkronu için).
 var size_scale: float = 1.0
+## Hıza bağlı oynayan klip (yürüme ya da koşu) ve anahtarlandığı ref hız; &"" = senkron yok.
+var _sync_clip: StringName = &""
+var _sync_ref: float = 0.0
 
 
 ## Yürüyüşü rastgele bir kareden ve biraz farklı hızda başlatır; sürü aynı adımda yürümez.
@@ -23,17 +26,27 @@ func start_walk() -> void:
 		animation.speed_scale = randf_range(1.0 - variance, 1.0 + variance)
 	animation.play(clip, Tuning.ZOMBIE_ANIM_BLEND)
 	animation.seek(randf() * animation.current_animation_length)
+	if is_walk_synced():
+		_sync_clip = clip
+		_sync_ref = float(row["walk_ref_speed"])
 
 
 func is_walk_synced() -> bool:
 	return Tuning.FEATURE_WALK_SPEED_SYNC and row.has("walk_ref_speed")
 
 
-## Kovalarken yürüme klibini gerçek hıza uydurur (yumuşatılmış); boy ölçeği örnek başınadır.
+## Klip ve hız senkronu durumunu sıfırlar (ölüm, havuza dönüş).
+func reset_sync() -> void:
+	_sync_clip = &""
+	_sync_ref = 0.0
+
+
+## Yürüme ya da koşu klibini gerçek hıza uydurur (yumuşatılmış); boy ölçeği örnek başınadır.
+## Yalnız senkronlu klip oynuyorsa çalışır (pençe, çığlık, sendeleme vb. kendi hızında).
 func sync_walk(speed: float) -> void:
-	if animation == null or not is_walk_synced():
+	if animation == null or _sync_clip == &"" or animation.current_animation != _sync_clip:
 		return
-	var target: float = ZombieClipRules.walk_speed_scale(speed, row["walk_ref_speed"], size_scale,
+	var target: float = ZombieClipRules.walk_speed_scale(speed, _sync_ref, size_scale,
 			Tuning.WALK_SPEED_SCALE_MIN, Tuning.WALK_SPEED_SCALE_MAX)
 	animation.speed_scale = lerpf(animation.speed_scale, target, Tuning.WALK_SPEED_SMOOTH)
 
@@ -67,6 +80,10 @@ func play_rush(state: ZombieRules.State, duration: float, lunge_speed: float) ->
 	match state:
 		ZombieRules.State.SPRINT:
 			play_loop(&"anim_sprint", float(row.get("sprint_anim_speed", 1.0)))
+			# Yeni modelde koşu klibi gerçek hıza bağlanır (sprint_ref_speed).
+			if row.has("sprint_ref_speed") and Tuning.FEATURE_WALK_SPEED_SYNC and animation != null:
+				_sync_clip = animation.current_animation
+				_sync_ref = float(row["sprint_ref_speed"])
 		ZombieRules.State.STRIKE:
 			play_timed(&"anim_strike", float(row.get("strike_anim_hit_time", 0.0)), float(row.get("strike_hit_time", duration)))
 		_:

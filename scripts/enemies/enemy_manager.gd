@@ -257,10 +257,10 @@ func _move(delta: float) -> void:
 			var face: Vector2 = _special.facing(i, p)
 			if face != Vector2.ZERO:
 				node.rotation.y = atan2(face.x, face.y)
+		if sync_walk and (state == ZombieRules.State.CHASE or (state == ZombieRules.State.SPRINT and _rows[i].has("sprint_ref_speed"))):
+			node.ground_speed.emit(p.distance_to(prev) / delta)
 		if state != ZombieRules.State.CHASE:
 			continue
-		if sync_walk and _rows[i].has("walk_ref_speed"):
-			node.ground_speed.emit(p.distance_to(prev) / delta)
 		# Yalnız kovalarken döner; hazırlanırken yönü kilitlidir, yana kaçan asker ıskalatır.
 		if dir != Vector2.ZERO:
 			node.rotation.y = atan2(dir.x, dir.y)

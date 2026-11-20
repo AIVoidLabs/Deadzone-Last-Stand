@@ -24,6 +24,12 @@ const VC_MODELS: Dictionary = {
 		preload("res://assets/models/characters/zombie_walker_skinny.glb"),
 		preload("res://assets/models/characters/zombie_walker_civilian.glb"),
 	],
+	&"runner_v": [
+		preload("res://assets/models/characters/zombie_runner_jogger.glb"),
+		preload("res://assets/models/characters/zombie_runner_torn.glb"),
+		preload("res://assets/models/characters/zombie_runner_bare.glb"),
+		preload("res://assets/models/characters/zombie_runner_marathon.glb"),
+	],
 }
 const VC_SHADER: Shader = preload("res://assets/shaders/zombie_vc.gdshader")
 ## Örnek başına hafif ton farkı (±); sürüde aynı ağ aynı görünmesin.
@@ -113,6 +119,7 @@ func _on_state_changed(new_state: int, old_state: int) -> void:
 		_tongue.on_state(new_state, old_state)
 	match new_state:
 		ZombieRules.State.DYING:
+			_clips.reset_sync()
 			_dying = true
 			_death_left = _body.state_duration
 			set_process(true)
@@ -163,6 +170,7 @@ func _on_state_changed(new_state: int, old_state: int) -> void:
 				_clips.animation.speed_scale = 1.0
 		ZombieRules.State.INACTIVE:
 			_hide_extras()
+			_clips.reset_sync()
 			_set_burn(0.0)
 			_flash_left = 0.0
 			_set_flash(0.0)

@@ -55,6 +55,9 @@ const FEATURE_DILCI_MODEL: bool = true
 ## Yürüyen Blender'da üretilen yeni modelleriyle (4 çeşit, köşe renkli, kendi klipleri) çizilir;
 ## kapalıyken eski zombie_walker.glb ve paylaşılan klip kütüphanesi (V.5).
 const FEATURE_WALKER_MODEL: bool = true
+## Koşucu Blender'da üretilen yeni modelleriyle (4 çeşit, köşe renkli, kendi klipleri) çizilir; yalnız
+## FEATURE_RUNNER_SPRINT açıkken (yeni modelde atılış klibi yok). Kapalıyken eski zombie_runner.glb (V.5).
+const FEATURE_RUNNER_MODEL: bool = true
 ## Yeni dil mekaniği (V.4): dil görünür hızla uçar (kaçılabilir), yakalarsa askeri dilciye doğru yavaşça
 ## çeker; kapalıyken eski anlık ışın + tam 1 sn bağ (7.3).
 const FEATURE_TONGUE_PULL: bool = true
@@ -225,6 +228,9 @@ const CHARACTER_MODEL_HEIGHT: float = 1.83
 const FEATURE_WALK_SPEED_SYNC: bool = true
 ## Yeni yürüyen walk klibinin anahtarlandığı ilerleme hızı (m/sn, 1.6 m boyda model için).
 const WALK_REF_SPEED: float = 2.6
+## Yeni koşucu klipleri (walk, sprint) anahtarlandığı ilerleme hızları (m/sn, 1.3 m boyda model için).
+const RUNNER_WALK_REF_SPEED: float = 3.0
+const RUNNER_SPRINT_REF_SPEED: float = 5.2
 ## Senkron klip hızı sınırları ve kare başına yumuşatma payı (0-1).
 const WALK_SPEED_SCALE_MIN: float = 0.3
 const WALK_SPEED_SCALE_MAX: float = 1.8

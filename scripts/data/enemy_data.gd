@@ -61,6 +61,26 @@ const _WALKER_LOOK_V: Dictionary = {
 	"walk_ref_speed": Tuning.WALK_REF_SPEED,
 }
 
+# Yeni koşucu (Tuning.FEATURE_RUNNER_MODEL, FEATURE_RUNNER_SPRINT açıkken): 4 çeşit GLB (ZombieVisual.VC_MODELS[runner_v]).
+# Çığlık (scream 0.6 sn) WINDUP'a, sprint döngüsü SPRINT'e, strike (vuruş 0.25 sn) STRIKE'a oturur. Boy 1.30 m:
+# ref hızlar bu boya göre (Tuning.RUNNER_*_REF_SPEED). Satırın üstüne sprint_v'den sonra yazılır.
+const _RUNNER_LOOK_V: Dictionary = {
+	"model": &"runner_v",
+	"height": 1.3,
+	"anim_idle": [&"idle"],
+	"anim_walk": [&"walk"],
+	"anim_attack": [&"scream"],
+	"anim_sprint": [&"sprint"],
+	"anim_strike": [&"strike"],
+	"anim_stagger": [&"stagger"],
+	"anim_death": [&"death_a", &"death_b"],
+	"anim_spawn": [&"spawn"],
+	"strike_anim_hit_time": 0.25,
+	"sprint_anim_speed": 1.0,
+	"walk_ref_speed": Tuning.RUNNER_WALK_REF_SPEED,
+	"sprint_ref_speed": Tuning.RUNNER_SPRINT_REF_SPEED,
+}
+
 const _OVERRIDES: Dictionary = {
 	# Zıplayan: askere 7 m kala çömelir, yerde işaret çıkar (ilk 0.4 sn askeri önden izler, son 0.3 sn kilitli),
 	# yay çizerek havalanıp işaretli yere iner. Havadayken vurulamaz. İniş: alan hasarı (land_radius).
@@ -246,6 +266,8 @@ static func _build() -> Dictionary:
 			row.merge(row["sprint_v"], true)
 			# Çığlık, hazırlık (WINDUP) süresidir.
 			row["attack_windup"] = row["scream_time"]
+			if id == RUNNER and Tuning.FEATURE_RUNNER_MODEL:
+				row.merge(_RUNNER_LOOK_V, true)
 		table[id] = _paced(row)
 	return table
 
