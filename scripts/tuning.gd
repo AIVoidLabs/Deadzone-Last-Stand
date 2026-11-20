@@ -1,4 +1,4 @@
-class_name Tuning
+﻿class_name Tuning
 extends RefCounted
 ## Tüm genel oynanış sayıları burada. İçerik satırları (zombi, silah) scripts/data/ tablolarında.
 
@@ -200,6 +200,15 @@ const ENEMY_MAX_SPEED_FACTOR: float = 1.6
 # --- Zombi görüntüsü ---
 ## Ortak iskeletli modelin dinlenme pozundaki boyu; tür boyu buna oranlanır.
 const CHARACTER_MODEL_HEIGHT: float = 1.83
+## Yürüme klibinin hızı gerçek yatay hıza bağlanır (satırda walk_ref_speed olan türler; ayak kaymaz).
+## Kapalıyken klip rastgele hızda (ZOMBIE_ANIM_SPEED_VARIANCE) oynar.
+const FEATURE_WALK_SPEED_SYNC: bool = true
+## Yeni yürüyen walk klibinin anahtarlandığı ilerleme hızı (m/sn, 1.6 m boyda model için).
+const WALK_REF_SPEED: float = 2.6
+## Senkron klip hızı sınırları ve kare başına yumuşatma payı (0-1).
+const WALK_SPEED_SCALE_MIN: float = 0.3
+const WALK_SPEED_SCALE_MAX: float = 1.8
+const WALK_SPEED_SMOOTH: float = 0.25
 ## Zombiler aynı adımda yürümesin diye animasyon hızına eklenen rastgele pay (±).
 const ZOMBIE_ANIM_SPEED_VARIANCE: float = 0.15
 ## Zombi boyuna eklenen rastgele pay (±); yalnız görüntü, çarpışma değişmez. 0 = kapalı.

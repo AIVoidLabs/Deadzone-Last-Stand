@@ -57,6 +57,7 @@ const _WALKER_LOOK_V: Dictionary = {
 	"anim_death": [&"death_a", &"death_b"],
 	"anim_spawn": [&"spawn"],
 	"recover_finishes_attack": true,
+	"walk_ref_speed": Tuning.WALK_REF_SPEED,
 }
 
 const _OVERRIDES: Dictionary = {

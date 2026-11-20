@@ -66,6 +66,7 @@ func _ready() -> void:
 	_body = get_parent() as Zombie
 	_body.event.connect(_on_event)
 	_body.state_changed.connect(_on_state_changed)
+	_body.ground_speed.connect(_clips.sync_walk)
 
 
 func _process(delta: float) -> void:
@@ -235,6 +236,7 @@ func _apply_kind(row: Dictionary) -> void:
 		return
 	var size: float = randf_range(1.0 - Tuning.ZOMBIE_SCALE_VARIANCE, 1.0 + Tuning.ZOMBIE_SCALE_VARIANCE)
 	scale = Vector3.ONE * (size * height / _model_height)
+	_clips.size_scale = scale.x
 
 
 ## Dil görüntüsü: yeni modelde Head kemiğine bağlı yordamsal dil, yoksa eski kutu.

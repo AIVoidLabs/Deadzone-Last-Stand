@@ -207,6 +207,7 @@ func _move(delta: float) -> void:
 	var hittable: bool = player.is_hittable()
 	var solid: bool = not (Tuning.FEATURE_DASH_PASS_THROUGH and player.is_dashing())
 	var windup_attack: bool = Tuning.FEATURE_ZOMBIE_WINDUP_ATTACK
+	var sync_walk: bool = Tuning.FEATURE_WALK_SPEED_SYNC
 	var target_vel: Vector2 = Vector2(player.velocity.x, player.velocity.z)
 	for i in _pos.size():
 		if _alive[i] == 0 or debug_freeze:
@@ -217,6 +218,7 @@ func _move(delta: float) -> void:
 			if _timer[i] <= 0.0:
 				state = _on_timer(i, state, target)
 		var p: Vector2 = _pos[i]
+		var prev: Vector2 = p
 		var dir: Vector2 = Steering.seek(p, target)
 		var speed: float = _speed[i]
 		var special: bool = SpecialAttacks.is_special(_rows[i])
@@ -257,6 +259,8 @@ func _move(delta: float) -> void:
 				node.rotation.y = atan2(face.x, face.y)
 		if state != ZombieRules.State.CHASE:
 			continue
+		if sync_walk and _rows[i].has("walk_ref_speed"):
+			node.ground_speed.emit(p.distance_to(prev) / delta)
 		# Yalnız kovalarken döner; hazırlanırken yönü kilitlidir, yana kaçan asker ıskalatır.
 		if dir != Vector2.ZERO:
 			node.rotation.y = atan2(dir.x, dir.y)
