@@ -44,6 +44,7 @@ func _swap_from_last(i: int, last: int) -> void:
 	_m._burn_dps[i] = _m._burn_dps[last]
 	_m._burn_acc[i] = _m._burn_acc[last]
 	_m._nodes[i] = _m._nodes[last]
+	_m._special.swap_from_last(i, last)
 
 
 func _shrink(last: int) -> void:
@@ -63,3 +64,4 @@ func _shrink(last: int) -> void:
 	_m._burn_dps.resize(last)
 	_m._burn_acc.resize(last)
 	_m._nodes.resize(last)
+	_m._special.shrink(last)

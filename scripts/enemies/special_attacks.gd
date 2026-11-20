@@ -158,6 +158,15 @@ func lunge_contact(i: int, state: ZombieRules.State, p: Vector2, dist: float, re
 	return S.RECOVER
 
 
+## Sıkıştırma: örneğe bağlı özel diziler paralel dizilerle birlikte kayar.
+func swap_from_last(i: int, last: int) -> void:
+	_tongue.swap_from_last(i, last)
+
+
+func shrink(last: int) -> void:
+	_tongue.shrink(last)
+
+
 ## Zombi ölürken ya da silinirken: bağ ve işaret temizlenir.
 func on_removed(i: int) -> void:
 	var node: Zombie = _m._nodes[i]

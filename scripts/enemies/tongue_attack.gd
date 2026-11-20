@@ -18,6 +18,19 @@ func _init(manager: EnemyManager) -> void:
 	_m = manager
 
 
+## Sıkıştırmada son örneğin yakın vuruş bayrağı i'ye taşınır (EnemyCompactor'ın paralel dizi takası).
+func swap_from_last(i: int, last: int) -> void:
+	if i >= _melee.size():
+		return
+	_melee[i] = _melee[last] if last < _melee.size() else 0
+
+
+## Sıkıştırmada dizi boyu manager'ınkine iner (kalan eski bayrak sonradan doğana geçmesin).
+func shrink(last: int) -> void:
+	if last < _melee.size():
+		_melee.resize(last)
+
+
 ## Hazırlık süresi (sn). Temasa yakınsa yakın vuruşa karar verir (bayrak açıkken), değilse satırdaki attack_windup.
 func windup_time(i: int, row: Dictionary, dist: float, contact: float) -> float:
 	if i >= _melee.size():
