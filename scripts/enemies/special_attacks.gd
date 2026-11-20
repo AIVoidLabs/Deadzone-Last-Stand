@@ -115,7 +115,7 @@ func windup_time(i: int, dist: float, contact: float) -> float:
 	if i >= _melee.size():
 		_melee.resize(_m._pos.size())
 	_melee[i] = 0
-	if row["attack_kind"] == &"tongue" and Tuning.FEATURE_TONGUE_MELEE 			and TongueRules.wants_melee(dist, contact, float(row["tongue_melee_range"])):
+	if row["attack_kind"] == &"tongue" and Tuning.FEATURE_TONGUE_MELEE and TongueRules.wants_melee(dist, contact, float(row["tongue_melee_range"])):
 		_melee[i] = 1
 		return row["tongue_melee_windup"]
 	return row["attack_windup"]
