@@ -1,6 +1,6 @@
 class_name SpecialAttacks
 extends RefCounted
-## Yürüyenden farklı saldırı düzenleri: koşucunun atılışı, zıplayanın sıçrayıp inişi, dilcinin dili.
+## Yürüyenden farklı saldırı düzenleri: koşucunun atılışı ya da durmadan koşusu (SprintAttack), zıplayanın sıçrayıp inişi, dilcinin dili.
 ## EnemyManager'ın paralel dizilerini onun adına işler (durum, süre ve nişan manager'da kalır;
 ## görüntüye yalnız zombi düğümünün `event` sinyaliyle haber verilir).
 
@@ -11,16 +11,18 @@ const TONGUE_REACH_MARGIN: float = 1.0
 const OLD_EXTEND_TIME: float = 0.12
 
 var _m: EnemyManager
+var _sprint: SprintAttack
 
 
 func _init(manager: EnemyManager) -> void:
 	_m = manager
+	_sprint = SprintAttack.new(manager)
 
 
 ## Bu türün özel saldırısı açık mı (kapalıysa yürüyen gibi yaklaşıp vurur).
 static func is_special(row: Dictionary) -> bool:
 	match row["attack_kind"]:
-		&"lunge":
+		&"lunge", &"sprint":
 			return Tuning.FEATURE_ZOMBIE_LUNGE
 		&"jump":
 			return Tuning.FEATURE_ZOMBIE_JUMP
@@ -31,7 +33,12 @@ static func is_special(row: Dictionary) -> bool:
 
 ## Bu durumda saldırı SpecialAttacks'ta işlenir (act / finish).
 static func acts_in(state: ZombieRules.State) -> bool:
-	return state == S.WINDUP or state == S.LUNGE or state == S.JUMP or state == S.LASH or state == S.PULL
+	return faces_in(state) or state == S.LASH or state == S.PULL
+
+
+## Bu durumda zombi nişan yönüne bakar (kovalarken askere döner).
+static func faces_in(state: ZombieRules.State) -> bool:
+	return state == S.WINDUP or state == S.LUNGE or state == S.JUMP or state == S.SPRINT or state == S.STRIKE
 
 
 ## Kovalarken saldırıyı başlatan mesafe payı (temasın üstüne).
@@ -41,6 +48,8 @@ static func start_range(row: Dictionary) -> float:
 	match row["attack_kind"]:
 		&"lunge":
 			return row["lunge_range"]
+		&"sprint":
+			return row["sprint_trigger_range"]
 		&"jump":
 			return row["jump_range"]
 	return row["tongue_range"]
@@ -53,6 +62,8 @@ static func windup_next(row: Dictionary) -> ZombieRules.State:
 	match row["attack_kind"]:
 		&"lunge":
 			return S.LUNGE
+		&"sprint":
+			return S.SPRINT
 		&"jump":
 			return S.JUMP
 	return S.LASH
@@ -79,7 +90,14 @@ func act(i: int, state: ZombieRules.State, p: Vector2, dir: Vector2, delta: floa
 				_m._nodes[i].event.emit(&"tongue", {"to": _player_point(target)})
 		S.PULL:
 			_tongue_pull(i, row, p, delta, target)
+		S.SPRINT, S.STRIKE:
+			p = _sprint.act(i, state, p, dir, delta, target)
 	return p
+
+
+## Askerle temas çözümü (içine girmeme) bu karede uygulanır mı: havadaki zıplayan ve pençeden sonra geçip giden koşucu geçer.
+func is_solid(i: int, state: ZombieRules.State) -> bool:
+	return state != S.JUMP and _sprint.is_solid(i, state)
 
 
 ## Zombinin baktığı yön (özel durumlarda nişan yönü).
@@ -102,6 +120,8 @@ func end_windup(i: int, target: Vector2) -> ZombieRules.State:
 			_m.lunge_starts += 1
 			_m._enter(i, S.LUNGE, row["lunge_time"])
 			return S.LUNGE
+		&"sprint":
+			return _sprint.begin(i)
 		&"jump":
 			_m._targetable[i] = 0
 			_m._enter(i, S.JUMP, row["jump_time"])
@@ -113,6 +133,8 @@ func end_windup(i: int, target: Vector2) -> ZombieRules.State:
 
 ## Atılış / sıçrama / dil süresi doldu. Dönüş: girilen durum.
 func finish(i: int, state: ZombieRules.State, target: Vector2) -> ZombieRules.State:
+	if state == S.STRIKE:
+		return _sprint.end_strike(i)
 	var row: Dictionary = _m._rows[i]
 	var recover: float = row["attack_recover"]
 	if state == S.JUMP:
@@ -160,6 +182,8 @@ func _windup_tick(i: int, row: Dictionary, p: Vector2, target: Vector2, target_v
 		&"lunge":
 			if not LungeRules.is_aim_locked(left, float(row["lunge_lock_time"])):
 				_m._aim[i] = LungeRules.aim_direction(p, target, target_vel, float(row["lunge_speed"]), float(row["lunge_lead"]))
+		&"sprint":
+			_sprint.scream_tick(i, p, target)
 		&"jump":
 			if not LungeRules.is_aim_locked(left, float(row["jump_lock_time"])):
 				var ahead: float = left + float(row["jump_time"])

@@ -2,7 +2,8 @@ class_name EnemyData
 extends RefCounted
 ## Zombi türleri tablosu. Yeni tür = yeni satır (eksik alanlar yürüyen zombiden gelir).
 ## attack_kind: &"melee" (yaklaşıp vurur), &"lunge" (hazırlanıp düz atılır; lunge_*), &"jump" (havaya sıçrayıp
-## işaretli yere iner; jump_*, land_radius), &"tongue" (uzaktan dil atıp askeri bağlar; tongue_*, root_time).
+## işaretli yere iner; jump_*, land_radius), &"tongue" (uzaktan dil atıp askeri bağlar; tongue_*, root_time),
+## &"sprint" (koşucunun yeni saldırısı: çığlık, durmadan koşu, koşarken pençe; sprint_*, strike_*).
 
 const WALKER: StringName = &"walker"
 const RUNNER: StringName = &"runner"
@@ -169,6 +170,36 @@ const _OVERRIDES: Dictionary = {
 		"anim_walk": [&"run_a", &"run_b"],
 		"anim_attack": [&"pounce_windup"],
 		"anim_lunge": [&"pounce"],
+		# Yeni koşu saldırısı (Tuning.FEATURE_RUNNER_SPRINT): askere sprint_trigger_range kala yerinde bir kez
+		# çığlık (WINDUP = scream_time), sonra ölene dek SPRINT: sprint_speed ile koşar, dönüşü sprint_turn_rate
+		# (rad/sn) ile sınırlı (yana dash ıskalatır, geniş yay çizip geri döner, durmaz). Temas + strike_range'e
+		# girince STRIKE: strike_hit_time sn sonra pençe iner (temas + strike_hit_range içindeyse contact_damage),
+		# ardından strike_recover sn dönmeden geçip gider (askerin içinden; temas çözümü yok) ve yine SPRINT: yay çizip
+		# yeniden gelir. Hız çarpanları: vuruşa kadar strike_move_factor, geçerken strike_recover_factor. Pençe yalnız
+		# koşu yönü askere dönükken başlar (aim · askere yön >= strike_face_dot). Asker sprint_trigger_range ×
+		# sprint_give_up_factor'dan uzaklaşırsa CHASE.
+		# Açıkken bu alanlar satırın üstüne yazılır (attack_kind &"sprint").
+		"sprint_v": {
+			"attack_kind": &"sprint",
+			"sprint_trigger_range": 9.0,
+			"scream_time": 0.6,
+			"sprint_speed": 6.5,
+			"sprint_turn_rate": 2.4,
+			"sprint_give_up_factor": 2.0,
+			"strike_range": 0.5,
+			"strike_hit_range": 0.9,
+			"strike_hit_time": 0.25,
+			"strike_recover": 0.5,
+			"strike_move_factor": 0.8,
+			"strike_recover_factor": 1.0,
+			"strike_face_dot": 0.5,
+			# Eski modelde paylaşılan klipler: koşu run_a/b, pençe yürüyenin attack klibi (vuruşu 0.7 sn'de).
+			# Yeni modelde: anim_sprint [sprint], anim_strike [strike], strike_anim_hit_time 0.25.
+			"anim_sprint": [&"run_a", &"run_b"],
+			"anim_strike": [&"attack"],
+			"strike_anim_hit_time": 0.7,
+			"sprint_anim_speed": 1.15,
+		},
 	},
 	# Tank: iri, yavaş, çok dayanıklı; sendelemez, zor itilir. Geniş ve ağır savurur: hazırlığı uzun, erişimi geniş.
 	&"tank": {
@@ -195,22 +226,35 @@ const _OVERRIDES: Dictionary = {
 	},
 }
 
+## Genel tempoyla (Tuning.GAME_PACE) çarpılan hız alanları (m/sn). Referans hızlar (walk_ref_speed) çarpılmaz.
+const PACED_KEYS: Array[String] = ["speed", "lunge_speed", "sprint_speed", "tongue_speed", "tongue_pull_speed"]
+
 static var TABLE: Dictionary = _build()
 
 
 static func _build() -> Dictionary:
-	var walker: Dictionary = _WALKER_ROW
+	var walker: Dictionary = _WALKER_ROW.duplicate()
 	if Tuning.FEATURE_WALKER_MODEL:
-		walker = _WALKER_ROW.duplicate()
 		walker.merge(_WALKER_LOOK_V, true)
-	var table: Dictionary = {&"walker": walker}
+	var table: Dictionary = {&"walker": _paced(walker)}
 	for id: StringName in _OVERRIDES:
 		var row: Dictionary = _WALKER_ROW.duplicate()
 		row.merge(_OVERRIDES[id], true)
 		if Tuning.FEATURE_DILCI_MODEL and row.has("look_v"):
 			row.merge(row["look_v"], true)
-		table[id] = row
+		if Tuning.FEATURE_RUNNER_SPRINT and row.has("sprint_v"):
+			row.merge(row["sprint_v"], true)
+			# Çığlık, hazırlık (WINDUP) süresidir.
+			row["attack_windup"] = row["scream_time"]
+		table[id] = _paced(row)
 	return table
+
+
+static func _paced(row: Dictionary) -> Dictionary:
+	for key: String in PACED_KEYS:
+		if row.has(key):
+			row[key] = float(row[key]) * Tuning.GAME_PACE
+	return row
 
 
 static func get_row(id: StringName) -> Dictionary:
@@ -220,6 +264,10 @@ static func get_row(id: StringName) -> Dictionary:
 
 static func lunges(row: Dictionary) -> bool:
 	return row["attack_kind"] == &"lunge"
+
+
+static func sprints(row: Dictionary) -> bool:
+	return row["attack_kind"] == &"sprint"
 
 
 static func jumps(row: Dictionary) -> bool:

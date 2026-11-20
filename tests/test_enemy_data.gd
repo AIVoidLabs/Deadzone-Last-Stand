@@ -3,6 +3,8 @@ extends GutTest
 const KIND_KEYS: Dictionary = {
 	&"melee": [],
 	&"lunge": ["lunge_range", "lunge_speed", "lunge_time", "lunge_lead", "lunge_lock_time", "lunge_turn_rate", "lunge_hit_range"],
+	&"sprint": ["sprint_trigger_range", "scream_time", "sprint_speed", "sprint_turn_rate", "sprint_give_up_factor", "strike_range",
+		"strike_hit_range", "strike_hit_time", "strike_recover", "strike_move_factor", "strike_recover_factor", "strike_face_dot"],
 	&"jump": ["jump_range", "jump_time", "jump_height", "jump_lock_time", "jump_lead", "jump_max_range", "land_radius"],
 	&"tongue": ["tongue_range", "tongue_lock_time", "tongue_hit_radius", "root_time", "tongue_miss_recover",
 		"tongue_speed", "tongue_lead", "tongue_pull_speed", "tongue_pull_time", "tongue_release_gap"],

@@ -4,9 +4,11 @@ extends RefCounted
 ## Akış: SPAWN -> CHASE -> WINDUP -> (vuruş) -> RECOVER -> CHASE; STAGGER araya girer; DYING son.
 ## Atılan türlerde (koşucu): WINDUP -> LUNGE -> RECOVER; zıplayanda WINDUP -> JUMP (havada) -> RECOVER;
 ## dilcide WINDUP -> LASH (dil uçuyor; eski mekanikte bağ) -> PULL (yakaladı, çekiyor) -> RECOVER.
+## Koşucunun yeni saldırısında (FEATURE_RUNNER_SPRINT): CHASE -> WINDUP (çığlık) -> SPRINT (süresiz, durmadan koşu)
+## <-> STRIKE (koşarken pençe) ; asker çok uzaklaşınca SPRINT -> CHASE.
 ## Bu durumlarda sendeleme olmaz (kararlı saldırı); havadaki zombi hasar da almaz.
 
-enum State { INACTIVE, SPAWN, CHASE, WINDUP, RECOVER, STAGGER, DYING, LUNGE, JUMP, LASH, PULL }
+enum State { INACTIVE, SPAWN, CHASE, WINDUP, RECOVER, STAGGER, DYING, LUNGE, JUMP, LASH, PULL, SPRINT, STRIKE }
 
 
 ## Süreli bir durumun süresi dolunca geçilecek durum. windup_next: hazırlıktan sonra gelen durum
@@ -17,6 +19,8 @@ static func after_timer(state: State, windup_next: State = State.RECOVER) -> Sta
 			return windup_next
 		State.LUNGE, State.JUMP, State.LASH, State.PULL:
 			return State.RECOVER
+		State.STRIKE:
+			return State.SPRINT
 		State.DYING, State.INACTIVE:
 			return State.INACTIVE
 		_:
@@ -29,7 +33,7 @@ static func can_move(state: State) -> bool:
 
 
 static func is_timed(state: State) -> bool:
-	return state != State.CHASE and state != State.INACTIVE
+	return state != State.CHASE and state != State.INACTIVE and state != State.SPRINT
 
 
 static func can_take_damage(state: State) -> bool:

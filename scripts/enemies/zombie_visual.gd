@@ -103,9 +103,9 @@ func _on_event(event_name: StringName, data: Dictionary) -> void:
 
 
 func _on_state_changed(new_state: int, old_state: int) -> void:
-	if old_state == ZombieRules.State.JUMP and new_state != ZombieRules.State.JUMP:
-		_jump_age = -1.0
-		position.y = 0.0
+	# İniş bitti ya da hazırlık sendelemeyle kesildi: yükseklik ve iniş işareti sıfırlanır.
+	if (old_state == ZombieRules.State.JUMP or old_state == ZombieRules.State.WINDUP) and new_state != ZombieRules.State.JUMP:
+		_hide_extras()
 	if _dying and new_state != ZombieRules.State.DYING:
 		_dying = false
 		_set_fade(0.0)
@@ -131,8 +131,8 @@ func _on_state_changed(new_state: int, old_state: int) -> void:
 			else:
 				# Klipteki vuruş anı (satırda varsa) hazırlığın sonuna denk gelir; 0 ise klip bütünüyle sığar.
 				_clips.play_timed(&"anim_attack", _clips.row.get("attack_anim_hit_time", 0.0), _body.state_duration)
-		ZombieRules.State.LUNGE:
-			_clips.play_loop(&"anim_lunge", LUNGE_ANIM_SPEED)
+		ZombieRules.State.LUNGE, ZombieRules.State.SPRINT, ZombieRules.State.STRIKE:
+			_clips.play_rush(new_state, _body.state_duration, LUNGE_ANIM_SPEED)
 		ZombieRules.State.JUMP:
 			_jump_age = 0.0
 			_jump_total = maxf(_body.state_duration, 0.01)

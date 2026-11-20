@@ -63,5 +63,6 @@ func test_pull_ends_within_time_limit_from_full_range() -> void:
 	# Sınır süre çekişi uzatmaz: en uzak yakalamada bile asker sınır dolunca bırakılır.
 	var row: Dictionary = _row()
 	assert_gt(float(row["tongue_pull_time"]), 0.0)
-	assert_lte(float(row["tongue_pull_speed"]), 2.0, "yavaş çekiş (Taha: ~1.5-2 m/sn)")
-	assert_gte(float(row["tongue_pull_speed"]), 1.5)
+	# Taha'nın aralığı tempo öncesi hızdır; satır hızı Tuning.GAME_PACE ile çarpılı gelir.
+	assert_lte(float(row["tongue_pull_speed"]), 2.0 * Tuning.GAME_PACE, "yavaş çekiş (Taha: ~1.5-2 m/sn)")
+	assert_gte(float(row["tongue_pull_speed"]), 1.5 * Tuning.GAME_PACE)

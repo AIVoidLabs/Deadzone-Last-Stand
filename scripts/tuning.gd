@@ -37,6 +37,16 @@ const FEATURE_ROOT: bool = true
 const FEATURE_ZOMBIE_JUMP: bool = true
 ## Dilci dilini atıp askeri bağlar; kapalıyken yürüyen gibi yaklaşıp vurur (7.3).
 const FEATURE_ZOMBIE_TONGUE: bool = true
+## Zıplayanın iniş işareti yaklaşan cismin gölgesi gibi çizilir; kapalıyken eski kırmızı halka.
+const FEATURE_JUMP_SHADOW_MARKER: bool = true
+## Gölge: en koyu opaklık, yumuşaklık (yarıçap oranı; hazırlık başı / iniş anı), kenar çizgisi kalınlığı ve gücü,
+## kilit nabzının süresi (sn).
+const JUMP_SHADOW_DARKNESS: float = 0.7
+const JUMP_SHADOW_SOFT_START: float = 0.6
+const JUMP_SHADOW_SOFT_END: float = 0.12
+const JUMP_SHADOW_EDGE_WIDTH: float = 0.035
+const JUMP_SHADOW_EDGE_STRENGTH: float = 0.28
+const JUMP_SHADOW_LOCK_PULSE_TIME: float = 0.25
 ## Dil ıskalayınca ekranda kalma süresi (sn) ve bağlıyken dilin askerde bittiği yükseklik (m).
 const TONGUE_MISS_SHOW_TIME: float = 0.25
 ## Dilci Blender'da üretilen yeni modeliyle (köşe renkli, kendi klipleri, yordamsal dil) çizilir;
@@ -68,6 +78,9 @@ const PLAYER_STRUGGLE_RATE: float = 60.0
 const CAMERA_SHAKE_ON_LAND: float = 0.25
 ## Koşucu hazırlanıp atılır; kapalıyken koşucu yürüyen gibi yaklaşıp vurur.
 const FEATURE_ZOMBIE_LUNGE: bool = true
+## Koşucu tetiklenince bir kez çığlık atar, sonra ölene dek durmadan koşar ve koşarken pençeler (SPRINT/STRIKE);
+## kapalıyken eski çömel-atıl-toparlan döngüsü (lunge). Ayarlar EnemyData runner satırının sprint_v alanında.
+const FEATURE_RUNNER_SPRINT: bool = true
 ## Zombiler yerden doğrularak doğar; kapalıyken doğrudan yürümeye başlar.
 const FEATURE_ZOMBIE_SPAWN_RISE: bool = true
 ## Vurulan zombi geriye itilir.
@@ -146,8 +159,15 @@ const ARENA_WALL_HEIGHT: float = 1.2
 const ARENA_WALL_THICKNESS: float = 1.0
 const ARENA_GROUND_MARGIN: float = 30.0
 
+# --- Genel tempo ---
+## Oyunun genel hızı (1.0 = eski oyun). Hızlar çarpılır, süreler değil: asker yürüyüşü (PLAYER_SPEED),
+## zombi hızları (EnemyData.PACED_KEYS), mermi hızları (WeaponData.get_row). Dash ve zamanlayıcılar aynı kalır.
+## Engine.time_scale kullanılmaz.
+const GAME_PACE: float = 0.8
+
 # --- Asker ---
-const PLAYER_SPEED: float = 6.0
+## Yürüme hızı (m/sn); GAME_PACE öncesi 6.0.
+const PLAYER_SPEED: float = 6.0 * GAME_PACE
 const PLAYER_ACCEL: float = 55.0
 const PLAYER_FRICTION: float = 50.0
 const PLAYER_MAX_HP: float = 100.0

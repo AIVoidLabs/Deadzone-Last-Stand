@@ -241,8 +241,8 @@ func _move(delta: float) -> void:
 		if state == ZombieRules.State.LUNGE:
 			state = _special.lunge_contact(i, state, p, dist, reach, target)
 			hittable = player.is_hittable()
-		# Havadaki zıplayan askerin üstünden geçer; itişme yok.
-		if solid and dist < reach and state != ZombieRules.State.JUMP:
+		# Havadaki zıplayan üstünden, pençeden sonra koşucu içinden geçer; itişme yok.
+		if solid and dist < reach and _special.is_solid(i, state):
 			if hittable and not windup_attack:
 				player.take_hit(_damage[i], -away)
 				hittable = player.is_hittable()
@@ -253,7 +253,7 @@ func _move(delta: float) -> void:
 		_pos[i] = p
 		var node: Zombie = _nodes[i]
 		node.position = Vector3(p.x, 0.0, p.y)
-		if special and (state == ZombieRules.State.WINDUP or state == ZombieRules.State.LUNGE or state == ZombieRules.State.JUMP):
+		if special and SpecialAttacks.faces_in(state):
 			var face: Vector2 = _special.facing(i, p)
 			if face != Vector2.ZERO:
 				node.rotation.y = atan2(face.x, face.y)

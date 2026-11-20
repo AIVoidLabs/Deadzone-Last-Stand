@@ -61,6 +61,18 @@ func play_lash() -> void:
 		animation.queue(pick_clip(&"anim_pull"))
 
 
+## Koşucu: atılış döngüsü (LUNGE), koşu döngüsü (SPRINT) ya da koşarken pençe (STRIKE; klipteki vuruş anı
+## strike_hit_time'a denk gelir).
+func play_rush(state: ZombieRules.State, duration: float, lunge_speed: float) -> void:
+	match state:
+		ZombieRules.State.SPRINT:
+			play_loop(&"anim_sprint", float(row.get("sprint_anim_speed", 1.0)))
+		ZombieRules.State.STRIKE:
+			play_timed(&"anim_strike", float(row.get("strike_anim_hit_time", 0.0)), float(row.get("strike_hit_time", duration)))
+		_:
+			play_loop(&"anim_lunge", lunge_speed)
+
+
 ## Klibi sabit hızda baştan oynatır (süreye uydurmadan).
 func play_loop(row_key: StringName, speed: float) -> void:
 	var clip: StringName = pick_clip(row_key)

@@ -149,10 +149,11 @@ func _process(delta: float) -> void:
 		_tick_auto_pick(delta)
 	if _time < _seconds:
 		return
-	print("LUNGE starts=%d hits=%d  JUMP lands=%d hits=%d  TONGUE shots=%d hits=%d bites=%d timeouts=%d" % [
-		enemies.lunge_starts, enemies.lunge_hits, enemies.jump_lands, enemies.jump_hits, enemies.tongue_shots, enemies.tongue_hits,
+	print("%s starts=%d hits=%d  JUMP lands=%d hits=%d  TONGUE shots=%d hits=%d bites=%d timeouts=%d" % [
+		"SPRINT(strike)" if Tuning.FEATURE_RUNNER_SPRINT else "LUNGE", enemies.lunge_starts, enemies.lunge_hits, enemies.jump_lands, enemies.jump_hits, enemies.tongue_shots, enemies.tongue_hits,
 		enemies.tongue_bites, enemies.tongue_timeouts])
-	var image: Image = get_viewport().get_texture().get_image()
+	# Headless (dummy renderer) görüntü dokusu yoktur; get_image "Parameter t is null" hatası basar.
+	var image: Image = null if DisplayServer.get_name() == "headless" else get_viewport().get_texture().get_image()
 	if image != null:
 		var path: String = ProjectSettings.globalize_path("res://").path_join(_out)
 		DirAccess.make_dir_recursive_absolute(path.get_base_dir())

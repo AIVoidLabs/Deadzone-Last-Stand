@@ -184,9 +184,11 @@ static func tier_row(tier: int) -> Dictionary:
 	return TIERS[clampi(tier, 1, TIERS.size()) - 1]
 
 
-## Satır + eksik alanlar için DEFAULTS.
+## Satır + eksik alanlar için DEFAULTS. Mermi hızı genel tempoyla (Tuning.GAME_PACE) çarpılır.
 static func get_row(id: StringName) -> Dictionary:
 	assert(TABLE.has(id), "Bilinmeyen silah: %s" % id)
 	var row: Dictionary = (TABLE[id] as Dictionary).duplicate()
 	row.merge(DEFAULTS)
+	if row.has("projectile_speed"):
+		row["projectile_speed"] = float(row["projectile_speed"]) * Tuning.GAME_PACE
 	return row
