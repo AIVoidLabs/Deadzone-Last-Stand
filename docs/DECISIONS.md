@@ -2,6 +2,18 @@
 
 Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar verilince "Açık kararlar"dan çıkarılıp tarihli bölüme yazılır.
 
+## 2026-11-20 — 7.3 beş özel tür tasarımı (Claude; Taha "komple bitir" dedi, arenada gözden geçirecek)
+
+- Taha: "devam, alt ajanlarla işi yönet, komple bitir bana öyle gel". Bu yüzden konsept onayı ara adımı atlandı; tasarım ve görsel kararları Claude verdi, hepsi bayrakla kapatılabilir.
+- Türler (tam spec `build/briefs/s73_design.md`; sayılar `EnemyData` satırlarında):
+  - **Zırhlı "Kalkan"** (`armored`): çevik kuvvet zırhı, sol kolda kırık kalkan; önden hasar ×0.25, yan/arka ×1.3 (±60°); yavaş döner (1.8 rad/sn) ve bakış yönünde yürür → oyuncu etrafından dolaşır. Saldırı kalkan darbesi.
+  - **Çığlıkçı "Çağıran"** (`screamer`): uzun boyunlu, sıska; 6–10 m mesafe korur, 6 sn'de bir 1.2 sn çığlıkla çevresine 3 yürüyen çağırır (çağrı sınırı 6, sahnede en çok 2 çığlıkçı); yakın dövüşü yok.
+  - **Tükürücü "Asitli"** (`spitter`): şiş gırtlak, yeşil parıltı; 8 m'den görünür yay çizen asit topu → 1.6 m, 5 sn asit havuzu (0.5 sn'de 4 hasar, dokunulmazlık vermez).
+  - **Taş fırlatan "Ağır Kol"** (`thrower`): dev sağ kol; 11 m'den kaya, yerde büyüyen gölge, 1.1 m alanda 14 hasar; dibindeyse dev kolla yakın vuruş.
+  - **Patlayıcı "Şişko"** (`bloater`): yuvarlak şiş gövde, parlayan kabarcıklar; yakında 0.9 sn şişer ve 3 m patlar (askere 28, zombilere 80, zincirleme); vurularak ölürse de patlar.
+- Dalgalar: zırhlı 2'den, tükürücü + patlayıcı 3'ten, taş fırlatan + çığlıkçı 4'ten, düşük ağırlıklarla (az ama zorlayıcı yönü).
+- Çalışma biçimi: Blender (konsept → oyun modeli → elle anahtarlı klipler) Opus alt ajanlar, her biri kendi `blender --background` örneğinde, paralel; kod Sonnet alt ajanlar, sırayla; her iş ayrı bir Sonnet gözden geçiriciden geçer; ana döngü doğrular.
+
 ## 2026-11-20 — V.5 kapanışı, V.6 gerekmiyor, sesler sonraya (Taha)
 
 - Taha arena düzeltmelerini (tank 2.3 m, dilci hızı + yakın vuruş, sürüklenme hatası) onayladı: "onaylıyorum, sıradaki işlemlere geçebiliriz".
