@@ -2,6 +2,14 @@
 
 Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar verilince "Açık kararlar"dan çıkarılıp tarihli bölüme yazılır.
 
+## 2026-11-20 — V.5 kapanışı, V.6 gerekmiyor, sesler sonraya (Taha)
+
+- Taha arena düzeltmelerini (tank 2.3 m, dilci hızı + yakın vuruş, sürüklenme hatası) onayladı: "onaylıyorum, sıradaki işlemlere geçebiliriz".
+- **V.6 (asker animasyon cilası) yapılmıyor:** "askerin animasyonları güzel kalsın". Dash (Roll), vurulma ve ölüm klipleri olduğu gibi kalır.
+- **Sesler:** şimdilik kalır; ileride ayrı bir oturumda ele alınır, gerekirse dışarıdan (açık lisanslı) ses indirilir — indirmeyi Taha yapar (CLAUDE.md kural 4).
+- V.5 kapanmadan önce refactor borcu alt ajanlarla temizlenir (davranış değişmez): `tongue_rope.gd`, `special_attacks.gd`, `enemy_manager.gd`.
+  Blender betikleri ve veri tabloları (`tuning.gd`, `enemy_data.gd`) bu turda bölünmez.
+
 ## 2026-11-20 — Hedef görünüm: gece şehir sokağı, daha üstten ve uzaktan kamera (Taha)
 
 - Taha oyunun bitmiş halinin nasıl görünmesini istediğini bir referans görselle gösterdi (başka bir oyunun ekran görüntüsü; repoya girmez, yerel kopya `build/reference/target_look_city_night.webp`).

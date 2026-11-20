@@ -5,6 +5,11 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 
 ## Şu an
 
+**Oturum 11 sonu (2026-11-20): Aşama V bitti, Taha'nın "devam" demesi bekleniyor.** Sıradaki: Aşama 7 kaldığı yerden (7.3 özel türler: kalan zırhlı, çığlıkçı, tükürücü, taş fırlatan, patlayıcı; DECISIONS K7). Önce 7.3 için kararlar sorulur (hangi türler, sıra, imzalar; yeni hatla: konsept → model → klipler → Taha onayı → oyun), kod yazılmaz.
+- Oturum 11'de yapılanlar: sürüklenme takılması (`bb823c3`), tank 2.3 m (`177964b`), dilci hızlandı + `FEATURE_TONGUE_MELEE` (`402a47f`, `2918639`), refactor (`4b88fbc` TongueMeshUpdater, `278e226` TongueAttack + EnemyCombat, `9c4bc1d` compactor `_melee` taşıma + 2 test). 212 test. Hepsi alt ajanlarla (Sonnet uygulayıcı + ayrı Sonnet gözden geçirici), ana döngü doğruladı.
+- Kalan küçük açıklar: tank sırt plakaları üstten tek tepelik gibi; zıplayanın şortu havada yelken gibi; ölüm pozlarında 2–4 cm gömülme; koşucuya karşı daire çizmek ayakta durmaktan kötü; bot 0 galibiyet (7.3'ten beri, 11. aşamada denge); kapanışta ara sıra "2 ObjectDB instances leaked"; Blender betikleri ve `tuning.gd`/`enemy_data.gd` 300 satırı aşıyor (bilerek bölünmedi).
+- Sesler ayrı bir oturumda ele alınacak (Taha, gerekirse dışarıdan açık lisanslı ses indirir).
+
 Oturum 8 (2026-11-19). Taha görsel kaliteden memnun değildi; yeni yön onaylandı (DECISIONS 2026-11-19). Aşama 7.3+ dondu, araya **V — Görsel yeniden yön** girdi. V.1 ve V.2 bitti. **V.4 sürüyor: Taha dilci videolarını ve gırtlak B'yi onayladı (2026-11-19). V.4 bitti: Taha oyun videolarını ve ısırma kuralını onayladı (2026-11-19). Sıradaki: V.5 (yeni hattın diğer türlere yayılması).**
 
 - **Taha (2026-11-19): "genel işleyişten memnunum".** Bu oturumun çalışma biçimi korunur: her adım tek sabitle kapatılabilir; Blender'da pozlar MCP içinde kemik konumu ölçülerek bulunur ve `look` görüntüsüyle yinelenir; oyunda ekran görüntüsü + kare özeti + video; ölçümler sayıyla raporlanır (TONGUE sayaçları); eklenen tasarım kuralı (ısırma) açıkça onaya sunulur.
@@ -128,7 +133,7 @@ Oturum 7 (2026-11-18). Aşama 7.1 onaylı. **7.2 kod bitti, Taha'nın oynayıp y
 | 5 | Dikey dilim: silah ve vuruş hissi | ✔ bitti (2026-11-17, dikey dilim onaylandı) |
 | 6 | Tur döngüsü | ✔ kod bitti 2026-11-18 (Taha'nın oynayıp onayı bekleniyor: 6.4–6.6) |
 | 7 | Silah ve zombi çeşitliliği | 7.1 ✔, 7.2–7.3 kod var, dondu (V bitince devam) |
-| V | Görsel yeniden yön | sürüyor |
+| V | Görsel yeniden yön | ✔ bitti (2026-11-20) |
 | 8 | Arena, atmosfer, ses | — |
 | 9 | Arayüz ve akış | — |
 | 10 | Kalıcı ilerleme | — |
@@ -187,10 +192,10 @@ Bitiş ölçütleri `ROADMAP.md`'de. Biten kutunun yanına tarih ve commit yazı
 ### V — Görsel yeniden yön
 - [x] V.1 Kurtulma hatası düzeltmesi — 2026-11-19 (`79ca05a`; `break_free` tek sefer, `ZombieClipData`/`PlayerClipData` satırında `loop` alanı, 3 yeni test; oyunda kurtulma sonrası koşu görüntüyle doğrulandı)
 - [x] V.2 Animasyon önizleme video aracı — 2026-11-19 (`tools/preview_movie.ps1`: kare dizisi + kare özeti + AVI; iki deneme: anim_preview ve dilci saldırısı)
-- [ ] V.3 Üslup rehberi + konsept galerisi + Blender deneme modeli
+- [x] V.3 Üslup rehberi + konsept galerisi + Blender deneme modeli — 2026-11-19 (dilci denemesi; sonuç: Tripo gerekmez, zombiler tamamen Blender'da)
 - [x] V.4 Dilci uçtan uca dikey dilim — 2026-11-19 (`571d6f2`, `25e12f1`, `09ea19e`, `4257599`; Taha oyun videosunu onayladı)
-- [ ] V.5 Yeni hattın diğer türlere yayılması
-- [ ] V.6 Asker animasyon cilası
+- [x] V.5 Yeni hattın diğer türlere yayılması — 2026-11-20 (yürüyen, koşucu, zıplayan, tank oyunda; sürü ölçüldü; arena düzeltmeleri `bb823c3`, `177964b`, `402a47f`; refactor `4b88fbc`, `278e226`, `9c4bc1d`; Taha onayladı)
+- [x] V.6 Asker animasyon cilası — 2026-11-20 yapılmadı, Taha: "askerin animasyonları güzel kalsın" (DECISIONS)
 
 ### 8 — Arena, atmosfer, ses
 - [ ] 8.1 Şehir sokağı parçaları
