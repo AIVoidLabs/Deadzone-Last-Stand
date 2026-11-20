@@ -29,7 +29,10 @@ func _ready() -> void:
 	if Tuning.FEATURE_IMPACT_SPARKS:
 		var sparks: ImpactSparks = ImpactSparks.new()
 		add_child(sparks)
-		projectiles.impact.connect(sparks.burst)
+		projectiles.impact.connect(func(at: Vector3, direction: Vector2) -> void:
+			sparks.burst(at, direction))
+		enemies.enemy_blocked.connect(func(at: Vector3, direction: Vector2, _amount: float) -> void:
+			sparks.burst(at + Vector3.UP * Tuning.PROJECTILE_HEIGHT, direction, true))
 
 	if Tuning.FEATURE_EXPLOSION_FX:
 		projectiles.explosion.connect(func(at: Vector3, radius: float) -> void:
@@ -146,6 +149,7 @@ func _add_hit_feedback(enemies: EnemyManager, camera: FollowCamera) -> void:
 		var numbers: DamageNumbers = DamageNumbers.new()
 		add_child(numbers)
 		enemies.enemy_damaged.connect(numbers.on_enemy_damaged)
+		enemies.enemy_blocked.connect(numbers.on_enemy_blocked)
 	enemies.enemy_damaged.connect(func(_at: Vector3, _dir: Vector2, _amount: float, killed: bool) -> void:
 		if not killed:
 			return
@@ -180,6 +184,8 @@ func _add_sounds(player: Player, enemies: EnemyManager, weapons: WeaponRig, proj
 		Audio.play(&"explosion"))
 	enemies.enemy_damaged.connect(func(_at: Vector3, _dir: Vector2, _amount: float, killed: bool) -> void:
 		Audio.play(SoundData.ZOMBIE_DEATH if killed else SoundData.HIT))
+	enemies.enemy_blocked.connect(func(_at: Vector3, _dir: Vector2, _amount: float) -> void:
+		Audio.play(SoundData.HIT))
 	player.event.connect(func(event_name: StringName, _data: Dictionary) -> void:
 		if event_name == &"hit":
 			Audio.play(SoundData.PLAYER_HURT)

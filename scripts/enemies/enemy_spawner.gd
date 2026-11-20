@@ -34,6 +34,8 @@ func spawn(kind: StringName, at: Vector2) -> void:
 	z.activate(Vector3(at.x, 0.0, at.y))
 	var index: int = _m._nodes.size() - 1
 	z.rotation.y = _yaw_towards(at, _m.player.position_2d())
+	if ChaseSteer.active(row):
+		_m._aim[index] = Steering.seek(at, _m.player.position_2d())
 	if Tuning.FEATURE_ZOMBIE_SPAWN_RISE:
 		_m._enter(index, ZombieRules.State.SPAWN, row["spawn_time"])
 	else:

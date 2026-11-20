@@ -16,6 +16,8 @@ signal jump_landed(at: Vector3, radius: float)
 signal lob_launched(kind: StringName, from: Vector3, dest: Vector3, flight: float, arc: float, radius: float)
 signal lob_landed(kind: StringName, at: Vector3, radius: float)
 signal acid_pool_started(at: Vector3, radius: float, time: float)
+## Zırhlıya önden gelen (azaltılmış) isabet; öldürmeyen vuruşlarda enemy_damaged yerine (kan yok: gri kıvılcım, küçük sayı).
+signal enemy_blocked(at: Vector3, direction: Vector2, amount: float)
 
 const PHYSICS_PRIORITY: int = -10
 ## Bu hızın (karesi) altındaki itme sıfırlanır.
@@ -44,6 +46,9 @@ var spit_ticks: int = 0
 var throw_shots: int = 0
 var throw_hits: int = 0
 var throw_melees: int = 0
+## Zırhlı sayaçları: önden ve yandan/arkadan isabet.
+var armor_front: int = 0
+var armor_back: int = 0
 ## Askeri dille bağlayan dilci (yoksa null); ölürse bağ çözülür.
 var latched: Zombie
 ## Debug arenası: true iken canlı zombiler donar (hareket ve saldırı durur).
@@ -76,6 +81,7 @@ var _aim: PackedVector2Array = PackedVector2Array()
 ## Silahların hedef alabildiği (1) ya da alamadığı (0: ölü, havadaki) zombiler.
 var _targetable: PackedByteArray = PackedByteArray()
 var _special: SpecialAttacks
+var _steer: ChaseSteer
 var _nodes: Array[Zombie] = []
 var _pool: EnemyPool
 var _queries: EnemyQueries
@@ -94,6 +100,7 @@ func _ready() -> void:
 	_grid = SpatialGrid.new(Vector2(-_half, -_half), Vector2(Tuning.ARENA_SIZE, Tuning.ARENA_SIZE), Tuning.GRID_CELL_SIZE)
 	_rng.randomize()
 	_special = SpecialAttacks.new(self)
+	_steer = ChaseSteer.new(self)
 	_pool = EnemyPool.new(self)
 	_queries = EnemyQueries.new(self)
 	_burn = EnemyBurn.new(self)
@@ -162,9 +169,10 @@ func find_segment_hit(a: Vector2, b: Vector2, radius: float, exclude: PackedInt3
 	return _queries.find_segment_hit(a, b, radius, exclude)
 
 
-## direction: vuruşun geldiği yön (itme bu yöne). knockback: ağırlığı 1 olana verilen ilk hız.
-func damage(index: int, amount: float, direction: Vector2 = Vector2.ZERO, knockback: float = 0.0) -> void:
-	_combat.damage(index, amount, direction, knockback)
+## direction: vuruşun geldiği yön (itme bu yöne; zırhlıda kaynak yönü = -direction). knockback: ağırlığı 1 olana verilen ilk hız.
+## dot: sürekli hasar (yanma); zırh uygulanmaz.
+func damage(index: int, amount: float, direction: Vector2 = Vector2.ZERO, knockback: float = 0.0, dot: bool = false) -> void:
+	_combat.damage(index, amount, direction, knockback, dot)
 
 
 func spawn(kind: StringName, at: Vector2) -> void:
@@ -228,10 +236,12 @@ func _move(delta: float) -> void:
 		var dir: Vector2 = Steering.seek(p, target)
 		var speed: float = _speed[i]
 		var special: bool = SpecialAttacks.is_special(_rows[i])
+		var steer: bool = false
 		if special and SpecialAttacks.acts_in(state):
 			p = _special.act(i, state, p, dir, delta, target, target_vel)
 		elif ZombieRules.can_move(state):
-			var vel: Vector2 = dir * speed
+			steer = ChaseSteer.active(_rows[i])
+			var vel: Vector2 = (_steer.heading(i, _rows[i], dir, delta) if steer else dir) * speed
 			if Tuning.FEATURE_SEPARATION:
 				vel += Steering.separation(i, _pos, _grid, _radius[i] * 2.0) * Tuning.ENEMY_SEPARATION_STRENGTH
 			p += vel.limit_length(speed * Tuning.ENEMY_MAX_SPEED_FACTOR) * delta
@@ -268,8 +278,9 @@ func _move(delta: float) -> void:
 		if state != ZombieRules.State.CHASE:
 			continue
 		# Yalnız kovalarken döner; hazırlanırken yönü kilitlidir, yana kaçan asker ıskalatır.
-		if dir != Vector2.ZERO:
-			node.rotation.y = atan2(dir.x, dir.y)
+		var face_dir: Vector2 = _steer.facing(i) if steer else dir
+		if face_dir != Vector2.ZERO:
+			node.rotation.y = atan2(face_dir.x, face_dir.y)
 		if windup_attack and ZombieRules.wants_attack(dist, reach, SpecialAttacks.start_range(_rows[i])):
 			var windup: float = _rows[i]["attack_windup"]
 			if special:

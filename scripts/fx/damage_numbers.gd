@@ -16,6 +16,9 @@ const PIXEL_SIZE: float = 0.0042
 const KILL_SCALE: float = 1.35
 const HIT_COLOR: Color = Color(1.0, 0.97, 0.9)
 const KILL_COLOR: Color = Color(1.0, 0.68, 0.2)
+## Zırhtan sekmiş (azaltılmış) vuruş: gri ve küçük.
+const BLOCKED_COLOR: Color = Color(0.7, 0.72, 0.75)
+const BLOCKED_SCALE: float = 0.7
 const OUTLINE_COLOR: Color = Color(0.08, 0.05, 0.05)
 
 var _labels: Array[Label3D] = []
@@ -66,13 +69,21 @@ func _process(delta: float) -> void:
 
 
 func on_enemy_damaged(at: Vector3, _direction: Vector2, amount: float, killed: bool) -> void:
+	_show(at, amount, KILL_COLOR if killed else HIT_COLOR, KILL_SCALE if killed else 1.0)
+
+
+func on_enemy_blocked(at: Vector3, _direction: Vector2, amount: float) -> void:
+	_show(at, amount, BLOCKED_COLOR, BLOCKED_SCALE)
+
+
+func _show(at: Vector3, amount: float, color: Color, size: float) -> void:
 	var i: int = _next
 	_next = (_next + 1) % _labels.size()
 	var label: Label3D = _labels[i]
 	label.text = str(roundi(amount))
-	label.modulate = KILL_COLOR if killed else HIT_COLOR
+	label.modulate = color
 	label.outline_modulate = OUTLINE_COLOR
-	_size[i] = KILL_SCALE if killed else 1.0
+	_size[i] = size
 	_start[i] = at + Vector3(randf_range(-JITTER, JITTER), HEIGHT, randf_range(-JITTER, JITTER))
 	_age[i] = 0.0
 	label.position = _start[i]

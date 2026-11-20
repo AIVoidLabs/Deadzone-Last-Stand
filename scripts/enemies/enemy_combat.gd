@@ -4,6 +4,8 @@ extends RefCounted
 ## Dizilere yöneticinin üzerinden erişir; sinyalleri ve sayaçları yöneticide yayar.
 
 var _m: EnemyManager
+## Son _armor çağrısının hasar çarpanı.
+var _armor_factor: float = 1.0
 
 
 func _init(manager: EnemyManager) -> void:
@@ -11,15 +13,22 @@ func _init(manager: EnemyManager) -> void:
 
 
 ## direction: vuruşun geldiği yön (itme bu yöne). knockback: ağırlığı 1 olana verilen ilk hız.
-func damage(index: int, amount: float, direction: Vector2, knockback: float) -> void:
+func damage(index: int, amount: float, direction: Vector2, knockback: float, dot: bool = false) -> void:
 	var state: ZombieRules.State = _m._state[index] as ZombieRules.State
 	if _m._alive[index] == 0 or not ZombieRules.can_take_damage(state):
 		return
+	var row: Dictionary = _m._rows[index]
+	var blocked: bool = false
+	if not dot and Tuning.FEATURE_ZOMBIE_ARMOR and row.has("armor_front_factor"):
+		blocked = _armor(index, row, direction)
+		amount *= _armor_factor
 	_m._hp[index] -= amount
 	_m._nodes[index].notify_hit(amount)
-	var row: Dictionary = _m._rows[index]
 	var at: Vector3 = Vector3(_m._pos[index].x, 0.0, _m._pos[index].y)
-	_m.enemy_damaged.emit(at, direction, amount, _m._hp[index] <= 0.0)
+	if blocked and _m._hp[index] > 0.0:
+		_m.enemy_blocked.emit(at, direction, amount)
+	else:
+		_m.enemy_damaged.emit(at, direction, amount, _m._hp[index] <= 0.0)
 	if _m._hp[index] <= 0.0:
 		kill(index, Knockback.impulse(direction, knockback * Tuning.ZOMBIE_DEATH_KNOCKBACK_FACTOR, row["weight"]))
 		return
@@ -27,6 +36,20 @@ func damage(index: int, amount: float, direction: Vector2, knockback: float) -> 
 		_m._knock[index] += Knockback.impulse(direction, knockback, row["weight"])
 	if Tuning.FEATURE_STAGGER and float(row["stagger_time"]) > 0.0 and ZombieRules.can_stagger(state):
 		_m._enter(index, ZombieRules.State.STAGGER, row["stagger_time"], true)
+
+
+## Zırhlıya gelen vuruş: çarpanı _armor_factor'a yazar, önden mi döner; sayaçlar.
+func _armor(index: int, row: Dictionary, direction: Vector2) -> bool:
+	var half: float = deg_to_rad(float(row["armor_front_half_deg"]))
+	var facing: Vector2 = _m._aim[index]
+	var to_source: Vector2 = -direction
+	_armor_factor = ArmorRules.factor(facing, to_source, half, float(row["armor_front_factor"]), float(row["armor_back_factor"]))
+	var front: bool = ArmorRules.is_front(facing, to_source, half)
+	if front:
+		_m.armor_front += 1
+	elif to_source != Vector2.ZERO:
+		_m.armor_back += 1
+	return front
 
 
 ## Süresi dolan durumdan çıkar; hazırlık bittiyse vuruşu uygular. Dönüş: yeni durum.

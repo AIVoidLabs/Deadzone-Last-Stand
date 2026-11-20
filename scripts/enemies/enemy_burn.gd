@@ -29,7 +29,7 @@ func tick(delta: float) -> void:
 		_m._burn_left[i] = step["left"]
 		_m._burn_acc[i] = step["acc"]
 		for _t in int(step["ticks"]):
-			_m.damage(i, _m._burn_dps[i] * Tuning.BURN_TICK_INTERVAL, Vector2.from_angle(_m._rng.randf() * TAU))
+			_m.damage(i, _m._burn_dps[i] * Tuning.BURN_TICK_INTERVAL, Vector2.from_angle(_m._rng.randf() * TAU), 0.0, true)
 			if _m._alive[i] == 0:
 				break
 		if _m._alive[i] != 0 and _m._burn_left[i] <= 0.0:

@@ -29,6 +29,7 @@ const ROWS: Dictionary = {
 		"height": 1.9,
 		"color": Color(0.2, 0.28, 0.5),
 		"tint": Color(0.45, 0.55, 1.0),
+		"steer": &"armor",
 		"armor_front_half_deg": 60.0,
 		"armor_front_factor": 0.25,
 		"armor_back_factor": 1.3,
