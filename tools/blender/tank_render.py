@@ -1,8 +1,8 @@
-﻿"""Tank zombi konsept görselleri (V.5 v1): dizi, imza pozu, oyun kamerası, siluet, yakın.
+﻿"""Tank zombi konsept görselleri (V.5 v2): dizi, imza pozu, oyun kamerası, siluet, yakın.
 
 Arka planda tümü (her görüntü kendi sahnesini kurar):
     blender --background --python tools/blender/tank_render.py [-- lineup signature gamecam silhouette close] [--samples=N]
-Çıktılar: docs/concept/tank_v1_{lineup,signature,gamecam,silhouette,close}.png, ara kareler build/shots/.
+Çıktılar: docs/concept/tank_v2_{lineup,signature,gamecam,silhouette,close}.png, ara kareler build/shots/.
 """
 import importlib
 import math
@@ -21,7 +21,7 @@ import zombie_kit as kit  # noqa: E402
 importlib.reload(bt)
 CONCEPT_DIR = os.path.join(bt.REPO, "docs", "concept")
 SHOTS_DIR = os.path.join(bt.REPO, "build", "shots")
-VERSION = "v1"
+VERSION = "v2"
 SAMPLES = 64
 GAMECAM_PITCH = 55.0
 GAMECAM_DIST = 17.0
