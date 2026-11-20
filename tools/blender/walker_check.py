@@ -73,3 +73,39 @@ def scan(rig, mesh, fn, times) -> list:
         set_pose(rig, fn(t, rig))
         out.append((t,) + low_where(mesh))
     return out
+
+
+def walk_slip(rig, mesh, walk_fn, feet_fn, cycle: float, speed: float) -> dict:
+    """Yürüyüşte basan ayağın kayması (m/döngü, ayak başına): kök `speed` ile -Y'ye ilerlerken, yerdeki
+    ayağın en alt köşesinin bir sonraki karedeki dünya yer değişimi toplanır. feet_fn(evre, rig) -> (sol, sağ)
+    ayak hedefi; lift > 0 olan kareler salınımdır, sayılmaz. Örnek:
+        wk.walk_slip(rig, mesh, wa.walk, wa.walk_feet, wa.WALK_CYCLE, wa.walk_speed(rig))"""
+    rig.arm.animation_data.action = None
+    inv = rig.arm.matrix_world.inverted() @ mesh.matrix_world
+    side_of = {}
+    for v in mesh.data.vertices:
+        if v.groups:
+            name = mesh.vertex_groups[max(v.groups, key=lambda g: g.weight).group].name
+            if name[:-2] in ("foot", "ball", "calf"):
+                side_of.setdefault(name[-1], []).append(v.index)
+    frames = []
+    for f in range(round(cycle * wp.FPS) + 1):
+        t = f / wp.FPS
+        set_pose(rig, walk_fn(t, rig))
+        lf, rf = feet_fn((t / cycle) % 1.0, rig)
+        ev = mesh.evaluated_get(bpy.context.evaluated_depsgraph_get())
+        me = ev.to_mesh()
+        co = [inv @ v.co for v in me.vertices]
+        ev.to_mesh_clear()
+        frames.append((t, co, {"l": lf[2], "r": rf[2]}))
+    out = {}
+    for side, idx in side_of.items():
+        slip = 0.0
+        for (ta, ca, la), (tb, cb, lb) in zip(frames[:-1], frames[1:]):
+            if la[side] > 1e-6 or lb[side] > 1e-6:
+                continue
+            i = min(idx, key=lambda i: ca[i].z)
+            slip += wp.Vector((cb[i].x - ca[i].x, (cb[i].y - speed * tb) - (ca[i].y - speed * ta), 0.0)).length
+        out[side] = slip
+    print("WALK SLIP", {k: "%.1f cm" % (v * 100) for k, v in out.items()})
+    return out

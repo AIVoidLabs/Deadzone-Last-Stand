@@ -24,72 +24,116 @@ from walker_pose import blend, cyc, merge, smooth, track
 TAU = math.tau
 
 # --- yürüyüş ---------------------------------------------------------------------
-WALK_CYCLE = 1.1          # sn, iki adım (sağ taşır, sol sürünür)
-WALK_SPEED = 0.75         # m/sn (Office ölçeğinde; rig.s ile ölçeklenir): basan ayağın geri kayma hızı
-R_STANCE = 0.62           # sağ ayağın yerde kaldığı evre payı
-L_DRAG = (0.05, 0.55)     # sol ayağın süründüğü evre aralığı (gerisi basış)
-R_CENTER = -0.06          # sağ parmak ekleminin basış ortası (iskelet Y, m)
-L_CENTER = 0.03
-R_LIFT = 0.07             # sağ ayağın salınımda kalkışı (m)
-L_SCRAPE = 0.010          # sol ayak sürünürken en çok bu kadar kalkar
-CROUCH = 0.015            # pelvis yürürken bu kadar alçak (dizler bükük)
+# Oyunda kök GAME_SPEED ile ilerler ve model GAME_HEIGHT boyuna ölçeklenir (ZombieVisual: scale = boy / ağ
+# boyu). Basan ayak model uzayında GAME_SPEED * ağ boyu / GAME_HEIGHT hızla geri kayar; dünyada durur.
+# Bu hız bacakları için koşu hızıdır (Froude ~0.85): uzun adımlı, öne düşer gibi bir sendeleme. Derin
+# çöküş ve öne eğik gövde erimi açar; sağ ayak topuktan basıp uzun iter, sol ayak parmak ucunda kısa basar
+# ve salınımda yerde sürünür (aksak). Döngü kare sayısı tam sayıdır (0.70 sn = 21 kare), son kare ilk kare.
+GAME_SPEED = 2.6          # = EnemyData walker speed (m/sn)
+GAME_HEIGHT = 1.6         # = EnemyData walker height (m)
+REF_HEIGHT = 1.731        # Office ağ boyu; ağ bulunamazsa rig.s ile ölçeklenir
+WALK_CYCLE = 0.70         # sn, iki adım
+R_STANCE = (0.0, 0.53)    # sağ ayağın yerde kaldığı evre aralığı (topuk -> parmak)
+L_STANCE = (0.48, 0.98)   # sol ayağın basışı (parmak ucunda); gerisi sürünen salınım
+R_CENTER = 0.04           # basış ortası, parmak ekleminin dinlenmeye göre yeri (m, +Y geri): eğik gövde
+L_CENTER = 0.05           # ayağı geride bırakır
+R_LIFT = 0.13             # sağ salınımda kalkış (m)
+L_SCRAPE = 0.034          # sol salınımda kalkış: parmak ucu yere sürtünür
+CROUCH = 0.10             # yürürken pelvis bu kadar alçak (dizler bükük, erim açılır)
+LIFTOFF_FOLLOW = 0.4      # kalkışta ayak basış hızının bu payıyla geri gitmeye devam eder (diz aşırı açılmasın)
+LEAN = 14.0               # pelvisin öne eğimi (derece); omurga üstüne ekler
+
+
+def walk_speed(rig) -> float:
+    """Basan ayağın model uzayındaki geri kayma hızı (m/sn): dünyada kök hızına eşit."""
+    h = getattr(rig, "mesh_h", None) or REF_HEIGHT * rig.s
+    return GAME_SPEED * h / GAME_HEIGHT
+
+
+def _span(phi: float, rng) -> float:
+    """Evrenin aralıktaki yeri 0..1 (aralık dışındaysa <0 ya da >1); 1'i aşan aralık sarar."""
+    return ((phi - rng[0]) % 1.0) / (rng[1] - rng[0])
+
+
+def _hermite(p0: float, p1: float, m0: float, m1: float, u: float) -> float:
+    """Salınım yolu, uç hızları m0/m1. İnişte m1 = basışın hızı: ayak dünyada durarak yere değer."""
+    u2, u3 = u * u, u * u * u
+    return (2 * u3 - 3 * u2 + 1) * p0 + (u3 - 2 * u2 + u) * m0 + (-2 * u3 + 3 * u2) * p1 + (u3 - u2) * m1
+
+
+def _foot_track(phi: float, rig, rng, center: float) -> tuple:
+    """Basışta ayak sabit hızla geri kayar (dünyada durur); salınımda Hermite ile öne döner. (y, u, yerde)."""
+    v = walk_speed(rig) * WALK_CYCLE              # bir döngüde kat edilen yol (model uzayı)
+    dur = rng[1] - rng[0]
+    reach = v * dur
+    u = _span(phi, rng)
+    if u <= 1.0:
+        return center * rig.s - reach / 2 + reach * u, u, True
+    w = (u - 1.0) * dur / (1.0 - dur)             # salınım 0..1
+    m = v * (1.0 - dur)                           # basış hızı salınım biriminde
+    return _hermite(center * rig.s + reach / 2, center * rig.s - reach / 2, LIFTOFF_FOLLOW * m, m, w), w, False
 
 
 def walk_feet(phi: float, rig) -> tuple:
     s = rig.s
-    v = WALK_SPEED * s * WALK_CYCLE        # bir döngüde kat edilen yol
-    r_range = v * R_STANCE
-    if phi < R_STANCE:
-        ry, rl = R_CENTER * s - r_range / 2 + v * phi, 0.0
-    else:
-        u = (phi - R_STANCE) / (1.0 - R_STANCE)
-        ry, rl = R_CENTER * s + r_range / 2 - r_range * smooth(u), R_LIFT * s * math.sin(math.pi * u) ** 1.3
-    r_pitch = cyc(phi, [(0.0, -14), (0.08, 0), (0.42, 2), (0.62, 34), (0.8, 6), (0.95, -16)])
-    d0, d1 = L_DRAG
-    l_range = v * (1.0 - (d1 - d0))
-    if d0 <= phi < d1:
-        u = (phi - d0) / (d1 - d0)
-        ly = L_CENTER * s + l_range / 2 - l_range * smooth(u)
-        ll = L_SCRAPE * s * math.sin(math.pi * u) ** 2
-        ldx = -0.02 * s * math.sin(math.pi * u)
-    else:
-        psi = (phi - d1) % 1.0
-        ly, ll, ldx = L_CENTER * s - l_range / 2 + v * psi, 0.0, 0.0
-    l_pitch = cyc(phi, [(0.05, 40), (0.3, 46), (0.55, 30), (0.7, 18), (0.85, 20), (0.98, 34)])
-    r_foot = (ry - rig.legs["r"]["ball0"].y, r_pitch, rl, -0.015 * s)
-    l_foot = (ly - rig.legs["l"]["ball0"].y, l_pitch, ll, 0.015 * s + ldx)
+    ry, ru, r_down = _foot_track(phi, rig, R_STANCE, R_CENTER)
+    if r_down:      # topuktan basar, tabana iner, topuğu kaldırıp parmaktan iter
+        r_pitch, rl = _ease(ru, [(0.0, -16.0), (0.14, 0.0), (0.42, 0.0), (0.78, 14.0), (1.0, 40.0)]), 0.0
+    else:           # parmak önde kalkar, diz yüksek, inişe doğru parmak kalkık
+        r_pitch = _ease(ru, [(0.0, 40.0), (0.3, 30.0), (0.7, -4.0), (1.0, -16.0)])
+        rl = R_LIFT * s * math.sin(math.pi * ru) ** 1.2 * (1.0 - 0.25 * ru)
+    ly, lu, l_down = _foot_track(phi, rig, L_STANCE, L_CENTER)
+    if l_down:      # parmak ucunda basar, topuk hiç tam inmez
+        l_pitch, ll, ldx = _ease(lu, [(0.0, 26.0), (0.35, 20.0), (0.7, 26.0), (1.0, 44.0)]), 0.0, 0.0
+    else:           # sürünen salınım: parmak aşağıda, yere sürtünür, ayak hafif içe savrulur
+        l_pitch = _ease(lu, [(0.0, 44.0), (0.4, 42.0), (0.8, 32.0), (1.0, 26.0)])
+        ll = L_SCRAPE * s * math.sin(math.pi * lu) ** 1.5
+        ldx = -0.03 * s * math.sin(math.pi * lu)
+    r_foot = (ry - rig.legs["r"]["ball0"].y, r_pitch, rl, -0.02 * s)
+    l_foot = (ly - rig.legs["l"]["ball0"].y, l_pitch, ll, 0.02 * s + ldx)
     return l_foot, r_foot
+
+
+def _ease(u: float, keys) -> float:
+    """Açık uçlu eğri (sarmaz): keys [(0..1, değer)] arasında Catmull-Rom, uçlarda tutar."""
+    return track(u, [(k, {"v": {"x": val}}) for k, val in keys])["v"]["x"]
 
 
 def walk(t: float, rig) -> dict:
     phi = (t / WALK_CYCLE) % 1.0
     s = rig.s
-    dz = cyc(phi, [(0.0, -0.025), (0.12, -0.035), (0.32, 0.012), (0.55, -0.01), (0.72, -0.05), (0.9, -0.005)])
-    sway = cyc(phi, [(0.0, -0.01), (0.3, -0.045), (0.55, 0.0), (0.75, 0.055), (0.95, 0.015)])
-    roll = cyc(phi, [(0.0, 0.0), (0.3, -4.0), (0.75, 6.0), (0.95, 2.0)])
-    yaw = cyc(phi, [(0.0, 6.0), (0.31, 0.0), (0.62, -6.0), (0.81, 0.0)])
-    lurch = cyc(phi - 0.08, [(0.1, 2.0), (0.45, -3.0), (0.8, 10.0)])      # gövde düşük omuza yalpalar
-    nod = cyc(phi - 0.05, [(0.1, 6.0), (0.35, -2.0), (0.8, 8.0), (0.95, 0.0)])
-    flop = cyc(phi - 0.12, [(0.15, -6.0), (0.6, 1.0), (0.9, 10.0)])
+    # iki adım: sağ basış 0, sol basış ~0.47. Basışta çöker (düşüşü yakalar), basış ortasında kalkar;
+    # sol (aksak) basışta daha derin çöker.
+    dz = cyc(phi, [(0.02, -0.035), (0.22, 0.012), (0.42, -0.01), (0.52, -0.05), (0.72, -0.008), (0.92, -0.012)])
+    sway = cyc(phi, [(0.05, -0.012), (0.28, -0.04), (0.5, -0.005), (0.75, 0.04), (0.97, 0.01)])
+    surge = cyc(phi, [(0.0, 0.02), (0.25, -0.02), (0.5, 0.025), (0.75, -0.025)])   # öne düşüp yakalanma
+    roll = cyc(phi, [(0.0, 1.0), (0.25, -5.0), (0.5, 1.0), (0.75, 7.0)])
+    yaw = cyc(phi, [(0.0, 10.0), (0.28, 0.0), (0.5, -9.0), (0.78, 0.0)])
+    fall = cyc(phi - 0.04, [(0.0, 5.0), (0.25, -2.0), (0.5, 7.0), (0.75, -2.0)])      # basışta gövde öne düşer
+    lurch = cyc(phi - 0.08, [(0.1, 3.0), (0.4, -3.0), (0.8, 9.0)])                  # düşük omuza yalpalar
+    nod = cyc(phi - 0.1, [(0.05, 7.0), (0.3, -3.0), (0.55, 9.0), (0.8, -2.0)])
+    flop = cyc(phi - 0.14, [(0.15, -7.0), (0.6, 2.0), (0.9, 11.0)])
     l_foot, r_foot = walk_feet(phi, rig)
     pose = {
-        "pelvis": {"loc": (sway * s, 0.0, (dz - CROUCH) * s), "rot": (5.0, roll, yaw)},
-        "spine_01": {"rot": (7.0, -0.5 * roll, -0.6 * cyc(phi - 0.06, [(0.0, 6.0), (0.31, 0.0), (0.62, -6.0), (0.81, 0.0)]))},
-        "spine_02": {"rot": (5.0, lurch, -0.3 * yaw)},
-        "spine_03": {"rot": (2.0, 0.6 * lurch, 0.0)},
-        "neck_01": {"rot": (-0.4 * nod, 0.3 * flop, 0.0)},
-        "Head": {"rot": (nod, flop, 2.0 * math.sin(TAU * phi))},
-        "jaw": {"rot": (cyc(phi - 0.1, [(0.1, 6.0), (0.4, 1.0), (0.8, 9.0), (0.95, 3.0)]), 0.0, 0.0)},
+        "pelvis": {"loc": (sway * s, surge * s, (dz - CROUCH) * s), "rot": (LEAN + 0.4 * fall, roll, yaw)},
+        "spine_01": {"rot": (8.0 + 0.4 * fall, -0.5 * roll, -0.5 * cyc(phi - 0.06, [(0.0, 10.0), (0.28, 0.0), (0.5, -9.0), (0.78, 0.0)]))},
+        "spine_02": {"rot": (6.0 + 0.3 * fall, lurch, -0.3 * yaw)},
+        "spine_03": {"rot": (3.0, 0.6 * lurch, 0.0)},
+        "neck_01": {"rot": (-10.0 - 0.4 * nod, 0.3 * flop, 0.0)},
+        "Head": {"rot": (-8.0 + nod, flop, 3.0 * math.sin(TAU * phi))},
+        "jaw": {"rot": (cyc(phi - 0.1, [(0.05, 8.0), (0.3, 2.0), (0.55, 11.0), (0.8, 3.0)]), 0.0, 0.0)},
         "ik_l": {"foot": l_foot},
         "ik_r": {"foot": r_foot},
     }
-    # kollar yarı kalkık; bacakların tersine, gecikmeli ve gevşek salınır
+    # kollar öne uzanık kalır: gövdenin öne eğimi omuzda geri alınır (imza duruşu), gevşek ve gecikmeli salınır
+    lean = LEAN + 8.0 + 6.0 + 3.0
     for side, ph, sy in (("l", 0.0, 1.0), ("r", 0.5, -1.0)):
-        sw = cyc(phi - 0.15 + ph, [(0.0, -7.0), (0.35, 3.0), (0.6, 8.0), (0.9, -6.0)])
+        sw = cyc(phi - 0.15 + ph, [(0.0, -6.0), (0.35, 3.0), (0.6, 7.0), (0.9, -5.0)])
+        bob = 0.5 * cyc(phi - 0.1, [(0.0, 6.0), (0.25, -3.0), (0.5, 6.0), (0.75, -3.0)])   # basışta kollar sarkar
         pose["clavicle_" + side] = {"rot": (0.0, -sy * 0.4 * lurch, 0.0)}
-        pose["upperarm_" + side] = {"rot": (sw, 0.0, 0.0)}
+        pose["upperarm_" + side] = {"rot": (-0.75 * lean + sw + bob, 0.0, 0.0)}
         pose["lowerarm_" + side] = {"rot": (0.6 * cyc(phi - 0.3 + ph, [(0.0, -7.0), (0.35, 3.0), (0.6, 8.0), (0.9, -6.0)]), 0.0, 0.0)}
-        pose["hand_" + side] = {"rot": (cyc(phi - 0.4 + ph, [(0.0, -8.0), (0.5, 8.0)]), 0.0, 0.0)}
+        pose["hand_" + side] = {"rot": (cyc(phi - 0.4 + ph, [(0.0, -10.0), (0.5, 10.0)]), 0.0, 0.0)}
     return pose
 
 
@@ -245,6 +289,16 @@ CLIPS = [("idle_Loop", idle, IDLE_CYCLE), ("walk_Loop", walk, WALK_CYCLE), ("win
          ("attack", attack, ATTACK_TIME), ("stagger", stagger, STAGGER_TIME)]
 
 
+def mesh_height(arm):
+    """İskelete bağlı ağın dinlenme boyu (m; Godot'taki AABB üstü). Ağ yoksa None."""
+    import bpy
+    for obj in bpy.data.objects:
+        if obj.type == "MESH" and any(m.type == "ARMATURE" and m.object == arm for m in obj.modifiers):
+            mw = arm.matrix_world.inverted() @ obj.matrix_world
+            return max((mw @ v.co).z for v in obj.data.vertices)
+    return None
+
+
 def build_all(arm) -> list:
     import bpy
     bpy.context.scene.render.fps = wp.FPS
@@ -255,10 +309,11 @@ def build_all(arm) -> list:
     import walker_falls
     importlib.reload(walker_falls)
     rig = wp.Rig(arm)
+    rig.mesh_h = mesh_height(arm)
     names = []
     for name, fn, length in CLIPS + walker_falls.CLIPS:
         wp.build_clip(rig, name, fn, length)
         names.append(name)
     arm.animation_data.action = bpy.data.actions[CLIPS[0][0]]
-    print("WALKER ANIMS", names, "IK clamped frames:", rig.clamped)
+    print("WALKER ANIMS", names, "IK clamped frames:", rig.clamped, "walk speed %.3f" % walk_speed(rig))
     return names
