@@ -9,6 +9,9 @@ Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar v
   terk edilmiş arabalar, tuğla binalar ve yangın merdivenleri, havada kıvılcım ve duman; sıcak turuncu (ateş) ile soğuk yeşil/mavi (neon) karşıtlığı.
   Kamera daha yüksek ve uzak; karakterler küçük, **çevre ana unsur**.
 - Taha'nın gerekçesi: üstten/uzaktan kamera asker ve zombi modellerindeki eksikleri de gizler. Taha: "çevre özellikle çok önemli".
+- **Öncelik (Taha, aynı gün):** birebir kopya değil, buna benzer bir sonuç bekleniyor; "beni çok içine çekti, bu referansı unutmayalım".
+  **Ortam kalitesi gerekirse zombi sayısından önce gelir:** zombiler daha zorlayıcı yapılıp sayıları azaltılabilir (sürü bütçesi ve dalga
+  üst sınırları bu yönde değişebilir; karar Aşama 8 ölçümleriyle verilir).
 - Durum: **yön kaydı, henüz iş yok.** Aşama 8 (arena, atmosfer) bu referansa göre planlanacak; kamera açısı/uzaklığı denemesi oraya ya da daha
   önce bir küçük denemeye girer. Özgünlük: referansın ruh hali alınır; o oyunun sahnesi, tabelaları ve görünüşü kopyalanmaz.
 
