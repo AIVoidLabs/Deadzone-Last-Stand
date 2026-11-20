@@ -17,6 +17,13 @@ const MODELS: Dictionary = {
 ## satırdaki anim_* adları bu kliplerdir. Birden çok ağ = çeşit (ModelVariants).
 const VC_MODELS: Dictionary = {
 	&"dilci": preload("res://assets/models/characters/zombie_dilci.glb"),
+	# Dizi = ayrı dosyalarda çeşitler; örnek başına biri rastgele seçilir.
+	&"walker_v": [
+		preload("res://assets/models/characters/zombie_walker_office.glb"),
+		preload("res://assets/models/characters/zombie_walker_worker.glb"),
+		preload("res://assets/models/characters/zombie_walker_skinny.glb"),
+		preload("res://assets/models/characters/zombie_walker_civilian.glb"),
+	],
 }
 const VC_SHADER: Shader = preload("res://assets/shaders/zombie_vc.gdshader")
 ## Örnek başına hafif ton farkı (±); sürüde aynı ağ aynı görünmesin.
@@ -118,13 +125,10 @@ func _on_state_changed(new_state: int, old_state: int) -> void:
 		ZombieRules.State.CHASE:
 			_clips.start_walk()
 		ZombieRules.State.WINDUP:
-			if _clips.own_clips:
-				# Elle anahtarlanmış hazırlık klibi hazırlık süresine sığar.
-				_clips.play_timed(&"anim_attack", 0.0, _body.state_duration)
-			elif _is_special():
+			if _is_special() and not _clips.own_clips:
 				_clips.play_loop(&"anim_attack", HOLD_ANIM_SPEED)
 			else:
-				# Klipteki vuruş anı hazırlığın sonuna denk gelsin.
+				# Klipteki vuruş anı (satırda varsa) hazırlığın sonuna denk gelir; 0 ise klip bütünüyle sığar.
 				_clips.play_timed(&"anim_attack", _clips.row.get("attack_anim_hit_time", 0.0), _body.state_duration)
 		ZombieRules.State.LUNGE:
 			_clips.play_loop(&"anim_lunge", LUNGE_ANIM_SPEED)
@@ -146,7 +150,10 @@ func _on_state_changed(new_state: int, old_state: int) -> void:
 		ZombieRules.State.STAGGER:
 			_clips.play_timed(&"anim_stagger", 0.0, _body.state_duration)
 		ZombieRules.State.RECOVER:
-			if _clips.own_clips:
+			if _clips.own_clips and _clips.row.get("recover_finishes_attack", false) and _clips.animation != null:
+				# Saldırı klibi kendi hızında sonuna dek tamamlanır.
+				_clips.animation.speed_scale = 1.0
+			elif _clips.own_clips:
 				_clips.play_loop(&"anim_idle", 1.0)
 			elif _is_special():
 				_clips.play_loop(&"anim_attack", HOLD_ANIM_SPEED)
@@ -194,7 +201,9 @@ func _build_model(model_kind: StringName) -> void:
 
 ## Yeni hat: çeşitlerden biri kalır, köşe renkli ortak malzeme, modelin kendi AnimationPlayer'ı.
 func _build_vc_model(model_kind: StringName) -> void:
-	var model: Node3D = (VC_MODELS[model_kind] as PackedScene).instantiate() as Node3D
+	var source: Variant = VC_MODELS[model_kind]
+	var scene: PackedScene = (source as Array).pick_random() as PackedScene if source is Array else source as PackedScene
+	var model: Node3D = scene.instantiate() as Node3D
 	add_child(model)
 	var mesh: MeshInstance3D = ModelVariants.keep(model, randi())
 	mesh.material_override = _vc_shared_material()

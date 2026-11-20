@@ -45,6 +45,20 @@ const _WALKER_ROW: Dictionary = {
 	"anim_spawn": [&"spawn"],
 }
 
+# Yeni yürüyen (Tuning.FEATURE_WALKER_MODEL): 4 çeşit GLB, kendi klipleri (ZombieVisual.VC_MODELS[walker_v]).
+# Satırın üstüne yazılır; ölüm klipleri yalnız death_a/b. Vuruş anı attack_anim_hit_time (0.7 sn), saldırı
+# klibi RECOVER'da sonuna dek tamamlanır.
+const _WALKER_LOOK_V: Dictionary = {
+	"model": &"walker_v",
+	"anim_idle": [&"idle"],
+	"anim_walk": [&"walk"],
+	"anim_attack": [&"attack"],
+	"anim_stagger": [&"stagger"],
+	"anim_death": [&"death_a", &"death_b"],
+	"anim_spawn": [&"spawn"],
+	"recover_finishes_attack": true,
+}
+
 const _OVERRIDES: Dictionary = {
 	# Zıplayan: askere 7 m kala çömelir, yerde işaret çıkar (ilk 0.4 sn askeri önden izler, son 0.3 sn kilitli),
 	# yay çizerek havalanıp işaretli yere iner. Havadayken vurulamaz. İniş: alan hasarı (land_radius).
@@ -184,7 +198,11 @@ static var TABLE: Dictionary = _build()
 
 
 static func _build() -> Dictionary:
-	var table: Dictionary = {&"walker": _WALKER_ROW}
+	var walker: Dictionary = _WALKER_ROW
+	if Tuning.FEATURE_WALKER_MODEL:
+		walker = _WALKER_ROW.duplicate()
+		walker.merge(_WALKER_LOOK_V, true)
+	var table: Dictionary = {&"walker": walker}
 	for id: StringName in _OVERRIDES:
 		var row: Dictionary = _WALKER_ROW.duplicate()
 		row.merge(_OVERRIDES[id], true)
