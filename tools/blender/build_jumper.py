@@ -1,17 +1,19 @@
-"""Zıplayan zombi konsepti v1 — Aşama V.5, tamamen Blender.
+"""Zıplayan zombi konsepti v2 — Aşama V.5, tamamen Blender.
 
-İmza: iri uyluklar. Derin çömelir, yay çizerek sıçrar, indiği yerde şok yaratır.
-Siluet: dev uyluk ve baldır, yaylı / ters bükük bacak (topuk havada, parmak ucunda durur),
-geniş açık duruş, küçük kambur üst gövde ve küçük kafa, yere uzanan uzun ince kollar.
-Yukarıdan bakınca alt gövde kütlesi (yana açılmış uyluklar) okunur.
+İmza: kaslı, yaylı bacaklar. Derin çömelir, yay çizerek sıçrar, indiği yerde şok yaratır.
+Siluet (v1'den korunan): alçak kemer, kambur küçük üst gövde, yana açık dev alt gövde.
+v2 düzeltmeleri: bacak balon/armut değil kas grupları (ön uyluk üç baş, iç uyluk, hamstring, kalça,
+diz kapağı, iki başlı sıkı baldır, ince aşil ve bilek); kollar kısaldı ve kaslandı (deltoid, biseps,
+triseps, önkol; dirsekte incelir); bacak insansı: eklem sırası değişmez, topuk yalnız ~6 cm havada;
+ayakta beş parmak ve topuk; kendi kafası (jumper_head); kargo pantolon çıktı.
 
-Gövde: iskelet noktaları + skin modifier + voxel remesh (zombie_kit). Kafa: walker_head (küçültülmüş,
-yukarı bakar). Kıyafet: jumper_clothes.py. Görseller: jumper_render.py.
+Gövde: iskelet noktaları + skin modifier (kemik hacmi) + ayrı kas elipsoitleri (jumper_muscles),
+birleştirilip voxel remesh (kaslar arası oluk kalır). Kıyafet: jumper_clothes.py. Görseller: jumper_render.py.
 
 Çalıştırma (arka plan; canlı MCP değil):
     blender --background --python tools/blender/jumper_render.py            # sahne + tüm görseller
     blender --background --python tools/blender/build_jumper.py             # yalnız sahne
-Çıktı: build/blender/jumper.blend. Bu adım yalnız konsept: iskelet, animasyon ve GLB yok.
+Çıktı: build/blender/jumper.blend. Oyun modeli: jumper_game.py.
 """
 import importlib
 import math
@@ -27,96 +29,82 @@ if not REPO or not os.path.isdir(os.path.join(REPO, "tools")):
     REPO = r"C:\Users\pekta\projeler\Deadzone-Last-Stand"
 sys.path.insert(0, os.path.join(REPO, "tools", "blender"))
 import zombie_kit as kit  # noqa: E402
-import walker_head as wh  # noqa: E402
+import jumper_head as jh  # noqa: E402
+import jumper_muscles as jm  # noqa: E402
 import jumper_clothes as jc  # noqa: E402
 
-importlib.reload(kit)
-importlib.reload(wh)
-importlib.reload(jc)
+for _m in (kit, jh, jm, jc):
+    importlib.reload(_m)
 OUT_BLEND = os.path.join(REPO, "build", "blender", "jumper.blend")
 
 # Karakter -Y yönüne bakar, Z yukarı, metre. Uzuv noktaları sol (+X) için; sağ aynalanır.
-# (konum, yarıçap). "thigh" ve "calf" ara noktaları kas kütlesidir (öne kayık quadriceps,
-# dizin altında arkaya kayık baldır). Bacak ters bükük: diz önde ve dışta, bilek (topuk) yüksek ve
-# geride, ağırlık parmak kökünde.
+# Yarıçaplar kemik hacmidir (ince); kütleyi kaslar verir.
 POSES = {
-    # nötr: yarı çömelik hazır duruş
+    # nötr: yarı çömelik hazır duruş (oyun modelinin dinlenme pozu)
     "stand": {
         "torso": {
-            "pelvis": ((0.0, 0.060, 0.860), 0.150), "belly": ((0.0, 0.020, 0.975), 0.125),
-            "spine": ((0.0, -0.035, 1.075), 0.120), "chest": ((0.0, -0.105, 1.170), 0.135),
-            "upchest": ((0.0, -0.165, 1.240), 0.110), "neck0": ((0.0, -0.225, 1.290), 0.055),
-            "neck1": ((0.0, -0.265, 1.320), 0.048)},
+            "pelvis": ((0.0, 0.050, 0.800), 0.135), "belly": ((0.0, 0.010, 0.915), 0.112),
+            "spine": ((0.0, -0.040, 1.010), 0.112), "chest": ((0.0, -0.110, 1.100), 0.122),
+            "upchest": ((0.0, -0.170, 1.165), 0.100), "neck0": ((0.0, -0.225, 1.215), 0.058),
+            "neck1": ((0.0, -0.262, 1.245), 0.050)},
         "limb": {
-            "hip": ((0.150, 0.060, 0.840), 0.125), "thigh": ((0.260, -0.050, 0.700), 0.172),
-            "knee": ((0.315, -0.170, 0.530), 0.080), "calf": ((0.305, 0.030, 0.400), 0.128),
-            "ankle": ((0.260, 0.110, 0.180), 0.045), "heel": ((0.260, 0.150, 0.135), 0.050),
-            "ball": ((0.250, -0.050, 0.048), 0.060), "toe": ((0.245, -0.120, 0.038), 0.045),
-            "shoulder": ((0.190, -0.160, 1.230), 0.082), "elbow": ((0.255, -0.235, 0.870), 0.056),
-            "forearm": ((0.225, -0.330, 0.715), 0.058),
-            "wrist": ((0.165, -0.450, 0.380), 0.040), "palm": ((0.155, -0.470, 0.295), 0.048)},
-        "head": (-12.0, 4.0, 0.0),        # pitch (eksi: yukarı), roll, yaw — derece
+            "hip": ((0.115, 0.050, 0.785), 0.088), "knee": ((0.290, -0.180, 0.470), 0.056),
+            "ankle": ((0.245, 0.095, 0.120), 0.037), "heel": ((0.245, 0.122, 0.058), 0.038),
+            "ball": ((0.235, -0.075, 0.032), 0.036),
+            "shoulder": ((0.190, -0.150, 1.150), 0.058), "elbow": ((0.265, -0.200, 0.880), 0.038),
+            "wrist": ((0.225, -0.320, 0.690), 0.029), "palm": ((0.212, -0.362, 0.618), 0.036)},
+        "head": (-14.0, 4.0, 0.0),        # pitch (eksi: yukarı), roll, yaw — derece
     },
-    # imza: sıçramadan önceki derin çömelme; kalça yere yakın, uyluklar yatay ve sıkışmış,
-    # kollar geriye savrulmuş, kafa hedefe (yukarı-ileri) bakar
+    # imza: sıçramadan önceki derin çömelme; kalça yere yakın, kollar geriye, kafa hedefe bakar
     "crouch": {
         "torso": {
-            "pelvis": ((0.0, 0.170, 0.400), 0.150), "belly": ((0.0, 0.085, 0.500), 0.125),
-            "spine": ((0.0, -0.020, 0.585), 0.120), "chest": ((0.0, -0.140, 0.665), 0.135),
-            "upchest": ((0.0, -0.230, 0.720), 0.110), "neck0": ((0.0, -0.305, 0.775), 0.055),
-            "neck1": ((0.0, -0.350, 0.815), 0.048)},
+            "pelvis": ((0.0, 0.200, 0.400), 0.135), "belly": ((0.0, 0.120, 0.500), 0.112),
+            "spine": ((0.0, 0.020, 0.580), 0.112), "chest": ((0.0, -0.090, 0.650), 0.122),
+            "upchest": ((0.0, -0.180, 0.700), 0.100), "neck0": ((0.0, -0.245, 0.745), 0.058),
+            "neck1": ((0.0, -0.285, 0.780), 0.050)},
         "limb": {
-            "hip": ((0.160, 0.160, 0.390), 0.125), "thigh": ((0.295, -0.020, 0.420), 0.185),
-            "knee": ((0.335, -0.210, 0.470), 0.080), "calf": ((0.315, 0.000, 0.290), 0.135),
-            "ankle": ((0.285, 0.130, 0.150), 0.045), "heel": ((0.285, 0.170, 0.110), 0.050),
-            "ball": ((0.270, -0.060, 0.048), 0.060), "toe": ((0.265, -0.130, 0.038), 0.045),
-            "shoulder": ((0.190, -0.210, 0.715), 0.082), "elbow": ((0.310, 0.130, 0.570), 0.056),
-            "forearm": ((0.312, 0.280, 0.610), 0.058),
-            "wrist": ((0.300, 0.470, 0.700), 0.040), "palm": ((0.295, 0.545, 0.735), 0.048)},
-        "head": (-38.0, 0.0, 0.0),
+            "hip": ((0.125, 0.200, 0.385), 0.088), "knee": ((0.300, -0.170, 0.460), 0.050),
+            "ankle": ((0.270, 0.120, 0.125), 0.032), "heel": ((0.270, 0.148, 0.062), 0.036),
+            "ball": ((0.260, -0.050, 0.032), 0.036),
+            "shoulder": ((0.190, -0.160, 0.690), 0.058), "elbow": ((0.280, 0.080, 0.580), 0.038),
+            "wrist": ((0.300, 0.330, 0.620), 0.029), "palm": ((0.300, 0.400, 0.640), 0.036)},
+        "head": (-36.0, 0.0, 0.0),
     },
 }
 TORSO_EDGES = [("pelvis", "belly"), ("belly", "spine"), ("spine", "chest"), ("chest", "upchest"),
                ("upchest", "neck0"), ("neck0", "neck1")]
-LIMB_CHAIN = [("hip", "thigh"), ("thigh", "knee"), ("knee", "calf"), ("calf", "ankle"),
-              ("ankle", "heel"), ("ankle", "ball"), ("ball", "toe"),
-              ("shoulder", "elbow"), ("elbow", "forearm"), ("forearm", "wrist"), ("wrist", "palm")]
-# Kıyafet sınıflandırması ana eklemlerden (kas ara noktaları yok sayılır).
+LIMB_CHAIN = [("hip", "knee"), ("knee", "ankle"), ("ankle", "heel"), ("ankle", "ball"),
+              ("shoulder", "elbow"), ("elbow", "wrist"), ("wrist", "palm")]
+LEG_NAMES = ("hip", "knee", "ankle", "heel", "ball")
 CLASS_SEGMENTS = [("hips", "pelvis", "belly"), ("hips", "pelvis", "hip_*"), ("torso", "belly", "spine"),
                   ("torso", "spine", "chest"), ("torso", "chest", "upchest"), ("neck", "upchest", "neck1"),
                   ("clav", "upchest", "shoulder_*"), ("thigh", "hip_*", "knee_*"),
-                  ("shin", "knee_*", "ankle_*"), ("foot", "ankle_*", "ball_*"), ("foot", "ball_*", "toe_*"),
+                  ("shin", "knee_*", "ankle_*"), ("foot", "ankle_*", "ball_*"),
                   ("uparm", "shoulder_*", "elbow_*"), ("forearm", "elbow_*", "wrist_*"),
                   ("hand", "wrist_*", "palm_*")]
-LINEUP_SPACING = 1.25
-QUAD = 0.042              # uyluk ön kas şişkinliği (m)
-CALF = 0.030              # baldır şişkinliği (m, arkaya)
+LINEUP_SPACING = 1.15
+VOXEL = 0.0065            # kas oluklarını tutacak kadar ince
+SMOOTH = 3                # remesh sonrası yumuşatma (fazlası olukları siler)
 
-# Çeşitler. body: h boy, w gövde genişliği, t uzuv kalınlığı, leg bacak kütle çarpanı, arm kol
-# kalınlığı, head kafa ölçeği. top: None / tank / tshirt; bib: tulum önlüğü rengi (askılı);
-# bottom: shorts / pants; hem: paça boyu (0 kalça .. 1 bilek); burst: uyluk/baldırda patlak yoğunluğu;
-# pocket: kargo cebi rengi. Hepsi yalınayak (ayakkabı kas şişmesiyle patlamış). Renkler doğrusal RGB.
+# Çeşitler. body: h boy, w gövde genişliği, t uzuv kalınlığı, leg/arm kas çarpanı, head kafa ölçeği.
+# top: None / jacket (eşofman üstü, kollar dirseğe sıvalı); bib: tulum önlüğü rengi (askılı);
+# bottom_color + hem: paça boyu (0 kalça .. 1 bilek); stripe: yan şerit rengi; scalp: kısa saç rengi.
+# Hepsi yalınayak (ayakkabı kas şişmesiyle patlamış). Renkler doğrusal RGB.
 VARIANTS = [
-    {"name": "Shorts", "body": {"h": 1.00, "w": 1.00, "t": 1.00, "leg": 1.08, "arm": 0.95, "head": 0.86},
+    {"name": "Shorts", "body": {"h": 1.00, "w": 1.00, "t": 1.00, "leg": 1.08, "arm": 0.96, "head": 0.92},
      "tone": (0.24, 0.26, 0.21), "bruise": (0.09, 0.08, 0.12), "bruise_band": (0.50, 0.70),
      "top": None, "top_color": None, "bib": None, "blood": 0.5,
-     "bottom": "shorts", "bottom_color": (0.30, 0.025, 0.03), "hem": 0.30, "burst": 0.10, "pocket": None,
-     "hair": (0.03, 0.025, 0.02), "hair_style": "bald", "seed": 2.0},
-    {"name": "Cargo", "body": {"h": 1.04, "w": 0.95, "t": 1.00, "leg": 1.00, "arm": 1.00, "head": 0.88},
-     "tone": (0.22, 0.24, 0.195), "bruise": (0.10, 0.075, 0.11), "bruise_band": (0.50, 0.70),
-     "top": "tank", "top_color": (0.50, 0.48, 0.40), "bib": None, "blood": 0.8,
-     "bottom": "pants", "bottom_color": (0.13, 0.13, 0.07), "hem": 0.70, "burst": 0.32,
-     "pocket": (0.10, 0.10, 0.055), "hair": (0.04, 0.03, 0.02), "hair_style": "fringe", "seed": 5.4},
-    {"name": "Overall", "body": {"h": 0.97, "w": 1.10, "t": 1.08, "leg": 1.12, "arm": 1.05, "head": 0.90},
+     "bottom_color": (0.30, 0.025, 0.03), "hem": 0.34, "stripe": None, "scalp": None, "seed": 2.0},
+    {"name": "Overall", "body": {"h": 0.97, "w": 1.10, "t": 1.05, "leg": 1.12, "arm": 1.06, "head": 0.94},
      "tone": (0.25, 0.235, 0.19), "bruise": (0.12, 0.07, 0.09), "bruise_band": (0.50, 0.70),
      "top": None, "top_color": None, "bib": (0.04, 0.10, 0.16), "blood": 0.3,
-     "bottom": "pants", "bottom_color": (0.04, 0.10, 0.16), "hem": 0.55, "burst": 0.22, "pocket": None,
-     "hair": (0.05, 0.035, 0.02), "hair_style": "sparse", "seed": 9.1},
-    {"name": "Track", "body": {"h": 1.02, "w": 0.92, "t": 0.96, "leg": 1.04, "arm": 0.92, "head": 0.85},
+     "bottom_color": (0.04, 0.10, 0.16), "hem": 0.66, "stripe": None, "scalp": (0.05, 0.035, 0.02),
+     "seed": 9.1},
+    {"name": "Track", "body": {"h": 1.02, "w": 0.94, "t": 0.96, "leg": 1.04, "arm": 0.93, "head": 0.90},
      "tone": (0.13, 0.105, 0.085), "bruise": (0.10, 0.045, 0.05), "bruise_band": (0.50, 0.70),
-     "top": "tshirt", "top_color": (0.10, 0.20, 0.32), "bib": None, "blood": 0.5,
-     "bottom": "pants", "bottom_color": (0.035, 0.035, 0.04), "hem": 0.85, "burst": 0.28, "pocket": None,
-     "hair": (0.02, 0.016, 0.012), "hair_style": "short", "seed": 13.3},
+     "top": "jacket", "top_color": (0.035, 0.07, 0.17), "bib": None, "blood": 0.5,
+     "bottom_color": (0.03, 0.03, 0.035), "hem": 0.93, "stripe": (0.55, 0.55, 0.52),
+     "scalp": (0.02, 0.016, 0.012), "seed": 13.3},
 ]
 
 
@@ -129,17 +117,20 @@ def body_points(body, pose="stand"):
     pts = {}
     for n, (c, r) in p["torso"].items():
         pts[n] = (Vector((c[0] * w, c[1], c[2] * h)), r * w)
-    leg_names = ("hip", "thigh", "knee", "calf", "ankle", "heel", "ball", "toe")
     for n, (c, r) in p["limb"].items():
-        k = body["t"] * (body["leg"] if n in leg_names else body["arm"])
+        k = body["t"]
         xs = w if n in ("hip", "shoulder") else 1.0
         for side, sx in (("L", 1.0), ("R", -1.0)):
             pts[f"{n}_{side}"] = (Vector((c[0] * xs * sx, c[1], c[2] * h)), r * k)
+    for side in ("L", "R"):          # ayak tabanı yerde kalır (boy ölçeği yalnız bacağı uzatır)
+        for n in ("ball", "heel"):
+            c, r = pts[f"{n}_{side}"]
+            pts[f"{n}_{side}"] = (Vector((c.x, c.y, POSES[pose]["limb"][n][0][2])), r)
     return pts
 
 
 def _hand(pts, side, t):
-    """Uzun, pençe gibi kıvrık dört parmak + başparmak."""
+    """Kısa, boğumlu dört parmak (yarı kıvrık) + başparmak."""
     wrist, palm = pts[f"wrist_{side}"][0], pts[f"palm_{side}"][0]
     d = (palm - wrist).normalized()
     ref = Vector((0.0, -1.0, 0.0)) if abs(d.y) < 0.8 else Vector((0.0, 0.0, 1.0))
@@ -147,31 +138,36 @@ def _hand(pts, side, t):
     curl = across.cross(d).normalized()
     extra, edges = {}, []
     for i in range(4):
-        spread = (i - 1.5) * 0.024 * t
+        spread = (i - 1.5) * 0.021 * t
         base = palm + across * spread
-        mid = base + d * 0.060 + curl * 0.010 + across * spread * 0.5
-        tip = mid + d * 0.040 + curl * 0.035 + across * spread * 0.3
-        extra[f"f{i}a_{side}"] = (mid, 0.0115 * t)
-        extra[f"f{i}b_{side}"] = (tip, 0.0080 * t)
+        k = 1.0 - abs(i - 1.3) * 0.08
+        mid = base + d * 0.040 * k + curl * 0.008 + across * spread * 0.3
+        tip = mid + d * 0.026 * k + curl * 0.026
+        extra[f"f{i}a_{side}"] = (mid, 0.0118 * t)
+        extra[f"f{i}b_{side}"] = (tip, 0.0092 * t)
         edges += [(f"palm_{side}", f"f{i}a_{side}"), (f"f{i}a_{side}", f"f{i}b_{side}")]
     inward = Vector((-1.0 if palm.x > 0 else 1.0, 0.0, 0.0))
-    extra[f"th_{side}"] = (palm + d * 0.040 + inward * 0.040 + curl * 0.012, 0.0105 * t)
+    extra[f"th_{side}"] = (palm + d * 0.022 + inward * 0.036 + curl * 0.018, 0.0115 * t)
     edges.append((f"palm_{side}", f"th_{side}"))
     return extra, edges
 
 
 def _toes(pts, side):
-    """Çıplak ayakta dört kısa parmak (takunya değil)."""
-    ball, toe = pts[f"ball_{side}"][0], pts[f"toe_{side}"][0]
-    fwd = (toe - ball).normalized()
-    across = Vector((1.0, 0.0, 0.0))
+    """Beş parmak: kalın başparmak içte, küçükler dışa doğru kısalır; uçları yerde."""
+    ball, ankle = pts[f"ball_{side}"][0], pts[f"ankle_{side}"][0]
+    fwd = Vector(((ball - ankle).x * 0.2, (ball - ankle).y, 0.0)).normalized()
+    out = Vector((1.0 if ball.x > 0 else -1.0, 0.0, 0.0))
     extra, edges = {}, []
-    for i in range(4):
-        off = (i - 1.5) * 0.032 * (1.0 if ball.x > 0 else -1.0)
-        tip = ball + fwd * (0.135 - abs(i - 0.8) * 0.018) + across * off
-        tip.z = 0.016
-        extra[f"t{i}_{side}"] = (tip, 0.0135 - i * 0.0010)
-        edges.append((f"ball_{side}", f"t{i}_{side}"))
+    for i, (off, length, r) in enumerate(((-0.030, 0.060, 0.0150), (-0.012, 0.056, 0.0108),
+                                          (0.004, 0.051, 0.0100), (0.019, 0.045, 0.0094),
+                                          (0.033, 0.038, 0.0088))):
+        root = ball + out * off + Vector((0.0, 0.0, -0.004))
+        knuckle = root + fwd * length * 0.55 + Vector((0.0, 0.0, 0.004))
+        tip = root + fwd * length
+        tip.z = r + 0.002
+        extra[f"t{i}a_{side}"] = (knuckle, r * 1.05)
+        extra[f"t{i}b_{side}"] = (tip, r)
+        edges += [(f"ball_{side}", f"t{i}a_{side}"), (f"t{i}a_{side}", f"t{i}b_{side}")]
     return extra, edges
 
 
@@ -196,43 +192,23 @@ def classify_fn(pts):
     return classify
 
 
-def shape_muscles(obj, pts, body):
-    """Uyluk önüne quadriceps, dizin altında arkaya baldır şişkinliği; ince bilek."""
-    quad, calf = QUAD * body["leg"], CALF * body["leg"]
-    legs = [(pts[f"hip_{s}"][0], pts[f"knee_{s}"][0], pts[f"ankle_{s}"][0]) for s in ("L", "R")]
-    top = max(h.z for h, _k, _a in legs) + 0.10
-    for vert in obj.data.vertices:
-        co = vert.co
-        if co.z > top:
-            continue
-        best = None
-        for hip, knee, ankle in legs:
-            for a, b, kind in ((hip, knee, "thigh"), (knee, ankle, "shin")):
-                _c, t = geometry.intersect_point_line(co, a, b)
-                t = min(max(t, 0.0), 1.0)
-                axis_pt = a.lerp(b, t)
-                d = (co - axis_pt).length
-                if best is None or d < best[0]:
-                    best = (d, kind, t, axis_pt, (b - a).normalized())
-        d, kind, t, axis_pt, axis = best
-        if d > 0.28 or d < 1e-6:
-            continue
-        radial = (co - axis_pt).normalized()
-        # bacağın "önü": dizin baktığı yön (uyluk için) / dizin geldiği yön (baldır arka)
-        front = Vector((0.0, -1.0, 0.25))
-        front = (front - axis * front.dot(axis)).normalized()
-        facing = radial.dot(front)
-        if kind == "thigh":
-            push = quad * math.exp(-((t - 0.55) / 0.28) ** 2) * (0.3 + 0.7 * max(0.0, facing))
-            inner = radial.dot(Vector((-1.0 if co.x > 0 else 1.0, 0.0, 0.0)))
-            push += 0.5 * quad * math.exp(-((t - 0.82) / 0.09) ** 2) * max(0.0, inner)  # damla kas
-        else:
-            push = calf * math.exp(-((t - 0.25) / 0.18) ** 2) * (0.3 + 0.7 * max(0.0, -facing))
-            push -= 0.30 * calf * max(0.0, (t - 0.75) / 0.25)
-        vert.co = co + radial * push
+def _flesh(obj):
+    """Remesh (kaslar gövdeyle kaynaşır, aralarında oluk kalır) + az yumuşatma + ince yumru."""
+    rem = obj.modifiers.new("Remesh", "REMESH")
+    rem.mode, rem.voxel_size = "VOXEL", VOXEL
+    sm = obj.modifiers.new("Smooth", "SMOOTH")       # düz yumuşatma (remesh sonrası köşe sayısı değişir)
+    sm.factor, sm.iterations = 0.5, SMOOTH
+    tex = bpy.data.textures.new(obj.name + "_lump", "CLOUDS")
+    tex.noise_scale = 0.05
+    disp = obj.modifiers.new("Lump", "DISPLACE")
+    disp.texture, disp.strength, disp.mid_level = tex, 0.004, 0.5
+    kit.apply_all(obj)
+    for poly in obj.data.polygons:
+        poly.use_smooth = True
 
 
-def build_body(v, mat, pose):
+def build_body(v, mat, pose, drape=False):
+    """Gövde (kemik hacmi + ayrı kaslar, oluklu). drape=True: kaslar tek metaball (kumaş örtüsü)."""
     body = v["body"]
     pts = body_points(body, pose)
     edges = list(TORSO_EDGES)
@@ -240,13 +216,16 @@ def build_body(v, mat, pose):
     for side in ("L", "R"):
         edges += [(f"{a}_{side}", f"{b}_{side}") for a, b in LIMB_CHAIN]
         edges += [("pelvis", f"hip_{side}"), ("upchest", f"shoulder_{side}")]
-        for fn in (lambda: _hand(pts, side, body["t"] * body["arm"]), lambda: _toes(pts, side)):
+        for fn in (lambda: _hand(pts, side, body["t"]), lambda: _toes(pts, side)):
             extra, e = fn()
             skin_pts.update(extra)
             edges += e
-    obj = kit.skin_object("Jumper_Body", {n: (tuple(p), r) for n, (p, r) in skin_pts.items()}, edges, mat)
-    kit.organic_pass(obj, voxel=0.008)
-    shape_muscles(obj, pts, body)
+    name = "Jumper_Drape" if drape else "Jumper_Body"
+    obj = kit.skin_object(name, {n: (tuple(p), r) for n, (p, r) in skin_pts.items()}, edges, mat)
+    muscles = jm.build(pts, body, mat, merged=drape)
+    from zombie_game import join
+    obj = join([obj] + muscles, name)
+    _flesh(obj)
     return obj, pts
 
 
@@ -254,10 +233,8 @@ def build_body(v, mat, pose):
 
 def skin_for(v, name):
     mat = kit.skin_material(name, v["tone"], v["bruise"])
-    band = v.get("bruise_band")
-    if band:
-        ramp = next(n for n in mat.node_tree.nodes if n.type == "VALTORGB")
-        ramp.color_ramp.elements[0].position, ramp.color_ramp.elements[1].position = band
+    ramp = next(n for n in mat.node_tree.nodes if n.type == "VALTORGB")
+    ramp.color_ramp.elements[0].position, ramp.color_ramp.elements[1].position = v["bruise_band"]
     return mat
 
 
@@ -266,14 +243,14 @@ def build_variant(v, offset_x=0.0, pose="stand"):
     suffix = "_" + v["name"] + ("" if pose == "stand" else "_" + pose)
     skin = skin_for(v, "M_Jumper_Skin" + suffix)
     tooth_mat, _ = kit.material("M_Jumper_Teeth" + suffix, (0.45, 0.40, 0.28), rough=0.4)
-    style = wh.HAIR_STYLES.get(v["hair_style"])
-    hair_mat = wh.hair_material("M_Jumper_Hair" + suffix, v["hair"], style["rough"]) if style else None
+    scalp = kit.cloth_material("M_Jumper_Scalp" + suffix, v["scalp"]) if v["scalp"] else None
     body_obj, pts = build_body(v, skin, pose)
-    body_obj["chest_z"], body_obj["belly_z"] = pts["chest"][0].z, pts["belly"][0].z
-    jc.build_clothes(body_obj, classify_fn(pts), v, suffix)
-    hv = dict(v, name="Jumper" + suffix)
-    head = wh.build_head(hv, skin, tooth_mat, hair_mat, pts["neck1"][0], 1.0)
-    head.location = pts["neck1"][0] + Vector((0.0, -0.030, 0.020))
+    drape, _ = build_body(v, skin, pose, drape=True)
+    drape["chest_z"], drape["belly_z"] = pts["chest"][0].z, pts["belly"][0].z
+    jc.build_clothes(drape, classify_fn(pts), v, suffix)
+    bpy.data.objects.remove(drape)
+    head = jh.build_head(dict(v, name="Jumper" + suffix), skin, tooth_mat, scalp)
+    head.location = pts["neck1"][0] + Vector((0.0, -0.022, 0.018))
     pitch, roll, yaw = POSES[pose]["head"]
     head.rotation_euler = (math.radians(pitch), math.radians(roll), math.radians(yaw))
     created = list(set(bpy.data.objects) - before)

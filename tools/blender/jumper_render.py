@@ -1,8 +1,9 @@
-"""Zıplayan zombi konsept görselleri (V.5 v1): dizi, imza pozu, yakın, oyun kamerası, siluet.
+"""Zıplayan zombi konsept görselleri (V.5 v2): dizi, imza pozu, yakın, oyun kamerası (+ siluet).
 
 Arka planda çalıştırılır (sahneyi kendisi kurar):
     blender --background --python tools/blender/jumper_render.py -- [lineup signature close gamecam silhouette] [--samples=N]
-Argüman verilmezse hepsi. Çıktılar docs/concept/jumper_v1_*.png, ara görseller build/shots/.
+Argüman verilmezse lineup, signature, close, gamecam. Çıktılar docs/concept/jumper_v2_*.png (v1 görselleri
+git'teki v1 betiğinden), ara görseller build/shots/.
 walker_render'ın kamera / birleştirme yardımcılarını kullanır (o dosya değişmez).
 """
 import importlib
@@ -22,8 +23,8 @@ import walker_render as wr  # noqa: E402
 importlib.reload(bj)
 CONCEPT_DIR = os.path.join(bj.REPO, "docs", "concept")
 SHOTS_DIR = os.path.join(bj.REPO, "build", "shots")
-VERSION = "v1"
-SIGNATURE_VARIANT = 1      # Cargo
+VERSION = "v2"
+SIGNATURE_VARIANT = 0      # Shorts (kaslar açıkta)
 SAMPLES = 48
 
 
@@ -84,7 +85,7 @@ def render_close():
 
 GAMECAM_LAYOUT = [  # (çeşit, x, y, yön derece, poz) — zıplayan grubu + bir çömelen
     (0, -1.8, 0.5, 10, "stand"), (1, -0.4, -0.2, -15, "stand"), (2, 1.0, 0.6, 18, "stand"),
-    (3, -1.0, 1.9, -8, "stand"), (1, 0.6, 2.1, 12, "crouch"),
+    (2, -1.0, 1.9, -8, "stand"), (0, 0.6, 2.1, 12, "crouch"),
 ]
 WALKERS = [(0, 2.3, -0.1, -10), (2, 2.6, 1.8, 15)]
 
@@ -179,7 +180,7 @@ def main(argv):
     for a in args:
         if a.startswith("--samples="):
             SAMPLES = int(a.split("=")[1])
-    names = [a for a in args if a in STEPS] or list(STEPS)
+    names = [a for a in args if a in STEPS] or ["lineup", "signature", "close", "gamecam"]
     for name in names:
         print("JUMPER render:", name, STEPS[name]())
 
