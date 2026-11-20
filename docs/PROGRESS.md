@@ -10,13 +10,11 @@ Oturum 8 (2026-11-19). Taha görsel kaliteden memnun değildi; yeni yön onaylan
 - **Taha (2026-11-19): "genel işleyişten memnunum".** Bu oturumun çalışma biçimi korunur: her adım tek sabitle kapatılabilir; Blender'da pozlar MCP içinde kemik konumu ölçülerek bulunur ve `look` görüntüsüyle yinelenir; oyunda ekran görüntüsü + kare özeti + video; ölçümler sayıyla raporlanır (TONGUE sayaçları); eklenen tasarım kuralı (ısırma) açıkça onaya sunulur.
 - **Yeni oturum başlangıcı:** ortam kontrolü → bu bölüm → ROADMAP V.5 satırı → V.5 için kararları sor (hangi türler önce, sıra, her türün imza hareketi: DECISIONS K5), kod yazma. Blender işinden önce `claude mcp list` + Blender'da BlenderMCP bağlantısı; MCP'de `read_factory_settings` çağırma. Küçük açıklar: ısırıp bırakmada da `break_free` oynuyor; 40 dilcide dil maliyeti ölçülmedi (`--bench`); `zombie_visual.gd` ve `enemy_manager.gd` 300 satırı aşıyor.
 
-- **YENİ OTURUM BURADAN (Oturum 11, gece): Taha'nın arena geri bildirimi (2026-11-20). Temiz bir oturumda, sırayla düzeltilecek; o zamana kadar kod yazılmadı.**
-  1. **Tank daha büyük olmalı.** Şu an `_TANK_LOOK_V` `height` 1.85 (eski 2.4). Taha oyunda küçük buldu → büyüt (ör. 2.2–2.4; yürüme ref hızı ve
-     erişim/yarıçap boyla birlikte ölçeklenmeli, `walk_ref_speed` × boy ölçeği zaten hesapta). Görüntüyle yürüyen yanında doğrula.
-  2. **Dilci çok yavaş karar veriyor ve yavaş hareket ediyor → hızlandır.** Hareket hızı (`speed` 2.4 × GAME_PACE), hazırlık (`attack_windup` 0.8),
-     bekleme (`attack_recover` 5.0 / `tongue_miss_recover` 2.0) gözden geçirilecek. **Yeni kural:** asker dilcinin yakın vuruş menzilindeyse
-     (düz vuruş hizasında) dil atmak yerine yakın dövüşle (düz vuruş) saldırsın. Bayrakla; dilci klip setinde yakın vuruş klibi yok → ya mevcut
-     `lash` kısa yakın darbe olarak kullanılır ya da Blender'da `swipe` klibi anahtarlanır (karar o oturumda).
+- **YENİ OTURUM BURADAN (Oturum 11, gece): Taha'nın arena geri bildirimi (2026-11-20). 1–3 yapıldı (Oturum 11), Taha'nın arenada denemesi bekleniyor.**
+  1. ✔ **Tank büyüdü (`177964b`):** `_TANK_LOOK_V` `height` 1.85 → 2.3 m (yarıçap 0.75 ve erişim 1.5 zaten eski 2.4 m tanka göreydi; yürüme senkronu boy ölçeğini kendisi hesaplar). Görüntü `build/shots/tank_h23.png`.
+  2. ✔ **Dilci hızlandı + yakın vuruş (`402a47f`, `2918639`; Sonnet ajan yazdı, ayrı Sonnet ajan gözden geçirdi):** speed 2.4→3.2, hazırlık 0.8→0.55, kilit 0.3→0.25, bekleme 5.0→3.0, ıskalama beklemesi 2.0→1.2.
+     `FEATURE_TONGUE_MELEE`: CHASE→WINDUP'ta asker temas + `tongue_melee_range` (0.9) içindeyse dil yok; 0.3 sn hazırlık (windup klibi ölçekli), `lash` klibiyle vuruş (temas + 0.8 içindeyse `contact_damage`), 0.8 sn toparlanma. Karar `TongueRules.wants_melee` (4 test, 210 geçiyor). Klip: Blender'da yeni `swipe` yerine mevcut elle anahtarlı `lash` (Claude seçti, Taha beğenmezse swipe anahtarlanır).
+     Ölçüm (`--god --no-weapons`, 8 sn): yakın (1.2 m) `shots=0 melee=7`; uzak (7 m) `shots=1 melee=0`; bayrak kapalı yakın `shots=2 melee=0`. **Taha'nın arenada denemesi bekleniyor.** Şüphe: 0.3 sn hazırlıkta windup klibi ~2.7× hızlı, sert görünebilir.
   3. ✔ **Düzeldi (Oturum 11): dil bağı kalkınca asker sürüklenme pozunda takılı kalıyordu.** Kök neden: `ec3b12e`'den beri ısırıp bırakmada
      (`broke_free=false`) `PlayerVisual` hiçbir şey çağırmıyordu; döngülü `drag` tek-sefer düğümü kendiliğinden bitmediği için açık kalıyordu
      (yakın mesafede her ısırma bu yoldan geçiyor). Düzeltme: `PlayerAnimator.release(broke_free)` sürüklenmeyi her durumda söndürür, kurtulma
