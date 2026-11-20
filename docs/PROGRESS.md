@@ -10,7 +10,20 @@ Oturum 8 (2026-11-19). Taha görsel kaliteden memnun değildi; yeni yön onaylan
 - **Taha (2026-11-19): "genel işleyişten memnunum".** Bu oturumun çalışma biçimi korunur: her adım tek sabitle kapatılabilir; Blender'da pozlar MCP içinde kemik konumu ölçülerek bulunur ve `look` görüntüsüyle yinelenir; oyunda ekran görüntüsü + kare özeti + video; ölçümler sayıyla raporlanır (TONGUE sayaçları); eklenen tasarım kuralı (ısırma) açıkça onaya sunulur.
 - **Yeni oturum başlangıcı:** ortam kontrolü → bu bölüm → ROADMAP V.5 satırı → V.5 için kararları sor (hangi türler önce, sıra, her türün imza hareketi: DECISIONS K5), kod yazma. Blender işinden önce `claude mcp list` + Blender'da BlenderMCP bağlantısı; MCP'de `read_factory_settings` çağırma. Küçük açıklar: ısırıp bırakmada da `break_free` oynuyor; 40 dilcide dil maliyeti ölçülmedi (`--bench`); `zombie_visual.gd` ve `enemy_manager.gd` 300 satırı aşıyor.
 
-- **YENİ OTURUM BURADAN (Oturum 10, 2. tur, 2026-11-20):** Taha v1 eleştirisini kabul etti, "düzeltip oyuna ekleyin" dedi. Hepsi oyunda, bayraklı, **Taha'nın arenada denemesi bekleniyor.**
+- **YENİ OTURUM BURADAN (Oturum 11, gece): Taha'nın arena geri bildirimi (2026-11-20). Temiz bir oturumda, sırayla düzeltilecek; o zamana kadar kod yazılmadı.**
+  1. **Tank daha büyük olmalı.** Şu an `_TANK_LOOK_V` `height` 1.85 (eski 2.4). Taha oyunda küçük buldu → büyüt (ör. 2.2–2.4; yürüme ref hızı ve
+     erişim/yarıçap boyla birlikte ölçeklenmeli, `walk_ref_speed` × boy ölçeği zaten hesapta). Görüntüyle yürüyen yanında doğrula.
+  2. **Dilci çok yavaş karar veriyor ve yavaş hareket ediyor → hızlandır.** Hareket hızı (`speed` 2.4 × GAME_PACE), hazırlık (`attack_windup` 0.8),
+     bekleme (`attack_recover` 5.0 / `tongue_miss_recover` 2.0) gözden geçirilecek. **Yeni kural:** asker dilcinin yakın vuruş menzilindeyse
+     (düz vuruş hizasında) dil atmak yerine yakın dövüşle (düz vuruş) saldırsın. Bayrakla; dilci klip setinde yakın vuruş klibi yok → ya mevcut
+     `lash` kısa yakın darbe olarak kullanılır ya da Blender'da `swipe` klibi anahtarlanır (karar o oturumda).
+  3. **Hata: dil bağı kalkınca asker sürüklenme (drag) animasyonunda takılı kalıyor.** Yeniden üretme: dilci çok yakından dil atar, çeker ve ısırır
+     → asker artık bağlı değil ama `drag` pozunda kalıyor, çözülmüyor (görüntü `build/shots/bug_tongue_stuck_drag.png`). Şüphe: yakın mesafede
+     `attach` ile `released`/ısırma aynı karede ya da sırası ters geliyor; `PlayerAnimator` sürüklenme düğümünden çıkış (`break_free`/bitiş) olayı
+     kaçıyor. Önce kök neden (olay sırası logu), sonra düzeltme + GUT testi (`TongueRules` yakın mesafe senaryosu).
+  4. **Hedef görünüm notu (DECISIONS 2026-11-20):** gece şehir sokağı, daha üstten/uzaktan kamera, çevre ana unsur. Aşama 8 planına girer.
+
+- **Oturum 10, 2. tur (2026-11-20):** Taha v1 eleştirisini kabul etti, "düzeltip oyuna ekleyin" dedi. Hepsi oyunda, bayraklı, **Taha'nın arenada denemesi bekleniyor.**
   - Koşucu v2 (`e53d7f4`, oyunda `bf67714`, `FEATURE_RUNNER_MODEL`), zıplayan v2 (`b9bafa6`, `d53e049`, `FEATURE_JUMPER_MODEL`), tank v2 (`b3796c0`, `FEATURE_TANK_MODEL`). Her türün kendi kafası, tanımlı kaslar, ayak parmakları. Model tablosu `scripts/data/zombie_model_data.gd`.
   - `25ee792`: `GAME_PACE` 0.8 (hızlar, dash ve süreler değil), `FEATURE_RUNNER_SPRINT` (çığlık → durmadan koşu → pençe → geçip gider → döner), `FEATURE_JUMP_SHADOW_MARKER` (kırmızı halka yerine gölge).
   - Sürü (100 zombi, temiz): yürüyen 3.3, koşucu 3.5, tank 3.7, zıplayan 5.8 ms/kare.

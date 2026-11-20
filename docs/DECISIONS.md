@@ -2,6 +2,16 @@
 
 Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar verilince "Açık kararlar"dan çıkarılıp tarihli bölüme yazılır.
 
+## 2026-11-20 — Hedef görünüm: gece şehir sokağı, daha üstten ve uzaktan kamera (Taha)
+
+- Taha oyunun bitmiş halinin nasıl görünmesini istediğini bir referans görselle gösterdi (başka bir oyunun ekran görüntüsü; repoya girmez, yerel kopya `build/reference/target_look_city_night.webp`).
+  Ruh hali: gece, yağmur sonrası ıslak asfalt, yanan araç ve çöp ateşleri, neon tabelalar, sokak lambası ve far ışık konileri, yerde kâğıt/çöp/kan,
+  terk edilmiş arabalar, tuğla binalar ve yangın merdivenleri, havada kıvılcım ve duman; sıcak turuncu (ateş) ile soğuk yeşil/mavi (neon) karşıtlığı.
+  Kamera daha yüksek ve uzak; karakterler küçük, **çevre ana unsur**.
+- Taha'nın gerekçesi: üstten/uzaktan kamera asker ve zombi modellerindeki eksikleri de gizler. Taha: "çevre özellikle çok önemli".
+- Durum: **yön kaydı, henüz iş yok.** Aşama 8 (arena, atmosfer) bu referansa göre planlanacak; kamera açısı/uzaklığı denemesi oraya ya da daha
+  önce bir küçük denemeye girer. Özgünlük: referansın ruh hali alınır; o oyunun sahnesi, tabelaları ve görünüşü kopyalanmaz.
+
 ## 2026-11-19 — Yürüyen hızı ve video kuralı (Taha)
 
 - **Hız:** yürüyen oyunda 2.6 m/sn'de kalır, dalga dengesi değişmez. İlk `walk` klibi 0.7 m/sn'ye göre yapılmıştı; bu klip 2.6 m/sn'ye göre yeniden anahtarlanacak (uzun adım, öne yıkılır gibi sendeleme, ayak kaymaz).
