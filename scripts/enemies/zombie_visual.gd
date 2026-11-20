@@ -4,7 +4,6 @@ extends Node3D
 ## Görünüm (gövde çeşidi + renk şeması) ZombieLook ile rastgele seçilir; vuruş parlaması örnek başına.
 ## Yeni hat (VC_MODELS, Aşama V): Blender'da üretilen köşe renkli model, kendi klipleriyle.
 
-const FLASH_SHADER: Shader = preload("res://assets/shaders/flash_lit.gdshader")
 ## Tür satırındaki "model" alanı bu tablodan seçilir; her model aynı 25 kemikli iskeleti kullanır.
 const MODELS: Dictionary = {
 	&"walker": preload("res://assets/models/characters/zombie_walker.glb"),
@@ -15,17 +14,11 @@ const MODELS: Dictionary = {
 }
 ## Yeni hat modelleri (ZombieModelData): satırdaki anim_* adları modelin kendi klipleridir.
 const VC_MODELS: Dictionary = ZombieModelData.VC_MODELS
-const VC_SHADER: Shader = preload("res://assets/shaders/zombie_vc.gdshader")
 ## Örnek başına hafif ton farkı (±); sürüde aynı ağ aynı görünmesin.
 const VC_TINT_VARIANCE: float = 0.08
 ## Atılma hazırlığı ve toparlanma: klip bu hızda (yavaş) oynar, çömelme duruşu uzunca okunur.
 const HOLD_ANIM_SPEED: float = 0.3
 const LUNGE_ANIM_SPEED: float = 1.25
-const BOX_WIDTH_FACTOR: float = 1.6
-
-static var _box_meshes: Dictionary = {}
-static var _materials: Dictionary = {}
-static var _vc_material: ShaderMaterial
 
 var _meshes: Array[MeshInstance3D] = []
 var _clips: ZombieClipPlayer = ZombieClipPlayer.new()
@@ -207,7 +200,7 @@ func _build_vc_model(model_kind: StringName) -> void:
 	var model: Node3D = scene.instantiate() as Node3D
 	add_child(model)
 	var mesh: MeshInstance3D = ModelVariants.keep(model, randi())
-	mesh.material_override = _vc_shared_material()
+	mesh.material_override = ZombieMaterials.vc_shared()
 	var t: float = 1.0 + randf_range(-VC_TINT_VARIANCE, VC_TINT_VARIANCE)
 	_tint = Vector3(t, t * randf_range(0.97, 1.03), t)
 	mesh.set_instance_shader_parameter(&"tint", _tint)
@@ -231,8 +224,8 @@ func _apply_kind(row: Dictionary) -> void:
 		_make_tongue(height)
 	if _clips.animation == null:
 		var box: MeshInstance3D = _meshes[0]
-		box.mesh = _box_mesh_for(row)
-		box.material_override = _material_for(row)
+		box.mesh = ZombieMaterials.box_mesh(row)
+		box.material_override = ZombieMaterials.box_material(row)
 		box.position.y = height * 0.5
 		return
 	_apply_tint(row)
@@ -284,30 +277,3 @@ func _tick_jump(delta: float) -> void:
 		return
 	_jump_age += delta
 	position.y = JumpRules.height_at(_jump_age / _jump_total, float(_clips.row.get("jump_height", 0.0)))
-
-
-static func _vc_shared_material() -> ShaderMaterial:
-	if _vc_material == null:
-		_vc_material = ShaderMaterial.new()
-		_vc_material.shader = VC_SHADER
-	return _vc_material
-
-
-static func _material_for(row: Dictionary) -> ShaderMaterial:
-	var id: StringName = row["id"]
-	if not _materials.has(id):
-		var material: ShaderMaterial = ShaderMaterial.new()
-		material.shader = FLASH_SHADER
-		material.set_shader_parameter(&"albedo", row["color"])
-		_materials[id] = material
-	return _materials[id]
-
-
-static func _box_mesh_for(row: Dictionary) -> BoxMesh:
-	var id: StringName = row["id"]
-	if not _box_meshes.has(id):
-		var radius: float = row["radius"]
-		var box: BoxMesh = BoxMesh.new()
-		box.size = Vector3(radius * BOX_WIDTH_FACTOR, row["height"], radius * BOX_WIDTH_FACTOR)
-		_box_meshes[id] = box
-	return _box_meshes[id]
