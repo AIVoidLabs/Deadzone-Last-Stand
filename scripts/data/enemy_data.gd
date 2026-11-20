@@ -97,6 +97,22 @@ const _JUMPER_LOOK_V: Dictionary = {
 	"walk_ref_speed": Tuning.JUMPER_WALK_REF_SPEED,
 }
 
+# Yeni tank (Tuning.FEATURE_TANK_MODEL): 4 çeşit GLB (ZombieVisual.VC_MODELS[tank_v]). Saldırı klibi (1.6 sn) vuruşu
+# 0.90 sn'de: attack_windup (0.9) ile birebir; WINDUP'ta hızı ~1.0, RECOVER'da sonuna dek tamamlanır. Boy 1.85 m.
+const _TANK_LOOK_V: Dictionary = {
+	"model": &"tank_v",
+	"height": 1.85,
+	"anim_idle": [&"idle"],
+	"anim_walk": [&"walk"],
+	"anim_attack": [&"attack"],
+	"anim_stagger": [&"stagger"],
+	"anim_death": [&"death_a", &"death_b"],
+	"anim_spawn": [&"spawn"],
+	"attack_anim_hit_time": 0.9,
+	"recover_finishes_attack": true,
+	"walk_ref_speed": Tuning.TANK_WALK_REF_SPEED,
+}
+
 const _OVERRIDES: Dictionary = {
 	# Zıplayan: askere 7 m kala çömelir, yerde işaret çıkar (ilk 0.4 sn askeri önden izler, son 0.3 sn kilitli),
 	# yay çizerek havalanıp işaretli yere iner. Havadayken vurulamaz. İniş: alan hasarı (land_radius).
@@ -286,6 +302,8 @@ static func _build() -> Dictionary:
 				row.merge(_RUNNER_LOOK_V, true)
 		if id == JUMPER and Tuning.FEATURE_JUMPER_MODEL:
 			row.merge(_JUMPER_LOOK_V, true)
+		if id == TANK and Tuning.FEATURE_TANK_MODEL:
+			row.merge(_TANK_LOOK_V, true)
 		table[id] = _paced(row)
 	return table
 

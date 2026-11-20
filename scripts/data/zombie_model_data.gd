@@ -22,4 +22,10 @@ const VC_MODELS: Dictionary = {
 		preload("res://assets/models/characters/zombie_jumper_overall.glb"),
 		preload("res://assets/models/characters/zombie_jumper_track.glb"),
 	],
+	&"tank_v": [
+		preload("res://assets/models/characters/zombie_tank_overall.glb"),
+		preload("res://assets/models/characters/zombie_tank_guard.glb"),
+		preload("res://assets/models/characters/zombie_tank_heavy.glb"),
+		preload("res://assets/models/characters/zombie_tank_bare.glb"),
+	],
 }

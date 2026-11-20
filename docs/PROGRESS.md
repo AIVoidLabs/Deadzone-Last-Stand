@@ -10,7 +10,13 @@ Oturum 8 (2026-11-19). Taha görsel kaliteden memnun değildi; yeni yön onaylan
 - **Taha (2026-11-19): "genel işleyişten memnunum".** Bu oturumun çalışma biçimi korunur: her adım tek sabitle kapatılabilir; Blender'da pozlar MCP içinde kemik konumu ölçülerek bulunur ve `look` görüntüsüyle yinelenir; oyunda ekran görüntüsü + kare özeti + video; ölçümler sayıyla raporlanır (TONGUE sayaçları); eklenen tasarım kuralı (ısırma) açıkça onaya sunulur.
 - **Yeni oturum başlangıcı:** ortam kontrolü → bu bölüm → ROADMAP V.5 satırı → V.5 için kararları sor (hangi türler önce, sıra, her türün imza hareketi: DECISIONS K5), kod yazma. Blender işinden önce `claude mcp list` + Blender'da BlenderMCP bağlantısı; MCP'de `read_factory_settings` çağırma. Küçük açıklar: ısırıp bırakmada da `break_free` oynuyor; 40 dilcide dil maliyeti ölçülmedi (`--bench`); `zombie_visual.gd` ve `enemy_manager.gd` 300 satırı aşıyor.
 
-- **YENİ OTURUM BURADAN (Oturum 10, 2026-11-20, paralel alt ajanlar):** her Blender ajanı kendi `blender --background` örneğinde çalıştı (Taha onayı).
+- **YENİ OTURUM BURADAN (Oturum 10, 2. tur, 2026-11-20):** Taha v1 eleştirisini kabul etti, "düzeltip oyuna ekleyin" dedi. Hepsi oyunda, bayraklı, **Taha'nın arenada denemesi bekleniyor.**
+  - Koşucu v2 (`e53d7f4`, oyunda `bf67714`, `FEATURE_RUNNER_MODEL`), zıplayan v2 (`b9bafa6`, `d53e049`, `FEATURE_JUMPER_MODEL`), tank v2 (`b3796c0`, `FEATURE_TANK_MODEL`). Her türün kendi kafası, tanımlı kaslar, ayak parmakları. Model tablosu `scripts/data/zombie_model_data.gd`.
+  - `25ee792`: `GAME_PACE` 0.8 (hızlar, dash ve süreler değil), `FEATURE_RUNNER_SPRINT` (çığlık → durmadan koşu → pençe → geçip gider → döner), `FEATURE_JUMP_SHADOW_MARKER` (kırmızı halka yerine gölge).
+  - Sürü (100 zombi, temiz): yürüyen 3.3, koşucu 3.5, tank 3.7, zıplayan 5.8 ms/kare.
+  - Açıklar: tank sırt plakaları üstten tek tepelik gibi; zıplayanın şortu havada yelken gibi; ölüm pozlarında 2–4 cm gömülme; koşucuya karşı daire çizmek ayakta durmaktan kötü (12 vs 5 vuruş/19 sn); bot 0 galibiyet (7.3'ten beri).
+
+- **Oturum 10, 1. tur (2026-11-20, paralel alt ajanlar):** her Blender ajanı kendi `blender --background` örneğinde çalıştı (Taha onayı).
   - Yürüyen oyunda: `af8df5e` (`FEATURE_WALKER_MODEL`), walk 0.70 sn döngü, 2.6 m/sn'de kayma 1–3 cm (`d2a07fc`), klip hızı gerçek hıza bağlı (`c6ff391`, `FEATURE_WALK_SPEED_SYNC`). Sürü: 100 yürüyen 3.4 ms, 300 yürüyen 10.0 ms/kare (temiz ölçüm).
   - **1v1 debug arenası** (`2da4997`): `scenes/debug/arena.tscn` (F6) ya da `-- --arena=<tür>`; 1–5 tür, R doğur, G silah, H ölümsüz, T dondur, K öldür, F7 silah. `FEATURE_DEBUG_ARENA`.
   - Konseptler v1 (`14643ee`): `docs/concept/{runner,jumper,tank}_v1_{lineup,signature,gamecam,silhouette,close}.png`. **Taha'nın yorumu bekleniyor.** Ortak zayıflık: kafa yürüyenden, yüz hamur gibi; kas formları balon; ayaklar parmaksız. Onaydan sonra oyun modeli + klipler (paralel), değerlendirme arenada (klip videosu yok).
