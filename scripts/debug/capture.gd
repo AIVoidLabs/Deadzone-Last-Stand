@@ -8,11 +8,11 @@ extends Node
 ## --weapons=N: toplam N silahla başlar (debug silahı eklenir). --no-weapons: silahlar ateş etmez (saldırı ölçümü).
 ## --levels=N: N seviye atlatır (kart seçimi dalga arasında açılır). --capture-pick: açılan kart ekranında 1'e basar. --wave=N: N. dalgadan başlar. --capture-wave-end=S: görüntüden S saniye önce dalgayı bitirir.
 ## --autopilot: asker ölümsüz, daire çizerek yürür. --god: asker ölümsüz ama yerinde durur.
-## --capture-kind=runner|tank: --capture-spawn ile bu türden doğurur (varsayılan walker).
+## --capture-kind=<tür id> (runner, tank, spitter, thrower ...): --capture-spawn ile bu türden doğurur (varsayılan walker).
 ## --capture-root=S: görüntüden S saniye önce askeri 1 sn bağlar (S<1: çırpınma, S 1.1–1.4: kurtulma karesi).
 ## --capture-near=M: --capture-spawn zombilerini askerin M metre çevresine dizer (özel saldırıları hızlı görmek için).
 ## --circle: asker (ölümsüz değil) daire çizerek yürür. --zigzag=S: S saniyede bir yön değiştirerek yürür.
-## Sonda tür başına atılış istatistiği basılır (LUNGE starts/hits): koşucu kaçış ayarı denetimi.
+## Sonda tür başına atılış istatistiği basılır (LUNGE starts/hits): koşucu kaçış ayarı denetimi; SPIT/THROW satırı yay atışı sayaçları.
 
 var player: Player
 var enemies: EnemyManager
@@ -152,6 +152,8 @@ func _process(delta: float) -> void:
 	print("%s starts=%d hits=%d  JUMP lands=%d hits=%d  TONGUE shots=%d hits=%d bites=%d timeouts=%d melee=%d" % [
 		"SPRINT(strike)" if Tuning.FEATURE_RUNNER_SPRINT else "LUNGE", enemies.lunge_starts, enemies.lunge_hits, enemies.jump_lands, enemies.jump_hits, enemies.tongue_shots, enemies.tongue_hits,
 		enemies.tongue_bites, enemies.tongue_timeouts, enemies.tongue_melees])
+	print("SPIT shots=%d pools=%d ticks=%d  THROW shots=%d hits=%d melee=%d" % [
+		enemies.spit_shots, enemies.spit_pools, enemies.spit_ticks, enemies.throw_shots, enemies.throw_hits, enemies.throw_melees])
 	# Headless (dummy renderer) görüntü dokusu yoktur; get_image "Parameter t is null" hatası basar.
 	var image: Image = null if DisplayServer.get_name() == "headless" else get_viewport().get_texture().get_image()
 	if image != null:

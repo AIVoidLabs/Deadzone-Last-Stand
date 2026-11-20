@@ -71,3 +71,24 @@ func test_special_rows_follow_the_spec() -> void:
 	assert_almost_eq(float(EnemyData.TABLE[EnemyData.SPITTER]["speed"]), 2.4 * Tuning.GAME_PACE, 0.0001)
 	assert_eq(EnemyData.TABLE[EnemyData.SPITTER]["attack_kind"], &"spit")
 	assert_eq(EnemyData.TABLE[EnemyData.THROWER]["attack_kind"], &"throw")
+
+
+func test_special_attack_router_knows_lob_kinds() -> void:
+	var spitter: Dictionary = EnemyData.get_row(EnemyData.SPITTER)
+	var thrower: Dictionary = EnemyData.get_row(EnemyData.THROWER)
+	assert_eq(SpecialAttacks.is_special(spitter), Tuning.FEATURE_ZOMBIE_SPIT)
+	assert_eq(SpecialAttacks.is_special(thrower), Tuning.FEATURE_ZOMBIE_THROW)
+	assert_eq(SpecialAttacks.start_range(spitter), float(spitter["spit_range"]) if Tuning.FEATURE_ZOMBIE_SPIT else float(spitter["attack_range"]))
+	assert_eq(SpecialAttacks.start_range(thrower), float(thrower["throw_range"]) if Tuning.FEATURE_ZOMBIE_THROW else float(thrower["attack_range"]))
+
+
+func test_lob_locks_leave_a_reaction_window() -> void:
+	var spitter: Dictionary = EnemyData.get_row(EnemyData.SPITTER)
+	var thrower: Dictionary = EnemyData.get_row(EnemyData.THROWER)
+	assert_lt(float(spitter["spit_lock"]), float(spitter["attack_windup"]))
+	assert_lt(float(thrower["throw_lock"]), float(thrower["attack_windup"]))
+	# Kilitten sonra uçuş sırasında asker iniş halkasından çıkabilmeli.
+	var window: float = float(thrower["throw_lock"]) + float(thrower["throw_flight"])
+	assert_gt(Tuning.PLAYER_SPEED * window, float(thrower["throw_radius"]) + Tuning.PLAYER_RADIUS)
+	window = float(spitter["spit_lock"]) + float(spitter["spit_flight"])
+	assert_gt(Tuning.PLAYER_SPEED * window, float(spitter["acid_radius"]) + Tuning.PLAYER_RADIUS)

@@ -39,6 +39,8 @@ var _jump_total: float = 0.0
 var _marker: ZombieJumpMarker
 var _model_height: float = Tuning.CHARACTER_MODEL_HEIGHT
 var _skeleton: Skeleton3D
+## Yeni hat modelinin örnek başına ton farkı (VC_TINT_VARIANCE); satırdaki `tint` ile çarpılır.
+var _tint: Vector3 = Vector3.ONE
 ## Dil görüntüsü (yalnız dilci): DilciTongue (yeni model) ya da BeamTongue (eski kutu).
 var _tongue: Node
 
@@ -87,6 +89,8 @@ func _on_event(event_name: StringName, data: Dictionary) -> void:
 				_tongue.on_event(data)
 		&"melee":
 			_clips.play_melee()
+		&"swat":
+			_clips.play_timed(&"anim_swat", float(_clips.row.get("throw_melee_anim_hit_time", 0.0)), _body.state_duration)
 		&"hit":
 			if Tuning.FEATURE_HIT_FLASH:
 				_flash_left = Tuning.HIT_FLASH_TIME
@@ -205,7 +209,8 @@ func _build_vc_model(model_kind: StringName) -> void:
 	var mesh: MeshInstance3D = ModelVariants.keep(model, randi())
 	mesh.material_override = _vc_shared_material()
 	var t: float = 1.0 + randf_range(-VC_TINT_VARIANCE, VC_TINT_VARIANCE)
-	mesh.set_instance_shader_parameter(&"tint", Vector3(t, t * randf_range(0.97, 1.03), t))
+	_tint = Vector3(t, t * randf_range(0.97, 1.03), t)
+	mesh.set_instance_shader_parameter(&"tint", _tint)
 	_meshes.append(mesh)
 	_model_height = mesh.get_aabb().end.y
 	_clips.animation = model.find_child("AnimationPlayer", true, false) as AnimationPlayer
@@ -230,9 +235,18 @@ func _apply_kind(row: Dictionary) -> void:
 		box.material_override = _material_for(row)
 		box.position.y = height * 0.5
 		return
+	_apply_tint(row)
 	var size: float = randf_range(1.0 - Tuning.ZOMBIE_SCALE_VARIANCE, 1.0 + Tuning.ZOMBIE_SCALE_VARIANCE)
 	scale = Vector3.ONE * (size * height / _model_height)
 	_clips.size_scale = scale.x
+
+
+## Satırda tint varsa (özel türler, kendi modeli yokken yürüyenin modeli) köşe renginin çarpanı olarak uygulanır.
+func _apply_tint(row: Dictionary) -> void:
+	if not _clips.own_clips or not row.has("tint"):
+		return
+	var tint: Color = row["tint"]
+	_meshes[0].set_instance_shader_parameter(&"tint", Vector3(tint.r * _tint.x, tint.g * _tint.y, tint.b * _tint.z))
 
 
 ## Dil görüntüsü: yeni modelde Head kemiğine bağlı yordamsal dil, yoksa eski kutu.

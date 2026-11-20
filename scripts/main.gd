@@ -60,6 +60,7 @@ func _ready() -> void:
 		Audio.play(&"explosion"))
 	projectiles.explosion.connect(func(_at: Vector3, _radius: float) -> void:
 		camera.add_trauma(Tuning.CAMERA_SHAKE_ON_EXPLOSION))
+	_add_lob_fx(enemies, camera)
 	_add_sounds(player, enemies, weapons, projectiles)
 
 	if Tuning.FEATURE_HURT_VIGNETTE:
@@ -151,6 +152,22 @@ func _add_hit_feedback(enemies: EnemyManager, camera: FollowCamera) -> void:
 		GameFlow.hit_stop(Tuning.HIT_STOP_KILL_TIME)
 		if Tuning.FEATURE_KILL_SHAKE:
 			camera.add_trauma(Tuning.CAMERA_SHAKE_ON_KILL))
+
+
+## Yay atışı görüntüsü (7.3): uçan asit topu / kaya + gölge işareti, asit havuzları; kaya inişinde toz ve sarsıntı.
+func _add_lob_fx(enemies: EnemyManager, camera: FollowCamera) -> void:
+	if Tuning.FEATURE_ZOMBIE_SPIT or Tuning.FEATURE_ZOMBIE_THROW:
+		var lobs: LobProjectiles = LobProjectiles.new()
+		add_child(lobs)
+		enemies.lob_launched.connect(lobs.launch)
+	if Tuning.FEATURE_ZOMBIE_SPIT:
+		var pools: AcidPools = AcidPools.new()
+		add_child(pools)
+		enemies.acid_pool_started.connect(pools.add_pool)
+	enemies.lob_landed.connect(func(kind: StringName, at: Vector3, radius: float) -> void:
+		if kind == &"throw":
+			LandingFx.play(self, at, radius)
+			camera.add_trauma(Tuning.CAMERA_SHAKE_ON_ROCK))
 
 
 ## Ses efektleri: olaylar Audio.play'e bağlanır; hangi sesin açık olduğu SoundData/Tuning'den.

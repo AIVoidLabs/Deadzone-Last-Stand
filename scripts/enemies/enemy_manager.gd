@@ -11,6 +11,11 @@ signal enemy_killed(at: Vector3, row: Dictionary)
 signal enemy_damaged(at: Vector3, direction: Vector2, amount: float, killed: bool)
 ## Zıplayan indi (şok dalgası efekti ve kamera sarsıntısı için). at: yerde, radius: iniş yarıçapı.
 signal jump_landed(at: Vector3, radius: float)
+## Yay atışı (LobAttack): kind &"spit" / &"throw"; from/dest dünya konumu (from bırakış yüksekliğinde), flight sn,
+## arc tepe yüksekliği, radius iniş yarıçapı (gölge işareti). İnince lob_landed; asit topu havuz bırakınca acid_pool_started.
+signal lob_launched(kind: StringName, from: Vector3, dest: Vector3, flight: float, arc: float, radius: float)
+signal lob_landed(kind: StringName, at: Vector3, radius: float)
+signal acid_pool_started(at: Vector3, radius: float, time: float)
 
 const PHYSICS_PRIORITY: int = -10
 ## Bu hızın (karesi) altındaki itme sıfırlanır.
@@ -32,6 +37,13 @@ var tongue_hits: int = 0
 var tongue_bites: int = 0
 var tongue_timeouts: int = 0
 var tongue_melees: int = 0
+## Yay atışı sayaçları: atılan top, bırakılan havuz, asit tiki; atılan kaya, isabet eden kaya, yakın vuruş.
+var spit_shots: int = 0
+var spit_pools: int = 0
+var spit_ticks: int = 0
+var throw_shots: int = 0
+var throw_hits: int = 0
+var throw_melees: int = 0
 ## Askeri dille bağlayan dilci (yoksa null); ölürse bağ çözülür.
 var latched: Zombie
 ## Debug arenası: true iken canlı zombiler donar (hareket ve saldırı durur).
@@ -101,6 +113,7 @@ func _physics_process(delta: float) -> void:
 	elapsed += delta
 	_grid.rebuild(_pos)
 	_move(delta)
+	_special.tick(delta)
 	if _burning > 0:
 		_burn.tick(delta)
 

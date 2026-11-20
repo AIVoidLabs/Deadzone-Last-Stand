@@ -124,6 +124,20 @@ func take_hit(amount: float, push: Vector2 = Vector2.ZERO) -> void:
 	if Tuning.FEATURE_PLAYER_IFRAMES:
 		_iframes_left = Tuning.PLAYER_HIT_IFRAMES
 	event.emit(&"hit", {"amount": dealt, "hp": health.current, "iframes": _iframes_left})
+	_die_if_dead()
+
+
+## Sürekli hasar (asit havuzu): zırh azaltması uygulanır; dokunulmazlık vermez, itme ve vurulma animasyonu yok
+## (`dot` olayı: yalnız hafif ekran kızarması). Dash ve dokunulmazlıkta hasar yok.
+func take_dot(amount: float) -> void:
+	if not is_hittable():
+		return
+	var dealt: float = health.take_damage(CombatMath.mitigate(amount, stats.armor()))
+	event.emit(&"dot", {"amount": dealt, "hp": health.current})
+	_die_if_dead()
+
+
+func _die_if_dead() -> void:
 	if health.is_dead():
 		_rooted = false
 		_set_state(State.DEAD)

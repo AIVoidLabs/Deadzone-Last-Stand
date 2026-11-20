@@ -1,7 +1,7 @@
 class_name SpecialAttacks
 extends RefCounted
 ## Yürüyenden farklı saldırı düzenleri: koşucunun atılışı ya da durmadan koşusu (SprintAttack), zıplayanın sıçrayıp inişi,
-## dilcinin dili ve yakın vuruşu (TongueAttack). Yönlendirici: tür satırına göre ilgili sınıfa devreder.
+## dilcinin dili ve yakın vuruşu (TongueAttack), tükürücünün asit topu ve taş fırlatanın kayası (LobAttack). Yönlendirici: tür satırına göre ilgili sınıfa devreder.
 ## EnemyManager'ın paralel dizilerini onun adına işler (durum, süre ve nişan manager'da kalır;
 ## görüntüye yalnız zombi düğümünün `event` sinyaliyle haber verilir).
 
@@ -12,12 +12,14 @@ const TONGUE_REACH_MARGIN: float = TongueAttack.TONGUE_REACH_MARGIN
 var _m: EnemyManager
 var _sprint: SprintAttack
 var _tongue: TongueAttack
+var _lob: LobAttack
 
 
 func _init(manager: EnemyManager) -> void:
 	_m = manager
 	_sprint = SprintAttack.new(manager)
 	_tongue = TongueAttack.new(manager)
+	_lob = LobAttack.new(manager)
 
 
 ## Bu türün özel saldırısı açık mı (kapalıysa yürüyen gibi yaklaşıp vurur).
@@ -29,6 +31,10 @@ static func is_special(row: Dictionary) -> bool:
 			return Tuning.FEATURE_ZOMBIE_JUMP
 		&"tongue":
 			return Tuning.FEATURE_ZOMBIE_TONGUE
+		&"spit":
+			return Tuning.FEATURE_ZOMBIE_SPIT
+		&"throw":
+			return Tuning.FEATURE_ZOMBIE_THROW
 	return false
 
 
@@ -53,6 +59,10 @@ static func start_range(row: Dictionary) -> float:
 			return row["sprint_trigger_range"]
 		&"jump":
 			return row["jump_range"]
+		&"spit":
+			return row["spit_range"]
+		&"throw":
+			return row["throw_range"]
 	return row["tongue_range"]
 
 
@@ -67,6 +77,8 @@ static func windup_next(row: Dictionary) -> ZombieRules.State:
 			return S.SPRINT
 		&"jump":
 			return S.JUMP
+		&"spit", &"throw":
+			return S.RECOVER
 	return S.LASH
 
 
@@ -98,22 +110,29 @@ func is_solid(i: int, state: ZombieRules.State) -> bool:
 
 ## Zombinin baktığı yön (özel durumlarda nişan yönü).
 func facing(i: int, p: Vector2) -> Vector2:
-	if _m._rows[i]["attack_kind"] == &"jump":
+	if _is_aimed_at_point(_m._rows[i]["attack_kind"]):
 		return Steering.seek(p, _m._aim[i])
 	return _m._aim[i]
 
 
-## Hazırlık süresi (sn). Dilci temasa yakınsa yakın vuruşa karar verir (bayrak açıkken), değilse satırdaki attack_windup.
+## Hazırlık süresi (sn). Dilci / taş fırlatan temasa yakınsa yakın vuruşa karar verir (bayrak açıkken), değilse satırdaki attack_windup.
 func windup_time(i: int, dist: float, contact: float) -> float:
 	var row: Dictionary = _m._rows[i]
-	if row["attack_kind"] == &"tongue":
-		return _tongue.windup_time(i, row, dist, contact)
+	match row["attack_kind"]:
+		&"tongue":
+			return _tongue.windup_time(i, row, dist, contact)
+		&"throw":
+			return _lob.windup_time(i, row, dist, contact)
 	return row["attack_windup"]
 
 
 ## Hazırlık başlarken ilk nişan.
 func begin_windup(i: int, p: Vector2, target: Vector2, target_vel: Vector2) -> void:
-	_windup_tick(i, _m._rows[i], p, target, target_vel)
+	var row: Dictionary = _m._rows[i]
+	if row["attack_kind"] == &"spit" or row["attack_kind"] == &"throw":
+		_lob.begin_windup(i, row, p, target, target_vel)
+		return
+	_windup_tick(i, row, p, target, target_vel)
 
 
 ## Hazırlık bitti: saldırı başlar. Dönüş: girilen durum.
@@ -130,6 +149,8 @@ func end_windup(i: int, target: Vector2) -> ZombieRules.State:
 			_m._targetable[i] = 0
 			_m._enter(i, S.JUMP, row["jump_time"])
 			return S.JUMP
+		&"spit", &"throw":
+			return _lob.end_windup(i, row, target)
 	return _tongue.end_windup(i, row, target)
 
 
@@ -161,10 +182,17 @@ func lunge_contact(i: int, state: ZombieRules.State, p: Vector2, dist: float, re
 ## Sıkıştırma: örneğe bağlı özel diziler paralel dizilerle birlikte kayar.
 func swap_from_last(i: int, last: int) -> void:
 	_tongue.swap_from_last(i, last)
+	_lob.swap_from_last(i, last)
 
 
 func shrink(last: int) -> void:
 	_tongue.shrink(last)
+	_lob.shrink(last)
+
+
+## Her fizik karesi: uçan top/kayalar ve asit havuzları.
+func tick(delta: float) -> void:
+	_lob.tick(delta)
 
 
 ## Zombi ölürken ya da silinirken: bağ ve işaret temizlenir.
@@ -174,6 +202,7 @@ func on_removed(i: int) -> void:
 	if kind == &"jump":
 		node.event.emit(&"marker", {"on": false})
 	_tongue.on_removed(i, node, kind)
+	_lob.on_removed(i)
 	_m._targetable[i] = 0
 
 
@@ -192,6 +221,8 @@ func _windup_tick(i: int, row: Dictionary, p: Vector2, target: Vector2, target_v
 			_marker(i, _m._aim[i], row, true)
 		&"tongue":
 			_tongue.aim_tick(i, row, p, target, target_vel)
+		&"spit", &"throw":
+			_lob.aim_tick(i, row, p, target, target_vel)
 
 
 func _marker(i: int, dest: Vector2, row: Dictionary, on: bool) -> void:
@@ -210,3 +241,8 @@ func _land(i: int, row: Dictionary, target: Vector2) -> void:
 		_m.jump_hits += 1
 		_m.player.take_hit(_m._damage[i], target - dest)
 	_m.jump_landed.emit(Vector3(dest.x, 0.1, dest.y), float(row["land_radius"]))
+
+
+## Nişan alanı bir yön değil yerdeki nokta olan türler (iniş / atış noktası).
+static func _is_aimed_at_point(kind: StringName) -> bool:
+	return kind == &"jump" or kind == &"spit" or kind == &"throw"

@@ -46,6 +46,8 @@ func _process(delta: float) -> void:
 func _on_player_event(event_name: StringName, _data: Dictionary) -> void:
 	if event_name == &"hit":
 		_flash = 1.0
+	elif event_name == &"dot":
+		_flash = maxf(_flash, Tuning.ACID_VIGNETTE_FLASH)
 
 
 func _apply(strength: float) -> void:
