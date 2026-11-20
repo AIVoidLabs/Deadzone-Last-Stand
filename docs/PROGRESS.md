@@ -17,10 +17,11 @@ Oturum 8 (2026-11-19). Taha görsel kaliteden memnun değildi; yeni yön onaylan
      bekleme (`attack_recover` 5.0 / `tongue_miss_recover` 2.0) gözden geçirilecek. **Yeni kural:** asker dilcinin yakın vuruş menzilindeyse
      (düz vuruş hizasında) dil atmak yerine yakın dövüşle (düz vuruş) saldırsın. Bayrakla; dilci klip setinde yakın vuruş klibi yok → ya mevcut
      `lash` kısa yakın darbe olarak kullanılır ya da Blender'da `swipe` klibi anahtarlanır (karar o oturumda).
-  3. **Hata: dil bağı kalkınca asker sürüklenme (drag) animasyonunda takılı kalıyor.** Yeniden üretme: dilci çok yakından dil atar, çeker ve ısırır
-     → asker artık bağlı değil ama `drag` pozunda kalıyor, çözülmüyor (görüntü `build/shots/bug_tongue_stuck_drag.png`). Şüphe: yakın mesafede
-     `attach` ile `released`/ısırma aynı karede ya da sırası ters geliyor; `PlayerAnimator` sürüklenme düğümünden çıkış (`break_free`/bitiş) olayı
-     kaçıyor. Önce kök neden (olay sırası logu), sonra düzeltme + GUT testi (`TongueRules` yakın mesafe senaryosu).
+  3. ✔ **Düzeldi (Oturum 11): dil bağı kalkınca asker sürüklenme pozunda takılı kalıyordu.** Kök neden: `ec3b12e`'den beri ısırıp bırakmada
+     (`broke_free=false`) `PlayerVisual` hiçbir şey çağırmıyordu; döngülü `drag` tek-sefer düğümü kendiliğinden bitmediği için açık kalıyordu
+     (yakın mesafede her ısırma bu yoldan geçiyor). Düzeltme: `PlayerAnimator.release(broke_free)` sürüklenmeyi her durumda söndürür, kurtulma
+     klibini yalnız asker kopardıysa oynatır. 2 yeni GUT testi (206 geçiyor); oyunda `--capture-near=3` ile ısırma sonrası bekleme duruşu görüldü
+     (`build/shots/fix_tongue_drag.png`).
   4. **Hedef görünüm notu (DECISIONS 2026-11-20):** gece şehir sokağı, daha üstten/uzaktan kamera, çevre ana unsur. Aşama 8 planına girer.
 
 - **Oturum 10, 2. tur (2026-11-20):** Taha v1 eleştirisini kabul etti, "düzeltip oyuna ekleyin" dedi. Hepsi oyunda, bayraklı, **Taha'nın arenada denemesi bekleniyor.**

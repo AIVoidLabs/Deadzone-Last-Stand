@@ -40,7 +40,25 @@ func test_struggle_runs_until_released() -> void:
 func test_break_free_ends_and_returns_to_locomotion() -> void:
 	_animator.play_struggle()
 	_advance(1.0)
-	_animator.play_break_free()
+	_animator.release(true)
 	_advance(_animator.break_free_time() + Tuning.PLAYER_ANIM_BLEND * 2.0 + 0.2)
 	assert_false(_tree.get(&"parameters/struggle/active"))
 	assert_false(_tree.get(&"parameters/free/active"))
+
+
+## Hata (2026-11-20): dilci ısırıp bırakınca (kurtulma klibi yok) asker sürüklenme pozunda kalıyordu.
+func test_bite_release_ends_drag_without_break_free() -> void:
+	_animator.play_struggle()
+	_advance(1.0)
+	_animator.release(false)
+	_advance(Tuning.PLAYER_ANIM_BLEND * 2.0 + 0.2)
+	assert_false(_tree.get(&"parameters/struggle/active"), "sürüklenme kapanmalı")
+	assert_false(_tree.get(&"parameters/free/active"), "ısırıp bırakmada kurtulma klibi oynamaz")
+
+
+## Yakın mesafede bağ ve bırakma aynı karede gelebilir: yine sürüklenmede kalmamalı.
+func test_same_frame_root_and_bite_release_ends_drag() -> void:
+	_animator.play_struggle()
+	_animator.release(false)
+	_advance(Tuning.PLAYER_ANIM_BLEND * 2.0 + 0.2)
+	assert_false(_tree.get(&"parameters/struggle/active"))

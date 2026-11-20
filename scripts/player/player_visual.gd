@@ -61,8 +61,8 @@ func _on_event(event_name: StringName, data: Dictionary) -> void:
 			_animator.play_struggle()
 		return
 	if event_name == &"released":
-		if _animator != null and data.get("broke_free", true):
-			_animator.play_break_free()
+		if _animator != null:
+			_animator.release(data.get("broke_free", true))
 		return
 	if event_name != &"hit":
 		return

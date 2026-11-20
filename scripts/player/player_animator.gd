@@ -69,10 +69,13 @@ func play_struggle() -> void:
 	_tree.set(&"parameters/struggle/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_FIRE)
 
 
-## Bağ çözülünce: çırpınma biter, kollar açılarak kurtulma klibi bir kez oynar.
-func play_break_free() -> void:
-	_tree.set(&"parameters/struggle/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_ABORT)
-	_tree.set(&"parameters/free/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_FIRE)
+## Bağ çözülünce sürüklenme döngüsü her durumda kapanır (döngü kendiliğinden bitmez).
+## broke_free: asker kendini kopardı, kollar açılarak kurtulma klibi bir kez oynar;
+## değilse (dilci ısırıp bıraktı) doğrudan yürüme/beklemeye harmanlanır.
+func release(broke_free: bool) -> void:
+	_tree.set(&"parameters/struggle/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_FADE_OUT)
+	if broke_free:
+		_tree.set(&"parameters/free/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_FIRE)
 
 
 func set_dead(dead: bool) -> void:
