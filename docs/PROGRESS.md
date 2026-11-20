@@ -10,7 +10,13 @@ Oturum 8 (2026-11-19). Taha görsel kaliteden memnun değildi; yeni yön onaylan
 - **Taha (2026-11-19): "genel işleyişten memnunum".** Bu oturumun çalışma biçimi korunur: her adım tek sabitle kapatılabilir; Blender'da pozlar MCP içinde kemik konumu ölçülerek bulunur ve `look` görüntüsüyle yinelenir; oyunda ekran görüntüsü + kare özeti + video; ölçümler sayıyla raporlanır (TONGUE sayaçları); eklenen tasarım kuralı (ısırma) açıkça onaya sunulur.
 - **Yeni oturum başlangıcı:** ortam kontrolü → bu bölüm → ROADMAP V.5 satırı → V.5 için kararları sor (hangi türler önce, sıra, her türün imza hareketi: DECISIONS K5), kod yazma. Blender işinden önce `claude mcp list` + Blender'da BlenderMCP bağlantısı; MCP'de `read_factory_settings` çağırma. Küçük açıklar: ısırıp bırakmada da `break_free` oynuyor; 40 dilcide dil maliyeti ölçülmedi (`--bench`); `zombie_visual.gd` ve `enemy_manager.gd` 300 satırı aşıyor.
 
-- **YENİ OTURUM BURADAN (Oturum 9 sonu, 2026-11-19):** V.5'te yürüyen. Konsept onaylı (`850f3d1`), oyun modeli (`1aa67c5`) ve klipler (`9ce5318`) hazır, **henüz oyunda değil**. Sırayla:
+- **YENİ OTURUM BURADAN (Oturum 10, 2026-11-20, paralel alt ajanlar):** her Blender ajanı kendi `blender --background` örneğinde çalıştı (Taha onayı).
+  - Yürüyen oyunda: `af8df5e` (`FEATURE_WALKER_MODEL`), walk 0.70 sn döngü, 2.6 m/sn'de kayma 1–3 cm (`d2a07fc`), klip hızı gerçek hıza bağlı (`c6ff391`, `FEATURE_WALK_SPEED_SYNC`). Sürü: 100 yürüyen 3.4 ms, 300 yürüyen 10.0 ms/kare (temiz ölçüm).
+  - **1v1 debug arenası** (`2da4997`): `scenes/debug/arena.tscn` (F6) ya da `-- --arena=<tür>`; 1–5 tür, R doğur, G silah, H ölümsüz, T dondur, K öldür, F7 silah. `FEATURE_DEBUG_ARENA`.
+  - Konseptler v1 (`14643ee`): `docs/concept/{runner,jumper,tank}_v1_{lineup,signature,gamecam,silhouette,close}.png`. **Taha'nın yorumu bekleniyor.** Ortak zayıflık: kafa yürüyenden, yüz hamur gibi; kas formları balon; ayaklar parmaksız. Onaydan sonra oyun modeli + klipler (paralel), değerlendirme arenada (klip videosu yok).
+  - Refactor borcu: `zombie_visual.gd` 303, `enemy_manager.gd` ~315, `walker_anims.py` 319, `walker_pose.py` 333, `build_jumper.py` 307, `tongue_rope.gd` ~400 satır.
+
+- **Oturum 9 sonu (2026-11-19):** V.5'te yürüyen. Konsept onaylı (`850f3d1`), oyun modeli (`1aa67c5`) ve klipler (`9ce5318`) hazır, **henüz oyunda değil**. Sırayla:
   1. **Yürüyüşü 2.6 m/sn'ye göre yeniden anahtarla (Taha kararı):** oyun hızı değişmez. Uzun adımlı, öne yıkılır gibi giden bir sendeleme; ayaklar oyunun 2.6 m/sn hızında kaymamalı. Yalnız `walk` klibi değişir (`tools/blender/walker_anims.py` + `walker_pose.py`, `walker_game.py` ile dışa aktarım). Blender MCP gerekir.
   2. **Oyuna bağla:**
      - `FEATURE_WALKER_MODEL` bayrağı.
