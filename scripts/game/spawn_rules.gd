@@ -64,6 +64,18 @@ static func pick_kind(rng: RandomNumberGenerator, mix: Dictionary) -> StringName
 	return chosen
 
 
+## pick_kind ama sınırdaki türler (caps: tür → en çok canlı, alive: tür → şu anki canlı) seçimden çıkarılır.
+## Karışımda sınırsız tür (yürüyen) her zaman kalır.
+static func pick_kind_capped(rng: RandomNumberGenerator, mix: Dictionary, caps: Dictionary, alive: Dictionary) -> StringName:
+	var allowed: Dictionary = mix
+	for kind: StringName in caps:
+		if allowed.has(kind) and int(alive.get(kind, 0)) >= int(caps[kind]):
+			if allowed == mix:
+				allowed = mix.duplicate()
+			allowed.erase(kind)
+	return pick_kind(rng, allowed)
+
+
 ## Sabit açılı kameranın yerde gördüğü alanı, kameranın baktığı noktaya göre çevreleyen dikdörtgen.
 ## Kamera +Y (dünya +Z) tarafında durur: position.y uzak kenar (negatif), end.y yakın kenar.
 static func ground_view_rect(pitch_deg: float, distance: float, fov_deg: float, aspect: float, min_ray_deg: float) -> Rect2:

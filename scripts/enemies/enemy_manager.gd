@@ -125,6 +125,10 @@ func nearest_enemy(from: Vector2, max_range: float) -> int:
 	return _queries.nearest_enemy(from, max_range)
 
 
+func count_kind(kind: StringName) -> int:
+	return _queries.count_kind(kind)
+
+
 func count_near(center: Vector2, radius: float) -> int:
 	return _queries.count_near(center, radius)
 

@@ -37,6 +37,32 @@ const FEATURE_ROOT: bool = true
 const FEATURE_ZOMBIE_JUMP: bool = true
 ## Dilci dilini atıp askeri bağlar; kapalıyken yürüyen gibi yaklaşıp vurur (7.3).
 const FEATURE_ZOMBIE_TONGUE: bool = true
+## 7.3 beş özel tür (docs: build/briefs/s73_design.md). Davranış bayrakları: kapalıyken tür yürüyen gibi davranır
+## (zırhlı, çığlıkçı, patlayıcı) ya da dalga karışımından düşer; tükürücü ve taş fırlatan kapalıyken hiç doğmaz.
+const FEATURE_ZOMBIE_ARMOR: bool = true
+const FEATURE_ZOMBIE_SCREAM: bool = true
+const FEATURE_ZOMBIE_SPIT: bool = true
+const FEATURE_ZOMBIE_THROW: bool = true
+const FEATURE_ZOMBIE_BLOAT: bool = true
+## Taş fırlatan temas + throw_melee_range içindeyken atış yerine dev kolla yakın vuruş (swat) yapar.
+const FEATURE_THROW_MELEE: bool = true
+## Model bayrakları: Blender GLB'leri hazır olunca açılır (kapalıyken satır yürüyenin modeli + tint ile çizilir).
+const FEATURE_ARMORED_MODEL: bool = false
+const FEATURE_SCREAMER_MODEL: bool = false
+const FEATURE_SPITTER_MODEL: bool = false
+const FEATURE_THROWER_MODEL: bool = false
+const FEATURE_BLOATER_MODEL: bool = false
+## Yay atışı (asit topu, kaya): bırakış yüksekliği (m), görsel havuz boyu, kayanın yerde kalma ve solma süresi (sn),
+## iniş sarsıntısı. Asit havuzu: en çok aynı anda, son söne süresi (sn). Asit hasarında ekran kızarması payı.
+const LOB_RELEASE_HEIGHT: float = 1.3
+const LOB_POOL_SIZE: int = 24
+const LOB_TRAIL_STEP: float = 0.035
+const ROCK_REST_TIME: float = 2.0
+const ROCK_FADE_TIME: float = 0.4
+const CAMERA_SHAKE_ON_ROCK: float = 0.15
+const ACID_POOL_MAX: int = 12
+const ACID_FADE_TIME: float = 1.0
+const ACID_VIGNETTE_FLASH: float = 0.3
 ## Zıplayanın iniş işareti yaklaşan cismin gölgesi gibi çizilir; kapalıyken eski kırmızı halka.
 const FEATURE_JUMP_SHADOW_MARKER: bool = true
 ## Gölge: en koyu opaklık, yumuşaklık (yarıçap oranı; hazırlık başı / iniş anı), kenar çizgisi kalınlığı ve gücü,

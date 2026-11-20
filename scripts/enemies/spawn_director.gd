@@ -86,10 +86,17 @@ func _tick_wave(delta: float) -> void:
 	var t: float = run.progress()
 	_spawn_timer = SpawnRules.wave_interval(row, t)
 	var cap: int = mini(row["max_alive"], Quality.max_enemies())
+	var mix: Dictionary = WaveData.active_mix(row["mix"])
+	var kind_caps: Dictionary = row.get("max_alive_kind", {})
+	var alive: Dictionary = {}
+	for capped: StringName in kind_caps:
+		alive[capped] = enemies.count_kind(capped)
 	for _i in SpawnRules.wave_batch(row, t):
 		if enemies.active_count() >= cap:
 			break
-		var kind: StringName = SpawnRules.pick_kind(_rng, row["mix"]) if Tuning.FEATURE_ZOMBIE_VARIETY else EnemyData.WALKER
+		var kind: StringName = SpawnRules.pick_kind_capped(_rng, mix, kind_caps, alive) if Tuning.FEATURE_ZOMBIE_VARIETY else EnemyData.WALKER
+		if kind_caps.has(kind):
+			alive[kind] += 1
 		enemies.spawn(kind, enemies.pick_spawn_point())
 
 

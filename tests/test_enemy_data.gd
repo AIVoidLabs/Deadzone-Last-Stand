@@ -8,6 +8,11 @@ const KIND_KEYS: Dictionary = {
 	&"jump": ["jump_range", "jump_time", "jump_height", "jump_lock_time", "jump_lead", "jump_max_range", "land_radius"],
 	&"tongue": ["tongue_range", "tongue_lock_time", "tongue_hit_radius", "root_time", "tongue_miss_recover",
 		"tongue_speed", "tongue_lead", "tongue_pull_speed", "tongue_pull_time", "tongue_release_gap"],
+	&"spit": ["spit_range", "spit_lock", "spit_lead", "spit_flight", "spit_arc", "acid_radius", "acid_time", "acid_tick", "acid_damage"],
+	&"throw": ["throw_range", "throw_lock", "throw_lead", "throw_flight", "throw_arc", "throw_radius", "throw_melee_range",
+		"throw_melee_windup", "throw_melee_hit_range", "throw_melee_recover"],
+	&"scream": ["scream_range", "scream_keep_min", "scream_time", "scream_radius", "scream_count", "scream_max_alive", "scream_cooldown"],
+	&"bloat": ["bloat_prime_range", "bloat_prime_time", "bloat_radius", "bloat_player_damage", "bloat_edge_factor", "bloat_zombie_damage", "bloat_death_fuse"],
 }
 
 
@@ -52,3 +57,17 @@ func test_player_release_is_safe_when_not_rooted() -> void:
 	add_child_autofree(player)
 	player.release_root()
 	assert_false(player.is_rooted())
+
+
+func test_special_rows_follow_the_spec() -> void:
+	for id: StringName in EnemyDataSpecials.ROWS:
+		assert_true(EnemyData.TABLE.has(id), "%s tabloda yok" % id)
+		var row: Dictionary = EnemyData.TABLE[id]
+		assert_eq(row["id"], id)
+		assert_true(row.has("tint") or EnemyDataSpecials.model_enabled(id), "%s: model yokken tint gerekir" % id)
+		var look: Dictionary = EnemyDataSpecials.ROWS[id]["look_v"]
+		assert_true(look.has("model") and look.has("anim_idle") and look.has("anim_walk") and look.has("anim_spawn"), "%s: look_v eksik" % id)
+	# Hızlar tempo ile çarpılır (spec "tempo öncesi").
+	assert_almost_eq(float(EnemyData.TABLE[EnemyData.SPITTER]["speed"]), 2.4 * Tuning.GAME_PACE, 0.0001)
+	assert_eq(EnemyData.TABLE[EnemyData.SPITTER]["attack_kind"], &"spit")
+	assert_eq(EnemyData.TABLE[EnemyData.THROWER]["attack_kind"], &"throw")

@@ -61,3 +61,12 @@ func find_segment_hit(a: Vector2, b: Vector2, radius: float, exclude: PackedInt3
 			best_t = t
 			best = i
 	return best
+
+
+## Bu türden canlı zombi sayısı (dalga başına tür sınırı için; seyrek çağrılır).
+func count_kind(kind: StringName) -> int:
+	var count: int = 0
+	for i in _m._rows.size():
+		if _m._alive[i] != 0 and _m._rows[i]["id"] == kind:
+			count += 1
+	return count

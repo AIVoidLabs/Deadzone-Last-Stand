@@ -3,13 +3,19 @@ extends RefCounted
 ## Zombi türleri tablosu. Yeni tür = yeni satır (eksik alanlar yürüyen zombiden gelir).
 ## attack_kind: &"melee" (yaklaşıp vurur), &"lunge" (hazırlanıp düz atılır; lunge_*), &"jump" (havaya sıçrayıp
 ## işaretli yere iner; jump_*, land_radius), &"tongue" (uzaktan dil atıp askeri bağlar; tongue_*, root_time),
-## &"sprint" (koşucunun yeni saldırısı: çığlık, durmadan koşu, koşarken pençe; sprint_*, strike_*).
+## &"sprint" (koşucunun yeni saldırısı: çığlık, durmadan koşu, koşarken pençe; sprint_*, strike_*),
+## &"spit" / &"throw" (yay atışı: asit topu, kaya), &"scream", &"bloat". 7.3 beş türün satırları enemy_data_specials.gd'de.
 
 const WALKER: StringName = &"walker"
 const RUNNER: StringName = &"runner"
 const TANK: StringName = &"tank"
 const JUMPER: StringName = &"jumper"
 const TONGUE: StringName = &"tongue"
+const ARMORED: StringName = &"armored"
+const SCREAMER: StringName = &"screamer"
+const SPITTER: StringName = &"spitter"
+const THROWER: StringName = &"thrower"
+const BLOATER: StringName = &"bloater"
 
 const _WALKER_ROW: Dictionary = {
 	"id": &"walker",
@@ -296,7 +302,8 @@ static func _build() -> Dictionary:
 	var walker: Dictionary = _WALKER_ROW.duplicate()
 	if Tuning.FEATURE_WALKER_MODEL:
 		walker.merge(_WALKER_LOOK_V, true)
-	var table: Dictionary = {&"walker": _paced(walker)}
+	var table: Dictionary = {&"walker": _paced(walker.duplicate())}
+	_add_specials(table, walker)
 	for id: StringName in _OVERRIDES:
 		var row: Dictionary = _WALKER_ROW.duplicate()
 		row.merge(_OVERRIDES[id], true)
@@ -314,6 +321,21 @@ static func _build() -> Dictionary:
 			row.merge(_TANK_LOOK_V, true)
 		table[id] = _paced(row)
 	return table
+
+
+## 7.3 beş özel tür (EnemyDataSpecials): yürüyenin modeli ve klipleri üstüne satır; model bayrağı açıksa look_v.
+static func _add_specials(table: Dictionary, walker: Dictionary) -> void:
+	for id: StringName in EnemyDataSpecials.ROWS:
+		var row: Dictionary = walker.duplicate()
+		row.merge(EnemyDataSpecials.ROWS[id], true)
+		if EnemyDataSpecials.model_enabled(id):
+			row.merge(row["look_v"], true)
+		table[id] = _paced(row)
+
+
+## Bu tür oyunda açık mı (davranış bayrağı); kapalıysa dalga karışımına girmez.
+static func kind_enabled(id: StringName) -> bool:
+	return EnemyDataSpecials.behavior_enabled(id)
 
 
 static func _paced(row: Dictionary) -> Dictionary:

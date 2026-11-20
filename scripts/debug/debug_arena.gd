@@ -2,10 +2,11 @@ class_name DebugArena
 extends Node
 ## 1v1 debug arenası: dalga, kart ve mağaza yok; asker + tek zombi (seçilen tür). Yalnız debug yapıda.
 ## Başlatma: `godot --path . -- --arena[=tür]` ya da scenes/debug/arena.tscn (F6).
-## Tuşlar: 1-5 tür seç (anında yeniden doğur), R yeniden doğur, G silahlar aç/kapa, H (ya da F5) ölümsüz,
+## Tuşlar: 1-9 ve 0 tür seç (sırası KINDS) (anında yeniden doğur), R yeniden doğur, G silahlar aç/kapa, H (ya da F5) ölümsüz,
 ## T zombiyi dondur/çöz, K zombiyi öldür; F7 silah ekle. Köşedeki etiket durumu gösterir.
 
-const KINDS: Array[StringName] = [EnemyData.WALKER, EnemyData.RUNNER, EnemyData.TANK, EnemyData.JUMPER, EnemyData.TONGUE]
+const KINDS: Array[StringName] = [EnemyData.WALKER, EnemyData.RUNNER, EnemyData.TANK, EnemyData.JUMPER, EnemyData.TONGUE,
+	EnemyData.ARMORED, EnemyData.SCREAMER, EnemyData.SPITTER, EnemyData.THROWER, EnemyData.BLOATER]
 const LAYER: int = 11
 const FONT_SIZE: int = 16
 
@@ -80,7 +81,7 @@ func _unhandled_input(input_event: InputEvent) -> void:
 	var key: InputEventKey = input_event as InputEventKey
 	if key == null or not key.pressed or key.echo or key.ctrl_pressed:
 		return
-	var number: int = key.physical_keycode - KEY_1
+	var number: int = 9 if key.physical_keycode == KEY_0 else key.physical_keycode - KEY_1
 	if number >= 0 and number < KINDS.size():
 		_kind = KINDS[number]
 		_clear()
@@ -130,5 +131,5 @@ func _build_text() -> String:
 	return "\n".join([
 		"TÜR %s   durum %s%s" % [_kind, state, "  [DONDU]" if _frozen else ""],
 		"silah %s   ölümsüz %s" % ["kapalı" if weapons.process_mode == Node.PROCESS_MODE_DISABLED else "AÇIK", "AÇIK" if player.god_mode else "kapalı"],
-		"1-5 tür · R doğur · G silah · H ölümsüz · T dondur · K öldür · F7 +silah",
+		"1-0 tür · R doğur · G silah · H ölümsüz · T dondur · K öldür · F7 +silah",
 	])
