@@ -145,23 +145,30 @@ const _OVERRIDES: Dictionary = {
 		"anim_attack": [&"pounce_windup"],
 		"anim_air": [&"leap"],
 	},
-	# Dilci: uzakta (tongue_range) durup 0.8 sn hazırlanır (son 0.3 sn yön kilitli), dilini fırlatır.
+	# Dilci: uzakta (tongue_range) durup 0.55 sn hazırlanır (son 0.25 sn yön kilitli), dilini fırlatır.
 	# Yeni mekanik (Tuning.FEATURE_TONGUE_PULL): dil tongue_speed m/sn ile düz uçar; ucun yolu askere
 	# (yarıçap + tongue_hit_radius) değerse yakalar (dash dokunulmazlığı kaçırır). Yakalanan asker dilciye
 	# tongue_pull_speed m/sn ile çekilir (hareket ve dash yok, silahlar çalışır); dilci ölünce, tongue_pull_time
 	# dolunca ya da asker temas + tongue_release_gap'e gelince bırakır (yakına geldiyse ısırır: contact_damage).
 	# Eski mekanik: anlık ışın, isabette root_time sn bağ.
+	# Yakın vuruş (Tuning.FEATURE_TONGUE_MELEE): hazırlığa girerken asker temas + tongue_melee_range içindeyse dil
+	# atılmaz; tongue_melee_windup sn hazırlanıp şaklar, vuruş anında asker temas + tongue_melee_hit_range içindeyse
+	# contact_damage vurur, tongue_melee_recover sn toparlanır.
 	&"tongue": {
 		"id": &"tongue",
 		"model": &"tongue",
 		"max_hp": 35.0,
-		"speed": 2.4,
+		"speed": 3.2, # eski 2.4
 		"contact_damage": 6.0,
 		"radius": 0.42,
 		"attack_kind": &"tongue",
 		"tongue_range": 7.5,
-		"attack_windup": 0.8,
-		"tongue_lock_time": 0.3,
+		"attack_windup": 0.55, # eski 0.8
+		"tongue_lock_time": 0.25, # eski 0.3
+		"tongue_melee_range": 0.9,
+		"tongue_melee_windup": 0.3,
+		"tongue_melee_hit_range": 0.8,
+		"tongue_melee_recover": 0.8,
 		"tongue_hit_radius": 0.35,
 		"root_time": 1.0,
 		"tongue_speed": 16.0,
@@ -169,8 +176,8 @@ const _OVERRIDES: Dictionary = {
 		"tongue_pull_speed": 1.8,
 		"tongue_pull_time": 3.0,
 		"tongue_release_gap": 0.25,
-		"attack_recover": 5.0,
-		"tongue_miss_recover": 2.0,
+		"attack_recover": 3.0, # eski 5.0
+		"tongue_miss_recover": 1.2, # eski 2.0
 		"attack_anim_hit_time": 0.0,
 		"prewarm": 8,
 		"drop_value": 8,

@@ -149,9 +149,9 @@ func _process(delta: float) -> void:
 		_tick_auto_pick(delta)
 	if _time < _seconds:
 		return
-	print("%s starts=%d hits=%d  JUMP lands=%d hits=%d  TONGUE shots=%d hits=%d bites=%d timeouts=%d" % [
+	print("%s starts=%d hits=%d  JUMP lands=%d hits=%d  TONGUE shots=%d hits=%d bites=%d timeouts=%d melee=%d" % [
 		"SPRINT(strike)" if Tuning.FEATURE_RUNNER_SPRINT else "LUNGE", enemies.lunge_starts, enemies.lunge_hits, enemies.jump_lands, enemies.jump_hits, enemies.tongue_shots, enemies.tongue_hits,
-		enemies.tongue_bites, enemies.tongue_timeouts])
+		enemies.tongue_bites, enemies.tongue_timeouts, enemies.tongue_melees])
 	# Headless (dummy renderer) görüntü dokusu yoktur; get_image "Parameter t is null" hatası basar.
 	var image: Image = null if DisplayServer.get_name() == "headless" else get_viewport().get_texture().get_image()
 	if image != null:

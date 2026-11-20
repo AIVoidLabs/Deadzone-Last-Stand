@@ -67,6 +67,8 @@ const FEATURE_TANK_MODEL: bool = true
 ## Yeni dil mekaniği (V.4): dil görünür hızla uçar (kaçılabilir), yakalarsa askeri dilciye doğru yavaşça
 ## çeker; kapalıyken eski anlık ışın + tam 1 sn bağ (7.3).
 const FEATURE_TONGUE_PULL: bool = true
+## Dilci askere temas + tongue_melee_range içindeyken dil yerine kısa yakın vuruş yapar.
+const FEATURE_TONGUE_MELEE: bool = true
 const TONGUE_PLAYER_HEIGHT: float = 1.1
 ## Dil ağı hızlı yol: indeks/UV bir kez, köşe tamponu yerinde güncellenir, az köşe, sarkarken seyrek kurma,
 ## ekran dışında kurma yok, sıkı AABB. Kapalıyken eski her-kare-yeniden-kurma yolu (V.4).

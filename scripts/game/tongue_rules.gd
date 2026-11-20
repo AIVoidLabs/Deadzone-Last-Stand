@@ -7,6 +7,11 @@ extends RefCounted
 enum Release { NONE, NEAR, TIMEOUT }
 
 
+## Yakın vuruş mu: asker temasın üstüne melee_range içindeyse (dist = merkezler arası, contact = yarıçaplar toplamı).
+static func wants_melee(dist: float, contact: float, melee_range: float) -> bool:
+	return dist <= contact + melee_range
+
+
 ## Dilin tam boya (reach) uçma süresi (sn).
 static func flight_time(reach: float, speed: float) -> float:
 	return reach / maxf(speed, 0.001)

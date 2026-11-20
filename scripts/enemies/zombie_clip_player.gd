@@ -74,6 +74,15 @@ func play_lash() -> void:
 		animation.queue(pick_clip(&"anim_pull"))
 
 
+## Dilcinin yakın vuruşu: şaklama klibi bir kez, ardından idle'a döner.
+func play_melee() -> void:
+	play_lash()
+	if animation != null and own_clips:
+		var idle: StringName = pick_clip(&"anim_idle")
+		if idle != &"":
+			animation.queue(idle)
+
+
 ## Koşucu: atılış döngüsü (LUNGE), koşu döngüsü (SPRINT) ya da koşarken pençe (STRIKE; klipteki vuruş anı
 ## strike_hit_time'a denk gelir).
 func play_rush(state: ZombieRules.State, duration: float, lunge_speed: float) -> void:

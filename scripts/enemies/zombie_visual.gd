@@ -85,6 +85,8 @@ func _on_event(event_name: StringName, data: Dictionary) -> void:
 		&"tongue":
 			if _tongue != null:
 				_tongue.on_event(data)
+		&"melee":
+			_clips.play_melee()
 		&"hit":
 			if Tuning.FEATURE_HIT_FLASH:
 				_flash_left = Tuning.HIT_FLASH_TIME

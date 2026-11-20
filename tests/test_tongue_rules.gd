@@ -66,3 +66,31 @@ func test_pull_ends_within_time_limit_from_full_range() -> void:
 	# Taha'nın aralığı tempo öncesi hızdır; satır hızı Tuning.GAME_PACE ile çarpılı gelir.
 	assert_lte(float(row["tongue_pull_speed"]), 2.0 * Tuning.GAME_PACE, "yavaş çekiş (Taha: ~1.5-2 m/sn)")
 	assert_gte(float(row["tongue_pull_speed"]), 1.5 * Tuning.GAME_PACE)
+
+
+func test_melee_inside_range() -> void:
+	var row: Dictionary = _row()
+	var contact: float = Tuning.PLAYER_RADIUS + float(row["radius"])
+	var range_m: float = float(row["tongue_melee_range"])
+	assert_true(TongueRules.wants_melee(contact + range_m * 0.5, contact, range_m))
+
+
+func test_melee_at_boundary() -> void:
+	var row: Dictionary = _row()
+	var contact: float = Tuning.PLAYER_RADIUS + float(row["radius"])
+	var range_m: float = float(row["tongue_melee_range"])
+	assert_true(TongueRules.wants_melee(contact + range_m, contact, range_m))
+
+
+func test_no_melee_outside_range() -> void:
+	var row: Dictionary = _row()
+	var contact: float = Tuning.PLAYER_RADIUS + float(row["radius"])
+	var range_m: float = float(row["tongue_melee_range"])
+	assert_false(TongueRules.wants_melee(contact + range_m + 0.05, contact, range_m))
+	assert_false(TongueRules.wants_melee(float(row["tongue_range"]), contact, range_m))
+
+
+func test_melee_windup_shorter_than_tongue_windup() -> void:
+	var row: Dictionary = _row()
+	assert_lt(float(row["tongue_melee_windup"]), float(row["attack_windup"]))
+	assert_lt(float(row["tongue_lock_time"]), float(row["attack_windup"]))

@@ -31,6 +31,7 @@ var tongue_hits: int = 0
 ## Yeni dil mekaniği: çekişin bitişi (yakında ısırdı / süre doldu).
 var tongue_bites: int = 0
 var tongue_timeouts: int = 0
+var tongue_melees: int = 0
 ## Askeri dille bağlayan dilci (yoksa null); ölürse bağ çözülür.
 var latched: Zombie
 ## Debug arenası: true iken canlı zombiler donar (hareket ve saldırı durur).
@@ -265,7 +266,10 @@ func _move(delta: float) -> void:
 		if dir != Vector2.ZERO:
 			node.rotation.y = atan2(dir.x, dir.y)
 		if windup_attack and ZombieRules.wants_attack(dist, reach, SpecialAttacks.start_range(_rows[i])):
-			_enter(i, ZombieRules.State.WINDUP, _rows[i]["attack_windup"])
+			var windup: float = _rows[i]["attack_windup"]
+			if special:
+				windup = _special.windup_time(i, dist, reach)
+			_enter(i, ZombieRules.State.WINDUP, windup)
 			if special:
 				_special.begin_windup(i, p, target, target_vel)
 

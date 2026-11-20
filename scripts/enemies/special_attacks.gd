@@ -12,6 +12,8 @@ const OLD_EXTEND_TIME: float = 0.12
 
 var _m: EnemyManager
 var _sprint: SprintAttack
+## Örnek başına: bu dilci hazırlığı yakın vuruş (1) mu, dil (0) mu.
+var _melee: PackedByteArray = PackedByteArray()
 
 
 func _init(manager: EnemyManager) -> void:
@@ -107,6 +109,18 @@ func facing(i: int, p: Vector2) -> Vector2:
 	return _m._aim[i]
 
 
+## Hazırlık süresi (sn). Dilci temasa yakınsa yakın vuruşa karar verir (bayrak açıkken), değilse satırdaki attack_windup.
+func windup_time(i: int, dist: float, contact: float) -> float:
+	var row: Dictionary = _m._rows[i]
+	if i >= _melee.size():
+		_melee.resize(_m._pos.size())
+	_melee[i] = 0
+	if row["attack_kind"] == &"tongue" and Tuning.FEATURE_TONGUE_MELEE 			and TongueRules.wants_melee(dist, contact, float(row["tongue_melee_range"])):
+		_melee[i] = 1
+		return row["tongue_melee_windup"]
+	return row["attack_windup"]
+
+
 ## Hazırlık başlarken ilk nişan.
 func begin_windup(i: int, p: Vector2, target: Vector2, target_vel: Vector2) -> void:
 	_windup_tick(i, _m._rows[i], p, target, target_vel)
@@ -126,6 +140,8 @@ func end_windup(i: int, target: Vector2) -> ZombieRules.State:
 			_m._targetable[i] = 0
 			_m._enter(i, S.JUMP, row["jump_time"])
 			return S.JUMP
+	if i < _melee.size() and _melee[i] == 1:
+		return _melee_strike(i, row, target)
 	if Tuning.FEATURE_TONGUE_PULL:
 		return _shoot_tongue(i, row)
 	return _fire_tongue(i, row, target)
@@ -174,6 +190,8 @@ func on_removed(i: int) -> void:
 	elif kind == &"tongue":
 		node.event.emit(&"tongue", {"off": true})
 	_m._targetable[i] = 0
+	if i < _melee.size():
+		_melee[i] = 0
 
 
 func _windup_tick(i: int, row: Dictionary, p: Vector2, target: Vector2, target_vel: Vector2) -> void:
@@ -211,6 +229,19 @@ func _land(i: int, row: Dictionary, target: Vector2) -> void:
 		_m.jump_hits += 1
 		_m.player.take_hit(_m._damage[i], target - dest)
 	_m.jump_landed.emit(Vector3(dest.x, 0.1, dest.y), float(row["land_radius"]))
+
+
+## Dilcinin yakın vuruşu: dil yok; asker hâlâ yakındaysa hasar, ardından kısa toparlanma.
+func _melee_strike(i: int, row: Dictionary, target: Vector2) -> ZombieRules.State:
+	_melee[i] = 0
+	_m.tongue_melees += 1
+	var p: Vector2 = _m._pos[i]
+	var contact: float = Tuning.PLAYER_RADIUS + _m._radius[i]
+	if _m.player.is_exposed() and ZombieRules.strike_hits(p.distance_to(target), contact, float(row["tongue_melee_hit_range"])):
+		_m.player.take_hit(_m._damage[i], target - p)
+	_m._enter(i, S.RECOVER, row["tongue_melee_recover"])
+	_m._nodes[i].event.emit(&"melee", {})
+	return S.RECOVER
 
 
 ## Yeni mekanik: dil kilitli yönde görünür hızla uçar (LASH süresi = tam boya uçuş).
