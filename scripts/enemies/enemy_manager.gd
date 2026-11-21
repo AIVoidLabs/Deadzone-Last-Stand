@@ -17,6 +17,8 @@ signal lob_launched(kind: StringName, from: Vector3, dest: Vector3, flight: floa
 signal lob_landed(kind: StringName, at: Vector3, radius: float)
 signal acid_pool_started(at: Vector3, radius: float, time: float)
 ## Zırhlıya önden gelen (azaltılmış) isabet; öldürmeyen vuruşlarda enemy_damaged yerine (kan yok: gri kıvılcım, küçük sayı).
+## Patlayıcı patladı (BloatAttack): at yerde, radius patlama yarıçapı (fx, sarsıntı ve ses için).
+signal bloat_exploded(at: Vector3, radius: float)
 signal enemy_blocked(at: Vector3, direction: Vector2, amount: float)
 
 const PHYSICS_PRIORITY: int = -10
@@ -49,6 +51,11 @@ var throw_melees: int = 0
 ## Zırhlı sayaçları: önden ve yandan/arkadan isabet.
 var armor_front: int = 0
 var armor_back: int = 0
+## Patlayıcı sayaçları: şişmeye başlayan, patlayan, zincirle patlayan (başka patlama öldürdü), askere isabet eden patlama.
+var bloat_primed: int = 0
+var bloat_exploded_count: int = 0
+var bloat_chains: int = 0
+var bloat_player_hits: int = 0
 ## Askeri dille bağlayan dilci (yoksa null); ölürse bağ çözülür.
 var latched: Zombie
 ## Debug arenası: true iken canlı zombiler donar (hareket ve saldırı durur).

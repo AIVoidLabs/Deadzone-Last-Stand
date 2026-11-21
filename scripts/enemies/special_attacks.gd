@@ -13,6 +13,7 @@ var _m: EnemyManager
 var _sprint: SprintAttack
 var _tongue: TongueAttack
 var _lob: LobAttack
+var _bloat: BloatAttack
 
 
 func _init(manager: EnemyManager) -> void:
@@ -20,6 +21,7 @@ func _init(manager: EnemyManager) -> void:
 	_sprint = SprintAttack.new(manager)
 	_tongue = TongueAttack.new(manager)
 	_lob = LobAttack.new(manager)
+	_bloat = BloatAttack.new(manager)
 
 
 ## Bu türün özel saldırısı açık mı (kapalıysa yürüyen gibi yaklaşıp vurur).
@@ -35,6 +37,8 @@ static func is_special(row: Dictionary) -> bool:
 			return Tuning.FEATURE_ZOMBIE_SPIT
 		&"throw":
 			return Tuning.FEATURE_ZOMBIE_THROW
+		&"bloat":
+			return Tuning.FEATURE_ZOMBIE_BLOAT
 	return false
 
 
@@ -63,6 +67,8 @@ static func start_range(row: Dictionary) -> float:
 			return row["spit_range"]
 		&"throw":
 			return row["throw_range"]
+		&"bloat":
+			return row["bloat_prime_range"]
 	return row["tongue_range"]
 
 
@@ -77,7 +83,7 @@ static func windup_next(row: Dictionary) -> ZombieRules.State:
 			return S.SPRINT
 		&"jump":
 			return S.JUMP
-		&"spit", &"throw":
+		&"spit", &"throw", &"bloat":
 			return S.RECOVER
 	return S.LASH
 
@@ -123,6 +129,8 @@ func windup_time(i: int, dist: float, contact: float) -> float:
 			return _tongue.windup_time(i, row, dist, contact)
 		&"throw":
 			return _lob.windup_time(i, row, dist, contact)
+		&"bloat":
+			return row["bloat_prime_time"]
 	return row["attack_windup"]
 
 
@@ -131,6 +139,9 @@ func begin_windup(i: int, p: Vector2, target: Vector2, target_vel: Vector2) -> v
 	var row: Dictionary = _m._rows[i]
 	if row["attack_kind"] == &"spit" or row["attack_kind"] == &"throw":
 		_lob.begin_windup(i, row, p, target, target_vel)
+		return
+	if row["attack_kind"] == &"bloat":
+		_bloat.begin_windup(i, p, target)
 		return
 	_windup_tick(i, row, p, target, target_vel)
 
@@ -151,6 +162,8 @@ func end_windup(i: int, target: Vector2) -> ZombieRules.State:
 			return S.JUMP
 		&"spit", &"throw":
 			return _lob.end_windup(i, row, target)
+		&"bloat":
+			return _bloat.end_windup(i, row)
 	return _tongue.end_windup(i, row, target)
 
 
@@ -193,6 +206,12 @@ func shrink(last: int) -> void:
 ## Her fizik karesi: uçan top/kayalar ve asit havuzları.
 func tick(delta: float) -> void:
 	_lob.tick(delta)
+	_bloat.tick(delta)
+
+
+## Silahla ölen patlayıcının ölüm fitili.
+func queue_death_fuse(i: int) -> void:
+	_bloat.queue_death_fuse(i, _m._rows[i])
 
 
 ## Zombi ölürken ya da silinirken: bağ ve işaret temizlenir.
@@ -223,6 +242,8 @@ func _windup_tick(i: int, row: Dictionary, p: Vector2, target: Vector2, target_v
 			_tongue.aim_tick(i, row, p, target, target_vel)
 		&"spit", &"throw":
 			_lob.aim_tick(i, row, p, target, target_vel)
+		&"bloat":
+			_bloat.aim_tick(i, p, target)
 
 
 func _marker(i: int, dest: Vector2, row: Dictionary, on: bool) -> void:

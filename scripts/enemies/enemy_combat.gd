@@ -34,7 +34,7 @@ func damage(index: int, amount: float, direction: Vector2, knockback: float, dot
 		return
 	if Tuning.FEATURE_KNOCKBACK:
 		_m._knock[index] += Knockback.impulse(direction, knockback, row["weight"])
-	if Tuning.FEATURE_STAGGER and float(row["stagger_time"]) > 0.0 and ZombieRules.can_stagger(state):
+	if Tuning.FEATURE_STAGGER and float(row["stagger_time"]) > 0.0 and ZombieRules.can_stagger(state) and not BloatAttack.is_primed(row, state):
 		_m._enter(index, ZombieRules.State.STAGGER, row["stagger_time"], true)
 
 
@@ -73,7 +73,8 @@ func on_timer(index: int, state: ZombieRules.State, target: Vector2) -> ZombieRu
 
 ## push: öldüren vuruşun itmesi; ceset bu yöne düşer ve kayar.
 ## credit: öldürme sayılır ve enemy_killed yayılır (dalga sonu devrilmelerde kapalı).
-func kill(index: int, push: Vector2 = Vector2.ZERO, credit: bool = true) -> void:
+## corpse: false ise düğüm hemen havuza döner (ceset yok). Silahla ölen patlayıcı (credit) cesetsiz kalıp fitille patlar.
+func kill(index: int, push: Vector2 = Vector2.ZERO, credit: bool = true, corpse: bool = true) -> void:
 	if _m._burn_left[index] > 0.0:
 		_m._burn.extinguish(index)
 	_m._special.on_removed(index)
@@ -83,7 +84,10 @@ func kill(index: int, push: Vector2 = Vector2.ZERO, credit: bool = true) -> void
 	if credit:
 		_m.kills += 1
 		_m.enemy_killed.emit(node.position, _m._rows[index])
-	if not Tuning.FEATURE_ZOMBIE_DEATH_ANIM:
+	if credit and BloatAttack.active(_m._rows[index]):
+		_m._special.queue_death_fuse(index)
+		corpse = false
+	if not corpse or not Tuning.FEATURE_ZOMBIE_DEATH_ANIM:
 		node.deactivate()
 		return
 	# Ölüm klipleri arkaya düşer: yüzü vuruşun geldiği yöne çevir, sırtüstü vuruş yönüne düşsün.

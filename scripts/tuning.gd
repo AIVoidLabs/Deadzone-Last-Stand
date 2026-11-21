@@ -61,6 +61,11 @@ const ROCK_REST_TIME: float = 2.0
 const ROCK_FADE_TIME: float = 0.4
 const CAMERA_SHAKE_ON_ROCK: float = 0.15
 const ACID_POOL_MAX: int = 12
+## Patlayıcı: alandaki zombilere itme hızı, patlama sarsıntısı; şişerken parlama (yanıp sönme Hz: başta, sonda).
+const BLOAT_ZOMBIE_KNOCKBACK: float = 9.0
+const CAMERA_SHAKE_ON_BLOAT: float = 0.3
+const BLOAT_BLINK_START_HZ: float = 3.0
+const BLOAT_BLINK_END_HZ: float = 14.0
 const ACID_FADE_TIME: float = 1.0
 const ACID_VIGNETTE_FLASH: float = 0.3
 ## Zıplayanın iniş işareti yaklaşan cismin gölgesi gibi çizilir; kapalıyken eski kırmızı halka.

@@ -30,6 +30,7 @@ var _death_left: float = 0.0
 var _jump_age: float = -1.0
 var _jump_total: float = 0.0
 var _marker: ZombieJumpMarker
+var _swell: ZombieSwell = ZombieSwell.new()
 var _model_height: float = Tuning.CHARACTER_MODEL_HEIGHT
 var _skeleton: Skeleton3D
 ## Yeni hat modelinin örnek başına ton farkı (VC_TINT_VARIANCE); satırdaki `tint` ile çarpılır.
@@ -65,7 +66,9 @@ func _process(delta: float) -> void:
 		_set_fade(1.0 - clampf(_death_left / Tuning.ZOMBIE_FADE_TIME, 0.0, 1.0))
 	_tick_jump(delta)
 	_marker.tick(delta)
-	if not _dying and _flash_left <= 0.0 and _jump_age < 0.0 and not _marker.is_on():
+	if _swell.is_on():
+		_set_burn(_swell.tick(delta))
+	if not _dying and _flash_left <= 0.0 and _jump_age < 0.0 and not _marker.is_on() and not _swell.is_on():
 		set_process(false)
 
 
@@ -82,6 +85,9 @@ func _on_event(event_name: StringName, data: Dictionary) -> void:
 				_tongue.on_event(data)
 		&"melee":
 			_clips.play_melee()
+		&"swell":
+			_swell.start(_body.state_duration)
+			set_process(true)
 		&"swat":
 			_clips.play_timed(&"anim_swat", float(_clips.row.get("throw_melee_anim_hit_time", 0.0)), _body.state_duration)
 		&"hit":
@@ -228,18 +234,10 @@ func _apply_kind(row: Dictionary) -> void:
 		box.material_override = ZombieMaterials.box_material(row)
 		box.position.y = height * 0.5
 		return
-	_apply_tint(row)
+	ZombieMaterials.apply_tint(_meshes[0], row, _clips.own_clips, _tint)
 	var size: float = randf_range(1.0 - Tuning.ZOMBIE_SCALE_VARIANCE, 1.0 + Tuning.ZOMBIE_SCALE_VARIANCE)
 	scale = Vector3.ONE * (size * height / _model_height)
 	_clips.size_scale = scale.x
-
-
-## Satırda tint varsa (özel türler, kendi modeli yokken yürüyenin modeli) köşe renginin çarpanı olarak uygulanır.
-func _apply_tint(row: Dictionary) -> void:
-	if not _clips.own_clips or not row.has("tint"):
-		return
-	var tint: Color = row["tint"]
-	_meshes[0].set_instance_shader_parameter(&"tint", Vector3(tint.r * _tint.x, tint.g * _tint.y, tint.b * _tint.z))
 
 
 ## Dil görüntüsü: yeni modelde Head kemiğine bağlı yordamsal dil, yoksa eski kutu.
@@ -266,6 +264,9 @@ func _on_marker(data: Dictionary) -> void:
 
 
 func _hide_extras() -> void:
+	if _swell.is_on():
+		_swell.stop()
+		_set_burn(0.0)
 	_jump_age = -1.0
 	position.y = 0.0
 	_marker.hide_marker()

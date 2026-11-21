@@ -64,6 +64,10 @@ func _ready() -> void:
 	projectiles.explosion.connect(func(_at: Vector3, _radius: float) -> void:
 		camera.add_trauma(Tuning.CAMERA_SHAKE_ON_EXPLOSION))
 	_add_lob_fx(enemies, camera)
+	enemies.bloat_exploded.connect(func(at: Vector3, radius: float) -> void:
+		ExplosionFx.play(self, at, radius)
+		camera.add_trauma(Tuning.CAMERA_SHAKE_ON_BLOAT)
+		Audio.play(&"explosion"))
 	_add_sounds(player, enemies, weapons, projectiles)
 
 	if Tuning.FEATURE_HURT_VIGNETTE:
