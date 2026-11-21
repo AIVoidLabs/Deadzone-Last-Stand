@@ -15,6 +15,7 @@ const SKIN_COLOR: Color = Color(0.55, 0.45, 0.38)
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 var _groups: Array[Dictionary] = []   # {node: MultiMeshInstance3D, total: int}
 var _blocked: Array[Vector2] = []
+var _hot: Array[Vector3] = []   # çöp kümelerinin merkezleri (prop, ceset, kan)
 
 
 func _ready() -> void:
@@ -23,6 +24,7 @@ func _ready() -> void:
 	for row: Dictionary in CityProps.rows():
 		if row["collide"]:
 			_blocked.append(row["pos"])
+			_hot.append(Vector3(row["pos"].x, 0.0, row["pos"].y))
 	var pools: Array[Transform3D] = []
 	_build_corpses(pools)
 	_build_blood(pools)
@@ -60,30 +62,62 @@ func _flat_basis(yaw: float, sx: float, sz: float) -> Basis:
 	return Basis(Vector3.UP, yaw) * Basis.from_scale(Vector3(sx, 1.0, sz))
 
 
+## Kümeli nokta: kaldırım dipleri, prop ve kan/ceset çevresi, geri kalanı seyrek sokak.
+func _debris_point() -> Vector3:
+	var r: float = _rng.randf()
+	if r < 0.35:
+		var half: float = Tuning.ARENA_SIZE * 0.5
+		var reach: float = half + Tuning.CITY_STREET_LENGTH - 4.0
+		var edge: float = Tuning.CITY_STREET_WIDTH * 0.5 - _rng.randf_range(0.2, 1.6)
+		edge *= 1.0 if _rng.randf() < 0.5 else -1.0
+		var along: float = _rng.randf_range(-half, half) if _rng.randf() < Tuning.DRESS_ARENA_SHARE else _rng.randf_range(-reach, reach)
+		return Vector3(along, 0.0, edge) if _rng.randf() < 0.5 else Vector3(edge, 0.0, along)
+	if r < 0.8 and not _hot.is_empty():
+		var c: Vector3 = _hot[_rng.randi() % _hot.size()]
+		var ang: float = _rng.randf() * TAU
+		var dist: float = absf(_rng.randfn(0.0, 1.5)) + 0.5
+		return Vector3(c.x + cos(ang) * dist, 0.0, c.z + sin(ang) * dist)
+	return _street_point()
+
+
 func _build_debris() -> void:
 	var size: Vector2 = Tuning.DRESS_DEBRIS_SIZE
-	var paper: Array[Transform3D] = []
-	var card: Array[Transform3D] = []
-	var paper_colors: Array[Color] = []
-	var card_colors: Array[Color] = []
+	# tür: [en, boy, kalınlık payı, renk paleti]; hepsi kirli ve koyu
+	var kinds: Array = [[0.22, 0.3, 0], [0.4, 0.3, 0], [0.5, 0.4, 1], [0.3, 0.3, 2]]
+	var groups: Array = [[[], []], [[], []], [[], []]]   # düz kâğıt, karton, poşet: [xfs, colors]
 	for i: int in Tuning.DRESS_DEBRIS_COUNT:
-		var p: Vector3 = _street_point()
-		var is_card: bool = _rng.randf() < 0.3
+		var p: Vector3 = _debris_point()
+		var kind: int = _rng.randi() % kinds.size()
+		var k: Array = kinds[kind]
+		var s: float = clampf(_rng.randf_range(0.6, 1.4) * (size.x + size.y) * 0.5 * _rng.randf_range(0.5, 1.3), size.x, size.y)
+		var sx: float = s * k[0] / 0.3
+		var sz: float = s * k[1] / 0.3
+		var tilt: Basis = Basis(Vector3.RIGHT, _rng.randf_range(-0.12, 0.12)) * Basis(Vector3.FORWARD, _rng.randf_range(-0.12, 0.12))
+		var basis: Basis = Basis(Vector3.UP, _rng.randf() * TAU) * tilt * Basis.from_scale(Vector3(sx, 1.0, sz))
 		p.y = 0.03 + _rng.randf() * 0.015
-		var xf: Transform3D = Transform3D(_flat_basis(_rng.randf() * TAU, _rng.randf_range(size.x, size.y), _rng.randf_range(size.x, size.y)), p)
-		var tint: Color = PAPER_COLORS[_rng.randi() % PAPER_COLORS.size()] * _rng.randf_range(0.35, 0.75)
-		if is_card:
-			card.append(xf)
-			card_colors.append(tint)
+		var tint: Color
+		if kind == 3:
+			tint = Color(0.07, 0.07, 0.08) * _rng.randf_range(0.6, 1.4)
+		elif _rng.randf() < 0.15:
+			tint = Color(0.45, 0.43, 0.38) * _rng.randf_range(0.5, 0.8)
 		else:
-			paper.append(xf)
-			paper_colors.append(tint)
-	var flat: BoxMesh = BoxMesh.new()
-	flat.size = Vector3(1.0, 0.012, 1.0)
+			tint = PAPER_COLORS[_rng.randi() % PAPER_COLORS.size()] * _rng.randf_range(0.25, 0.5)
+		var g: int = int(k[2])
+		groups[g][0].append(Transform3D(basis, p))
+		groups[g][1].append(tint)
+	var thin: BoxMesh = BoxMesh.new()
+	thin.size = Vector3(1.0, 0.01, 1.0)
 	var thick: BoxMesh = BoxMesh.new()
-	thick.size = Vector3(1.0, 0.05, 1.0)
-	_add_group(flat, paper, paper_colors, 0.95)
-	_add_group(thick, card, card_colors, 0.95)
+	thick.size = Vector3(1.0, 0.045, 1.0)
+	var bag: BoxMesh = BoxMesh.new()
+	bag.size = Vector3(1.0, 0.03, 1.0)
+	var meshes: Array = [thin, thick, bag]
+	for g: int in 3:
+		var xfs: Array[Transform3D] = []
+		var cols: Array[Color] = []
+		xfs.assign(groups[g][0])
+		cols.assign(groups[g][1])
+		_add_group(meshes[g], xfs, cols, 0.95)
 
 
 func _build_blood(pools: Array[Transform3D]) -> void:
@@ -91,7 +125,9 @@ func _build_blood(pools: Array[Transform3D]) -> void:
 	quad.size = Vector2.ONE
 	var xfs: Array[Transform3D] = pools.duplicate()
 	for i: int in Tuning.DRESS_BLOOD_POOLS:
-		xfs.append(_blob(_free_point(0.5), _rng.randf_range(0.9, 2.6)))
+		var bp: Vector3 = _free_point(0.5)
+		_hot.append(bp)
+		xfs.append(_blob(bp, _rng.randf_range(0.9, 2.6)))
 	for i: int in Tuning.DRESS_BLOOD_TRAILS:
 		var p: Vector3 = _free_point(1.5)
 		var dir: Vector3 = Vector3.RIGHT.rotated(Vector3.UP, _rng.randf() * TAU)
@@ -173,6 +209,7 @@ func _build_corpses(pools: Array[Transform3D]) -> void:
 		var pose: int = i % 2
 		xfs[pose].append(Transform3D(Basis(Vector3.UP, _rng.randf() * TAU), Vector3(p.x, 0.0, p.z)))
 		colors[pose].append(CLOTH_COLORS[_rng.randi() % CLOTH_COLORS.size()] * 3.0)
+		_hot.append(p)
 		pools.append(_blob(p + Vector3(_rng.randf_range(-0.3, 0.3), 0.0, _rng.randf_range(-0.3, 0.3)), _rng.randf_range(1.3, 2.0)))
 	for pose: int in 2:
 		var typed_x: Array[Transform3D] = []

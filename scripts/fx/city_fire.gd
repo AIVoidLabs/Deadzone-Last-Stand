@@ -5,7 +5,7 @@ extends Node3D
 
 const FLAME_FADE: Array[Color] = [Color(1, 1, 1, 0.0), Color(1, 1, 1, 1.0), Color(1, 1, 1, 1.0), Color(1, 1, 1, 0.0)]
 ## Duman şeridi: altta ateşle aydınlık turuncu, yukarı koyu gri; alfa düşük.
-const WISP_COLORS: Array[Color] = [Color(0.4, 0.16, 0.07, 0.0), Color(0.3, 0.13, 0.07, 0.85), Color(0.1, 0.09, 0.09, 0.7), Color(0.05, 0.05, 0.06, 0.0)]
+const WISP_COLORS: Array[Color] = [Color(0.45, 0.18, 0.07, 0.0), Color(0.32, 0.14, 0.07, 1.0), Color(0.12, 0.11, 0.11, 0.9), Color(0.07, 0.07, 0.08, 0.0)]
 const SPARK_COLORS: Array[Color] = [Color(1.0, 0.95, 0.6, 1.0), Color(1.0, 0.5, 0.12, 0.9), Color(0.8, 0.1, 0.0, 0.0)]
 
 var flame: GPUParticles3D
@@ -90,8 +90,8 @@ func _flame() -> GPUParticles3D:
 	m.gravity = Vector3(0.15, 0.6, 0.0)
 	m.angle_min = 0.0
 	m.angle_max = 360.0
-	m.scale_min = 0.5 * _size_mul + 0.15
-	m.scale_max = 1.2 * _size_mul + 0.15
+	m.scale_min = 0.7 * _size_mul + 0.2
+	m.scale_max = 1.5 * _size_mul + 0.2
 	m.scale_curve = CityFxAssets.scale_curve([Vector2(0.0, 0.6), Vector2(0.3, 1.0), Vector2(1.0, 0.3)])
 	m.color_ramp = CityFxAssets.ramp([0.0, 0.1, 0.8, 1.0], FLAME_FADE)
 	p.process_material = m
@@ -100,7 +100,7 @@ func _flame() -> GPUParticles3D:
 
 func _wisps() -> GPUParticles3D:
 	var mesh: QuadMesh = QuadMesh.new()
-	mesh.size = Vector2(1.5, 4.0)
+	mesh.size = Vector2(2.2, 4.5)
 	var p: GPUParticles3D = _base(Tuning.CITY_SMOKE_LIFETIME, mesh, CityFxAssets.wisp_material())
 	p.position.y = _lift + 0.4
 	var m: ParticleProcessMaterial = ParticleProcessMaterial.new()

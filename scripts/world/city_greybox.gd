@@ -257,6 +257,7 @@ func _build_decor() -> void:
 
 
 func _build_lights() -> void:
+	_omni(Vector3(0.0, 4.5, 0.0), Tuning.CITY_CENTER_LIGHT_COLOR, Tuning.CITY_CENTER_LIGHT_ENERGY, Tuning.CITY_CENTER_LIGHT_RANGE)
 	for p: Vector3 in _fire_spots():
 		var fire: OmniLight3D = _omni(p + Vector3(0.0, 2.2, 0.0), FIRE_COLOR, Tuning.CITY_FIRE_ENERGY, Tuning.CITY_FIRE_RANGE)
 		_fire_lights.append(fire)

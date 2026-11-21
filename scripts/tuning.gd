@@ -288,24 +288,24 @@ const CITY_INNER_BLOCK_HEIGHTS: Array[float] = [9.0, 12.0, 7.0, 10.0]
 const CITY_BARRICADE_DEPTH: float = 1.4
 const CITY_BARRICADE_HEIGHT: float = 2.2
 ## Karanlık önizleme: ortam, güneş (ay) ve arka plan.
-const CITY_AMBIENT_COLOR: Color = Color(0.46, 0.39, 0.33)
-const CITY_AMBIENT_ENERGY: float = 0.42
+const CITY_AMBIENT_COLOR: Color = Color(0.32, 0.29, 0.28)
+const CITY_AMBIENT_ENERGY: float = 0.09
 const CITY_SUN_COLOR: Color = Color(0.7, 0.58, 0.46)
-const CITY_SUN_ENERGY: float = 0.3
+const CITY_SUN_ENERGY: float = 0.06
 const CITY_BACKGROUND: Color = Color(0.035, 0.022, 0.015)
 ## Islak asfalt zemin (koyu gri, parlak).
 const CITY_GROUND_COLOR: Color = Color(0.2, 0.17, 0.15)
 const CITY_GROUND_ROUGHNESS: float = 0.6
 ## Omni ışık menzili (m) ve enerjisi: ateş, sokak lambası, neon.
-const CITY_FIRE_RANGE: float = 8.0
-const CITY_FIRE_ENERGY: float = 9.0
-const CITY_LAMP_RANGE: float = 24.0
-const CITY_LAMP_ENERGY: float = 9.0
+const CITY_FIRE_RANGE: float = 5.5
+const CITY_FIRE_ENERGY: float = 10.0
+const CITY_LAMP_RANGE: float = 14.0
+const CITY_LAMP_ENERGY: float = 7.0
 ## Sodyum lamba rengi (~2200K, turuncu-amber).
 const CITY_LAMP_COLOR: Color = Color(1.0, 0.58, 0.2)
 ## Zayıf (titrek denen) lambanın enerji çarpanı.
 const CITY_LAMP_WEAK_FACTOR: float = 0.45
-const CITY_NEON_RANGE: float = 16.0
+const CITY_NEON_RANGE: float = 10.0
 const CITY_NEON_ENERGY: float = 5.0
 
 # --- 8.3b/8.3e: ateş, kor, kıvılcım, duman şeritleri, pus, neon (scripts/fx/city_fx.gd) ---
@@ -330,8 +330,8 @@ const CITY_TRASH_FIRES: Array[Vector3] = [Vector3(10.4, 0.0, -12.9), Vector3(-15
 const CITY_FIRE_FLAME_HEIGHT: float = 0.9
 const CITY_FIRE_TRASH_HEIGHT: float = 0.15
 ## Alev dili boyutu (m), ömrü, çekirdek parlaklığı (HDR); kıvılcım çubuğu ve parlaklığı.
-const CITY_FLAME_WIDTH: float = 0.8
-const CITY_FLAME_HEIGHT: float = 1.3
+const CITY_FLAME_WIDTH: float = 1.2
+const CITY_FLAME_HEIGHT: float = 1.5
 const CITY_FLAME_LIFETIME: float = 0.6
 const CITY_FLAME_HDR: float = 3.0
 const CITY_SPARK_WIDTH: float = 0.09
@@ -341,7 +341,7 @@ const CITY_FIRE_FLICKER: float = 0.3
 const CITY_FIRE_FLICKER_SPEED: float = 3.0
 const CITY_FIRE_WOBBLE: float = 0.12
 ## Sahte zemin ışığı: yarıçap (m, araç ateşi), enerji, titreşim; kor yayılımı (m).
-const CITY_FIRE_GLOW_RADIUS: float = 8.0
+const CITY_FIRE_GLOW_RADIUS: float = 5.0
 const CITY_FIRE_GLOW_ENERGY: float = 0.22
 const CITY_FIRE_GLOW_FLICKER: float = 0.3
 const CITY_FIRE_EMBER_RADIUS: float = 2.2
@@ -349,7 +349,7 @@ const CITY_FIRE_EMBER_RADIUS: float = 2.2
 const CITY_SMOKE_LIFETIME: float = 5.0
 const CITY_SMOKE_WIND: Vector3 = Vector3(1.1, 0.0, 0.4)
 const CITY_SMOKE_HAZE_HEIGHTS: Array[float] = [0.6, 2.0]
-const CITY_SMOKE_HAZE_ALPHA: float = 0.09
+const CITY_SMOKE_HAZE_ALPHA: float = 0.05
 const CITY_SMOKE_HAZE_SIZE: float = 90.0
 ## Vitrin ateşi: duvar (z = sabit) üstünde orta nokta, genişlik (m), duvar düzlemi; içte turuncu parlayan pencere.
 const CITY_FIRE_STOREFRONT: Vector3 = Vector3(16.0, 0.0, -10.9)
@@ -386,12 +386,12 @@ const CITY_ASH_BOX: Vector3 = Vector3(16.0, 5.0, 12.0)
 const FEATURE_CITY_ATMOSPHERE: bool = true
 ## Zeminde birikinti maskesi (düşük pürüzlülük bölgeleri).
 const FEATURE_WET_GROUND: bool = true
-const ATMO_FOG_DENSITY: float = 0.0016
-const ATMO_FOG_COLOR: Color = Color(0.25, 0.18, 0.12)
+const ATMO_FOG_DENSITY: float = 0.0007
+const ATMO_FOG_COLOR: Color = Color(0.07, 0.055, 0.045)
 const ATMO_FOG_HEIGHT: float = 2.5
-const ATMO_FOG_HEIGHT_DENSITY: float = 0.035
-const ATMO_VOLUMETRIC_DENSITY: float = 0.006
-const ATMO_VOLUMETRIC_ALBEDO: Color = Color(0.75, 0.5, 0.3)
+const ATMO_FOG_HEIGHT_DENSITY: float = 0.012
+const ATMO_VOLUMETRIC_DENSITY: float = 0.003
+const ATMO_VOLUMETRIC_ALBEDO: Color = Color(0.45, 0.38, 0.33)
 const ATMO_VOLUMETRIC_LENGTH: float = 50.0
 const ATMO_GLOW_INTENSITY: float = 0.5
 const ATMO_GLOW_THRESHOLD: float = 1.3
@@ -706,13 +706,21 @@ const DRESS_CORPSES: int = 9
 const DRESS_SEED: int = 8304
 ## Dekorun yayıldığı yer: merkezde yoğun (alan içi payı) ve kol uzunluğu boyunca.
 const DRESS_ARENA_SHARE: float = 0.75
-const DRESS_DEBRIS_SIZE: Vector2 = Vector2(0.14, 0.45)
+const DRESS_DEBRIS_SIZE: Vector2 = Vector2(0.1, 0.6)
 const DRESS_BLOOD_COLOR: Color = Color(0.2, 0.015, 0.02, 0.85)
 ## Çift sarı orta şerit: renk, çizgi eni, iki çizgi arası (m).
 const CITY_LANE_COLOR: Color = Color(0.62, 0.44, 0.1)
 const CITY_LANE_WIDTH: float = 0.13
 const CITY_LANE_GAP: float = 0.3
 ## Elektrik telleri: sayı yerine çift tablosu kodda (blok köşeleri); sarkma (m) ve kalınlık (m).
-const WIRE_SAG: Vector2 = Vector2(0.7, 1.6)
-const WIRE_RADIUS: float = 0.025
+const WIRE_SAG: Vector2 = Vector2(1.0, 1.7)
+const WIRE_RADIUS: float = 0.03
+## Elektrik direği: yükseklik (m) ve kablo sayısı / aralığı (m).
+const POLE_HEIGHT: float = 8.5
+const WIRE_COUNT: int = 4
+const WIRE_SPACING: float = 0.7
+## Merkez kavşak ışığı (trafik lambası): asker merkezde başlar.
+const CITY_CENTER_LIGHT_ENERGY: float = 8.0
+const CITY_CENTER_LIGHT_RANGE: float = 12.0
+const CITY_CENTER_LIGHT_COLOR: Color = Color(1.0, 0.72, 0.4)
 const WIRE_COLOR: Color = Color(0.015, 0.012, 0.012)

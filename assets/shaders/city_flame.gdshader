@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode unshaded, cull_disabled, depth_draw_never;
+render_mode unshaded, blend_add, cull_disabled, depth_draw_never, fog_disabled;
 // Küçük, düzensiz, hızlı titreyen alev dili (8.3e): çekirdek sarı-beyaz HDR, kenar turuncu-kırmızı.
 // Parçacık billboard; INSTANCE_CUSTOM.y = yaşam oranı, COLOR.a = şeffaflık çarpanı.
 
@@ -41,20 +41,22 @@ void fragment() {
 	float h = 1.0 - UV.y;
 	float x = (UV.x - 0.5) * 2.0;
 	float t = TIME * scroll_speed + seed * 20.0;
-	// yanlara dalgalanan, yukarı sivrilen gövde
-	float sway = (vnoise(vec2(h * 3.0 + seed * 9.0, t)) - 0.5) * 0.7 * h;
-	float width = pow(max(1.0 - h, 0.0), 0.45) * (0.55 + 0.45 * smoothstep(0.0, 0.25, h));
-	float flick = vnoise(vec2(x * 2.5 + seed * 5.0, h * 4.0 - t * 1.5));
-	width *= 0.8 + 0.4 * flick;
-	float d = abs(x - sway) / max(width, 0.001);
-	float body = 1.0 - smoothstep(1.0 - edge_sharp * 3.0, 1.0, d);
-	body *= step(0.02, h) * smoothstep(0.0, 0.05, h);
-	float a = body * (1.0 - smoothstep(0.55, 1.0, age)) * COLOR.a;
-	if (a < 0.35) discard;
-	// iç çekirdek: merkeze ve aşağıya yakın = sarı-beyaz
-	float heat = clamp((1.0 - d) * 1.3 - h * 0.55 + (flick - 0.5) * 0.3, 0.0, 1.0);
-	vec3 col = mix(edge_color.rgb, mid_color.rgb, smoothstep(0.0, 0.4, heat));
-	col = mix(col, core_color.rgb, smoothstep(0.55, 0.9, heat));
-	ALBEDO = col * mix(1.0, hdr, smoothstep(0.35, 0.8, heat));
-	ALPHA = 1.0;
+	// kabarık, tabanı geniş yuvarlak gövde; yanlara salınır
+	float sway = (vnoise(vec2(h * 2.0 + seed * 9.0, t * 0.7)) - 0.5) * 0.5 * h;
+	float w = sqrt(max(1.0 - h * h * 0.85, 0.0)) * 0.95;
+	float dist = abs(x - sway) / max(w, 0.05);
+	// 3 katman gürültü: farklı ölçek ve hız, yukarı akar
+	float n = vnoise(vec2(x * 2.0 + seed * 7.0, h * 2.5 - t)) * 0.5
+		+ vnoise(vec2(x * 4.5 - seed * 3.0, h * 5.0 - t * 1.7)) * 0.3
+		+ vnoise(vec2(x * 9.0 + seed * 5.0, h * 9.0 - t * 2.6)) * 0.2;
+	// üste doğru parçalanan dil kenarları
+	float density = (1.0 - dist) + (n - 0.5) * (0.5 + h * 1.4) - h * 0.3;
+	density *= smoothstep(0.0, 0.06, h);
+	float a = smoothstep(0.02, 0.55, density) * (1.0 - smoothstep(0.55, 1.0, age)) * COLOR.a;
+	a *= 1.0 - 0.6 * smoothstep(0.55, 1.0, h);
+	float heat = clamp(density * 1.1 - h * 0.45 + (n - 0.5) * 0.3, 0.0, 1.0);
+	vec3 col = mix(edge_color.rgb, mid_color.rgb, smoothstep(0.05, 0.4, heat));
+	col = mix(col, core_color.rgb, smoothstep(0.5, 0.9, heat));
+	ALBEDO = col * mix(0.9, hdr, smoothstep(0.3, 0.8, heat));
+	ALPHA = a;
 }

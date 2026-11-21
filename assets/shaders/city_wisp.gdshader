@@ -28,6 +28,6 @@ void fragment() {
 	float across = smoothstep(1.0, 0.0, abs(p.x));
 	float along = smoothstep(1.0, 0.5, abs(p.y));
 	float n = vnoise(vec2(p.x * 2.0 + seed * 9.0, UV.y * 3.0 - TIME * 0.5 + seed * 5.0));
-	ALBEDO = COLOR.rgb;
-	ALPHA = across * across * along * (0.25 + 0.9 * n) * COLOR.a;
+	ALBEDO = COLOR.rgb * 0.6;
+	ALPHA = across * along * (0.55 + 0.9 * n) * COLOR.a;
 }

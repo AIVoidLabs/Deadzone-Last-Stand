@@ -1,6 +1,6 @@
 class_name CityWires
 extends Node3D
-## 8.3d: ön plan elektrik telleri. Blok cepheleri arasında sarkık koyu kablolar (kavşağı çapraz keser), gölgesiz.
+## 8.3d: ön plan elektrik telleri. Kaldırımdaki direkten karşı cepheye paralel sarkık kablo demetleri (2 demet), gölgesiz.
 ## Kapatma: Tuning.FEATURE_CITY_WIRES.
 
 const SEGMENTS: int = 16
@@ -11,25 +11,51 @@ func _ready() -> void:
 	name = "CityWires"
 	var w: float = Tuning.CITY_STREET_WIDTH * 0.5 + 0.3
 	var h: Array[float] = Tuning.CITY_INNER_BLOCK_HEIGHTS
-	var wires: Array = [
-		[Vector3(-w, h[0] - 0.5, -w - 2.0), Vector3(w, h[3] - 0.5, w + 2.0)],
-		[Vector3(w, h[1] - 0.6, -w - 2.0), Vector3(-w, h[2] - 0.5, w + 2.0)],
-		[Vector3(-w, h[0] - 1.4, -w - 5.0), Vector3(w, h[1] - 1.4, -w - 5.0)],
-		[Vector3(-w, h[2] - 1.2, w + 5.0), Vector3(w, h[3] - 1.2, w + 5.0)],
-		[Vector3(-w - 5.0, h[0] - 1.0, -w), Vector3(-w - 5.0, h[2] - 1.0, w)],
-		[Vector3(w + 5.0, h[1] - 1.0, -w), Vector3(w + 5.0, h[3] - 1.0, w)],
+	var top: float = Tuning.POLE_HEIGHT - 0.4
+	# direk, başı ve karşı cephedeki bağlantı noktası; kablolar paralel, tek yönde, hafif çapraz
+	var groups: Array = [
+		[Vector3(w - 1.7, 0.0, 6.0), Vector3(-w, h[2] - 2.0, w + 3.0)],
+		[Vector3(-w + 1.7, 0.0, -6.0), Vector3(w, h[1] - 5.5, -w - 3.0)],
 	]
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 	rng.seed = Tuning.DRESS_SEED
 	var mat: StandardMaterial3D = StandardMaterial3D.new()
 	mat.albedo_color = Tuning.WIRE_COLOR
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	for pair: Array in wires:
-		var mi: MeshInstance3D = MeshInstance3D.new()
-		mi.mesh = _tube(pair[0], pair[1], rng.randf_range(Tuning.WIRE_SAG.x, Tuning.WIRE_SAG.y))
-		mi.material_override = mat
-		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		add_child(mi)
+	for g: Array in groups:
+		var base: Vector3 = g[0]
+		_add_pole(base)
+		var start: Vector3 = Vector3(base.x, top, base.z)
+		var end: Vector3 = g[1]
+		var sag: float = rng.randf_range(Tuning.WIRE_SAG.x, Tuning.WIRE_SAG.y)
+		var side: Vector3 = (end - start).cross(Vector3.UP).normalized()
+		for i: int in Tuning.WIRE_COUNT:
+			var off: Vector3 = side * ((i - (Tuning.WIRE_COUNT - 1) * 0.5) * Tuning.WIRE_SPACING) + Vector3(0.0, rng.randf_range(-0.15, 0.15), 0.0)
+			var mi: MeshInstance3D = MeshInstance3D.new()
+			mi.mesh = _tube(start + off, end + off, sag * rng.randf_range(0.9, 1.1))
+			mi.material_override = mat
+			mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			add_child(mi)
+
+
+## Basit low-poly elektrik direği: gövde + iki çapraz kol.
+func _add_pole(base: Vector3) -> void:
+	var mat: StandardMaterial3D = StandardMaterial3D.new()
+	mat.albedo_color = Color(0.1, 0.075, 0.055)
+	mat.roughness = 0.9
+	var parts: Array = [
+		[Vector3(0.28, Tuning.POLE_HEIGHT, 0.28), Vector3(0.0, Tuning.POLE_HEIGHT * 0.5, 0.0)],
+		[Vector3(0.18, 0.18, 3.2), Vector3(0.0, Tuning.POLE_HEIGHT - 0.4, 0.0)],
+		[Vector3(0.18, 0.18, 2.4), Vector3(0.0, Tuning.POLE_HEIGHT - 1.4, 0.0)],
+	]
+	for p: Array in parts:
+		var box: MeshInstance3D = MeshInstance3D.new()
+		var mesh: BoxMesh = BoxMesh.new()
+		mesh.size = p[0]
+		box.mesh = mesh
+		box.material_override = mat
+		box.position = base + (p[1] as Vector3)
+		add_child(box)
 
 
 ## Sarkık eğri boyunca kare kesitli ince boru.
