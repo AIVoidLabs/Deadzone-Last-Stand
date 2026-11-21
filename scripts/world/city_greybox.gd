@@ -85,7 +85,7 @@ func _box(pos: Vector3, size: Vector3, color: Color, tilt: float = 0.0, emissive
 	return mi
 
 
-func _solid_box(pos: Vector3, size: Vector3, color: Color) -> void:
+func _solid_box(pos: Vector3, size: Vector3, color: Color, show_mesh: bool = true) -> void:
 	var body: StaticBody3D = StaticBody3D.new()
 	body.position = pos + Vector3(0.0, size.y * 0.5, 0.0)
 	var shape: BoxShape3D = BoxShape3D.new()
@@ -93,12 +93,13 @@ func _solid_box(pos: Vector3, size: Vector3, color: Color) -> void:
 	var collision: CollisionShape3D = CollisionShape3D.new()
 	collision.shape = shape
 	body.add_child(collision)
-	var mesh: BoxMesh = BoxMesh.new()
-	mesh.size = size
-	var mi: MeshInstance3D = MeshInstance3D.new()
-	mi.mesh = mesh
-	mi.material_override = _material(color)
-	body.add_child(mi)
+	if show_mesh:
+		var mesh: BoxMesh = BoxMesh.new()
+		mesh.size = size
+		var mi: MeshInstance3D = MeshInstance3D.new()
+		mi.mesh = mesh
+		mi.material_override = _material(color)
+		body.add_child(mi)
 	add_child(body)
 
 
@@ -169,15 +170,35 @@ func _build_outer_blocks() -> void:
 ## Alan içi dört blok: çarpışmalı; biri yıkık (eksik üst köşe).
 func _build_inner_blocks() -> void:
 	var rects: Array[Rect2] = CityLayout.block_rects(Tuning.ARENA_SIZE, Tuning.CITY_STREET_WIDTH)
+	var building: PackedScene = null
+	if Tuning.FEATURE_CITY_BUILDINGS:
+		building = load(Tuning.CITY_BUILDING_SCENE) as PackedScene
 	for i: int in rects.size():
 		var rect: Rect2 = rects[i]
 		var height: float = Tuning.CITY_INNER_BLOCK_HEIGHTS[i]
 		var color: Color = BRICK if i % 3 == 0 else GREY
 		var center: Vector3 = Vector3(rect.get_center().x, 0.0, rect.get_center().y)
+		if building != null:
+			_solid_box(center, Vector3(rect.size.x, height, rect.size.y), color, false)
+			_place_building(building, center)
+			continue
 		_solid_box(center, Vector3(rect.size.x, height, rect.size.y), color)
 		if i == 1:
 			# Yıkık çatı: üstte kırık basamak
 			_box(center + Vector3(-rect.size.x * 0.2, height, 0.0), Vector3(rect.size.x * 0.5, height * 0.25, rect.size.y * 0.7), color)
+
+
+## Model sokak cepheleri +X ve +Z yönüne bakar; her köşede merkeze bakacak kadar yalnız döndürülür (ölçek yok).
+func _place_building(scene: PackedScene, center: Vector3) -> void:
+	var node: Node3D = scene.instantiate() as Node3D
+	node.position = center
+	var quarter: int
+	if center.x < 0.0:
+		quarter = 0 if center.z < 0.0 else 1
+	else:
+		quarter = 2 if center.z > 0.0 else 3
+	node.rotation_degrees.y = 90.0 * quarter
+	add_child(node)
 
 
 func _build_decor() -> void:

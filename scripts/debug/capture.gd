@@ -8,6 +8,7 @@ extends Node
 ## --camera-distance=M: kamera uzaklığını dener (karşılaştırma görüntüleri için).
 ## --weapons=N: toplam N silahla başlar (debug silahı eklenir). --no-weapons: silahlar ateş etmez (saldırı ölçümü).
 ## --levels=N: N seviye atlatır (kart seçimi dalga arasında açılır). --capture-pick: açılan kart ekranında 1'e basar. --wave=N: N. dalgadan başlar. --capture-wave-end=S: görüntüden S saniye önce dalgayı bitirir.
+## --capture-player=x,z: askeri bu konuma koyar (köşe bina görüntüsü için).
 ## --autopilot: asker ölümsüz, daire çizerek yürür. --god: asker ölümsüz ama yerinde durur.
 ## --capture-kind=<tür id> (runner, tank, spitter, thrower ...): --capture-spawn ile bu türden doğurur (varsayılan walker).
 ## --capture-root=S: görüntüden S saniye önce askeri 1 sn bağlar (S<1: çırpınma, S 1.1–1.4: kurtulma karesi).
@@ -86,6 +87,10 @@ func _ready() -> void:
 			camera.set_pitch(arg.trim_prefix("--camera-pitch=").to_float(), _arg_float("--camera-distance=", Tuning.CAMERA_DISTANCE))
 		elif arg == "--autopilot":
 			_autopilot = true
+		elif arg.begins_with("--capture-player="):
+			var xz: PackedStringArray = arg.trim_prefix("--capture-player=").split(",")
+			if xz.size() == 2:
+				player.global_position = Vector3(xz[0].to_float(), 0.0, xz[1].to_float())
 		elif arg == "--no-weapons":
 			weapons.process_mode = Node.PROCESS_MODE_DISABLED
 		elif arg.begins_with("--weapons="):
