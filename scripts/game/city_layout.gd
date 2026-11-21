@@ -6,6 +6,8 @@ extends RefCounted
 
 ## Doğrudan karşıdan gelişte teğet yönü seçmek için eşik (|teğet · yön|).
 const TANGENT_TIE: float = 0.15
+## Katı dikdörtgenler arasında bırakılabilecek en dar geçit (zombi çapı + pay); daha dar boşluk kapatılır.
+const PASS_MIN: float = 2.0
 
 
 ## Dört köşe bloğunun XZ dikdörtgenleri (sıra: -x-z, +x-z, -x+z, +x+z).
@@ -24,8 +26,25 @@ static func block_rects(arena_size: float, street_width: float) -> Array[Rect2]:
 static func solid_rects(arena_size: float, street_width: float, with_props: bool) -> Array[Rect2]:
 	var rects: Array[Rect2] = block_rects(arena_size, street_width)
 	if with_props:
-		rects.append_array(CityProps.collide_rects())
+		for rect: Rect2 in CityProps.collide_rects():
+			rects.append(_seal_to_blocks(rect, rects.slice(0, 4)))
 	return rects
+
+
+## Bir bloğa PASS_MIN'den az yaklaşan prop dikdörtgenini bloğa kadar uzatır (zombi çapından dar çıkmaz cep kalmasın).
+static func _seal_to_blocks(rect: Rect2, blocks: Array[Rect2]) -> Rect2:
+	for block: Rect2 in blocks:
+		var x_overlap: bool = rect.position.x < block.end.x and rect.end.x > block.position.x
+		var y_overlap: bool = rect.position.y < block.end.y and rect.end.y > block.position.y
+		if y_overlap and not x_overlap:
+			var gap_x: float = block.position.x - rect.end.x if block.position.x >= rect.end.x else rect.position.x - block.end.x
+			if gap_x < PASS_MIN:
+				rect = rect.merge(Rect2(block.position.x if block.position.x >= rect.end.x else block.end.x, rect.position.y, 0.0, rect.size.y))
+		elif x_overlap and not y_overlap:
+			var gap_y: float = block.position.y - rect.end.y if block.position.y >= rect.end.y else rect.position.y - block.end.y
+			if gap_y < PASS_MIN:
+				rect = rect.merge(Rect2(rect.position.x, block.position.y if block.position.y >= rect.end.y else block.end.y, rect.size.x, 0.0))
+	return rect
 
 
 ## Daire (yarıçap r) bir bloğun içindeyse en yakın kenara iter (bloka sürtünerek kayma); değilse aynen döner.

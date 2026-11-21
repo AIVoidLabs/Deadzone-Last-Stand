@@ -42,17 +42,23 @@ func test_collide_rows_inside_arena_and_foot_known() -> void:
 
 
 func _island_rects() -> Array[Rect2]:
-	var out: Array[Rect2] = []
-	for island: Dictionary in CityProps.ISLANDS:
-		var c: Vector2 = island["center"]
-		var box: Rect2 = Rect2()
-		var first: bool = true
-		for p: Array in island["parts"]:
-			var r: Rect2 = CityProps.rect_of({"prop": p[0], "pos": c + Vector2(p[1], p[2]), "rot_y": p[3]})
-			box = r if first else box.merge(r)
-			first = false
-		out.append(box)
-	return out
+	return CityProps.island_rects()
+
+
+func _rect_gap(a: Rect2, b: Rect2) -> float:
+	var dx: float = maxf(0.0, maxf(a.position.x - b.end.x, b.position.x - a.end.x))
+	var dy: float = maxf(0.0, maxf(a.position.y - b.end.y, b.position.y - a.end.y))
+	return Vector2(dx, dy).length()
+
+
+func test_no_dead_end_pockets_between_solids() -> void:
+	# Çarpışan dikdörtgenler arasında zombi çapından dar (0 < boşluk < eşik) cep kalmaz.
+	var rects: Array[Rect2] = CityLayout.solid_rects(Tuning.ARENA_SIZE, Tuning.CITY_STREET_WIDTH, true)
+	var min_pass: float = CityLayout.PASS_MIN
+	for i: int in rects.size():
+		for j: int in range(i + 1, rects.size()):
+			var gap: float = _rect_gap(rects[i], rects[j])
+			assert_false(gap > 0.0 and gap < min_pass, "dar cep %.2f m: %s | %s" % [gap, rects[i], rects[j]])
 
 
 func test_islands_keep_player_start_clear() -> void:

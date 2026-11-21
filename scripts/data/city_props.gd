@@ -180,9 +180,32 @@ static func rect_of(row: Dictionary) -> Rect2:
 ## Zombi itmesi için çarpışmalı satırların dikdörtgenleri.
 static func collide_rects() -> Array[Rect2]:
 	var out: Array[Rect2] = []
-	var all: Array[Dictionary] = ROWS.duplicate()
-	all.append_array(_island_rows())
-	for row: Dictionary in all:
+	for row: Dictionary in ROWS:
 		if row["collide"]:
 			out.append(rect_of(row))
+	out.append_array(island_rects())
 	return out
+
+
+## Her ada için tek kapsayan çarpışma dikdörtgeni (proplar arası dar cep kalmaz; görsel proplar aynı).
+static func island_rects() -> Array[Rect2]:
+	var out: Array[Rect2] = []
+	for row_set: Array[Dictionary] in _island_row_sets():
+		var box: Rect2 = rect_of(row_set[0])
+		for row: Dictionary in row_set:
+			box = box.merge(rect_of(row))
+		out.append(box)
+	return out
+
+
+static func _island_row_sets() -> Array[Array]:
+	var sets: Array[Array] = []
+	if not Tuning.FEATURE_CITY_ISLANDS:
+		return sets
+	for island: Dictionary in ISLANDS:
+		var c: Vector2 = island["center"]
+		var rows_of: Array[Dictionary] = []
+		for p: Array in island["parts"]:
+			rows_of.append({"prop": p[0], "pos": c + Vector2(p[1], p[2]), "rot_y": p[3], "collide": true})
+		sets.append(rows_of)
+	return sets
