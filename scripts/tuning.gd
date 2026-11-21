@@ -245,6 +245,14 @@ const FEATURE_CITY_GREYBOX: bool = true
 ## 8.1c: iç köşe blokları building_a.glb modeliyle görünür (kapalıyken düz kutu); çarpışma kutusu aynı kalır.
 const FEATURE_CITY_BUILDINGS: bool = true
 const CITY_BUILDING_SCENE: String = "res://assets/models/world/building_a.glb"
+## 8.1f: yıkık araçlar, konteynerler, trafik lambaları, barikat parçaları ve kâğıt enkazı (scripts/data/city_props.gd tablosu).
+## Kapalıyken eski kutu arabalar, kutu çöp kutuları ve kutu barikatlar çizilir.
+const FEATURE_CITY_PROPS: bool = true
+## Barikat hattı parça aralığı (m), parça ölçeği ve yaw sapması (derece); kâğıt enkazı sayısı.
+const CITY_BARRICADE_STEP: float = 1.5
+const CITY_BARRICADE_PIECE_SCALE: float = 1.2
+const CITY_BARRICADE_YAW_JITTER: float = 10.0
+const CITY_PAPER_COUNT: int = 24
 ## Sokak genişliği (m): köşe blokları (ARENA_SIZE / 2 - bu / 2) kareler olur. Kol uzunluğu (alan dışı, görsel).
 const CITY_STREET_WIDTH: float = 22.0
 const CITY_STREET_LENGTH: float = 60.0

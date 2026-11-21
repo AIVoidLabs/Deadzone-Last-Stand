@@ -71,7 +71,7 @@ var debug_freeze: bool = false
 var _grid: SpatialGrid
 var _half: float
 ## Şehir bloklarının XZ dikdörtgenleri (FEATURE_CITY_GREYBOX); zombiler içine girmez, kenarda kayar.
-var _blocks: Array[Rect2] = CityLayout.block_rects(Tuning.ARENA_SIZE, Tuning.CITY_STREET_WIDTH)
+var _blocks: Array[Rect2] = CityLayout.solid_rects(Tuning.ARENA_SIZE, Tuning.CITY_STREET_WIDTH, Tuning.FEATURE_CITY_PROPS)
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 var _max_radius: float = 0.0
 

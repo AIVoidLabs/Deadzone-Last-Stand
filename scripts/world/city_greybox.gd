@@ -32,7 +32,7 @@ const OUTER_BLOCKS: Array = [
 ]
 const STAIN_SPOTS: Array = [Vector3(-4, 0, 6), Vector3(5, 0, -8), Vector3(-16, 0, -5), Vector3(3, 0, 17), Vector3(18, 0, 4)]
 ## Yanan araba (ateşli) ve sönük araba konumları; sokaklarda, bloklarda değil.
-const FIRE_CARS: Array = [Vector3(-4.0, 0.0, -20.0), Vector3(20.0, 0.0, 3.5)]
+const FIRE_CARS: Array[Vector3] = [Vector3(-4.0, 0.0, -20.0), Vector3(20.0, 0.0, 3.5)]
 const DEAD_CARS: Array = [Vector3(5.0, 0.0, 24.0), Vector3(-22.0, 0.0, -4.0)]
 const BIN_SPOTS: Array = [Vector3(-9.0, 0.0, 12.5), Vector3(9.0, 0.0, -13.0), Vector3(12.5, 0.0, 9.5), Vector3(-12.0, 0.0, -9.5)]
 ## Sokak lambaları (kaldırım kenarı); sonuncusu zayıf.
@@ -50,7 +50,10 @@ func _ready() -> void:
 	name = "CityGreybox"
 	_build_ground()
 	_build_sidewalks_and_lanes()
-	_build_barricades()
+	if Tuning.FEATURE_CITY_PROPS:
+		add_child(CityPropsBuilder.new())
+	else:
+		_build_barricades()
 	_build_outer_blocks()
 	_build_inner_blocks()
 	_build_decor()
@@ -201,17 +204,24 @@ func _place_building(scene: PackedScene, center: Vector3) -> void:
 	add_child(node)
 
 
+## Ateş konumları: prop açıkken yanmış araçların üstü, kapalıyken eski kutu arabalar.
+func _fire_spots() -> Array[Vector3]:
+	return CityProps.FIRE_SPOTS if Tuning.FEATURE_CITY_PROPS else FIRE_CARS
+
+
 func _build_decor() -> void:
 	for p: Vector3 in STAIN_SPOTS:
 		var stain: MeshInstance3D = _box(p, Vector3(3.0 + absf(p.x) * 0.1, 0.02, 2.2), STAIN)
 		stain.rotation_degrees.y = p.x * 7.0
-	for p: Vector3 in FIRE_CARS:
-		_box(p, Vector3(4.4, 1.5, 1.9), RUST_A)
+	for p: Vector3 in _fire_spots():
+		if not Tuning.FEATURE_CITY_PROPS:
+			_box(p, Vector3(4.4, 1.5, 1.9), RUST_A)
 		_box(p + Vector3(0.0, 1.5, 0.0), FLAME_SIZE, FIRE_COLOR, 0.0, true)
-	for i: int in DEAD_CARS.size():
-		_box(DEAD_CARS[i], Vector3(4.4, 1.5, 1.9), RUST_B if i == 0 else RUST_C)
-	for p: Vector3 in BIN_SPOTS:
-		_box(p, Vector3(0.8, 1.0, 0.8), BIN)
+	if not Tuning.FEATURE_CITY_PROPS:
+		for i: int in DEAD_CARS.size():
+			_box(DEAD_CARS[i], Vector3(4.4, 1.5, 1.9), RUST_B if i == 0 else RUST_C)
+		for p: Vector3 in BIN_SPOTS:
+			_box(p, Vector3(0.8, 1.0, 0.8), BIN)
 	for p: Vector3 in LAMP_SPOTS:
 		_box(p, Vector3(0.25, LAMP_HEIGHT, 0.25), POLE)
 	# Neon: -x-z blok cephesi (sokağa bakan yüz)
@@ -221,7 +231,7 @@ func _build_decor() -> void:
 
 
 func _build_lights() -> void:
-	for p: Vector3 in FIRE_CARS:
+	for p: Vector3 in _fire_spots():
 		var fire: OmniLight3D = _omni(p + Vector3(0.0, 2.2, 0.0), FIRE_COLOR, Tuning.CITY_FIRE_ENERGY, Tuning.CITY_FIRE_RANGE)
 		_fire_lights.append(fire)
 	var face: float = -Tuning.CITY_STREET_WIDTH * 0.5

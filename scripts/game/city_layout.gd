@@ -16,6 +16,14 @@ static func block_rects(arena_size: float, street_width: float) -> Array[Rect2]:
 	return rects
 
 
+## Bloklar + (isteniyorsa) çarpışmalı proplar: zombi itmesi ve doğma kaydırması bunu kullanır.
+static func solid_rects(arena_size: float, street_width: float, with_props: bool) -> Array[Rect2]:
+	var rects: Array[Rect2] = block_rects(arena_size, street_width)
+	if with_props:
+		rects.append_array(CityProps.collide_rects())
+	return rects
+
+
 ## Daire (yarıçap r) bir bloğun içindeyse en yakın kenara iter (bloka sürtünerek kayma); değilse aynen döner.
 static func push_out(p: Vector2, r: float, rects: Array[Rect2]) -> Vector2:
 	for rect: Rect2 in rects:
