@@ -299,8 +299,8 @@ const CITY_GROUND_ROUGHNESS: float = 0.6
 ## Omni ışık menzili (m) ve enerjisi: ateş, sokak lambası, neon.
 const CITY_FIRE_RANGE: float = 5.5
 const CITY_FIRE_ENERGY: float = 10.0
-const CITY_LAMP_RANGE: float = 14.0
-const CITY_LAMP_ENERGY: float = 7.0
+const CITY_LAMP_RANGE: float = 26.0
+const CITY_LAMP_ENERGY: float = 10.0
 ## Sodyum lamba rengi (~2200K, turuncu-amber).
 const CITY_LAMP_COLOR: Color = Color(1.0, 0.58, 0.2)
 ## Zayıf (titrek denen) lambanın enerji çarpanı.
@@ -347,9 +347,22 @@ const CITY_FIRE_GLOW_FLICKER: float = 0.3
 const CITY_FIRE_EMBER_RADIUS: float = 2.2
 ## Duman şeritleri: ömür, rüzgâr. Pus: iki katmanın yüksekliği, alfa, sürüklenme.
 const CITY_SMOKE_LIFETIME: float = 5.0
+## 8.3g: Kenney duman dokulu ince tül (kapalıyken eski şerit duman). Seviye başına adet; alfa düşük.
+const FEATURE_CITY_KENNEY_SMOKE: bool = true
+const CITY_KSMOKE_AMOUNT: Array[int] = [0, 5, 9]
+const CITY_KSMOKE_LIFETIME: float = 6.5
+const CITY_KSMOKE_SIZE: float = 6.0
+const CITY_KSMOKE_ALPHA: float = 0.6
+## Kaldırımdaki köşe sokak lambası altına sahte sodyum ışık havuzu.
+const FEATURE_CITY_LAMP_POOL: bool = true
+const CITY_LAMP_POOL_RADIUS: float = 6.5
+const CITY_LAMP_POOL_ENERGY: float = 0.32
+## Lambanın sokağa uzanan kolu (m) ve alan içi kenar lekeleri kapatıcısı.
+const CITY_LAMP_ARM: float = 1.3
+const FEATURE_CITY_STAINS: bool = false
 const CITY_SMOKE_WIND: Vector3 = Vector3(1.1, 0.0, 0.4)
 const CITY_SMOKE_HAZE_HEIGHTS: Array[float] = [0.6, 2.0]
-const CITY_SMOKE_HAZE_ALPHA: float = 0.05
+const CITY_SMOKE_HAZE_ALPHA: float = 0.022
 const CITY_SMOKE_HAZE_SIZE: float = 90.0
 ## Vitrin ateşi: duvar (z = sabit) üstünde orta nokta, genişlik (m), duvar düzlemi; içte turuncu parlayan pencere.
 const CITY_FIRE_STOREFRONT: Vector3 = Vector3(16.0, 0.0, -10.9)
@@ -358,8 +371,8 @@ const CITY_FIRE_STOREFRONT_LIGHT: float = 5.0
 ## Neon (tüp harf / şekil): yoğunluk, tüp kalınlığı, sızıntı lekesi (enerji, yarıçap), gerçek omni (yalnız "light": true olanlar).
 const CITY_NEON_EMISSION: float = 2.2
 const CITY_NEON_THICKNESS: float = 0.06
-const CITY_NEON_SPILL_ENERGY: float = 0.55
-const CITY_NEON_SPILL_RADIUS: float = 3.6
+const CITY_NEON_SPILL_ENERGY: float = 0.3
+const CITY_NEON_SPILL_RADIUS: float = 2.0
 const CITY_NEON_LIGHT_ENERGY: float = 2.2
 const CITY_NEON_LIGHT_RANGE: float = 8.0
 ## Tabela: text (BAR, OPEN, 24H, MOTEL, PIZZA) ya da shape (arrow, cup, barber); pos = duvar noktası (yükseklik y), n = duvardan dışa, u = yazı yönü,
@@ -389,8 +402,8 @@ const FEATURE_WET_GROUND: bool = true
 const ATMO_FOG_DENSITY: float = 0.0007
 const ATMO_FOG_COLOR: Color = Color(0.07, 0.055, 0.045)
 const ATMO_FOG_HEIGHT: float = 2.5
-const ATMO_FOG_HEIGHT_DENSITY: float = 0.012
-const ATMO_VOLUMETRIC_DENSITY: float = 0.003
+const ATMO_FOG_HEIGHT_DENSITY: float = 0.006
+const ATMO_VOLUMETRIC_DENSITY: float = 0.0015
 const ATMO_VOLUMETRIC_ALBEDO: Color = Color(0.45, 0.38, 0.33)
 const ATMO_VOLUMETRIC_LENGTH: float = 50.0
 const ATMO_GLOW_INTENSITY: float = 0.5
@@ -404,7 +417,7 @@ const ATMO_GRADE_HIGHLIGHT: Color = Color(1.0, 0.93, 0.8)
 const ATMO_GRADE_MID: Color = Color(0.3, 0.27, 0.245)
 ## Birikinti: gürültü ölçeği (1/m), eşik (büyük = az birikinti), ıslak/kuru pürüzlülük.
 const WET_PUDDLE_SCALE: float = 0.06
-const WET_PUDDLE_THRESHOLD: float = 0.6
+const WET_PUDDLE_THRESHOLD: float = 0.64
 const WET_ROUGHNESS: float = 0.1
 ## Lamba/ateş çevresinde birikinti artışı: yarıçap (m) ve güç.
 const WET_HOT_RADIUS: float = 7.0
@@ -707,7 +720,7 @@ const DRESS_SEED: int = 8304
 ## Dekorun yayıldığı yer: merkezde yoğun (alan içi payı) ve kol uzunluğu boyunca.
 const DRESS_ARENA_SHARE: float = 0.75
 const DRESS_DEBRIS_SIZE: Vector2 = Vector2(0.1, 0.6)
-const DRESS_BLOOD_COLOR: Color = Color(0.2, 0.015, 0.02, 0.85)
+const DRESS_BLOOD_COLOR: Color = Color(0.4, 0.04, 0.035, 0.8)
 ## Çift sarı orta şerit: renk, çizgi eni, iki çizgi arası (m).
 const CITY_LANE_COLOR: Color = Color(0.62, 0.44, 0.1)
 const CITY_LANE_WIDTH: float = 0.13

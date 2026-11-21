@@ -19,9 +19,9 @@ void vertex() {
 }
 
 float hash2(vec2 p) {
-	p = fract(p * vec2(123.34, 456.21));
-	p += dot(p, p + 45.32);
-	return fract(p.x * p.y);
+	vec3 p3 = fract(vec3(p.xyx) * 0.1031);
+	p3 += dot(p3, p3.yzx + 33.33);
+	return fract((p3.x + p3.y) * p3.z);
 }
 
 float vnoise(vec2 p) {
@@ -40,10 +40,10 @@ void fragment() {
 	for (int i = 0; i < hot_count; i++) {
 		n += hot_boost * (1.0 - smoothstep(0.0, hot_radius, distance(wpos.xz, hot_spots[i].xz)));
 	}
-	float puddle = smoothstep(puddle_threshold, puddle_threshold + 0.06, n);
+	float puddle = smoothstep(puddle_threshold, puddle_threshold + 0.2, n);
 	float grain = vnoise(wpos.xz * 9.0) * 0.5 + vnoise(wpos.xz * 31.0) * 0.5;
 	float dirt = fbm(wpos.xz * 0.35 + 11.0);
-	ALBEDO = base_color.rgb * (1.0 - 0.45 * puddle) * (0.8 + 0.4 * grain) * (0.65 + 0.7 * dirt);
+	ALBEDO = base_color.rgb * (1.0 - 0.3 * puddle) * (0.8 + 0.4 * grain) * (0.65 + 0.7 * dirt);
 	ROUGHNESS = mix(dry_roughness * (0.85 + 0.3 * grain), wet_roughness, puddle);
 	SPECULAR = mix(0.45, 1.0, puddle);
 	// gökyüzü yansımasından soğuk zayıf parıltı: birikinti karanlıkta da seçilsin

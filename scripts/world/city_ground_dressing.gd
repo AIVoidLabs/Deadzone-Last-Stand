@@ -152,13 +152,15 @@ func _build_blood(pools: Array[Transform3D]) -> void:
 	mat.albedo_color = Tuning.DRESS_BLOOD_COLOR
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	mat.vertex_color_use_as_albedo = true
-	mat.roughness = 0.12
+	mat.roughness = 0.4
+	mat.emission_enabled = true
+	mat.emission = Color(0.05, 0.004, 0.004)
 	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
 	_add_group(quad, xfs, colors, 0.0, mat)
 
 
 func _blob(p: Vector3, diameter: float) -> Transform3D:
-	var basis: Basis = Basis(Vector3.UP, _rng.randf() * TAU) * Basis.from_scale(Vector3(diameter * _rng.randf_range(0.8, 1.4), diameter, 1.0)) * Basis(Vector3.RIGHT, -PI * 0.5)
+	var basis: Basis = Basis(Vector3.UP, _rng.randf() * TAU) * Basis.from_scale(Vector3(diameter * _rng.randf_range(0.9, 1.15), diameter, 1.0)) * Basis(Vector3.RIGHT, -PI * 0.5)
 	return Transform3D(basis, Vector3(p.x, BLOOD_Y, p.z))
 
 

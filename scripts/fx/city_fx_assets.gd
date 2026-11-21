@@ -11,6 +11,9 @@ const EMBER_SHADER: Shader = preload("res://assets/shaders/city_ember.gdshader")
 const HAZE_SHADER: Shader = preload("res://assets/shaders/city_haze.gdshader")
 const WINDOW_SHADER: Shader = preload("res://assets/shaders/city_window_fire.gdshader")
 
+const KENNEY_DIR: String = "res://assets/textures/fx/kenney/%s.png"
+const SMOKE_TEXTURES: Array[String] = ["smoke_01", "smoke_03", "smoke_05", "smoke_07"]
+
 static var _soft: GradientTexture2D = null
 static var _puff: GradientTexture2D = null
 
@@ -29,6 +32,17 @@ static func puff_texture() -> GradientTexture2D:
 		_puff.width = 64
 		_puff.height = 64
 	return _puff
+
+
+## Kenney dokusu (CC0, assets/textures/fx/kenney/).
+static func kenney(name: String) -> Texture2D:
+	return load(KENNEY_DIR % name) as Texture2D
+
+
+## Ince duman tülü: Kenney smoke dokusu, alfa renk rampasından (vertex color).
+static func smoke_material(index: int) -> StandardMaterial3D:
+	var mat: StandardMaterial3D = particle_material(false, kenney(SMOKE_TEXTURES[index % SMOKE_TEXTURES.size()]))
+	return mat
 
 
 ## Alev malzemesi (shader billboard).

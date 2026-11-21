@@ -33,9 +33,18 @@ const FIRE_CARS: Array[Vector3] = [Vector3(-4.0, 0.0, -20.0), Vector3(20.0, 0.0,
 const DEAD_CARS: Array = [Vector3(5.0, 0.0, 24.0), Vector3(-22.0, 0.0, -4.0)]
 const BIN_SPOTS: Array = [Vector3(-9.0, 0.0, 12.5), Vector3(9.0, 0.0, -13.0), Vector3(12.5, 0.0, 9.5), Vector3(-12.0, 0.0, -9.5)]
 ## Sokak lambaları (kaldırım kenarı); sonuncusu zayıf.
-const LAMP_SPOTS: Array = [Vector3(-9.5, 0.0, -16.0), Vector3(9.5, 0.0, 16.0), Vector3(17.0, 0.0, -9.5), Vector3(-17.0, 0.0, 9.5)]
+## 8.3g: dört iç köşe (kavşak köşeleri), kaldırımda; kol sokağa (merkeze) uzanır.
+const LAMP_SPOTS: Array = [Vector3(-12.6, 0.0, -9.75), Vector3(9.75, 0.0, -12.6), Vector3(12.6, 0.0, 9.75), Vector3(-9.75, 0.0, 12.6)]
 const LAMP_HEIGHT: float = 4.4
 const FLAME_SIZE: Vector3 = Vector3(1.4, 0.6, 1.0)
+
+
+## Lamba başı: direğin üstünden sokak merkezine doğru uzanan kolun ucu.
+static func lamp_head(i: int) -> Vector3:
+	var spot: Vector3 = LAMP_SPOTS[i]
+	var toward: Vector3 = Vector3(-spot.x, 0.0, -spot.z)
+	toward = Vector3(signf(toward.x), 0.0, 0.0) if absf(toward.x) > absf(toward.z) else Vector3(0.0, 0.0, signf(toward.z))
+	return spot + toward * Tuning.CITY_LAMP_ARM + Vector3(0.0, LAMP_HEIGHT, 0.0)
 
 var _mats: Dictionary = {}
 ## Sıra önemli (profil sınırı baştan sayar): ateşler, neon, lambalar.
@@ -235,7 +244,7 @@ func _fire_spots() -> Array[Vector3]:
 
 
 func _build_decor() -> void:
-	for p: Vector3 in STAIN_SPOTS:
+	for p: Vector3 in (STAIN_SPOTS if Tuning.FEATURE_CITY_STAINS else []):
 		var stain: MeshInstance3D = _box(p, Vector3(3.0 + absf(p.x) * 0.1, 0.02, 2.2), STAIN)
 		stain.rotation_degrees.y = p.x * 7.0
 	for p: Vector3 in _fire_spots():
@@ -248,8 +257,14 @@ func _build_decor() -> void:
 			_box(DEAD_CARS[i], Vector3(4.4, 1.5, 1.9), RUST_B if i == 0 else RUST_C)
 		for p: Vector3 in BIN_SPOTS:
 			_box(p, Vector3(0.8, 1.0, 0.8), BIN)
-	for p: Vector3 in LAMP_SPOTS:
-		_box(p, Vector3(0.25, LAMP_HEIGHT, 0.25), POLE)
+	for i: int in LAMP_SPOTS.size():
+		var p: Vector3 = LAMP_SPOTS[i]
+		_box(p, Vector3(0.22, LAMP_HEIGHT, 0.22), POLE)
+		var head: Vector3 = lamp_head(i)
+		var mid: Vector3 = (Vector3(p.x, LAMP_HEIGHT, p.z) + head) * 0.5
+		var along_x: bool = absf(head.x - p.x) > 0.01
+		_box(Vector3(mid.x, LAMP_HEIGHT - 0.06, mid.z), Vector3(Tuning.CITY_LAMP_ARM if along_x else 0.14, 0.12, 0.14 if along_x else Tuning.CITY_LAMP_ARM), POLE)
+		_box(Vector3(head.x, LAMP_HEIGHT - 0.04, head.z), Vector3(0.55, 0.1, 0.35), POLE)
 	# Neon: -x-z blok cephesi (sokağa bakan yüz)
 	var half: float = Tuning.ARENA_SIZE * 0.5
 	var face: float = -Tuning.CITY_STREET_WIDTH * 0.5
@@ -262,10 +277,10 @@ func _build_lights() -> void:
 		var fire: OmniLight3D = _omni(p + Vector3(0.0, 2.2, 0.0), FIRE_COLOR, Tuning.CITY_FIRE_ENERGY, Tuning.CITY_FIRE_RANGE)
 		_fire_lights.append(fire)
 	var face: float = -Tuning.CITY_STREET_WIDTH * 0.5
-	_omni(Vector3(face + 2.5, 3.0, -Tuning.ARENA_SIZE * 0.275), NEON_COLOR, Tuning.CITY_NEON_ENERGY, Tuning.CITY_NEON_RANGE)
 	for i: int in LAMP_SPOTS.size():
 		var energy: float = Tuning.CITY_LAMP_ENERGY * (Tuning.CITY_LAMP_WEAK_FACTOR if i == LAMP_SPOTS.size() - 1 else 1.0)
-		_omni(LAMP_SPOTS[i] + Vector3(0.0, LAMP_HEIGHT, 0.0), LAMP_COLOR, energy, Tuning.CITY_LAMP_RANGE)
+		_omni(lamp_head(i), LAMP_COLOR, energy, Tuning.CITY_LAMP_RANGE)
+	_omni(Vector3(face + 2.5, 3.0, -Tuning.ARENA_SIZE * 0.275), NEON_COLOR, Tuning.CITY_NEON_ENERGY, Tuning.CITY_NEON_RANGE)
 
 
 func _omni(pos: Vector3, color: Color, energy: float, range_m: float) -> OmniLight3D:

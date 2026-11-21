@@ -27,7 +27,7 @@ func _init(size_mul: float = 1.0, extents: Vector3 = Vector3(0.9, 0.05, 0.45), l
 
 func _ready() -> void:
 	flame = _flame()
-	wisps = _wisps()
+	wisps = _smoke() if Tuning.FEATURE_CITY_KENNEY_SMOKE else _wisps()
 	sparks = _sparks()
 	ash = _ash()
 	for p: GPUParticles3D in [flame, wisps, sparks, ash]:
@@ -44,7 +44,8 @@ func _ready() -> void:
 ## Seviye 0/1/2: adetler tabloda; 0 = o parçacık kapalı. Sahte ışık her seviyede açık.
 func apply_level(level: int) -> void:
 	_set_amount(flame, Tuning.CITY_FX_FLAME_AMOUNT[level])
-	_set_amount(wisps, Tuning.CITY_FX_SMOKE_AMOUNT[level] if Tuning.FEATURE_CITY_FIRE_FX else 0)
+	var smoke_n: int = Tuning.CITY_KSMOKE_AMOUNT[level] if Tuning.FEATURE_CITY_KENNEY_SMOKE else Tuning.CITY_FX_SMOKE_AMOUNT[level]
+	_set_amount(wisps, smoke_n if Tuning.FEATURE_CITY_FIRE_FX else 0)
 	_set_amount(sparks, Tuning.CITY_FX_SPARK_AMOUNT[level])
 	_set_amount(ash, Tuning.CITY_FX_ASH_AMOUNT[level] if Tuning.FEATURE_CITY_ASH else 0)
 	var n: int = roundi(Tuning.CITY_FX_EMBER_AMOUNT[level] * _size_mul * (_extents.x + 1.0) / 1.9)
@@ -119,6 +120,38 @@ func _wisps() -> GPUParticles3D:
 	m.turbulence_enabled = true
 	m.turbulence_noise_strength = 0.5
 	m.turbulence_noise_scale = 2.5
+	p.process_material = m
+	return p
+
+
+## 8.3g: ince, çok saydam tül: altı ateş ışığıyla turuncu, yukarıda koyu gri; büyüdükçe solar.
+func _smoke() -> GPUParticles3D:
+	var mesh: QuadMesh = QuadMesh.new()
+	mesh.size = Vector2.ONE * Tuning.CITY_KSMOKE_SIZE
+	var idx: int = absi(int(position.x * 3.0 + position.z * 7.0))
+	var p: GPUParticles3D = _base(Tuning.CITY_KSMOKE_LIFETIME, mesh, CityFxAssets.smoke_material(idx))
+	p.position.y = _lift + 0.5
+	p.explosiveness = 0.0
+	var m: ParticleProcessMaterial = ParticleProcessMaterial.new()
+	m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
+	m.emission_sphere_radius = 0.25 + _extents.x * 0.3
+	m.direction = Vector3.UP
+	m.spread = 8.0
+	m.initial_velocity_min = 0.35 + 0.15 * _size_mul
+	m.initial_velocity_max = 0.6 + 0.2 * _size_mul
+	m.gravity = Vector3(0.1, 0.05, 0.04)
+	m.angle_min = 0.0
+	m.angle_max = 360.0
+	m.angular_velocity_min = -12.0
+	m.angular_velocity_max = 12.0
+	m.scale_min = 0.6 * _size_mul + 0.5
+	m.scale_max = 0.9 * _size_mul + 0.6
+	m.scale_curve = CityFxAssets.scale_curve([Vector2(0.0, 0.4), Vector2(1.0, 1.0)])
+	var a: float = Tuning.CITY_KSMOKE_ALPHA
+	m.color_ramp = CityFxAssets.ramp([0.0, 0.12, 0.4, 1.0], [Color(1.0, 0.5, 0.2, 0.0), Color(0.85, 0.42, 0.2, a), Color(0.42, 0.36, 0.34, a * 0.8), Color(0.22, 0.21, 0.23, 0.0)])
+	m.turbulence_enabled = true
+	m.turbulence_noise_strength = 0.25
+	m.turbulence_noise_scale = 3.0
 	p.process_material = m
 	return p
 

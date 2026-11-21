@@ -18,6 +18,7 @@ var _all_fire_pos: Array[Vector3] = []
 var _ash: GPUParticles3D = null
 var _noise: FastNoiseLite = FastNoiseLite.new()
 var _time: float = 0.0
+var _pool_mat: ShaderMaterial = null
 var _lamp_flicker: BrokenFlicker = BrokenFlicker.new(3)
 var _base_omni_count: int = 0
 
@@ -136,7 +137,7 @@ func _build_haze() -> void:
 func _build_lamps() -> void:
 	var count: int = CityGreybox.LAMP_SPOTS.size()
 	for i: int in count:
-		var head: Vector3 = CityGreybox.LAMP_SPOTS[i] + Vector3(0.0, CityGreybox.LAMP_HEIGHT, 0.0)
+		var head: Vector3 = CityGreybox.lamp_head(i)
 		var weak: bool = i == count - 1
 		var bulb: MeshInstance3D = MeshInstance3D.new()
 		var sphere: SphereMesh = SphereMesh.new()
@@ -148,6 +149,11 @@ func _build_lamps() -> void:
 		bulb.position = head - Vector3(0.0, 0.05, 0.0)
 		bulb.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		add_child(bulb)
+		if Tuning.FEATURE_CITY_LAMP_POOL and Tuning.FEATURE_CITY_FAKE_LIGHT:
+			var pool: MeshInstance3D = CityFxAssets.glow_quad(Vector3(head.x, 0.0, head.z), Tuning.CITY_LAMP_POOL_RADIUS, CityGreybox.LAMP_COLOR, Tuning.CITY_LAMP_POOL_ENERGY * (Tuning.CITY_LAMP_WEAK_FACTOR if weak else 1.0), 0.04)
+			add_child(pool)
+			if weak:
+				_pool_mat = pool.material_override as ShaderMaterial
 		if weak:
 			_bulbs.append(mat)
 			var light: OmniLight3D = _find_omni(head)
@@ -211,6 +217,8 @@ func _flicker_lamp(delta: float) -> void:
 		m.emission_energy_multiplier = Tuning.CITY_LAMP_BULB_ENERGY * k
 	for i: int in _lamp_lights.size():
 		_lamp_lights[i].light_energy = _lamp_energy[i] * k
+	if _pool_mat != null:
+		_pool_mat.set_shader_parameter(&"energy", Tuning.CITY_LAMP_POOL_ENERGY * Tuning.CITY_LAMP_WEAK_FACTOR * k)
 	if not _cones.is_empty():
 		_cones[_cones.size() - 1].light_energy = Tuning.CITY_LAMP_CONE_ENERGY * Tuning.CITY_LAMP_WEAK_FACTOR * k
 
