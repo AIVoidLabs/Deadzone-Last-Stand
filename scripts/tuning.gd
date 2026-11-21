@@ -497,7 +497,7 @@ const CAMERA_LOOK_AHEAD_SHARPNESS: float = 3.0
 ## Sarsıntı: en çok kayma (m), gürültü hızı, sönme hızı (1/sn) ve asker vurulunca eklenen pay.
 ## Dinamik açı: koşu yönüne göre en çok yaw / pitch ofseti (derece) ve yumuşatma
 const CAMERA_DYN_YAW_DEG: float = 7.0
-const CAMERA_DYN_PITCH_DEG: float = 3.0
+const CAMERA_DYN_PITCH_DEG: float = 5.0
 const CAMERA_DYN_SHARPNESS: float = 2.5
 const CAMERA_SHAKE_MAX_OFFSET: float = 0.6
 const CAMERA_SHAKE_FREQUENCY: float = 6.0
