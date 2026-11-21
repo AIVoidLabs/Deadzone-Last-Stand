@@ -7,6 +7,11 @@ uniform float puddle_threshold = 0.5;
 uniform float wet_roughness = 0.05;
 uniform float dry_roughness = 0.5;
 
+uniform vec3 hot_spots[12];
+uniform int hot_count = 0;
+uniform float hot_radius = 7.0;
+uniform float hot_boost = 0.2;
+
 varying vec3 wpos;
 
 void vertex() {
@@ -32,9 +37,14 @@ float fbm(vec2 p) {
 
 void fragment() {
 	float n = fbm(wpos.xz * puddle_scale);
-	float puddle = smoothstep(puddle_threshold, puddle_threshold + 0.1, n);
+	for (int i = 0; i < hot_count; i++) {
+		n += hot_boost * (1.0 - smoothstep(0.0, hot_radius, distance(wpos.xz, hot_spots[i].xz)));
+	}
+	float puddle = smoothstep(puddle_threshold, puddle_threshold + 0.06, n);
 	float grain = vnoise(wpos.xz * 9.0) * 0.5 + vnoise(wpos.xz * 31.0) * 0.5;
-	ALBEDO = base_color.rgb * (1.0 - 0.4 * puddle) * (0.8 + 0.4 * grain);
+	ALBEDO = base_color.rgb * (1.0 - 0.55 * puddle) * (0.8 + 0.4 * grain);
 	ROUGHNESS = mix(dry_roughness * (0.85 + 0.3 * grain), wet_roughness, puddle);
-	SPECULAR = mix(0.45, 0.9, puddle);
+	SPECULAR = mix(0.45, 1.0, puddle);
+	// gökyüzü yansımasından soğuk zayıf parıltı: birikinti karanlıkta da seçilsin
+	EMISSION = vec3(0.01, 0.017, 0.035) * puddle * (0.6 + 0.8 * vnoise(wpos.xz * 0.7));
 }

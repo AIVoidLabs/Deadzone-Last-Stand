@@ -320,11 +320,17 @@ const CITY_FX_ASH_AMOUNT: Array[int] = [0, 24, 44]
 const CITY_TRASH_FIRE_SCALE: float = 0.5
 const CITY_TRASH_FIRES: Array[Vector3] = [Vector3(10.4, 0.0, -12.9), Vector3(-15.6, 0.0, -10.0)]
 const CITY_FIRE_FLAME_HEIGHT: float = 1.4
+## Alev dili boyutu (m, araç ateşi), ömrü; kıvılcım çubuğu.
+const CITY_FLAME_WIDTH: float = 1.3
+const CITY_FLAME_HEIGHT: float = 2.8
+const CITY_FLAME_LIFETIME: float = 0.9
+const CITY_SPARK_WIDTH: float = 0.07
+const CITY_SPARK_LENGTH: float = 0.34
 const CITY_FIRE_FLICKER: float = 0.25
 const CITY_FIRE_FLICKER_SPEED: float = 2.2
 const CITY_FIRE_WOBBLE: float = 0.12
 const CITY_SMOKE_LIFETIME: float = 7.0
-const CITY_SMOKE_WIND: Vector3 = Vector3(0.45, 0.0, 0.15)
+const CITY_SMOKE_WIND: Vector3 = Vector3(0.9, 0.0, 0.35)
 const CITY_SMOKE_COLOR: Color = Color(0.05, 0.05, 0.06)
 ## Neon: tür (line/arrow/heart), pos (duvar düzleminde orta), u (duvar boyunca yön), size (yarım boy, m), color, broken (düzensiz yanıp söner).
 const CITY_NEON_EMISSION: float = 3.5
@@ -376,9 +382,12 @@ const PLAYER_LIGHT_ENERGY: float = 1.6
 const PLAYER_LIGHT_RANGE: float = 7.0
 const PLAYER_LIGHT_HEIGHT: float = 3.0
 ## Birikinti: gürültü ölçeği (1/m), eşik (büyük = az birikinti), ıslak/kuru pürüzlülük.
-const WET_PUDDLE_SCALE: float = 0.06
-const WET_PUDDLE_THRESHOLD: float = 0.42
-const WET_ROUGHNESS: float = 0.05
+const WET_PUDDLE_SCALE: float = 0.035
+const WET_PUDDLE_THRESHOLD: float = 0.44
+const WET_ROUGHNESS: float = 0.1
+## Lamba/ateş çevresinde birikinti artışı: yarıçap (m) ve güç.
+const WET_HOT_RADIUS: float = 7.0
+const WET_HOT_BOOST: float = 0.22
 const WET_DRY_ROUGHNESS: float = 0.5
 
 # --- Genel tempo ---

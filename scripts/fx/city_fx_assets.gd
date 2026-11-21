@@ -2,7 +2,41 @@ class_name CityFxAssets
 extends RefCounted
 ## 8.3b: şehir efektleri için betikle üretilmiş dokular ve malzemeler (dosya yok).
 
+const FLAME_SHADER: Shader = preload("res://assets/shaders/city_flame.gdshader")
+
 static var _soft: GradientTexture2D = null
+static var _puff: GradientTexture2D = null
+
+
+## Duman puf dokusu: geniş opak çekirdek, yumuşak kenar.
+static func puff_texture() -> GradientTexture2D:
+	if _puff == null:
+		var grad: Gradient = Gradient.new()
+		grad.offsets = PackedFloat32Array([0.0, 0.55, 1.0])
+		grad.colors = PackedColorArray([Color(1, 1, 1, 1), Color(1, 1, 1, 0.85), Color(1, 1, 1, 0)])
+		_puff = GradientTexture2D.new()
+		_puff.gradient = grad
+		_puff.fill = GradientTexture2D.FILL_RADIAL
+		_puff.fill_from = Vector2(0.5, 0.5)
+		_puff.fill_to = Vector2(1.0, 0.5)
+		_puff.width = 64
+		_puff.height = 64
+	return _puff
+
+
+## Alev malzemesi (shader billboard).
+static func flame_material() -> ShaderMaterial:
+	var mat: ShaderMaterial = ShaderMaterial.new()
+	mat.shader = FLAME_SHADER
+	return mat
+
+
+## Alt noktası pivot olan dikey quad (alev, kıvılcım).
+static func tall_quad(width: float, height: float) -> QuadMesh:
+	var mesh: QuadMesh = QuadMesh.new()
+	mesh.size = Vector2(width, height)
+	mesh.center_offset = Vector3(0.0, height * 0.5, 0.0)
+	return mesh
 
 
 ## Yumuşak dairesel leke (merkez opak, kenar saydam).
@@ -22,7 +56,7 @@ static func soft_texture() -> GradientTexture2D:
 
 
 ## Parçacık billboard malzemesi; additive = alev / kıvılcım, değilse duman / kül.
-static func particle_material(additive: bool) -> StandardMaterial3D:
+static func particle_material(additive: bool, tex: Texture2D = null) -> StandardMaterial3D:
 	var mat: StandardMaterial3D = StandardMaterial3D.new()
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
@@ -30,7 +64,7 @@ static func particle_material(additive: bool) -> StandardMaterial3D:
 	mat.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
 	mat.billboard_keep_scale = true
 	mat.vertex_color_use_as_albedo = true
-	mat.albedo_texture = soft_texture()
+	mat.albedo_texture = tex if tex != null else soft_texture()
 	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
 	return mat
 

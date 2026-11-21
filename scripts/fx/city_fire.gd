@@ -2,8 +2,9 @@ class_name CityFire
 extends Node3D
 ## 8.3b: tek ateş noktası: alev, duman sütunu, kıvılcım parçacıkları. size_mul küçük (çöp) ateş için.
 
-const FLAME_COLORS: Array[Color] = [Color(1.0, 0.8, 0.35, 0.0), Color(1.0, 0.5, 0.12, 0.5), Color(0.9, 0.2, 0.04, 0.3), Color(0.4, 0.05, 0.0, 0.0)]
-const SMOKE_COLORS: Array[Color] = [Color(0.3, 0.12, 0.05, 0.0), Color(0.12, 0.08, 0.07, 0.5), Color(0.05, 0.05, 0.06, 0.35), Color(0.05, 0.05, 0.06, 0.0)]
+const FLAME_FADE: Array[Color] = [Color(1, 1, 1, 0.0), Color(1, 1, 1, 1.0), Color(1, 1, 1, 1.0), Color(1, 1, 1, 0.0)]
+## Duman: altta ateşten turuncu-gri, yukarı koyu gri; opak-ish.
+const SMOKE_COLORS: Array[Color] = [Color(0.6, 0.3, 0.14, 0.0), Color(0.5, 0.26, 0.15, 0.9), Color(0.2, 0.19, 0.21, 0.9), Color(0.1, 0.1, 0.12, 0.0)]
 
 var flame: GPUParticles3D
 var smoke: GPUParticles3D
@@ -46,25 +47,29 @@ func _base(lifetime: float, additive: bool, size: float) -> GPUParticles3D:
 	p.visibility_aabb = AABB(Vector3(-8, -1, -8), Vector3(16, 24, 16))
 	p.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	p.draw_pass_1 = CityFxAssets.quad(size)
-	p.material_override = CityFxAssets.particle_material(additive)
+	p.material_override = CityFxAssets.particle_material(additive, null if additive else CityFxAssets.puff_texture())
 	return p
 
 
 func _flame() -> GPUParticles3D:
-	var p: GPUParticles3D = _base(0.8, true, 1.0)
-	p.position.y = Tuning.CITY_FIRE_FLAME_HEIGHT * _size_mul
+	var p: GPUParticles3D = _base(Tuning.CITY_FLAME_LIFETIME, true, 1.0)
+	p.position.y = Tuning.CITY_FIRE_FLAME_HEIGHT * _size_mul - 0.35 * _size_mul
+	p.draw_pass_1 = CityFxAssets.tall_quad(Tuning.CITY_FLAME_WIDTH, Tuning.CITY_FLAME_HEIGHT)
+	p.material_override = CityFxAssets.flame_material()
 	var m: ParticleProcessMaterial = ParticleProcessMaterial.new()
 	m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
-	m.emission_box_extents = Vector3(0.8, 0.05, 0.4) * _size_mul
+	m.emission_box_extents = Vector3(0.9, 0.05, 0.45) * _size_mul
 	m.direction = Vector3.UP
-	m.spread = 14.0
-	m.initial_velocity_min = 0.7
-	m.initial_velocity_max = 1.6
-	m.gravity = Vector3(0.0, 0.8, 0.0)
-	m.scale_min = 0.8 * _size_mul
-	m.scale_max = 1.5 * _size_mul
-	m.scale_curve = CityFxAssets.scale_curve([Vector2(0.0, 0.7), Vector2(0.3, 1.0), Vector2(1.0, 0.1)])
-	m.color_ramp = CityFxAssets.ramp([0.0, 0.2, 0.6, 1.0], FLAME_COLORS)
+	m.spread = 6.0
+	m.initial_velocity_min = 0.1
+	m.initial_velocity_max = 0.5
+	m.gravity = Vector3(0.1, 0.4, 0.0)
+	m.angle_min = 0.0
+	m.angle_max = 360.0
+	m.scale_min = 0.75 * _size_mul
+	m.scale_max = 1.25 * _size_mul
+	m.scale_curve = CityFxAssets.scale_curve([Vector2(0.0, 0.7), Vector2(0.25, 1.0), Vector2(1.0, 0.35)])
+	m.color_ramp = CityFxAssets.ramp([0.0, 0.1, 0.8, 1.0], FLAME_FADE)
 	p.process_material = m
 	return p
 
@@ -79,10 +84,10 @@ func _smoke() -> GPUParticles3D:
 	m.initial_velocity_min = 1.4
 	m.initial_velocity_max = 2.2
 	m.gravity = Tuning.CITY_SMOKE_WIND
-	m.scale_min = 1.4 * _size_mul
-	m.scale_max = 2.2 * _size_mul
-	m.scale_curve = CityFxAssets.scale_curve([Vector2(0.0, 0.4), Vector2(1.0, 3.2)])
-	m.color_ramp = CityFxAssets.ramp([0.0, 0.15, 0.6, 1.0], SMOKE_COLORS)
+	m.scale_min = 2.4 * _size_mul
+	m.scale_max = 3.6 * _size_mul
+	m.scale_curve = CityFxAssets.scale_curve([Vector2(0.0, 0.4), Vector2(1.0, 2.6)])
+	m.color_ramp = CityFxAssets.ramp([0.0, 0.1, 0.5, 1.0], SMOKE_COLORS)
 	m.turbulence_enabled = true
 	m.turbulence_noise_strength = 0.6
 	m.turbulence_noise_scale = 3.0
@@ -91,18 +96,19 @@ func _smoke() -> GPUParticles3D:
 
 
 func _sparks() -> GPUParticles3D:
-	var p: GPUParticles3D = _base(1.6, true, 0.09)
+	var p: GPUParticles3D = _base(1.4, true, 0.09)
+	p.draw_pass_1 = CityFxAssets.tall_quad(Tuning.CITY_SPARK_WIDTH, Tuning.CITY_SPARK_LENGTH)
 	p.position.y = Tuning.CITY_FIRE_FLAME_HEIGHT * _size_mul
 	var m: ParticleProcessMaterial = ParticleProcessMaterial.new()
 	m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
 	m.emission_box_extents = Vector3(0.6, 0.1, 0.35) * _size_mul
 	m.direction = Vector3.UP
 	m.spread = 35.0
-	m.initial_velocity_min = 1.5
-	m.initial_velocity_max = 4.0
-	m.gravity = Vector3(0.3, -1.5, 0.1)
-	m.scale_min = 0.6
-	m.scale_max = 1.2
-	m.color_ramp = CityFxAssets.ramp([0.0, 0.7, 1.0], [Color(1.0, 0.8, 0.3, 1.0), Color(1.0, 0.4, 0.1, 0.8), Color(0.8, 0.1, 0.0, 0.0)])
+	m.initial_velocity_min = 3.0
+	m.initial_velocity_max = 6.0
+	m.gravity = Vector3(0.4, -1.0, 0.1)
+	m.scale_min = 0.8
+	m.scale_max = 1.4
+	m.color_ramp = CityFxAssets.ramp([0.0, 0.7, 1.0], [Color(1.0, 0.95, 0.6, 1.0), Color(1.0, 0.55, 0.15, 0.9), Color(0.8, 0.1, 0.0, 0.0)])
 	p.process_material = m
 	return p

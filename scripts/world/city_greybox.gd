@@ -130,6 +130,13 @@ func _ground_material() -> Material:
 		wet.set_shader_parameter(&"puddle_threshold", Tuning.WET_PUDDLE_THRESHOLD)
 		wet.set_shader_parameter(&"wet_roughness", Tuning.WET_ROUGHNESS)
 		wet.set_shader_parameter(&"dry_roughness", Tuning.WET_DRY_ROUGHNESS)
+		var hot: Array[Vector3] = []
+		hot.append_array(LAMP_SPOTS)
+		hot.append_array(_fire_spots())
+		wet.set_shader_parameter(&"hot_spots", PackedVector3Array(hot))
+		wet.set_shader_parameter(&"hot_count", hot.size())
+		wet.set_shader_parameter(&"hot_radius", Tuning.WET_HOT_RADIUS)
+		wet.set_shader_parameter(&"hot_boost", Tuning.WET_HOT_BOOST)
 		return wet
 	var mat: StandardMaterial3D = StandardMaterial3D.new()
 	mat.albedo_color = Tuning.CITY_GROUND_COLOR
