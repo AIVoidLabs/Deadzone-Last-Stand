@@ -26,6 +26,7 @@ func _init() -> void:
 	var skeleton: Skeleton3D = _check_mannequin()
 	for path: String in LIBRARY_PATHS:
 		_check_library(path, skeleton)
+	_check_zombies()
 	if _mannequin_root != null:
 		_mannequin_root.free()
 	print("SONUC: ", "tamam" if _errors == 0 else "%d hata" % _errors)
@@ -83,3 +84,27 @@ func _check_tracks(clip: StringName, animation: Animation, skeleton: Skeleton3D)
 		if skeleton != null and skeleton.find_bone(track_path.get_concatenated_subnames()) < 0:
 			_fail("%s: iskelette olmayan kemik %s" % [clip, track_path])
 			return
+
+
+## Blender'da üretilen zombi GLB'leri (ZombieModelData): ortak iskelet, gerekli kemikler, kendi klipleri.
+func _check_zombies() -> void:
+	var count: int = 0
+	for key: StringName in ZombieModelData.VC_MODELS:
+		var source: Variant = ZombieModelData.VC_MODELS[key]
+		var scenes: Array = source if source is Array else [source]
+		for scene: PackedScene in scenes:
+			count += 1
+			var root: Node = scene.instantiate()
+			var label: String = "%s (%s)" % [key, scene.resource_path.get_file()]
+			var skeleton: Skeleton3D = root.find_child(SKELETON_NAME, true, false) as Skeleton3D
+			if skeleton == null:
+				_fail("%s: %s yok" % [label, SKELETON_NAME])
+			else:
+				for bone: StringName in REQUIRED_BONES:
+					if skeleton.find_bone(bone) < 0:
+						_fail("%s: kemik eksik %s" % [label, bone])
+			var player: AnimationPlayer = root.find_child("AnimationPlayer", true, false) as AnimationPlayer
+			if player == null or player.get_animation_list().is_empty():
+				_fail("%s: klip yok" % label)
+			root.free()
+	print("ZOMBI GLB: %d dosya tarandi" % count)

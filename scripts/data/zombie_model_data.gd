@@ -32,6 +32,11 @@ const VC_MODELS: Dictionary = {
 		preload("res://assets/models/characters/zombie_bloater_trucker.glb"),
 		preload("res://assets/models/characters/zombie_bloater_bare.glb"),
 	],
+	&"screamer_v": [
+		preload("res://assets/models/characters/zombie_screamer_gown.glb"),
+		preload("res://assets/models/characters/zombie_screamer_nurse.glb"),
+		preload("res://assets/models/characters/zombie_screamer_bare.glb"),
+	],
 	&"spitter_v": [
 		preload("res://assets/models/characters/zombie_spitter_worker.glb"),
 		preload("res://assets/models/characters/zombie_spitter_suit.glb"),

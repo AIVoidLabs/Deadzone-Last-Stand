@@ -72,7 +72,7 @@ const ROWS: Dictionary = {
 		"color": Color(0.6, 0.5, 0.7),
 		"tint": Color(0.85, 0.7, 1.0),
 		"look_v": {
-			"model": &"screamer_v", "tint": Color.WHITE, "walk_ref_speed": 1.76,
+			"model": &"screamer_v", "tint": Color.WHITE, "walk_ref_speed": Tuning.SCREAMER_WALK_REF_SPEED,
 			"anim_idle": [&"idle"], "anim_walk": [&"walk"], "anim_attack": [&"scream"], "anim_stagger": [&"stagger"],
 			"anim_death": [&"death_a", &"death_b"], "anim_spawn": [&"spawn"],
 			# Klipte çığlık tepe anı (sn).
