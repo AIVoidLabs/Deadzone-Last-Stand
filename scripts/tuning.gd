@@ -50,8 +50,8 @@ const FEATURE_THROW_MELEE: bool = true
 const FEATURE_ARMORED_MODEL: bool = false
 const FEATURE_SCREAMER_MODEL: bool = false
 const FEATURE_SPITTER_MODEL: bool = false
-const FEATURE_THROWER_MODEL: bool = false
-const FEATURE_BLOATER_MODEL: bool = false
+const FEATURE_THROWER_MODEL: bool = true
+const FEATURE_BLOATER_MODEL: bool = true
 ## Yay atışı (asit topu, kaya): bırakış yüksekliği (m), görsel havuz boyu, kayanın yerde kalma ve solma süresi (sn),
 ## iniş sarsıntısı. Asit havuzu: en çok aynı anda, son söne süresi (sn). Asit hasarında ekran kızarması payı.
 const LOB_RELEASE_HEIGHT: float = 1.3
@@ -280,6 +280,9 @@ const JUMPER_WALK_REF_SPEED: float = 2.4
 const JUMPER_LEAP_BLEND: float = 0.05
 ## Yeni tank walk klibinin anahtarlandığı hız (m/sn, 1.85 m boyda).
 const TANK_WALK_REF_SPEED: float = 1.2
+## Yeni taş fırlatan ve patlayıcı walk klibinin anahtarlandığı hız (m/sn; satırdaki hız x GAME_PACE ile aynı).
+const THROWER_WALK_REF_SPEED: float = 1.84
+const BLOATER_WALK_REF_SPEED: float = 1.92
 ## Senkron klip hızı sınırları ve kare başına yumuşatma payı (0-1).
 const WALK_SPEED_SCALE_MIN: float = 0.3
 const WALK_SPEED_SCALE_MAX: float = 1.8

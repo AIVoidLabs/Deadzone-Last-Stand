@@ -142,9 +142,12 @@ const ROWS: Dictionary = {
 		"color": Color(0.5, 0.35, 0.22),
 		"tint": Color(1.0, 0.8, 0.55),
 		"look_v": {
-			"model": &"thrower_v", "tint": Color.WHITE, "walk_ref_speed": 1.84,
+			"model": &"thrower_v", "tint": Color.WHITE, "walk_ref_speed": Tuning.THROWER_WALK_REF_SPEED,
 			"anim_idle": [&"idle"], "anim_walk": [&"walk"], "anim_attack": [&"throw"], "anim_swat": [&"swat"],
 			"throw_melee_anim_hit_time": 0.6, "anim_stagger": [&"stagger"],
+			# Kaya WINDUP'ta klibin 0.30 sn'sinden bırakışa dek sağ elde (kemik yerel ofseti); toparlanmada klip sonuna dek oynar.
+			"recover_finishes_attack": true,
+			"held_prop": {"bone": "RightHand", "offset": Vector3(0.049, -0.18, 0.162), "show_time": 0.3},
 			"anim_death": [&"death_a", &"death_b"], "anim_spawn": [&"spawn"],
 		},
 	},
@@ -177,7 +180,7 @@ const ROWS: Dictionary = {
 		"color": Color(0.85, 0.5, 0.15),
 		"tint": Color(1.0, 0.7, 0.4),
 		"look_v": {
-			"model": &"bloater_v", "tint": Color.WHITE, "walk_ref_speed": 1.92,
+			"model": &"bloater_v", "tint": Color.WHITE, "walk_ref_speed": Tuning.BLOATER_WALK_REF_SPEED,
 			"anim_idle": [&"idle"], "anim_walk": [&"walk"], "anim_attack": [&"swell"], "anim_stagger": [&"stagger"],
 			"anim_death": [&"death_a"], "anim_spawn": [&"spawn"],
 		},

@@ -31,6 +31,8 @@ var _jump_age: float = -1.0
 var _jump_total: float = 0.0
 var _marker: ZombieJumpMarker
 var _swell: ZombieSwell = ZombieSwell.new()
+## Elde taşınan prop (yalnız satırda held_prop varsa: taş fırlatanın kayası).
+var _held: ZombieHeldProp
 var _model_height: float = Tuning.CHARACTER_MODEL_HEIGHT
 var _skeleton: Skeleton3D
 ## Yeni hat modelinin örnek başına ton farkı (VC_TINT_VARIANCE); satırdaki `tint` ile çarpılır.
@@ -68,7 +70,9 @@ func _process(delta: float) -> void:
 	_marker.tick(delta)
 	if _swell.is_on():
 		_set_burn(_swell.tick(delta))
-	if not _dying and _flash_left <= 0.0 and _jump_age < 0.0 and not _marker.is_on() and not _swell.is_on():
+	if _held != null:
+		_held.tick(delta)
+	if not _dying and _flash_left <= 0.0 and _jump_age < 0.0 and not _marker.is_on() and not _swell.is_on() and not (_held != null and _held.is_waiting()):
 		set_process(false)
 
 
@@ -89,6 +93,8 @@ func _on_event(event_name: StringName, data: Dictionary) -> void:
 			_swell.start(_body.state_duration)
 			set_process(true)
 		&"swat":
+			if _held != null:
+				_held.reset()
 			_clips.play_timed(&"anim_swat", float(_clips.row.get("throw_melee_anim_hit_time", 0.0)), _body.state_duration)
 		&"hit":
 			if Tuning.FEATURE_HIT_FLASH:
@@ -101,6 +107,8 @@ func _on_state_changed(new_state: int, old_state: int) -> void:
 	# İniş bitti ya da hazırlık sendelemeyle kesildi: yükseklik ve iniş işareti sıfırlanır.
 	if (old_state == ZombieRules.State.JUMP or old_state == ZombieRules.State.WINDUP) and new_state != ZombieRules.State.JUMP:
 		_hide_extras()
+	if _held != null:
+		_held.reset()
 	if _dying and new_state != ZombieRules.State.DYING:
 		_dying = false
 		_set_fade(0.0)
@@ -127,6 +135,9 @@ func _on_state_changed(new_state: int, old_state: int) -> void:
 			else:
 				# Klipteki vuruş anı (satırda varsa) hazırlığın sonuna denk gelir; 0 ise klip bütünüyle sığar.
 				_clips.play_timed(&"anim_attack", _clips.row.get("attack_anim_hit_time", 0.0), _body.state_duration)
+				if _held != null:
+					_held.begin(_clips.row["held_prop"], _body.state_duration, float(_clips.row["attack_anim_hit_time"]))
+					set_process(true)
 		ZombieRules.State.LUNGE, ZombieRules.State.SPRINT, ZombieRules.State.STRIKE:
 			_clips.play_rush(new_state, _body.state_duration, LUNGE_ANIM_SPEED)
 		ZombieRules.State.JUMP:
@@ -235,6 +246,9 @@ func _apply_kind(row: Dictionary) -> void:
 		box.position.y = height * 0.5
 		return
 	ZombieMaterials.apply_tint(_meshes[0], row, _clips.own_clips, _tint)
+	if _held == null and _clips.own_clips and row.has("held_prop") and _skeleton != null:
+		_held = ZombieHeldProp.new()
+		_held.setup(_skeleton, row["held_prop"])
 	var size: float = randf_range(1.0 - Tuning.ZOMBIE_SCALE_VARIANCE, 1.0 + Tuning.ZOMBIE_SCALE_VARIANCE)
 	scale = Vector3.ONE * (size * height / _model_height)
 	_clips.size_scale = scale.x
