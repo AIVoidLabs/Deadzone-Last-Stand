@@ -4,6 +4,13 @@ extends RefCounted
 
 const FLAME_SHADER: Shader = preload("res://assets/shaders/city_flame.gdshader")
 
+const SPARK_SHADER: Shader = preload("res://assets/shaders/city_spark.gdshader")
+const WISP_SHADER: Shader = preload("res://assets/shaders/city_wisp.gdshader")
+const GLOW_SHADER: Shader = preload("res://assets/shaders/city_glow.gdshader")
+const EMBER_SHADER: Shader = preload("res://assets/shaders/city_ember.gdshader")
+const HAZE_SHADER: Shader = preload("res://assets/shaders/city_haze.gdshader")
+const WINDOW_SHADER: Shader = preload("res://assets/shaders/city_window_fire.gdshader")
+
 static var _soft: GradientTexture2D = null
 static var _puff: GradientTexture2D = null
 
@@ -26,9 +33,69 @@ static func puff_texture() -> GradientTexture2D:
 
 ## Alev malzemesi (shader billboard).
 static func flame_material() -> ShaderMaterial:
-	var mat: ShaderMaterial = ShaderMaterial.new()
-	mat.shader = FLAME_SHADER
+	var mat: ShaderMaterial = _shader_mat(FLAME_SHADER)
+	mat.set_shader_parameter(&"hdr", Tuning.CITY_FLAME_HDR)
 	return mat
+
+
+static func _shader_mat(shader: Shader) -> ShaderMaterial:
+	var mat: ShaderMaterial = ShaderMaterial.new()
+	mat.shader = shader
+	return mat
+
+
+static func spark_material() -> ShaderMaterial:
+	var mat: ShaderMaterial = _shader_mat(SPARK_SHADER)
+	mat.set_shader_parameter(&"hdr", Tuning.CITY_SPARK_HDR)
+	return mat
+
+
+static func wisp_material() -> ShaderMaterial:
+	return _shader_mat(WISP_SHADER)
+
+
+static func ember_material() -> ShaderMaterial:
+	return _shader_mat(EMBER_SHADER)
+
+
+static func window_material() -> ShaderMaterial:
+	return _shader_mat(WINDOW_SHADER)
+
+
+## Zemine sızan sahte ışık malzemesi (additive radyal leke).
+static func glow_material(color: Color, energy: float, flicker: float, seed_value: float) -> ShaderMaterial:
+	var mat: ShaderMaterial = _shader_mat(GLOW_SHADER)
+	mat.set_shader_parameter(&"glow_color", color)
+	mat.set_shader_parameter(&"energy", energy)
+	mat.set_shader_parameter(&"flicker", flicker)
+	mat.set_shader_parameter(&"seed", seed_value)
+	return mat
+
+
+static func haze_material(height_index: int) -> ShaderMaterial:
+	var mat: ShaderMaterial = _shader_mat(HAZE_SHADER)
+	mat.set_shader_parameter(&"alpha", Tuning.CITY_SMOKE_HAZE_ALPHA * (1.0 if height_index == 0 else 0.7))
+	mat.set_shader_parameter(&"scale", 0.07 if height_index == 0 else 0.045)
+	mat.set_shader_parameter(&"drift", Vector2(0.5, 0.2) if height_index == 0 else Vector2(-0.3, 0.45))
+	return mat
+
+
+## Yere yatan kare (glow, kor, pus).
+static func flat_quad(size: float) -> QuadMesh:
+	var mesh: QuadMesh = QuadMesh.new()
+	mesh.size = Vector2(size, size)
+	mesh.orientation = PlaneMesh.FACE_Y
+	return mesh
+
+
+## Zemine serilen sahte ışık düğümü (yerden biraz yukarıda; kaldırım 0.08).
+static func glow_quad(pos: Vector3, radius: float, color: Color, energy: float, flicker: float) -> MeshInstance3D:
+	var mi: MeshInstance3D = MeshInstance3D.new()
+	mi.mesh = flat_quad(radius * 2.0)
+	mi.material_override = glow_material(color, energy, flicker, pos.x * 1.3 + pos.z * 0.7)
+	mi.position = Vector3(pos.x, 0.1, pos.z)
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	return mi
 
 
 ## Alt noktası pivot olan dikey quad (alev, kıvılcım).

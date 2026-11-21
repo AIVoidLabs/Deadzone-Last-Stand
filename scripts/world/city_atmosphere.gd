@@ -1,6 +1,6 @@
 class_name CityAtmosphere
 extends Node
-## 8.3a: şehir atmosferi (yükseklik sisi, hacimsel sis, parıltı, renk ayarı, SSR, vinyet) ve karakter kenar ışığı.
+## 8.3a: şehir atmosferi (yükseklik sisi, hacimsel sis, parıltı, renk ayarı, SSR, vinyet).
 ## Her şey kalite profilinden okunur; Quality.profile_changed ile canlı uygulanır.
 
 const VIGNETTE_SHADER: Shader = preload("res://assets/shaders/hurt_vignette.gdshader")
@@ -22,18 +22,6 @@ func _ready() -> void:
 	_build_vignette()
 	_apply(Quality.current)
 	Quality.profile_changed.connect(_apply)
-
-
-## Kenar ışığı gücü (0 = kapalı); malzemeler ve asker ışığı bunu sorar.
-static func rim_active() -> bool:
-	return Tuning.FEATURE_CHARACTER_RIM and bool(Quality.get_value("rim_light"))
-
-
-static func apply_rim(material: ShaderMaterial) -> void:
-	var on: bool = rim_active()
-	material.set_shader_parameter(&"rim_strength", Tuning.RIM_STRENGTH if on else 0.0)
-	material.set_shader_parameter(&"rim_color", Tuning.RIM_COLOR)
-	material.set_shader_parameter(&"rim_power", Tuning.RIM_POWER)
 
 
 func _build_grade() -> void:
@@ -80,4 +68,3 @@ func _apply(_profile_id: StringName) -> void:
 	_env.adjustment_enabled = true
 	_env.ssr_enabled = on and bool(Quality.get_value("ssr"))
 	_vignette.visible = on and bool(Quality.get_value("vignette"))
-	ZombieMaterials.refresh_rim()

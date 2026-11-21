@@ -1,7 +1,7 @@
 shader_type spatial;
-// Islak asfalt (8.3a): gürültü maskeli birikintiler (düşük pürüzlülük, koyu) ve ince tane. Yansıma ışıklardan gelir.
+// Kirli asfalt (8.3d): ağırlıkla kuru, kahve-gri, kirli lekeli; yer yer küçük ıslak birikinti. Yansıma ışıklardan gelir.
 
-uniform vec4 base_color : source_color = vec4(0.13, 0.135, 0.15, 1.0);
+uniform vec4 base_color : source_color = vec4(0.2, 0.155, 0.12, 1.0);
 uniform float puddle_scale = 0.06;
 uniform float puddle_threshold = 0.5;
 uniform float wet_roughness = 0.05;
@@ -42,9 +42,10 @@ void fragment() {
 	}
 	float puddle = smoothstep(puddle_threshold, puddle_threshold + 0.06, n);
 	float grain = vnoise(wpos.xz * 9.0) * 0.5 + vnoise(wpos.xz * 31.0) * 0.5;
-	ALBEDO = base_color.rgb * (1.0 - 0.55 * puddle) * (0.8 + 0.4 * grain);
+	float dirt = fbm(wpos.xz * 0.35 + 11.0);
+	ALBEDO = base_color.rgb * (1.0 - 0.45 * puddle) * (0.8 + 0.4 * grain) * (0.65 + 0.7 * dirt);
 	ROUGHNESS = mix(dry_roughness * (0.85 + 0.3 * grain), wet_roughness, puddle);
 	SPECULAR = mix(0.45, 1.0, puddle);
 	// gökyüzü yansımasından soğuk zayıf parıltı: birikinti karanlıkta da seçilsin
-	EMISSION = vec3(0.01, 0.017, 0.035) * puddle * (0.6 + 0.8 * vnoise(wpos.xz * 0.7));
+	EMISSION = vec3(0.03, 0.017, 0.008) * puddle * (0.6 + 0.8 * vnoise(wpos.xz * 0.7));
 }

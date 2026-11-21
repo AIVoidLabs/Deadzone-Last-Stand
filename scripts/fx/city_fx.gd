@@ -13,6 +13,8 @@ var _lamp_energy: Array[float] = []
 var _bulbs: Array[StandardMaterial3D] = []
 var _cones: Array[SpotLight3D] = []
 var _neon: CityNeon = null
+var _store_light: OmniLight3D = null
+var _all_fire_pos: Array[Vector3] = []
 var _ash: GPUParticles3D = null
 var _noise: FastNoiseLite = FastNoiseLite.new()
 var _time: float = 0.0
@@ -25,6 +27,8 @@ func _ready() -> void:
 	_noise.frequency = 1.0
 	_base_omni_count = _sibling_omnis().size()
 	_build_fires()
+	_build_storefront()
+	_build_haze()
 	_build_lamps()
 	if Tuning.FEATURE_CITY_NEON:
 		_neon = CityNeon.new()
@@ -40,6 +44,8 @@ func _process(delta: float) -> void:
 	_flicker_fires()
 	_flicker_lamp(delta)
 	_follow_camera()
+	if _store_light != null:
+		_store_light.light_energy = 3.0 * (1.0 + clampf(_noise.get_noise_2d(_time * 4.0, 300.0) * 1.4, -1.0, 1.0) * 0.35)
 
 
 func _sibling_omnis() -> Array[OmniLight3D]:
@@ -72,14 +78,59 @@ func _build_fires() -> void:
 			_fire_base.append(light.position)
 			_fire_energy.append(light.light_energy)
 	for p: Vector3 in Tuning.CITY_TRASH_FIRES:
-		_add_fire(p, Tuning.CITY_TRASH_FIRE_SCALE)
+		_add_fire(p, Tuning.CITY_TRASH_FIRE_SCALE, Vector3(0.9, 0.05, 0.45) * Tuning.CITY_TRASH_FIRE_SCALE, Tuning.CITY_FIRE_TRASH_HEIGHT)
 
 
-func _add_fire(pos: Vector3, size_mul: float) -> void:
-	var fire: CityFire = CityFire.new(size_mul)
+func _add_fire(pos: Vector3, size_mul: float, extents: Vector3 = Vector3(0.9, 0.05, 0.45), lift: float = Tuning.CITY_FIRE_FLAME_HEIGHT) -> void:
+	var fire: CityFire = CityFire.new(size_mul, extents, lift)
 	fire.position = pos
 	add_child(fire)
 	_fires.append(fire)
+	_all_fire_pos.append(pos)
+
+
+## Köşe binanın zemin kat vitrini: cam içi yanıyor, önünde alev dilleri, kaldırıma kırmızı ışık.
+func _build_storefront() -> void:
+	if not (Tuning.FEATURE_CITY_STOREFRONT_FIRE and Tuning.FEATURE_CITY_FIRE_FX):
+		return
+	var c: Vector3 = Tuning.CITY_FIRE_STOREFRONT
+	var w: float = Tuning.CITY_FIRE_STOREFRONT_WIDTH
+	var window: MeshInstance3D = MeshInstance3D.new()
+	var mesh: QuadMesh = QuadMesh.new()
+	mesh.size = Vector2(w, 1.9)
+	window.mesh = mesh
+	window.material_override = CityFxAssets.window_material()
+	window.position = Vector3(c.x, 1.35, c.z + 0.03)
+	window.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(window)
+	_add_fire(Vector3(c.x, 0.0, c.z + 0.45), 1.0, Vector3(w * 0.45, 0.05, 0.2), 0.3)
+	_store_light = OmniLight3D.new()
+	_store_light.position = Vector3(c.x, 1.6, c.z + 1.6)
+	_store_light.light_color = Color(1.0, 0.25, 0.08)
+	_store_light.light_energy = 3.0
+	_store_light.omni_range = Tuning.CITY_FIRE_STOREFRONT_LIGHT
+	add_child(_store_light)
+
+
+## Yer seviyesinde iki çok saydam pus katmanı (ateş yakınında ışık saçar).
+func _build_haze() -> void:
+	if not Tuning.FEATURE_CITY_HAZE:
+		return
+	var fires: PackedVector3Array = PackedVector3Array()
+	for p: Vector3 in _all_fire_pos:
+		if fires.size() < 8:
+			fires.append(Vector3(p.x, p.z, 0.6))
+	fires.resize(8)
+	for i: int in Tuning.CITY_SMOKE_HAZE_HEIGHTS.size():
+		var plane: MeshInstance3D = MeshInstance3D.new()
+		plane.mesh = CityFxAssets.flat_quad(Tuning.CITY_SMOKE_HAZE_SIZE)
+		var mat: ShaderMaterial = CityFxAssets.haze_material(i)
+		mat.set_shader_parameter(&"fires", fires)
+		mat.set_shader_parameter(&"fire_count", mini(_all_fire_pos.size(), 8))
+		plane.material_override = mat
+		plane.position = Vector3(0.0, Tuning.CITY_SMOKE_HAZE_HEIGHTS[i], 0.0)
+		plane.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		add_child(plane)
 
 
 func _build_lamps() -> void:
@@ -191,5 +242,8 @@ func _apply_quality(_profile_id: StringName) -> void:
 		cone.visible = level > 0
 	if _neon != null:
 		var budget: int = Quality.get_value("omni_lights") - _base_omni_count
+		if _store_light != null:
+			_store_light.visible = budget > 0
+			budget -= 1
 		for i: int in _neon.lights.size():
 			_neon.lights[i].visible = i < budget

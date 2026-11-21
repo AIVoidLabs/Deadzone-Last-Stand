@@ -23,16 +23,7 @@ static func vc_shared() -> ShaderMaterial:
 	if _vc_material == null:
 		_vc_material = ShaderMaterial.new()
 		_vc_material.shader = VC_SHADER
-		CityAtmosphere.apply_rim(_vc_material)
 	return _vc_material
-
-
-## Profil değişince paylaşılan malzemelerin kenar ışığını yeniler.
-static func refresh_rim() -> void:
-	if _vc_material != null:
-		CityAtmosphere.apply_rim(_vc_material)
-	for material: ShaderMaterial in _materials.values():
-		CityAtmosphere.apply_rim(material)
 
 
 static func box_material(row: Dictionary) -> ShaderMaterial:
@@ -41,7 +32,6 @@ static func box_material(row: Dictionary) -> ShaderMaterial:
 		var material: ShaderMaterial = ShaderMaterial.new()
 		material.shader = FLASH_SHADER
 		material.set_shader_parameter(&"albedo", row["color"])
-		CityAtmosphere.apply_rim(material)
 		_materials[id] = material
 	return _materials[id]
 

@@ -5,7 +5,6 @@ extends Node3D
 
 const WET_SHADER: Shader = preload("res://assets/shaders/wet_asphalt.gdshader")
 const SIDEWALK: Color = Color(0.3, 0.3, 0.32)
-const LANE: Color = Color(0.55, 0.55, 0.5)
 const STAIN: Color = Color(0.02, 0.015, 0.015)
 const RUST_A: Color = Color(0.32, 0.16, 0.1)
 const RUST_B: Color = Color(0.24, 0.13, 0.1)
@@ -16,12 +15,9 @@ const BRICK: Color = Color(0.4, 0.15, 0.12)
 const GREY: Color = Color(0.28, 0.3, 0.34)
 const POLE: Color = Color(0.12, 0.12, 0.13)
 const FIRE_COLOR: Color = Color(1.0, 0.45, 0.12)
-const LAMP_COLOR: Color = Color(1.0, 0.8, 0.45)
+const LAMP_COLOR: Color = Tuning.CITY_LAMP_COLOR
 const NEON_COLOR: Color = Color(0.25, 1.0, 0.8)
 const TILT_DEG: float = 12.0
-const LANE_DASH: float = 3.0
-const LANE_STEP: float = 7.0
-const LANE_WIDTH: float = 0.25
 
 ## Dış bloklar (köşe başına; x, z, genişlik, derinlik, yükseklik, renk 0/1, yıkık mı); işaretle yansıtılır.
 const OUTER_BLOCKS: Array = [
@@ -60,6 +56,10 @@ func _ready() -> void:
 	_build_decor()
 	_build_lights()
 	add_child(CityFx.new())
+	if Tuning.FEATURE_CITY_GROUND_DRESSING:
+		add_child(CityGroundDressing.new())
+	if Tuning.FEATURE_CITY_WIRES:
+		add_child(CityWires.new())
 	_apply_quality(Quality.current)
 	Quality.profile_changed.connect(_apply_quality)
 
@@ -144,7 +144,7 @@ func _ground_material() -> Material:
 	return mat
 
 
-## Kaldırım şeritleri blok kenarlarında (sokak tarafı), sokak ortasında kesik şerit çizgisi.
+## Kaldırım şeritleri blok kenarlarında (sokak tarafı), sokak ortasında çift sarı şerit.
 func _build_sidewalks_and_lanes() -> void:
 	var half: float = Tuning.ARENA_SIZE * 0.5
 	var w: float = Tuning.CITY_STREET_WIDTH * 0.5
@@ -156,12 +156,14 @@ func _build_sidewalks_and_lanes() -> void:
 			# x ekseni boyunca kollar (z = off) ve z ekseni boyunca kollar (x = off)
 			_strip(Vector3(s * (w + end) * 0.5, 0.0, off), Vector3(end - w, 0.08, sw))
 			_strip(Vector3(off, 0.0, s * (w + end) * 0.5), Vector3(sw, 0.08, end - w))
+	# çift sarı orta şerit (kavşağa girmez)
+	var lane_len: float = end - w
+	var lane_mid: float = (end + w) * 0.5
 	for dir: float in [-1.0, 1.0]:
-		var d: float = w + LANE_DASH
-		while d < end:
-			_box(Vector3(dir * d, 0.0, 0.0), Vector3(LANE_DASH, 0.03, LANE_WIDTH), LANE)
-			_box(Vector3(0.0, 0.0, dir * d), Vector3(LANE_WIDTH, 0.03, LANE_DASH), LANE)
-			d += LANE_STEP
+		for side: float in [-1.0, 1.0]:
+			var off: float = side * Tuning.CITY_LANE_GAP * 0.5
+			_box(Vector3(dir * lane_mid, 0.0, off), Vector3(lane_len, 0.03, Tuning.CITY_LANE_WIDTH), Tuning.CITY_LANE_COLOR)
+			_box(Vector3(off, 0.0, dir * lane_mid), Vector3(Tuning.CITY_LANE_WIDTH, 0.03, lane_len), Tuning.CITY_LANE_COLOR)
 
 
 func _strip(center: Vector3, size: Vector3) -> void:
