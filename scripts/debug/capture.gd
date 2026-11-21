@@ -4,6 +4,7 @@ extends Node
 ## [--capture-spawn=150] [--autopilot] [--debug-panel] [--capture-dash=0.15]`. Yalnız debug yapıda eklenir.
 ## --capture-dash=S: görüntüden S saniye önce dash attırır.
 ## --capture-kill=S: görüntüden S saniye önce askeri öldürür (ölüm animasyonu denetimi).
+## --capture-focus: kamera ilk canlı zombiyi izler (arena ile yakın görüntü).
 ## --camera-distance=M: kamera uzaklığını dener (karşılaştırma görüntüleri için).
 ## --weapons=N: toplam N silahla başlar (debug silahı eklenir). --no-weapons: silahlar ateş etmez (saldırı ölçümü).
 ## --levels=N: N seviye atlatır (kart seçimi dalga arasında açılır). --capture-pick: açılan kart ekranında 1'e basar. --wave=N: N. dalgadan başlar. --capture-wave-end=S: görüntüden S saniye önce dalgayı bitirir.
@@ -42,6 +43,8 @@ var _circle: bool = false
 var _root_lead: float = -1.0
 var _near: float = 0.0
 var _zigzag: float = 0.0
+## --capture-focus: kamera ilk canlı zombiyi izler (yakın görüntü).
+var _focus: Node3D
 
 
 static func requested() -> bool:
@@ -84,6 +87,10 @@ func _ready() -> void:
 			_root_lead = arg.trim_prefix("--capture-root=").to_float()
 		elif arg.begins_with("--capture-near="):
 			_near = arg.trim_prefix("--capture-near=").to_float()
+		elif arg == "--capture-focus" and camera != null:
+			_focus = Node3D.new()
+			add_child(_focus)
+			camera.target = _focus
 		elif arg == "--circle":
 			_circle = true
 		elif arg.begins_with("--zigzag="):
@@ -129,6 +136,11 @@ func _process(delta: float) -> void:
 		player.input_override = Vector2(-sin(_angle), cos(_angle))
 	elif _zigzag > 0.0:
 		player.input_override = Vector2(1.0, 0.0) if int(_time / _zigzag) % 2 == 0 else Vector2(-1.0, 0.0)
+	if _focus != null:
+		var index: int = enemies.debug_alive_index()
+		if index >= 0:
+			var at: Vector2 = enemies.enemy_position(index)
+			_focus.global_position = Vector3(at.x, 0.9, at.y)
 	_time += delta
 	if _dash_lead >= 0.0 and _time >= _seconds - _dash_lead:
 		_dash_lead = -1.0
