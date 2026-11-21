@@ -86,6 +86,7 @@ func _tick_wave(delta: float) -> void:
 	var t: float = run.progress()
 	_spawn_timer = SpawnRules.wave_interval(row, t)
 	var cap: int = mini(row["max_alive"], Quality.max_enemies())
+	enemies.spawn_cap = cap
 	var mix: Dictionary = WaveData.active_mix(row["mix"])
 	var kind_caps: Dictionary = row.get("max_alive_kind", {})
 	var alive: Dictionary = {}

@@ -19,6 +19,8 @@ signal acid_pool_started(at: Vector3, radius: float, time: float)
 ## Zırhlıya önden gelen (azaltılmış) isabet; öldürmeyen vuruşlarda enemy_damaged yerine (kan yok: gri kıvılcım, küçük sayı).
 ## Patlayıcı patladı (BloatAttack): at yerde, radius patlama yarıçapı (fx, sarsıntı ve ses için).
 signal bloat_exploded(at: Vector3, radius: float)
+## Çığlıkçı ses dalgası yaydı (fx ve sarsıntı); radius çağrı halkasının yarıçapı.
+signal scream_emitted(at: Vector3, radius: float)
 signal enemy_blocked(at: Vector3, direction: Vector2, amount: float)
 
 const PHYSICS_PRIORITY: int = -10
@@ -56,6 +58,10 @@ var bloat_primed: int = 0
 var bloat_exploded_count: int = 0
 var bloat_chains: int = 0
 var bloat_player_hits: int = 0
+## Çığlıkçı sayaçları: atılan çığlık, çağrılan zombi. spawn_cap: dalganın canlı üst sınırı (SpawnDirector; 0 = yok).
+var screams: int = 0
+var summoned: int = 0
+var spawn_cap: int = 0
 ## Askeri dille bağlayan dilci (yoksa null); ölürse bağ çözülür.
 var latched: Zombie
 ## Debug arenası: true iken canlı zombiler donar (hareket ve saldırı durur).
@@ -246,9 +252,9 @@ func _move(delta: float) -> void:
 		var steer: bool = false
 		if special and SpecialAttacks.acts_in(state):
 			p = _special.act(i, state, p, dir, delta, target, target_vel)
-		elif ZombieRules.can_move(state):
+		elif ZombieRules.can_move(state) or (state == ZombieRules.State.RECOVER and ChaseSteer.walks_recovering(_rows[i])):
 			steer = ChaseSteer.active(_rows[i])
-			var vel: Vector2 = (_steer.heading(i, _rows[i], dir, delta) if steer else dir) * speed
+			var vel: Vector2 = (_steer.heading(i, _rows[i], p, target, dir, delta) if steer else dir) * speed
 			if Tuning.FEATURE_SEPARATION:
 				vel += Steering.separation(i, _pos, _grid, _radius[i] * 2.0) * Tuning.ENEMY_SEPARATION_STRENGTH
 			p += vel.limit_length(speed * Tuning.ENEMY_MAX_SPEED_FACTOR) * delta
@@ -280,14 +286,14 @@ func _move(delta: float) -> void:
 			var face: Vector2 = _special.facing(i, p)
 			if face != Vector2.ZERO:
 				node.rotation.y = atan2(face.x, face.y)
-		if sync_walk and (state == ZombieRules.State.CHASE or (state == ZombieRules.State.SPRINT and _rows[i].has("sprint_ref_speed"))):
+		if sync_walk and (state == ZombieRules.State.CHASE or steer or (state == ZombieRules.State.SPRINT and _rows[i].has("sprint_ref_speed"))):
 			node.ground_speed.emit(p.distance_to(prev) / delta)
+		# Yalnız kovalarken (ya da mesafe koruyan çığlıkçı beklerken) döner; hazırlanırken yönü kilitlidir.
+		var face_dir: Vector2 = _steer.facing(i) if steer else dir
+		if face_dir != Vector2.ZERO and (steer or state == ZombieRules.State.CHASE):
+			node.rotation.y = atan2(face_dir.x, face_dir.y)
 		if state != ZombieRules.State.CHASE:
 			continue
-		# Yalnız kovalarken döner; hazırlanırken yönü kilitlidir, yana kaçan asker ıskalatır.
-		var face_dir: Vector2 = _steer.facing(i) if steer else dir
-		if face_dir != Vector2.ZERO:
-			node.rotation.y = atan2(face_dir.x, face_dir.y)
 		if windup_attack and ZombieRules.wants_attack(dist, reach, SpecialAttacks.start_range(_rows[i])):
 			var windup: float = _rows[i]["attack_windup"]
 			if special:

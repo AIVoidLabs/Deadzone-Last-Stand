@@ -63,6 +63,11 @@ const CAMERA_SHAKE_ON_ROCK: float = 0.15
 const ACID_POOL_MAX: int = 12
 ## Patlayıcı: alandaki zombilere itme hızı, patlama sarsıntısı; şişerken parlama (yanıp sönme Hz: başta, sonda).
 const BLOAT_ZOMBIE_KNOCKBACK: float = 9.0
+## Çığlıkçı ses dalgası: halkanın büyüme süresi (sn), çağrı yarıçapına göre son yarıçap oranı, havuz boyu, sarsıntı.
+const SCREAM_WAVE_TIME: float = 0.7
+const SCREAM_WAVE_SCALE: float = 2.2
+const SCREAM_WAVE_POOL: int = 4
+const CAMERA_SHAKE_ON_SCREAM: float = 0.12
 const CAMERA_SHAKE_ON_BLOAT: float = 0.3
 const BLOAT_BLINK_START_HZ: float = 3.0
 const BLOAT_BLINK_END_HZ: float = 14.0

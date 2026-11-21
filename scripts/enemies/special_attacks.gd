@@ -14,6 +14,7 @@ var _sprint: SprintAttack
 var _tongue: TongueAttack
 var _lob: LobAttack
 var _bloat: BloatAttack
+var _scream: ScreamAttack
 
 
 func _init(manager: EnemyManager) -> void:
@@ -22,6 +23,7 @@ func _init(manager: EnemyManager) -> void:
 	_tongue = TongueAttack.new(manager)
 	_lob = LobAttack.new(manager)
 	_bloat = BloatAttack.new(manager)
+	_scream = ScreamAttack.new(manager)
 
 
 ## Bu türün özel saldırısı açık mı (kapalıysa yürüyen gibi yaklaşıp vurur).
@@ -39,6 +41,8 @@ static func is_special(row: Dictionary) -> bool:
 			return Tuning.FEATURE_ZOMBIE_THROW
 		&"bloat":
 			return Tuning.FEATURE_ZOMBIE_BLOAT
+		&"scream":
+			return Tuning.FEATURE_ZOMBIE_SCREAM
 	return false
 
 
@@ -69,6 +73,8 @@ static func start_range(row: Dictionary) -> float:
 			return row["throw_range"]
 		&"bloat":
 			return row["bloat_prime_range"]
+		&"scream":
+			return row["scream_range"]
 	return row["tongue_range"]
 
 
@@ -83,7 +89,7 @@ static func windup_next(row: Dictionary) -> ZombieRules.State:
 			return S.SPRINT
 		&"jump":
 			return S.JUMP
-		&"spit", &"throw", &"bloat":
+		&"spit", &"throw", &"bloat", &"scream":
 			return S.RECOVER
 	return S.LASH
 
@@ -143,6 +149,9 @@ func begin_windup(i: int, p: Vector2, target: Vector2, target_vel: Vector2) -> v
 	if row["attack_kind"] == &"bloat":
 		_bloat.begin_windup(i, p, target)
 		return
+	if row["attack_kind"] == &"scream":
+		_scream.aim_tick(i, p, target)
+		return
 	_windup_tick(i, row, p, target, target_vel)
 
 
@@ -164,6 +173,8 @@ func end_windup(i: int, target: Vector2) -> ZombieRules.State:
 			return _lob.end_windup(i, row, target)
 		&"bloat":
 			return _bloat.end_windup(i, row)
+		&"scream":
+			return _scream.end_windup(i, row)
 	return _tongue.end_windup(i, row, target)
 
 
@@ -196,11 +207,13 @@ func lunge_contact(i: int, state: ZombieRules.State, p: Vector2, dist: float, re
 func swap_from_last(i: int, last: int) -> void:
 	_tongue.swap_from_last(i, last)
 	_lob.swap_from_last(i, last)
+	_scream.swap_from_last(i, last)
 
 
 func shrink(last: int) -> void:
 	_tongue.shrink(last)
 	_lob.shrink(last)
+	_scream.shrink(last)
 
 
 ## Her fizik karesi: uçan top/kayalar ve asit havuzları.
@@ -222,6 +235,7 @@ func on_removed(i: int) -> void:
 		node.event.emit(&"marker", {"on": false})
 	_tongue.on_removed(i, node, kind)
 	_lob.on_removed(i)
+	_scream.on_removed(i)
 	_m._targetable[i] = 0
 
 
@@ -244,6 +258,8 @@ func _windup_tick(i: int, row: Dictionary, p: Vector2, target: Vector2, target_v
 			_lob.aim_tick(i, row, p, target, target_vel)
 		&"bloat":
 			_bloat.aim_tick(i, p, target)
+		&"scream":
+			_scream.aim_tick(i, p, target)
 
 
 func _marker(i: int, dest: Vector2, row: Dictionary, on: bool) -> void:

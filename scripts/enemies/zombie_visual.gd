@@ -147,17 +147,17 @@ func _on_state_changed(new_state: int, old_state: int) -> void:
 		ZombieRules.State.STAGGER:
 			_clips.play_timed(&"anim_stagger", 0.0, _body.state_duration)
 		ZombieRules.State.RECOVER:
-			if _clips.own_clips and _clips.row.has("anim_land"):
+			if _clips.own_clips and _clips.row.get("recover_walks", false):
+				_clips.start_walk()
+			elif _clips.own_clips and _clips.row.has("anim_land"):
 				_clips.play_land()
 			elif _clips.own_clips and _clips.row.get("recover_finishes_attack", false) and _clips.animation != null:
-				# Saldırı klibi kendi hızında sonuna dek tamamlanır.
 				_clips.animation.speed_scale = 1.0
 			elif _clips.own_clips:
 				_clips.play_loop(&"anim_idle", 1.0)
 			elif _is_special():
 				_clips.play_loop(&"anim_attack", HOLD_ANIM_SPEED)
 			elif _clips.animation != null:
-				# Saldırı klibi kendi hızında tamamlanır.
 				_clips.animation.speed_scale = 1.0
 		ZombieRules.State.INACTIVE:
 			_hide_extras()

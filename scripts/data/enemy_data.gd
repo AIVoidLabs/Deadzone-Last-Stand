@@ -328,6 +328,10 @@ static func _add_specials(table: Dictionary, walker: Dictionary) -> void:
 	for id: StringName in EnemyDataSpecials.ROWS:
 		var row: Dictionary = walker.duplicate()
 		row.merge(EnemyDataSpecials.ROWS[id], true)
+		if not EnemyDataSpecials.behavior_enabled(id):
+			# Bayrak kapalıyken yürüyen gibi vurur (özel hazırlık/bekleme süreleri düşer).
+			for key: String in ["attack_windup", "attack_recover", "attack_anim_hit_time"]:
+				row[key] = walker[key]
 		if EnemyDataSpecials.model_enabled(id):
 			row.merge(row["look_v"], true)
 		table[id] = _paced(row)

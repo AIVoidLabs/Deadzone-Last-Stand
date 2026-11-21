@@ -154,6 +154,7 @@ func _process(delta: float) -> void:
 		enemies.tongue_bites, enemies.tongue_timeouts, enemies.tongue_melees])
 	print("ARMOR front=%d back=%d" % [enemies.armor_front, enemies.armor_back])
 	print("BLOAT primed=%d exploded=%d chain=%d player_hits=%d" % [enemies.bloat_primed, enemies.bloat_exploded_count, enemies.bloat_chains, enemies.bloat_player_hits])
+	print("SCREAM screams=%d summoned=%d" % [enemies.screams, enemies.summoned])
 	print("SPIT shots=%d pools=%d ticks=%d  THROW shots=%d hits=%d melee=%d" % [
 		enemies.spit_shots, enemies.spit_pools, enemies.spit_ticks, enemies.throw_shots, enemies.throw_hits, enemies.throw_melees])
 	# Headless (dummy renderer) görüntü dokusu yoktur; get_image "Parameter t is null" hatası basar.

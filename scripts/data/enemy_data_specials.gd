@@ -48,6 +48,8 @@ const ROWS: Dictionary = {
 		"contact_damage": 6.0,
 		"radius": 0.38,
 		"attack_kind": &"scream",
+		"steer": &"scream",
+		"recover_walks": true,
 		"scream_range": 10.0,
 		"scream_keep_min": 6.0,
 		"scream_time": 1.2,

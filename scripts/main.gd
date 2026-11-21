@@ -64,6 +64,11 @@ func _ready() -> void:
 	projectiles.explosion.connect(func(_at: Vector3, _radius: float) -> void:
 		camera.add_trauma(Tuning.CAMERA_SHAKE_ON_EXPLOSION))
 	_add_lob_fx(enemies, camera)
+	var wave: ScreamWave = ScreamWave.new()
+	add_child(wave)
+	enemies.scream_emitted.connect(func(at: Vector3, radius: float) -> void:
+		wave.play(at, radius)
+		camera.add_trauma(Tuning.CAMERA_SHAKE_ON_SCREAM))
 	enemies.bloat_exploded.connect(func(at: Vector3, radius: float) -> void:
 		ExplosionFx.play(self, at, radius)
 		camera.add_trauma(Tuning.CAMERA_SHAKE_ON_BLOAT)
