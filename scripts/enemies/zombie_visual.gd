@@ -69,7 +69,7 @@ func _process(delta: float) -> void:
 	_tick_jump(delta)
 	_marker.tick(delta)
 	if _swell.is_on():
-		_set_burn(_swell.tick(delta))
+		_set_swell(_swell.tick(delta))
 	if _held != null:
 		_held.tick(delta)
 	if not _dying and _flash_left <= 0.0 and _jump_age < 0.0 and not _marker.is_on() and not _swell.is_on() and not (_held != null and _held.is_waiting()):
@@ -192,6 +192,11 @@ func _set_burn(value: float) -> void:
 		mesh.set_instance_shader_parameter(&"burn", value)
 
 
+func _set_swell(value: float) -> void:
+	for mesh: MeshInstance3D in _meshes:
+		mesh.set_instance_shader_parameter(&"swell", value)
+
+
 func _set_flash(value: float) -> void:
 	for mesh: MeshInstance3D in _meshes:
 		mesh.set_instance_shader_parameter(&"flash", value)
@@ -280,7 +285,7 @@ func _on_marker(data: Dictionary) -> void:
 func _hide_extras() -> void:
 	if _swell.is_on():
 		_swell.stop()
-		_set_burn(0.0)
+		_set_swell(0.0)
 	_jump_age = -1.0
 	position.y = 0.0
 	_marker.hide_marker()
