@@ -1,18 +1,17 @@
 class_name CityGroundDressing
 extends Node3D
-## 8.3d: yer dekoru. Kâğıt/karton/enkaz, devrik koni, düşmüş tabela, cesetler (kan ve zemin lekeleri: CityDecals).
+## 8.3d: yer dekoru. Kâğıt/karton/enkaz, devrik koni, düşmüş tabela, ölü zombi cesetleri (kan ve zemin lekeleri: CityDecals).
 ## Hepsi MultiMesh, çarpışmasız; adet profildeki ground_dressing çarpanıyla. Kapatma: Tuning.FEATURE_CITY_GROUND_DRESSING.
 
 const PAPER_SHADER: Shader = preload("res://assets/shaders/city_paper.gdshader")
 const PROP_CLEARANCE: float = 2.8
 const PAPER_COLORS: Array[Color] = [Color(0.5, 0.45, 0.36), Color(0.38, 0.32, 0.25), Color(0.3, 0.3, 0.29), Color(0.42, 0.28, 0.17)]
-const CLOTH_COLORS: Array[Color] = [Color(0.2, 0.22, 0.28), Color(0.3, 0.17, 0.14), Color(0.22, 0.26, 0.2), Color(0.3, 0.28, 0.24)]
 const SIGN_COLORS: Array[Color] = [Color(0.12, 0.3, 0.22), Color(0.5, 0.09, 0.07), Color(0.18, 0.22, 0.32)]
 const CONE_COLOR: Color = Color(0.85, 0.32, 0.05)
-const SKIN_COLOR: Color = Color(0.55, 0.45, 0.38)
 
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 var _groups: Array[Dictionary] = []   # {node: MultiMeshInstance3D, total: int}
+var _corpses: CityZombieCorpses
 var _blocked: Array[Vector2] = []
 var _hot: Array[Vector3] = []   # çöp kümelerinin merkezleri (prop, ceset, kan)
 
@@ -149,46 +148,20 @@ func _build_signs() -> void:
 	_add_group(mesh, xfs, colors, 0.7)
 
 
-## Yatan ceset: gövde + bacaklar + kollar (kıyafet) ve baş (ten); iki poz. Konumları kan lekeleri için döner.
+## Ölü zombi cesetleri (CityZombieCorpses). Konumları kan lekeleri için döner.
 func _build_corpses(spots: Array[Vector3]) -> void:
-	var xfs: Array[Array] = [[], []]
-	var colors: Array[Array] = [[], []]
+	var corpses: CityZombieCorpses = CityZombieCorpses.new() if Tuning.FEATURE_CITY_ZOMBIE_CORPSES else null
+	if corpses != null:
+		add_child(corpses)
+		_corpses = corpses
 	for i: int in Tuning.DRESS_CORPSES:
 		var p: Vector3 = _free_point(1.5)
-		var pose: int = i % 2
-		xfs[pose].append(Transform3D(Basis(Vector3.UP, _rng.randf() * TAU), Vector3(p.x, 0.0, p.z)))
-		colors[pose].append(CLOTH_COLORS[_rng.randi() % CLOTH_COLORS.size()] * 3.0)
+		var yaw: float = _rng.randf() * TAU
+		_rng.randi()   # Eski ceset renk seçimi: sonraki dekor yerleşimi bozulmasın.
+		if corpses != null:
+			corpses.add_corpse(p, yaw)
 		_hot.append(p)
 		spots.append(p)
-	for pose: int in 2:
-		var typed_x: Array[Transform3D] = []
-		var typed_c: Array[Color] = []
-		typed_x.assign(xfs[pose])
-		typed_c.assign(colors[pose])
-		_add_group(_corpse_mesh(pose), typed_x, typed_c, 0.9)
-
-
-func _corpse_mesh(pose: int) -> ArrayMesh:
-	var cloth: Color = Color(0.5, 0.5, 0.5)
-	var pants: Color = Color(0.25, 0.23, 0.22)
-	var parts: Array = []
-	var head: SphereMesh = SphereMesh.new()
-	head.radius = 0.13
-	head.height = 0.26
-	parts.append([head, Transform3D(Basis.IDENTITY, Vector3(0, 0.13, -0.95)), SKIN_COLOR])
-	parts.append([_box(0.46, 0.2, 0.62), Transform3D(Basis.IDENTITY, Vector3(0, 0.1, -0.5)), cloth])
-	for s: float in [-1.0, 1.0]:
-		var leg_yaw: float = (s * 0.12) if pose == 0 else (s * 0.4)
-		parts.append([_box(0.16, 0.15, 0.85), Transform3D(Basis(Vector3.UP, leg_yaw), Vector3(s * 0.11 + s * leg_yaw * 0.4, 0.075, 0.38)), pants])
-		var arm_yaw: float = (s * 0.05) if pose == 0 else (s * 0.9)
-		parts.append([_box(0.12, 0.12, 0.6), Transform3D(Basis(Vector3.UP, arm_yaw), Vector3(s * (0.34 + absf(arm_yaw) * 0.15), 0.06, -0.55 + absf(arm_yaw) * 0.1)), cloth])
-	return _merge(parts)
-
-
-func _box(x: float, y: float, z: float) -> BoxMesh:
-	var m: BoxMesh = BoxMesh.new()
-	m.size = Vector3(x, y, z)
-	return m
 
 
 ## [mesh, Transform3D, Color] parçalarını köşe renkli tek mesh'te birleştirir.
@@ -248,6 +221,8 @@ func _add_group(mesh: Mesh, xfs: Array[Transform3D], colors: Array[Color], rough
 
 
 func _apply_quality(_profile_id: StringName) -> void:
+	if _corpses != null:
+		_corpses.apply_quality(Quality.shadows_enabled())
 	var factor: float = Quality.get_value("ground_dressing")
 	for g: Dictionary in _groups:
 		(g["node"] as MultiMeshInstance3D).multimesh.visible_instance_count = int(ceilf(float(g["total"]) * factor))

@@ -1,15 +1,15 @@
 class_name CityFacadeLights
 extends Node3D
-## 8.3h: bina cepheleri. Her iç binanın iki sokak yüzünde pencere ızgarası (çoğu karanlık cam, birkaç sıcak sarı,
-## bazen soluk mavi TV ışığı) ve duvar lambaları (küçük ampul + cephede ve kaldırımda sahte ışık lekesi).
+## 8.3h: bina cepheleri. Her iç binanın iki sokak yüzünde pencere ızgarası (bina A'nın gerçek pencere ızgarasında: kapkara cam, birkaç sönük sarı,
+## çok az soluk mavi TV) ve duvar lambaları (küçük ampul + cephede ve kaldırımda sahte ışık lekesi).
 ## Kapatma: Tuning.FEATURE_CITY_FACADE_LIGHTS.
 
 const WINDOW_SHADER: Shader = preload("res://assets/shaders/city_facade_window.gdshader")
 const MASK_PATH: String = "res://assets/textures/fx/kenney/%s.png"
 const MASKS: Array[String] = ["window_01", "window_03"]
-const DARK: Color = Color(0.09, 0.11, 0.17, 0.4)
+const DARK: Color = Color(0.012, 0.012, 0.016, 0.55)
 const WARM: Array[Color] = [Color(1.0, 0.62, 0.22, 0.95), Color(1.0, 0.78, 0.4, 0.95), Color(0.95, 0.5, 0.18, 0.95)]
-const TV: Color = Color(0.2, 0.3, 0.5, 0.95)
+const TV: Color = Color(0.13, 0.19, 0.3, 0.9)
 const BRACKET: Color = Color(0.06, 0.06, 0.07)
 
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
@@ -22,49 +22,69 @@ func _ready() -> void:
 	_rng.seed = Tuning.DRESS_SEED + 303
 	for i: int in MASKS.size():
 		_windows.append({"xfs": [] as Array[Transform3D], "colors": [] as Array[Color], "customs": [] as Array[Color]})
-	for rect: Rect2 in CityLayout.block_rects(Tuning.ARENA_SIZE, Tuning.CITY_STREET_WIDTH):
+	var rects: Array[Rect2] = CityLayout.block_rects(Tuning.ARENA_SIZE, Tuning.CITY_STREET_WIDTH)
+	for rect: Rect2 in rects:
 		var c: Vector2 = rect.get_center()
-		# Sokağa (kavşak eksenlerine) bakan iki yüz
-		_face(Vector3(c.x, 0.0, c.y), Vector3(-signf(c.x), 0.0, 0.0), rect.size.x * 0.5, rect.size.y)
-		_face(Vector3(c.x, 0.0, c.y), Vector3(0.0, 0.0, -signf(c.y)), rect.size.y * 0.5, rect.size.x)
+		_building(Vector3(c.x, 0.0, c.y), _quarter(c))
 	_flush_windows()
 	_apply_quality(Quality.current)
 	Quality.profile_changed.connect(_apply_quality)
 
 
-## Yüz: merkezden normal yönünde yarı boyut kadar ileride, genişlik face_width.
-func _face(center: Vector3, normal: Vector3, half_depth: float, face_width: float) -> void:
-	var origin: Vector3 = center + normal * (half_depth + Tuning.CITY_FACADE_OFFSET)
-	var tangent: Vector3 = Vector3.UP.cross(normal)
+## Bina A'nın gerçek pencere ızgarası (tools/blender/build_city_building.py: WIN_U, WIN_Z, WINDOWS) dünyaya döndürülür.
+## Yüz: model +X (satırlar MODEL_X) ve +Z (MODEL_Z) cepheleri; kuzey-güney dönüş city_greybox._place_building ile aynı.
+func _building(center: Vector3, quarter: int) -> void:
+	var yaw: Basis = Basis(Vector3.UP, deg_to_rad(90.0 * quarter))
+	_face(center, yaw, Vector3.RIGHT, Vector3.FORWARD, Tuning.CITY_FACADE_MODEL_X)
+	_face(center, yaw, Vector3.BACK, Vector3.RIGHT, Tuning.CITY_FACADE_MODEL_Z)
+	_lamps(center, yaw)
+
+
+func _face(center: Vector3, yaw: Basis, normal_local: Vector3, tangent_local: Vector3, rows: Array[String]) -> void:
+	var normal: Vector3 = yaw * normal_local
+	var tangent: Vector3 = yaw * tangent_local
+	var origin: Vector3 = center + normal * (Tuning.CITY_FACADE_HALF + Tuning.CITY_FACADE_OFFSET)
 	var basis: Basis = Basis(tangent, Vector3.UP, normal)
-	var columns: int = int(floorf(face_width / Tuning.CITY_FACADE_COLUMN_STEP))
-	var slots: Array[Vector2i] = []
-	for r: int in Tuning.CITY_FACADE_ROWS.size():
-		for col: int in columns:
-			slots.append(Vector2i(r, col))
-	var lit_target: int = maxi(2, int(roundf(float(slots.size()) * Tuning.CITY_FACADE_LIT_CHANCE)))
-	var lit: Dictionary = {}
-	while lit.size() < lit_target:
-		lit[slots[_rng.randi() % slots.size()]] = true
-	for slot: Vector2i in slots:
-		var along: float = (float(slot.y) - (columns - 1) * 0.5) * Tuning.CITY_FACADE_COLUMN_STEP
-		var pos: Vector3 = origin + tangent * along + Vector3(0.0, Tuning.CITY_FACADE_ROWS[slot.x], 0.0)
-		var color: Color = DARK
-		var tv: float = 0.0
-		if lit.has(slot):
-			if _rng.randf() < Tuning.CITY_FACADE_TV_CHANCE / Tuning.CITY_FACADE_LIT_CHANCE:
-				color = TV
-				tv = 1.0
-			else:
+	for r: int in rows.size():
+		for col: int in rows[r].length():
+			var state: String = rows[r][col]
+			var color: Color = Color.BLACK
+			var tv: float = 0.0
+			if state == "D":
+				color = DARK
+				if _rng.randf() < Tuning.CITY_FACADE_TV_CHANCE:
+					color = TV
+					tv = 1.0
+			elif state == "L" and _rng.randf() < Tuning.CITY_FACADE_LIT_KEEP:
 				color = WARM[_rng.randi() % WARM.size()]
-		var g: Dictionary = _windows[0 if _rng.randf() < 0.7 else 1]
-		g["xfs"].append(Transform3D(basis * Basis.from_scale(Vector3(Tuning.CITY_FACADE_WINDOW_SIZE.x, Tuning.CITY_FACADE_WINDOW_SIZE.y, 1.0)), pos))
-		g["colors"].append(color)
-		g["customs"].append(Color(_rng.randf(), tv, 0.0, 0.0))
-	for k: int in Tuning.CITY_FACADE_LAMPS_PER_FACE:
-		var span: float = face_width * 0.5 - 2.5
-		var along: float = (float(k) + 0.5) / float(Tuning.CITY_FACADE_LAMPS_PER_FACE) * span * 2.0 - span + _rng.randf_range(-0.8, 0.8)
-		_lamp(origin + tangent * along, normal, basis, k == 0)
+			else:
+				continue
+			var along: float = Tuning.CITY_FACADE_WINDOW_U[col]
+			var pos: Vector3 = origin + tangent * along + Vector3(0.0, Tuning.CITY_FACADE_WINDOW_Z[r], 0.0)
+			var g: Dictionary = _windows[0 if _rng.randf() < 0.7 else 1]
+			g["xfs"].append(Transform3D(basis * Basis.from_scale(Vector3(Tuning.CITY_FACADE_WINDOW_SIZE.x, Tuning.CITY_FACADE_WINDOW_SIZE.y, 1.0)), pos))
+			g["colors"].append(color)
+			g["customs"].append(Color(_rng.randf(), tv, 0.0, 0.0))
+
+
+## Duvar lambaları: yüz başına CITY_FACADE_LAMPS_PER_FACE, pencere hattının dışında.
+func _lamps(center: Vector3, yaw: Basis) -> void:
+	for face: int in 2:
+		var normal: Vector3 = yaw * (Vector3.RIGHT if face == 0 else Vector3.BACK)
+		var tangent: Vector3 = yaw * (Vector3.FORWARD if face == 0 else Vector3.RIGHT)
+		var origin: Vector3 = center + normal * (Tuning.CITY_FACADE_HALF + Tuning.CITY_FACADE_OFFSET)
+		var basis: Basis = Basis(tangent, Vector3.UP, normal)
+		for k: int in Tuning.CITY_FACADE_LAMPS_PER_FACE:
+			var span: float = Tuning.CITY_FACADE_HALF - 2.5
+			var along: float = (float(k) + 0.5) / float(Tuning.CITY_FACADE_LAMPS_PER_FACE) * span * 2.0 - span + _rng.randf_range(-0.8, 0.8)
+			_lamp(origin + tangent * along, normal, basis, k == 0 and face == 0)
+
+
+## Bina modelinin köşe dönüşü (city_greybox._place_building ile aynı).
+func _quarter(c: Vector2) -> int:
+	if c.x < 0.0:
+		return 0 if c.y < 0.0 else 1
+	return 2 if c.y > 0.0 else 3
 
 
 func _flush_windows() -> void:

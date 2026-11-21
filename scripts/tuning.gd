@@ -709,6 +709,8 @@ const DEBUG_ARENA_RESPAWN_DELAY: float = 2.0
 # --- 8.3d: sıcak ışık dili, yer dekoru, teller (scripts/world/city_ground_dressing.gd, city_wires.gd) ---
 const FEATURE_CITY_GROUND_DRESSING: bool = true
 const FEATURE_CITY_WIRES: bool = true
+## 8.3i: sokak cesetleri = oyunun zombi modelleri, ölüm klibinin son karesinde (scripts/world/city_zombie_corpses.gd).
+const FEATURE_CITY_ZOMBIE_CORPSES: bool = true
 ## Yer dekoru adetleri (yüksek profil; profildeki ground_dressing çarpanı uygulanır).
 const DRESS_DEBRIS_COUNT: int = 560
 const DRESS_BLOOD_POOLS: int = 26
@@ -736,12 +738,18 @@ const CITY_SKID_COUNT: int = 8
 const CITY_CRACK_COUNT: int = 26
 ## Bina cepheleri: yanan pencereler, duvar lambaları (sahte ışık). Cephe düzlemi bloktan dışarı payı (m).
 const FEATURE_CITY_FACADE_LIGHTS: bool = true
-const CITY_FACADE_OFFSET: float = 0.1
-const CITY_FACADE_ROWS: Array[float] = [6.2, 9.2, 12.2]
-const CITY_FACADE_COLUMN_STEP: float = 3.0
-const CITY_FACADE_WINDOW_SIZE: Vector2 = Vector2(2.6, 2.8)
-const CITY_FACADE_LIT_CHANCE: float = 0.13
-const CITY_FACADE_TV_CHANCE: float = 0.05
+const CITY_FACADE_OFFSET: float = 0.13
+## 8.3i: pencereler bina A'nın modelindeki gerçek ızgarayla hizalı (tools/blender/build_city_building.py: WIN_U, WIN_Z, WIN_W/H, HALF).
+## Satır = kat (F2, F3), harf = pencere durumu: B kırık, L yanan, O tahtalı, D karanlık, - yok. Yalnız D ve L üstüne cam çizilir.
+const CITY_FACADE_HALF: float = 9.5
+const CITY_FACADE_WINDOW_U: Array[float] = [-7.2, -3.6, 0.0, 3.6, 7.2]
+const CITY_FACADE_WINDOW_Z: Array[float] = [6.0, 9.4]
+const CITY_FACADE_WINDOW_SIZE: Vector2 = Vector2(1.6, 1.8)
+const CITY_FACADE_MODEL_X: Array[String] = ["BLODB", "-ODDB"]
+const CITY_FACADE_MODEL_Z: Array[String] = ["ODDLB", "DBOD-"]
+## Yanan pencerelerin çizilme olasılığı; karanlıkların soluk mavi TV olma olasılığı.
+const CITY_FACADE_LIT_KEEP: float = 0.6
+const CITY_FACADE_TV_CHANCE: float = 0.08
 const CITY_FACADE_LAMPS_PER_FACE: int = 2
 const CITY_FACADE_LAMP_HEIGHT: float = 4.2
 const CITY_FACADE_LAMP_COLOR: Color = Color(1.0, 0.62, 0.25)
