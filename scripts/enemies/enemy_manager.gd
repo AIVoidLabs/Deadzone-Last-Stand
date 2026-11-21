@@ -191,6 +191,11 @@ func spawn(kind: StringName, at: Vector2) -> void:
 	_spawner.spawn(kind, at)
 
 
+## Debug: tür başına şimdiye dek doğan sayısı.
+func spawn_counts() -> Dictionary:
+	return _spawner.spawned
+
+
 ## Debug ve ölçüm için: üst sınıra bakmadan count kadar zombi doğurur.
 func spawn_many(count: int, kind: StringName = EnemyData.WALKER) -> void:
 	for _i in count:

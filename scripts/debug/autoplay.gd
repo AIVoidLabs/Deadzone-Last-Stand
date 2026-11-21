@@ -26,6 +26,7 @@ var _last_hp: float = 0.0
 var _damage_taken: float = 0.0
 var _wave_start_kills: int = 0
 var _wave_start_crystals: int = 0
+var _wave_start_spawns: Dictionary = {}
 var _wave_started_at: float = 0.0
 var _time: float = 0.0
 var _done: bool = false
@@ -101,6 +102,7 @@ func _on_phase(phase: WaveRun.Phase, wave_index: int) -> void:
 	if phase == WaveRun.Phase.WAVE:
 		_wave_start_kills = enemies.kills
 		_wave_start_crystals = loot.crystals
+		_wave_start_spawns = enemies.spawn_counts().duplicate()
 		_wave_started_at = _time
 		_damage_taken = 0.0
 	elif phase == WaveRun.Phase.CLEAR:
@@ -117,6 +119,16 @@ func _report_wave(wave_index: int) -> void:
 		" ".join(slots), enemies.active_count(), _time - _wave_started_at,
 	]
 	_log(line)
+	_log("  SPAWNS %d: %s" % [wave_index + 1, _spawn_summary()])
+
+
+## Dalgada doğan türler (tür:sayı); yeni türlerin dalga karışımında doğduğunu gösterir.
+func _spawn_summary() -> String:
+	var parts: PackedStringArray = PackedStringArray()
+	var now: Dictionary = enemies.spawn_counts()
+	for kind: StringName in now:
+		parts.append("%s:%d" % [kind, int(now[kind]) - int(_wave_start_spawns.get(kind, 0))])
+	return " ".join(parts)
 
 
 func _finish(won: bool) -> void:

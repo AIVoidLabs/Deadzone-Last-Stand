@@ -3,6 +3,8 @@ extends RefCounted
 ## EnemyManager'a yeni zombi ekler (paralel dizilere satır + havuzdan düğüm) ve doğma noktası seçer.
 
 var _m: EnemyManager
+## Debug ölçümü: tür başına doğan sayısı (autoplay raporu).
+var spawned: Dictionary = {}
 
 
 func _init(manager: EnemyManager) -> void:
@@ -11,6 +13,7 @@ func _init(manager: EnemyManager) -> void:
 
 func spawn(kind: StringName, at: Vector2) -> void:
 	var row: Dictionary = EnemyData.get_row(kind)
+	spawned[kind] = int(spawned.get(kind, 0)) + 1
 	var z: Zombie = _m._pool.take(kind)
 	z.configure(row)
 	var r: float = row["radius"]
