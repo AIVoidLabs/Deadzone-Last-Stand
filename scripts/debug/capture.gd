@@ -184,6 +184,9 @@ func _process(delta: float) -> void:
 	print("BOSS slams=%d ring_hits=%d center_hits=%d charges=%d charge_hits=%d stuns=%d summons=%d rage=%d alive=%s hp=%d died_at=%.1f" % [
 		boss.slams, boss.ring_hits, boss.center_hits, boss.charges, boss.charge_hits, boss.stuns, boss.summons, boss.rage_count,
 		status["alive"], int(status.get("hp", 0.0)), _boss_died_at])
+	if director.run != null:
+		print("RUN wave=%d phase=%s boss_stage=%s phase_left=%.1f kills=%d" % [director.run.index + 1, WaveRun.Phase.keys()[director.run.phase],
+			WaveRun.BossStage.keys()[director.run.boss_stage], director.run.phase_left, enemies.kills])
 	print("SPIT shots=%d pools=%d ticks=%d  THROW shots=%d hits=%d melee=%d" % [
 		enemies.spit_shots, enemies.spit_pools, enemies.spit_ticks, enemies.throw_shots, enemies.throw_hits, enemies.throw_melees])
 	# Headless (dummy renderer) görüntü dokusu yoktur; get_image "Parameter t is null" hatası basar.
@@ -200,7 +203,7 @@ func _spawn_boss() -> void:
 	var at: Vector2 = enemies.pick_spawn_point()
 	if _near > 0.0:
 		at = player.position_2d() + Vector2.from_angle(0.4) * _near
-	enemies.spawn(EnemyData.BOSS_HEAP, at)
+	director.debug_spawn_boss(at)
 
 
 ## Oyun menü için durunca (kart ekranı) kısa aralıklarla 1 tuşuna basar.

@@ -82,6 +82,9 @@ const FEATURE_BOSS_HITSTOP: bool = true
 const BOSS_HITSTOP_TIME: float = 0.18
 ## Boss uyarısı (yazı + kırmızı kenar nabzı) süresi (sn); boss uyarının bitiminde doğar.
 const BOSS_WARNING_TIME: float = 2.0
+## Boss canlıyken sürü doğma hızı çarpanı; boss ölünce dalga temizliği (sn; ölüm klibi oynasın, kristaller düşsün).
+const BOSS_HORDE_FACTOR: float = 0.5
+const BOSS_DEATH_CLEAR_TIME: float = 3.0
 ## Boss walk klibinin anahtarlandığı hız (m/sn; satırdaki hız x GAME_PACE ile aynı).
 const BOSS_WALK_REF_SPEED: float = 1.28
 ## Boss ölümünde kristal yağmuru: drop_value bu kadar parçaya bölünür.

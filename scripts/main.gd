@@ -87,6 +87,13 @@ func _ready() -> void:
 	var hud: Hud = Hud.new()
 	hud.setup(player, enemies, director, loot)
 	add_child(hud)
+	if Tuning.FEATURE_BOSS:
+		var boss_bar: BossBar = BossBar.new()
+		boss_bar.enemies = enemies
+		add_child(boss_bar)
+		var boss_warning: BossWarning = BossWarning.new()
+		boss_warning.director = director
+		add_child(boss_warning)
 
 	var level_up: LevelUpFlow = null
 	if Tuning.FEATURE_LEVEL_CARDS and not arena_mode:

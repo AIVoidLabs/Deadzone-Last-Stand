@@ -5,6 +5,7 @@ extends RefCounted
 ## max_alive: aynı anda en çok canlı zombi; kalite profilinin sınırıyla ayrıca kırpılır.
 ## mix: tür → ağırlık (EnemyData satırları); davranış bayrağı kapalı tür karışımdan düşer (active_mix).
 ## max_alive_kind (isteğe bağlı): tür → aynı anda en çok canlı sayısı; sınırdaki tür yerine başkası seçilir (SpawnRules.pick_kind_capped).
+## boss (isteğe bağlı): {kind, spawn_time, horde_factor?}; WaveRun boss akışı (spawn_time'da uyarı, uyarı sonunda doğar, ölünce dalga biter).
 ## 6.6 ilk denge: tabanca + 1–2 mağaza alımıyla 3. dalgayı, 3–4 silahla 5. dalgayı geçebilecek tırmanış.
 
 const WAVES: Array = [
@@ -46,6 +47,7 @@ const WAVES: Array = [
 		"mix": {&"walker": 1.0, &"runner": 0.22, &"jumper": 0.12, &"tongue": 0.05, &"tank": 0.05,
 				&"armored": 0.07, &"spitter": 0.06, &"thrower": 0.05, &"bloater": 0.07, &"screamer": 0.02},
 		"max_alive_kind": {&"screamer": 2},
+		"boss": {"kind": &"boss_heap", "spawn_time": 12.0},
 	},
 ]
 

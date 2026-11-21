@@ -82,3 +82,109 @@ func test_wave_table_rows_are_valid() -> void:
 		assert_gt(row["max_alive"], 0)
 		for kind: StringName in row["mix"]:
 			assert_true(EnemyData.TABLE.has(kind), "bilinmeyen tür: %s" % kind)
+
+
+# --- Boss dalgası (7.4) ---
+
+const WARNING: float = Tuning.BOSS_WARNING_TIME
+
+
+func _boss_run() -> WaveRun:
+	var run: WaveRun = WaveRun.new(WaveData.WAVES, CLEAR, BREAK, true, WARNING)
+	run.start_at(run.wave_count() - 1)
+	return run
+
+
+func _boss_spawn_time() -> float:
+	return float(WaveData.WAVES[WaveData.WAVES.size() - 1]["boss"]["spawn_time"])
+
+
+func test_last_wave_defines_a_boss_that_exists() -> void:
+	var boss: Dictionary = WaveData.WAVES[WaveData.WAVES.size() - 1]["boss"]
+	assert_true(EnemyData.TABLE.has(boss["kind"]))
+	for i in WaveData.WAVES.size() - 1:
+		assert_false(WaveData.WAVES[i].has("boss"), "boss yalnız son dalgada")
+
+
+func test_boss_disabled_wave_ends_by_timer_as_before() -> void:
+	var run: WaveRun = _run()
+	run.start_at(run.wave_count() - 1)
+	assert_eq(run.boss_stage, WaveRun.BossStage.NONE)
+	assert_eq(run.tick(_duration(run.index) + STEP_PAD), WaveRun.Phase.CLEAR)
+	assert_eq(run.horde_factor(), 1.0)
+
+
+func test_earlier_waves_have_no_boss_stage_even_when_enabled() -> void:
+	var run: WaveRun = WaveRun.new(WaveData.WAVES, CLEAR, BREAK, true, WARNING)
+	assert_eq(run.boss_stage, WaveRun.BossStage.NONE)
+
+
+func test_boss_warns_then_spawns_after_warning_time() -> void:
+	var run: WaveRun = _boss_run()
+	assert_eq(run.boss_stage, WaveRun.BossStage.WAITING)
+	run.tick(_boss_spawn_time() - 0.5)
+	assert_eq(run.boss_event, &"")
+	run.tick(0.5 + STEP_PAD)
+	assert_eq(run.boss_event, &"warn")
+	assert_eq(run.boss_stage, WaveRun.BossStage.WARNING)
+	run.boss_event = &""
+	run.tick(WARNING + STEP_PAD)
+	assert_eq(run.boss_event, &"spawn")
+	assert_eq(run.boss_stage, WaveRun.BossStage.ALIVE)
+
+
+func test_wave_clock_stops_while_boss_alive_and_never_ends_by_timer() -> void:
+	var run: WaveRun = _boss_run()
+	run.tick(_boss_spawn_time() + WARNING + STEP_PAD)
+	var left: float = run.phase_left
+	assert_eq(run.tick(_duration(run.index) * 3.0), WaveRun.NO_CHANGE)
+	assert_eq(run.phase, WaveRun.Phase.WAVE, "boss ölmeden dalga bitmez")
+	assert_eq(run.phase_left, left, "boss canlıyken süre durur")
+
+
+func test_boss_wave_does_not_end_by_timer_before_boss_spawns() -> void:
+	var run: WaveRun = _boss_run()
+	run.tick(_boss_spawn_time() - 1.0)
+	assert_eq(run.phase, WaveRun.Phase.WAVE)
+	assert_gt(run.phase_left, 0.0)
+
+
+func test_boss_defeat_ends_wave_into_clear_and_last_wave_wins() -> void:
+	var run: WaveRun = _boss_run()
+	run.tick(_boss_spawn_time() + WARNING + STEP_PAD)
+	assert_true(run.boss_defeated(Tuning.BOSS_DEATH_CLEAR_TIME))
+	assert_eq(run.phase, WaveRun.Phase.CLEAR)
+	assert_eq(run.tick(Tuning.BOSS_DEATH_CLEAR_TIME + STEP_PAD), WaveRun.Phase.WON)
+
+
+func test_boss_defeat_ignored_when_no_boss_is_expected() -> void:
+	var run: WaveRun = _run()
+	assert_false(run.boss_defeated(1.0))
+	var boss_run: WaveRun = _boss_run()
+	assert_false(boss_run.boss_defeated(1.0), "doğmadan ölemez")
+
+
+func test_horde_factor_only_while_boss_alive() -> void:
+	var run: WaveRun = _boss_run()
+	assert_eq(run.horde_factor(), 1.0)
+	run.tick(_boss_spawn_time() + WARNING + STEP_PAD)
+	assert_eq(run.horde_factor(), Tuning.BOSS_HORDE_FACTOR)
+
+
+func test_force_boss_holds_any_wave_when_enabled() -> void:
+	var run: WaveRun = WaveRun.new(WaveData.WAVES, CLEAR, BREAK, true, WARNING)
+	run.force_boss()
+	assert_eq(run.boss_stage, WaveRun.BossStage.ALIVE)
+	assert_eq(run.tick(_duration(0) * 2.0), WaveRun.NO_CHANGE)
+	assert_true(run.boss_defeated(1.0))
+	var off: WaveRun = _run()
+	off.force_boss()
+	assert_eq(off.boss_stage, WaveRun.BossStage.NONE, "bayrak kapalıyken etkisiz")
+
+
+func test_start_at_resets_boss_state() -> void:
+	var run: WaveRun = _boss_run()
+	run.tick(_boss_spawn_time() + WARNING + STEP_PAD)
+	run.start_at(0)
+	assert_eq(run.boss_stage, WaveRun.BossStage.NONE)
+	assert_eq(run.boss_event, &"")
