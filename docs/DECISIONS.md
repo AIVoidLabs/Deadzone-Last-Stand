@@ -29,6 +29,11 @@ Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar v
 - İlk parça seti (Blender betiği, low-poly/stilize): yol + kaldırım karosu, 2–3 tuğla cephe (yangın merdiveni, tabela yeri), terk araba, barikat, çöp konteyneri, çöp/kâğıt yığını. Ateş, neon, ışık 8.3'te.
 - **Ruh hali (Taha):** karanlık ve yıkık bir ortam önemli ("zombi baskını olmuş"). Taha gerekirse ücretsiz, açık lisanslı (CC0/CC-BY) model ve doku indirir; Claude ne arayacağını söyler. İndirilen her asset CREDITS.md'ye girer.
 
+## 2026-11-21 — Kamera: B + dinamik açı (Taha)
+
+- Varsayılan kamera 60° / 24 m. Koşuya göre dinamik açı (yaw 7°, ileri/geri eğim 5°) Taha'nın hoşuna gitti.
+- **9.2 Ayarlar'a "Dinamik kamera" aç/kapa seçeneği girer** (mide bulantısı yaşayanlar için); kapalıyken kamera sabit açıyla eskisi gibi. Şimdilik `FEATURE_CAMERA_DYNAMIC_ANGLE` sabiti; 9.2'de kayıtlı ayara bağlanır.
+
 ## 2026-11-20 — Hedef görünüm: gece şehir sokağı, daha üstten ve uzaktan kamera (Taha)
 
 - Taha oyunun bitmiş halinin nasıl görünmesini istediğini bir referans görselle gösterdi (başka bir oyunun ekran görüntüsü; repoya girmez, yerel kopya `build/reference/target_look_city_night.webp`).
