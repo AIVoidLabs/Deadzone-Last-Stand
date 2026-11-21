@@ -5,6 +5,7 @@ extends Node
 ## --capture-dash=S: görüntüden S saniye önce dash attırır.
 ## --capture-kill=S: görüntüden S saniye önce askeri öldürür (ölüm animasyonu denetimi).
 ## --capture-focus: kamera ilk canlı zombiyi izler (arena ile yakın görüntü).
+## --camera-fov=DEG: kamera görüş açısını dener (lens karşılaştırması).
 ## --camera-distance=M: kamera uzaklığını dener (karşılaştırma görüntüleri için).
 ## --weapons=N: toplam N silahla başlar (debug silahı eklenir). --no-weapons: silahlar ateş etmez (saldırı ölçümü).
 ## --levels=N: N seviye atlatır (kart seçimi dalga arasında açılır). --capture-pick: açılan kart ekranında 1'e basar. --wave=N: N. dalgadan başlar. --capture-wave-end=S: görüntüden S saniye önce dalgayı bitirir.
@@ -83,6 +84,8 @@ func _ready() -> void:
 			_kill_lead = arg.trim_prefix("--capture-kill=").to_float()
 		elif arg.begins_with("--camera-distance=") and camera != null:
 			camera.set_distance(arg.trim_prefix("--camera-distance=").to_float())
+		elif arg.begins_with("--camera-fov=") and camera != null:
+			camera.fov = arg.trim_prefix("--camera-fov=").to_float()
 		elif arg.begins_with("--camera-pitch=") and camera != null:
 			camera.set_pitch(arg.trim_prefix("--camera-pitch=").to_float(), _arg_float("--camera-distance=", Tuning.CAMERA_DISTANCE))
 		elif arg == "--autopilot":
