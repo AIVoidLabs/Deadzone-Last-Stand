@@ -1,10 +1,9 @@
 class_name CityGroundDressing
 extends Node3D
-## 8.3d: yer dekoru. Kâğıt/karton/enkaz, kan gölleri ve izleri, devrik koni, düşmüş tabela, cesetler.
+## 8.3d: yer dekoru. Kâğıt/karton/enkaz, devrik koni, düşmüş tabela, cesetler (kan ve zemin lekeleri: CityDecals).
 ## Hepsi MultiMesh, çarpışmasız; adet profildeki ground_dressing çarpanıyla. Kapatma: Tuning.FEATURE_CITY_GROUND_DRESSING.
 
-const BLOOD_Y: float = 0.04
-const TRAIL_BLOBS: int = 6
+const PAPER_SHADER: Shader = preload("res://assets/shaders/city_paper.gdshader")
 const PROP_CLEARANCE: float = 2.8
 const PAPER_COLORS: Array[Color] = [Color(0.5, 0.45, 0.36), Color(0.38, 0.32, 0.25), Color(0.3, 0.3, 0.29), Color(0.42, 0.28, 0.17)]
 const CLOTH_COLORS: Array[Color] = [Color(0.2, 0.22, 0.28), Color(0.3, 0.17, 0.14), Color(0.22, 0.26, 0.2), Color(0.3, 0.28, 0.24)]
@@ -25,9 +24,10 @@ func _ready() -> void:
 		if row["collide"]:
 			_blocked.append(row["pos"])
 			_hot.append(Vector3(row["pos"].x, 0.0, row["pos"].y))
-	var pools: Array[Transform3D] = []
-	_build_corpses(pools)
-	_build_blood(pools)
+	var corpse_spots: Array[Vector3] = []
+	_build_corpses(corpse_spots)
+	if Tuning.FEATURE_CITY_BLOOD_DECALS or Tuning.FEATURE_CITY_GROUND_DECALS:
+		add_child(CityDecals.new(_blocked, corpse_spots, _hot))
 	_build_debris()
 	_build_cones()
 	_build_signs()
@@ -82,86 +82,33 @@ func _debris_point() -> Vector3:
 
 func _build_debris() -> void:
 	var size: Vector2 = Tuning.DRESS_DEBRIS_SIZE
-	# tür: [en, boy, kalınlık payı, renk paleti]; hepsi kirli ve koyu
-	var kinds: Array = [[0.22, 0.3, 0], [0.4, 0.3, 0], [0.5, 0.4, 1], [0.3, 0.3, 2]]
-	var groups: Array = [[[], []], [[], []], [[], []]]   # düz kâğıt, karton, poşet: [xfs, colors]
+	# tür: [en, boy, biçim (0 yaprak, 1 buruşuk, 2 şerit)]
+	var kinds: Array = [[0.22, 0.3, 0], [0.4, 0.3, 0], [0.5, 0.4, 0], [0.2, 0.2, 1], [0.3, 0.3, 1], [0.1, 0.5, 2]]
+	var xfs: Array[Transform3D] = []
+	var colors: Array[Color] = []
+	var customs: Array[Color] = []
 	for i: int in Tuning.DRESS_DEBRIS_COUNT:
 		var p: Vector3 = _debris_point()
-		var kind: int = _rng.randi() % kinds.size()
-		var k: Array = kinds[kind]
+		var k: Array = kinds[_rng.randi() % kinds.size()]
 		var s: float = clampf(_rng.randf_range(0.6, 1.4) * (size.x + size.y) * 0.5 * _rng.randf_range(0.5, 1.3), size.x, size.y)
-		var sx: float = s * k[0] / 0.3
-		var sz: float = s * k[1] / 0.3
-		var tilt: Basis = Basis(Vector3.RIGHT, _rng.randf_range(-0.12, 0.12)) * Basis(Vector3.FORWARD, _rng.randf_range(-0.12, 0.12))
-		var basis: Basis = Basis(Vector3.UP, _rng.randf() * TAU) * tilt * Basis.from_scale(Vector3(sx, 1.0, sz))
-		p.y = 0.03 + _rng.randf() * 0.015
+		var basis: Basis = _flat_basis(_rng.randf() * TAU, s * k[0] / 0.3, s * k[1] / 0.3)
+		p.y = 0.034 + _rng.randf() * 0.004
 		var tint: Color
-		if kind == 3:
-			tint = Color(0.07, 0.07, 0.08) * _rng.randf_range(0.6, 1.4)
-		elif _rng.randf() < 0.15:
-			tint = Color(0.45, 0.43, 0.38) * _rng.randf_range(0.5, 0.8)
+		if k[2] == 1 and _rng.randf() < 0.4:
+			tint = Color(0.07, 0.07, 0.08) * _rng.randf_range(0.8, 1.4)
 		else:
-			tint = PAPER_COLORS[_rng.randi() % PAPER_COLORS.size()] * _rng.randf_range(0.25, 0.5)
-		var g: int = int(k[2])
-		groups[g][0].append(Transform3D(basis, p))
-		groups[g][1].append(tint)
-	var thin: BoxMesh = BoxMesh.new()
-	thin.size = Vector3(1.0, 0.01, 1.0)
-	var thick: BoxMesh = BoxMesh.new()
-	thick.size = Vector3(1.0, 0.045, 1.0)
-	var bag: BoxMesh = BoxMesh.new()
-	bag.size = Vector3(1.0, 0.03, 1.0)
-	var meshes: Array = [thin, thick, bag]
-	for g: int in 3:
-		var xfs: Array[Transform3D] = []
-		var cols: Array[Color] = []
-		xfs.assign(groups[g][0])
-		cols.assign(groups[g][1])
-		_add_group(meshes[g], xfs, cols, 0.95)
-
-
-func _build_blood(pools: Array[Transform3D]) -> void:
+			tint = PAPER_COLORS[_rng.randi() % PAPER_COLORS.size()] * _rng.randf_range(Tuning.CITY_PAPER_VALUE.x, Tuning.CITY_PAPER_VALUE.y)
+		xfs.append(Transform3D(basis, p))
+		colors.append(tint)
+		customs.append(Color(_rng.randf(), k[2], 0.0, 0.0))
 	var quad: QuadMesh = QuadMesh.new()
 	quad.size = Vector2.ONE
-	var xfs: Array[Transform3D] = pools.duplicate()
-	for i: int in Tuning.DRESS_BLOOD_POOLS:
-		var bp: Vector3 = _free_point(0.5)
-		_hot.append(bp)
-		xfs.append(_blob(bp, _rng.randf_range(0.9, 2.6)))
-	for i: int in Tuning.DRESS_BLOOD_TRAILS:
-		var p: Vector3 = _free_point(1.5)
-		var dir: Vector3 = Vector3.RIGHT.rotated(Vector3.UP, _rng.randf() * TAU)
-		var s: float = _rng.randf_range(0.6, 1.0)
-		for k: int in TRAIL_BLOBS:
-			xfs.append(_blob(p + dir * (k * 0.9) + Vector3(_rng.randf_range(-0.15, 0.15), 0.0, _rng.randf_range(-0.15, 0.15)), s * (1.0 - k * 0.12)))
-	var colors: Array[Color] = []
-	for x: Transform3D in xfs:
-		colors.append(Color.WHITE * _rng.randf_range(0.7, 1.1))
-	var mat: StandardMaterial3D = StandardMaterial3D.new()
-	var grad: Gradient = Gradient.new()
-	grad.offsets = PackedFloat32Array([0.0, 0.5, 0.8, 1.0])
-	grad.colors = PackedColorArray([Color.WHITE, Color.WHITE, Color(1, 1, 1, 0.5), Color(1, 1, 1, 0.0)])
-	var tex: GradientTexture2D = GradientTexture2D.new()
-	tex.gradient = grad
-	tex.fill = GradientTexture2D.FILL_RADIAL
-	tex.fill_from = Vector2(0.5, 0.5)
-	tex.fill_to = Vector2(0.5, 0.0)
-	tex.width = 64
-	tex.height = 64
-	mat.albedo_texture = tex
-	mat.albedo_color = Tuning.DRESS_BLOOD_COLOR
-	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	mat.vertex_color_use_as_albedo = true
-	mat.roughness = 0.4
-	mat.emission_enabled = true
-	mat.emission = Color(0.05, 0.004, 0.004)
-	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
-	_add_group(quad, xfs, colors, 0.0, mat)
-
-
-func _blob(p: Vector3, diameter: float) -> Transform3D:
-	var basis: Basis = Basis(Vector3.UP, _rng.randf() * TAU) * Basis.from_scale(Vector3(diameter * _rng.randf_range(0.9, 1.15), diameter, 1.0)) * Basis(Vector3.RIGHT, -PI * 0.5)
-	return Transform3D(basis, Vector3(p.x, BLOOD_Y, p.z))
+	quad.orientation = PlaneMesh.FACE_Y
+	var mat: ShaderMaterial = ShaderMaterial.new()
+	mat.shader = PAPER_SHADER
+	mat.set_shader_parameter(&"grime", load("res://assets/textures/fx/kenney/dirt_01.png"))
+	mat.set_shader_parameter(&"shaped", Tuning.FEATURE_CITY_PAPER_SHAPES)
+	_add_group(quad, xfs, colors, 0.95, mat, customs)
 
 
 func _build_cones() -> void:
@@ -202,8 +149,8 @@ func _build_signs() -> void:
 	_add_group(mesh, xfs, colors, 0.7)
 
 
-## Yatan ceset: gövde + bacaklar + kollar (kıyafet) ve baş (ten); iki poz. Altına kan gölü eklenir.
-func _build_corpses(pools: Array[Transform3D]) -> void:
+## Yatan ceset: gövde + bacaklar + kollar (kıyafet) ve baş (ten); iki poz. Konumları kan lekeleri için döner.
+func _build_corpses(spots: Array[Vector3]) -> void:
 	var xfs: Array[Array] = [[], []]
 	var colors: Array[Array] = [[], []]
 	for i: int in Tuning.DRESS_CORPSES:
@@ -212,7 +159,7 @@ func _build_corpses(pools: Array[Transform3D]) -> void:
 		xfs[pose].append(Transform3D(Basis(Vector3.UP, _rng.randf() * TAU), Vector3(p.x, 0.0, p.z)))
 		colors[pose].append(CLOTH_COLORS[_rng.randi() % CLOTH_COLORS.size()] * 3.0)
 		_hot.append(p)
-		pools.append(_blob(p + Vector3(_rng.randf_range(-0.3, 0.3), 0.0, _rng.randf_range(-0.3, 0.3)), _rng.randf_range(1.3, 2.0)))
+		spots.append(p)
 	for pose: int in 2:
 		var typed_x: Array[Transform3D] = []
 		var typed_c: Array[Color] = []
@@ -273,7 +220,7 @@ func _merge(parts: Array) -> ArrayMesh:
 	return mesh
 
 
-func _add_group(mesh: Mesh, xfs: Array[Transform3D], colors: Array[Color], roughness: float, material: Material = null) -> void:
+func _add_group(mesh: Mesh, xfs: Array[Transform3D], colors: Array[Color], roughness: float, material: Material = null, customs: Array[Color] = []) -> void:
 	if xfs.is_empty():
 		return
 	if material == null:
@@ -284,11 +231,14 @@ func _add_group(mesh: Mesh, xfs: Array[Transform3D], colors: Array[Color], rough
 	var mm: MultiMesh = MultiMesh.new()
 	mm.transform_format = MultiMesh.TRANSFORM_3D
 	mm.use_colors = true
+	mm.use_custom_data = not customs.is_empty()
 	mm.mesh = mesh
 	mm.instance_count = xfs.size()
 	for i: int in xfs.size():
 		mm.set_instance_transform(i, xfs[i])
 		mm.set_instance_color(i, colors[i])
+		if not customs.is_empty():
+			mm.set_instance_custom_data(i, customs[i])
 	var node: MultiMeshInstance3D = MultiMeshInstance3D.new()
 	node.multimesh = mm
 	node.material_override = material

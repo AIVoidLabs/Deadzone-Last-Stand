@@ -721,6 +721,33 @@ const DRESS_SEED: int = 8304
 const DRESS_ARENA_SHARE: float = 0.75
 const DRESS_DEBRIS_SIZE: Vector2 = Vector2(0.1, 0.6)
 const DRESS_BLOOD_COLOR: Color = Color(0.4, 0.04, 0.035, 0.8)
+# --- 8.3h: kan sıçraması, koyu kâğıt, zemin lekeleri, cephe ışıkları (city_decals.gd, city_facade_lights.gd) ---
+## Kan: Kenney maskeli gölcük/sıçrama/sürüklenme/ayak izi (kapalıysa kan lekesi yok). Zemin: yanık, yağ, lastik izi, çatlak.
+const FEATURE_CITY_BLOOD_DECALS: bool = true
+const FEATURE_CITY_GROUND_DECALS: bool = true
+## Kâğıt biçimleri (yırtık köşe, buruşuk kenar); kapalıysa düz dikdörtgen. Değer çarpanı aralığı (düşük = koyu).
+const FEATURE_CITY_PAPER_SHAPES: bool = true
+const CITY_PAPER_VALUE: Vector2 = Vector2(0.5, 0.8)
+const CITY_BLOOD_FOOTPRINTS: int = 8
+const CITY_BLOOD_SPLASHES: int = 30
+const CITY_SCORCH_BLASTS: int = 8
+const CITY_OIL_COUNT: int = 36
+const CITY_SKID_COUNT: int = 8
+const CITY_CRACK_COUNT: int = 26
+## Bina cepheleri: yanan pencereler, duvar lambaları (sahte ışık). Cephe düzlemi bloktan dışarı payı (m).
+const FEATURE_CITY_FACADE_LIGHTS: bool = true
+const CITY_FACADE_OFFSET: float = 0.1
+const CITY_FACADE_ROWS: Array[float] = [6.2, 9.2, 12.2]
+const CITY_FACADE_COLUMN_STEP: float = 3.0
+const CITY_FACADE_WINDOW_SIZE: Vector2 = Vector2(2.6, 2.8)
+const CITY_FACADE_LIT_CHANCE: float = 0.13
+const CITY_FACADE_TV_CHANCE: float = 0.05
+const CITY_FACADE_LAMPS_PER_FACE: int = 2
+const CITY_FACADE_LAMP_HEIGHT: float = 4.2
+const CITY_FACADE_LAMP_COLOR: Color = Color(1.0, 0.62, 0.25)
+const CITY_FACADE_LAMP_RADIUS: float = 2.3
+const CITY_FACADE_LAMP_WALL_ENERGY: float = 0.4
+const CITY_FACADE_LAMP_GROUND_ENERGY: float = 0.28
 ## Çift sarı orta şerit: renk, çizgi eni, iki çizgi arası (m).
 const CITY_LANE_COLOR: Color = Color(0.62, 0.44, 0.1)
 const CITY_LANE_WIDTH: float = 0.13

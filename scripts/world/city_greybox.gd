@@ -62,6 +62,8 @@ func _ready() -> void:
 		_build_barricades()
 	_build_outer_blocks()
 	_build_inner_blocks()
+	if Tuning.FEATURE_CITY_FACADE_LIGHTS:
+		add_child(CityFacadeLights.new())
 	_build_decor()
 	_build_lights()
 	add_child(CityFx.new())
