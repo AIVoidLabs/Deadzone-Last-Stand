@@ -34,7 +34,7 @@ func damage(index: int, amount: float, direction: Vector2, knockback: float, dot
 		return
 	if Tuning.FEATURE_KNOCKBACK:
 		_m._knock[index] += Knockback.impulse(direction, knockback, row["weight"])
-	if Tuning.FEATURE_STAGGER and float(row["stagger_time"]) > 0.0 and ZombieRules.can_stagger(state) and not BloatAttack.is_primed(row, state):
+	if Tuning.FEATURE_STAGGER and float(row["stagger_time"]) > 0.0 and ZombieRules.can_stagger(state) and not BloatAttack.is_primed(row, state) 			and not (state == ZombieRules.State.RECOVER and SpecialAttacks.holds_recover(row)):
 		_m._enter(index, ZombieRules.State.STAGGER, row["stagger_time"], true)
 
 
@@ -96,3 +96,13 @@ func kill(index: int, push: Vector2 = Vector2.ZERO, credit: bool = true, corpse:
 	var duration: float = Tuning.ZOMBIE_CORPSE_TIME + Tuning.ZOMBIE_FADE_TIME
 	node.enter_state(ZombieRules.State.DYING, duration)
 	_m._corpses.add(node, push if Tuning.FEATURE_KNOCKBACK else Vector2.ZERO, duration)
+
+
+## Dalga sonu: count kadar canlı zombiyi öldürme sayılmadan devirir (sondan başa).
+func dismiss(count: int) -> void:
+	var i: int = _m._pos.size() - 1
+	while i >= 0 and count > 0:
+		if _m._alive[i] != 0:
+			kill(i, Vector2.ZERO, false)
+			count -= 1
+		i -= 1

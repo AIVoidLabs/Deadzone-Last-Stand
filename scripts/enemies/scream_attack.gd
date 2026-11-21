@@ -74,7 +74,7 @@ func _summon(i: int, row: Dictionary, at: Vector2) -> void:
 		cap = mini(cap, _m.spawn_cap)
 	var count: int = ScreamRules.allowed_count(int(row["scream_count"]), int(_alive.get(id, 0)), int(row["scream_max_alive"]), _m.active_count(), cap)
 	var half: float = _m._half - Tuning.SPAWN_EDGE_INSET
-	for point in ScreamRules.ring_points(at, float(row["scream_radius"]), count, _m._rng.randf() * TAU, half):
+	for point: Vector2 in ScreamRules.ring_points(at, float(row["scream_radius"]), count, _m._rng.randf() * TAU, half):
 		_m.spawn(SUMMON_KIND, point)
 		_ensure()
 		_tag[_m._nodes.size() - 1] = -id

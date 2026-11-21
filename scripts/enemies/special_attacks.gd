@@ -46,6 +46,11 @@ static func is_special(row: Dictionary) -> bool:
 	return false
 
 
+## Atış/çağrı türlerinde toparlanma (bekleme) sendelemeyle bozulmaz: vurulunca bekleme sıfırlanıp hemen yeniden saldırmasın.
+static func holds_recover(row: Dictionary) -> bool:
+	return is_special(row) and (row["attack_kind"] == &"spit" or row["attack_kind"] == &"throw" or row["attack_kind"] == &"scream")
+
+
 ## Bu durumda saldırı SpecialAttacks'ta işlenir (act / finish).
 static func acts_in(state: ZombieRules.State) -> bool:
 	return faces_in(state) or state == S.LASH or state == S.PULL

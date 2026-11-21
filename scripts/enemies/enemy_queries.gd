@@ -70,3 +70,11 @@ func count_kind(kind: StringName) -> int:
 		if _m._alive[i] != 0 and _m._rows[i]["id"] == kind:
 			count += 1
 	return count
+
+
+## İlk canlı zombinin indeksi (yoksa -1); debug arenası için.
+func first_alive() -> int:
+	for i in _m._pos.size():
+		if _m._alive[i] != 0:
+			return i
+	return -1

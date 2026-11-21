@@ -16,11 +16,11 @@ signal jump_landed(at: Vector3, radius: float)
 signal lob_launched(kind: StringName, from: Vector3, dest: Vector3, flight: float, arc: float, radius: float)
 signal lob_landed(kind: StringName, at: Vector3, radius: float)
 signal acid_pool_started(at: Vector3, radius: float, time: float)
-## Zırhlıya önden gelen (azaltılmış) isabet; öldürmeyen vuruşlarda enemy_damaged yerine (kan yok: gri kıvılcım, küçük sayı).
 ## Patlayıcı patladı (BloatAttack): at yerde, radius patlama yarıçapı (fx, sarsıntı ve ses için).
 signal bloat_exploded(at: Vector3, radius: float)
 ## Çığlıkçı ses dalgası yaydı (fx ve sarsıntı); radius çağrı halkasının yarıçapı.
 signal scream_emitted(at: Vector3, radius: float)
+## Zırhlıya önden gelen (azaltılmış) isabet; öldürmeyen vuruşlarda enemy_damaged yerine (kan yok: gri kıvılcım, küçük sayı).
 signal enemy_blocked(at: Vector3, direction: Vector2, amount: float)
 
 const PHYSICS_PRIORITY: int = -10
@@ -32,14 +32,13 @@ var player: Player
 var spawning_enabled: bool = true
 var elapsed: float = 0.0
 var kills: int = 0
-## Özel saldırı sayaçları (ölçüm ve debug için; ölümsüz modda da isabet sayılır).
+## Özel saldırı sayaçları (ölçüm ve debug için; ölümsüz modda da isabet sayılır). Dil bitişleri: ısırdı / süre doldu / yakın vuruş.
 var lunge_starts: int = 0
 var lunge_hits: int = 0
 var jump_lands: int = 0
 var jump_hits: int = 0
 var tongue_shots: int = 0
 var tongue_hits: int = 0
-## Yeni dil mekaniği: çekişin bitişi (yakında ısırdı / süre doldu).
 var tongue_bites: int = 0
 var tongue_timeouts: int = 0
 var tongue_melees: int = 0
@@ -200,20 +199,12 @@ func spawn_many(count: int, kind: StringName = EnemyData.WALKER) -> void:
 
 ## Dalga sonu: count kadar canlı zombiyi öldürme sayılmadan devirir (ölüm animasyonu + solma).
 func dismiss(count: int) -> void:
-	var i: int = _pos.size() - 1
-	while i >= 0 and count > 0:
-		if _alive[i] != 0:
-			_combat.kill(i, Vector2.ZERO, false)
-			count -= 1
-		i -= 1
+	_combat.dismiss(count)
 
 
 ## Debug arenası: ilk canlı zombinin indeksi (yoksa -1), durumu ve öldürme.
 func debug_alive_index() -> int:
-	for i in _pos.size():
-		if _alive[i] != 0:
-			return i
-	return -1
+	return _queries.first_alive()
 
 
 func debug_state(index: int) -> ZombieRules.State:
