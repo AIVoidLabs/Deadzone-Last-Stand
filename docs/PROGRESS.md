@@ -5,7 +5,9 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 
 ## Şu an
 
-**Oturum 12 (2026-11-21): Aşama 7 bitti, Taha'nın arenada denemesi ve "devam" demesi bekleniyor.** Taha "alt ajanlarla komple bitir" dedi; tasarımı Claude verdi (DECISIONS 2026-11-20 7.3, spec `build/briefs/s73_design.md`, `s74_boss.md`). Sıradaki ana aşama 8 (arena, atmosfer, ses — hedef görünüm: gece şehir sokağı).
+**YENİ OTURUM BURADAN (Oturum 13): Aşama 8 başlıyor (arena, atmosfer, ses).** Taha Aşama 7'yi oynadı ve onayladı (2026-11-21): "oyun çok güzel bir seviyeye gelmiş", oyunu baştan sona bitirdi; **"şahsen oyun basit ama bunu dengeleriz"** → zorluk/derinlik Aşama 11'de (denge) ele alınır, şimdi kod değişmez. Yeni oturum başlangıcı: ortam kontrolü → bu bölüm → ROADMAP 8.1 satırı + DECISIONS 2026-11-20 hedef görünüm (gece şehir sokağı, üstten/uzak kamera, ortam > zombi sayısı) → 8.1 için kararları sor, kod yazma. Blender açık ve MCP bağlı olmalı. Aşama 8'de boss'un soluk görünmesi ve göğüs yarığının okunmaması ışıkla birlikte ele alınır.
+
+**Oturum 12 (2026-11-21): Aşama 7 bitti, Taha onayladı (yukarıda).** Taha "alt ajanlarla komple bitir" dedi; tasarımı Claude verdi (DECISIONS 2026-11-20 7.3, spec `build/briefs/s73_design.md`, `s74_boss.md`). Sıradaki ana aşama 8 (arena, atmosfer, ses — hedef görünüm: gece şehir sokağı).
 - **Dene:** `godot --path . -- --arena=armored|screamer|spitter|thrower|bloater|boss_heap` (arena: 1–0 tür, B boss, R doğur, G silah); normal oyunda `--wave=5` boss dalgası.
 - **Ayar soruları (Taha'nın elinde):** zırhlıya daire çizerek dolaşmak zor (yavaş dönüş 1.8 rad/sn ama ölçümde arka isabet az; zigzag işe yarıyor) → `armor_turn_rate` düşürülebilir; çığlıkçının çağrısı WINDUP sonunda (çığlık tepesi 0.55 sn'de değil); boss saldırı ağırlıkları slam 3 / charge 3 / summon 4.
 - **Görsel açıklar:** boss oyun ışığında soluk pembe, göğüs yarığı uzaktan seçilmiyor (Aşama 8 ışığıyla birlikte); zırhlıda ağız fazla açık; tükürücüde kese + karın "iki top"; taş fırlatanın dev kolu yakından "sosis"; çığlıkçının kolları çığlıkta T-poza yakın; ölüm kliplerinde 2–13 cm gömülmeler (boss en çok).
@@ -138,7 +140,7 @@ Oturum 7 (2026-11-18). Aşama 7.1 onaylı. **7.2 kod bitti, Taha'nın oynayıp y
 | 4 | Dikey dilim: zombi | ✔ bitti (2026-11-16) |
 | 5 | Dikey dilim: silah ve vuruş hissi | ✔ bitti (2026-11-17, dikey dilim onaylandı) |
 | 6 | Tur döngüsü | ✔ kod bitti 2026-11-18 (Taha'nın oynayıp onayı bekleniyor: 6.4–6.6) |
-| 7 | Silah ve zombi çeşitliliği | ✔ bitti (2026-11-21, Taha'nın arenada denemesi bekleniyor) |
+| 7 | Silah ve zombi çeşitliliği | ✔ bitti (2026-11-21, Taha oynadı ve onayladı) |
 | V | Görsel yeniden yön | ✔ bitti (2026-11-20) |
 | 8 | Arena, atmosfer, ses | — |
 | 9 | Arayüz ve akış | — |
