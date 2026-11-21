@@ -124,6 +124,11 @@ func _launch(i: int, row: Dictionary) -> void:
 	var from: Vector2 = _m._pos[i]
 	var dest: Vector2 = _m._aim[i]
 	var flight: float = _f(row, "flight")
+	if Tuning.FEATURE_OBSTACLE_STEER and Tuning.FEATURE_CITY_GREYBOX:
+		# Bina ya da engel araya girerse top/kaya engelin kenarına iner (kısalan yolla orantılı süre).
+		var shot: Vector3 = CityLayout.clip_shot(from, dest, Tuning.OBSTACLE_SHOT_RADIUS, Tuning.OBSTACLE_SHOT_MARGIN, _m._blocks)
+		dest = Vector2(shot.x, shot.y)
+		flight *= maxf(shot.z, 0.25)
 	_lob_from.append(from)
 	_lob_dest.append(dest)
 	_lob_left.append(flight)

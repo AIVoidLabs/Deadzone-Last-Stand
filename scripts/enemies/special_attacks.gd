@@ -279,7 +279,8 @@ func _windup_tick(i: int, row: Dictionary, p: Vector2, target: Vector2, target_v
 		&"jump":
 			if not LungeRules.is_aim_locked(left, float(row["jump_lock_time"])):
 				var ahead: float = left + float(row["jump_time"])
-				_m._aim[i] = JumpRules.landing_point(p, target, target_vel, ahead, float(row["jump_lead"]), float(row["jump_max_range"]), _m._half)
+				var land: Vector2 = JumpRules.landing_point(p, target, target_vel, ahead, float(row["jump_lead"]), float(row["jump_max_range"]), _m._half)
+				_m._aim[i] = _m.free_point(land, float(row["radius"]) + Tuning.CITY_SPAWN_STREET_MARGIN)
 			_jump.marker(i, _m._aim[i], row, true)
 		&"tongue":
 			_tongue.aim_tick(i, row, p, target, target_vel)

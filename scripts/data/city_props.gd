@@ -12,6 +12,14 @@ const FOOT: Dictionary = {
 	&"suv_burned": Vector3(1.8, 1.46, 4.49),
 	&"van_burned": Vector3(1.73, 1.54, 4.73),
 	&"trashbin_wreck": Vector3(1.76, 1.46, 0.93),
+	&"sedan_wreck_b": Vector3(1.8, 1.56, 4.49),
+	&"police_wreck": Vector3(1.8, 1.52, 4.35),
+	&"delivery_wreck": Vector3(1.73, 1.81, 5.2),
+	&"trash_pile_a": Vector3(1.96, 0.73, 1.34),
+	&"trash_pile_b": Vector3(2.13, 0.71, 1.43),
+	&"rubble_pile": Vector3(2.01, 1.07, 1.91),
+	&"sandbag_wall": Vector3(3.62, 0.85, 0.48),
+	&"tire_stack": Vector3(0.47, 0.88, 0.47),
 }
 ## Gölge atmayan küçük proplar.
 const NO_SHADOW: Array[StringName] = [&"traffic_barrier_wreck", &"paper_debris_a", &"paper_debris_b", &"paper_debris_c"]
@@ -34,6 +42,27 @@ const ROWS: Array[Dictionary] = [
 	{"prop": &"traffic_light_wreck", "pos": Vector2(-10.3, 10.3), "rot_y": -90.0, "collide": false, "tilt": 8.0},
 	{"prop": &"traffic_light_wreck", "pos": Vector2(-10.3, -10.3), "rot_y": 180.0, "collide": false},
 	{"prop": &"traffic_light_wreck", "pos": Vector2(10.3, -10.3), "rot_y": 90.0, "collide": false},
+]
+
+## Sokak ortası engel adaları (8.2, orta yoğunluk): merkez = ada orta noktası, parça = [prop, dx, dz, rot_y]; hepsi çarpışmalı.
+## Adalar merkezden (0,0) CITY_ISLAND_CLEAR_RADIUS uzakta, sokak kollarında girdap düzeninde.
+const ISLANDS: Array[Dictionary] = [
+	{"center": Vector2(1.0, -16.0), "parts": [
+		[&"police_wreck", 0.0, 0.0, 35.0], [&"sandbag_wall", 0.5, 3.4, 15.0], [&"trash_pile_a", -3.3, -1.0, 20.0]]},
+	{"center": Vector2(16.0, -1.0), "parts": [
+		[&"sedan_wreck_b", 0.0, 0.0, -100.0], [&"tire_stack", 2.4, -1.6, 0.0], [&"rubble_pile", -1.5, 3.0, 30.0]]},
+	{"center": Vector2(-1.0, 15.0), "parts": [
+		[&"trashbin_wreck", 0.0, 0.0, 20.0], [&"trashbin_wreck", 1.9, -1.4, -30.0], [&"trash_pile_b", -2.3, 0.9, 0.0],
+		[&"trash_pile_a", 1.0, 2.3, 40.0], [&"sandbag_wall", -0.5, -2.8, 5.0]]},
+	{"center": Vector2(-16.0, 1.0), "parts": [
+		[&"delivery_wreck", 0.0, 0.0, 70.0], [&"rubble_pile", 2.4, -2.9, 100.0], [&"trash_pile_b", -2.2, 2.6, 60.0]]},
+]
+## Kaldırım ve bina diplerine çarpışmasız çöp / moloz / lastik: [prop, x, z, rot_y].
+const PILES: Array = [
+	[&"trash_pile_a", 9.9, 16.5, 10.0], [&"trash_pile_b", -9.8, 22.0, 80.0], [&"rubble_pile", 9.9, -8.0, 40.0],
+	[&"trash_pile_b", 9.8, -26.0, 120.0], [&"rubble_pile", -9.9, 6.0, 200.0], [&"trash_pile_a", -9.7, -16.5, 300.0],
+	[&"trash_pile_a", 18.0, -9.8, 15.0], [&"rubble_pile", -18.0, 9.8, 160.0], [&"trash_pile_b", 26.0, -9.8, 250.0],
+	[&"trash_pile_a", -26.0, 9.8, 330.0], [&"tire_stack", -14.0, 9.9, 0.0], [&"tire_stack", 14.0, -9.9, 70.0],
 ]
 
 ## Kol şablonları (alan dışı, görsel): u = alan sınırından kol yönünde, v = yanal; kol k için 90 x k derece döner.
@@ -59,8 +88,30 @@ const ARM_B: Array = [
 static func rows() -> Array[Dictionary]:
 	var out: Array[Dictionary] = ROWS.duplicate()
 	out.append_array(_arm_rows())
+	out.append_array(_island_rows())
+	out.append_array(_pile_rows())
 	out.append_array(_barricade_rows())
 	out.append_array(_paper_rows())
+	return out
+
+
+static func _island_rows() -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	if not Tuning.FEATURE_CITY_ISLANDS:
+		return out
+	for island: Dictionary in ISLANDS:
+		var c: Vector2 = island["center"]
+		for p: Array in island["parts"]:
+			out.append({"prop": p[0], "pos": c + Vector2(p[1], p[2]), "rot_y": p[3], "collide": true})
+	return out
+
+
+static func _pile_rows() -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	if not Tuning.FEATURE_CITY_PILES:
+		return out
+	for p: Array in PILES:
+		out.append({"prop": p[0], "pos": Vector2(p[1], p[2]), "rot_y": p[3], "collide": false})
 	return out
 
 
@@ -129,7 +180,9 @@ static func rect_of(row: Dictionary) -> Rect2:
 ## Zombi itmesi için çarpışmalı satırların dikdörtgenleri.
 static func collide_rects() -> Array[Rect2]:
 	var out: Array[Rect2] = []
-	for row: Dictionary in ROWS:
+	var all: Array[Dictionary] = ROWS.duplicate()
+	all.append_array(_island_rows())
+	for row: Dictionary in all:
 		if row["collide"]:
 			out.append(rect_of(row))
 	return out

@@ -238,6 +238,8 @@ func _move(delta: float) -> void:
 	var solid: bool = not (Tuning.FEATURE_DASH_PASS_THROUGH and player.is_dashing())
 	var sync_walk: bool = Tuning.FEATURE_WALK_SPEED_SYNC
 	var target_vel: Vector2 = Vector2(player.velocity.x, player.velocity.z)
+	var obstacles: bool = Tuning.FEATURE_OBSTACLE_STEER and Tuning.FEATURE_CITY_GREYBOX
+	var anti_tunnel_sq: float = Tuning.OBSTACLE_ANTI_TUNNEL_STEP * Tuning.OBSTACLE_ANTI_TUNNEL_STEP
 	for i in _pos.size():
 		if _alive[i] == 0 or debug_freeze:
 			continue
@@ -252,14 +254,23 @@ func _move(delta: float) -> void:
 		var speed: float = _speed[i]
 		var special: bool = SpecialAttacks.is_special(_rows[i])
 		var steer: bool = false
+		var move_dir: Vector2 = dir
 		if special and SpecialAttacks.acts_in(state):
-			p = _special.act(i, state, p, dir, delta, target, target_vel)
+			var act_dir: Vector2 = dir
+			if obstacles and (state == ZombieRules.State.SPRINT or state == ZombieRules.State.LUNGE):
+				act_dir = _avoid(i, p, dir)
+			p = _special.act(i, state, p, act_dir, delta, target, target_vel)
 		elif ZombieRules.can_move(state) or (state == ZombieRules.State.RECOVER and ChaseSteer.walks_recovering(_rows[i])):
 			steer = ChaseSteer.active(_rows[i])
-			var vel: Vector2 = (_steer.heading(i, _rows[i], p, target, dir, delta) if steer else dir) * speed
+			move_dir = _steer.heading(i, _rows[i], p, target, dir, delta) if steer else dir
+			if obstacles:
+				move_dir = _avoid(i, p, move_dir)
+			var vel: Vector2 = move_dir * speed
 			if Tuning.FEATURE_SEPARATION:
 				vel += Steering.separation(i, _pos, _grid, _radius[i] * 2.0) * Tuning.ENEMY_SEPARATION_STRENGTH
 			p += vel.limit_length(speed * Tuning.ENEMY_MAX_SPEED_FACTOR) * delta
+		if obstacles and p.distance_squared_to(prev) > anti_tunnel_sq:
+			p = CityLayout.anti_tunnel(prev, p, _radius[i], _blocks)
 		if _knock[i] != Vector2.ZERO:
 			p += _knock[i] * delta
 			_knock[i] = Knockback.decay_to_rest(_knock[i], Tuning.KNOCKBACK_DAMPING, delta, KNOCK_REST_SQ)
@@ -289,13 +300,42 @@ func _move(delta: float) -> void:
 		if sync_walk and (state == ZombieRules.State.CHASE or steer or (state == ZombieRules.State.SPRINT and _rows[i].has("sprint_ref_speed"))):
 			node.ground_speed.emit(p.distance_to(prev) / delta)
 		# Yalnız kovalarken (ya da mesafe koruyan çığlıkçı beklerken) döner; hazırlanırken yönü kilitlidir.
-		var face_dir: Vector2 = _steer.facing(i) if steer else dir
+		var face_dir: Vector2 = _steer.facing(i) if steer else move_dir
 		if face_dir != Vector2.ZERO and (steer or state == ZombieRules.State.CHASE):
 			node.rotation.y = atan2(face_dir.x, face_dir.y)
 		if state != ZombieRules.State.CHASE:
 			continue
 		if Tuning.FEATURE_ZOMBIE_WINDUP_ATTACK:
 			_combat.begin_attack(i, p, target, target_vel, dist, reach, special, delta)
+
+
+## Engele doğru giden yönü kenara kaydırır (FEATURE_OBSTACLE_STEER; çağıran bayrağı denetler).
+func _avoid(i: int, p: Vector2, dir: Vector2) -> Vector2:
+	return CityLayout.steer(p, dir, _radius[i], Tuning.OBSTACLE_STEER_LOOK, Tuning.OBSTACLE_STEER_BLEND, _blocks)
+
+
+## Zombi doğma / iniş noktası bir engelin içine düşmüşse en yakın boş noktaya kaydırır (şehir kapalıyken aynen).
+func free_point(p: Vector2, r: float) -> Vector2:
+	if not Tuning.FEATURE_CITY_GREYBOX:
+		return p
+	return CityLayout.settle(p, r, _blocks, Tuning.OBSTACLE_SETTLE_PASSES)
+
+
+## Debug ölçümü (StuckMeter): dizi uzunluğu, indeks canlı ve kovalıyor mu, sürü hızı ve düğüm.
+func slot_count() -> int:
+	return _pos.size()
+
+
+func debug_chasing(index: int) -> bool:
+	return _alive[index] != 0 and _state[index] == ZombieRules.State.CHASE
+
+
+func debug_speed(index: int) -> float:
+	return _speed[index]
+
+
+func debug_node(index: int) -> Zombie:
+	return _nodes[index]
 
 
 func _enter(index: int, state: ZombieRules.State, duration: float, restart: bool = false) -> void:

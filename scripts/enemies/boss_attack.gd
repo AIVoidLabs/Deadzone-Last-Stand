@@ -114,6 +114,8 @@ func windup_tick(i: int, p: Vector2, target: Vector2) -> void:
 		_m._aim[i] = face
 	var lim: float = _m._half - _m._radius[i]
 	var length: float = minf(float(row["charge_speed"]) * float(row["charge_time"]), BossRules.wall_distance(p, _m._aim[i], lim))
+	if Tuning.FEATURE_OBSTACLE_STEER:
+		length *= maxf(_charge_block(p, p + _m._aim[i] * length, _m._radius[i]).x, 0.0)
 	_m.boss_event.emit(&"charge_marker", {
 		"on": true, "from": Vector3(p.x, 0.0, p.y), "dir": _m._aim[i], "length": length, "half_width": _m._radius[i], "locked": locked,
 	})
@@ -145,12 +147,18 @@ func charge_step(i: int, p: Vector2, delta: float, target: Vector2) -> Vector2:
 	var lim: float = _m._half - _m._radius[i]
 	var reach: Vector2 = p + _m._aim[i] * float(row["charge_speed"]) * delta
 	var np: Vector2 = reach.clamp(Vector2(-lim, -lim), Vector2(lim, lim))
+	var blocked: bool = false
+	if Tuning.FEATURE_OBSTACLE_STEER:
+		var hit: Vector3 = _charge_block(p, np, _m._radius[i])
+		if hit.x < 1.0:
+			np = p.lerp(np, hit.x)
+			blocked = true
 	_charge_hits(i, row, p, np, target)
 	_mind.dust_left -= delta
 	if _mind.dust_left <= 0.0:
 		_mind.dust_left = Tuning.BOSS_CHARGE_DUST_STEP
 		_m.boss_event.emit(&"charge_dust", {"at": Vector3(np.x, 0.1, np.y)})
-	if BossRules.hits_wall(reach, lim):
+	if blocked or BossRules.hits_wall(reach, lim):
 		stuns += 1
 		_m._nodes[i].event.emit(&"stun", {})
 		_m.boss_event.emit(&"stun", {"at": Vector3(np.x, 0.1, np.y)})
@@ -170,6 +178,12 @@ func finish(i: int, state: ZombieRules.State) -> ZombieRules.State:
 		_m._speed[i] = BossRules.rage_speed(_m._speed[i], row)
 	_m._enter(i, S.CHASE, 0.0)
 	return S.CHASE
+
+
+## Hücum adımı a→b bir engele (bina, prop) çarpar mı: Vector3(oran 0..1, -, -); çarpmazsa oran 1.
+func _charge_block(a: Vector2, b: Vector2, radius: float) -> Vector3:
+	var hit: Vector3 = CityLayout.first_hit(a, b, radius, _m._blocks)
+	return Vector3(1.0 if hit.x < 0.0 else hit.x, hit.y, hit.z)
 
 
 func _begin_charge(i: int, row: Dictionary) -> ZombieRules.State:

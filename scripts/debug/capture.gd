@@ -16,6 +16,7 @@ extends Node
 ## --capture-near=M: --capture-spawn zombilerini askerin M metre çevresine dizer (özel saldırıları hızlı görmek için).
 ## --capture-boss=S: S sn sonra boss Yığın'ı hemen doğurur (--capture-near ile o mesafede). Sonda BOSS satırı sayaçları.
 ## --circle: asker (ölümsüz değil) daire çizerek yürür. --zigzag=S: S saniyede bir yön değiştirerek yürür.
+## --capture-stuck: kovalayan zombilerin takılmasını ölçer (StuckMeter); sonda STUCK satırı.
 ## Sonda tür başına atılış istatistiği basılır (LUNGE starts/hits): koşucu kaçış ayarı denetimi; SPIT/THROW satırı yay atışı sayaçları.
 
 var player: Player
@@ -46,6 +47,7 @@ var _circle: bool = false
 var _root_lead: float = -1.0
 var _near: float = 0.0
 var _zigzag: float = 0.0
+var _stuck: StuckMeter
 ## --capture-boss: boss'un doğacağı an (sn; < 0 yok) ve öldüğü an (< 0 henüz yaşıyor).
 var _boss_at: float = -1.0
 var _boss_died_at: float = -1.0
@@ -119,6 +121,9 @@ func _ready() -> void:
 			_boss_at = arg.trim_prefix("--capture-boss=").to_float()
 		elif arg.begins_with("--zigzag="):
 			_zigzag = arg.trim_prefix("--zigzag=").to_float()
+		elif arg == "--capture-stuck":
+			_stuck = StuckMeter.new(enemies, player)
+			add_child(_stuck)
 		elif arg == "--debug-panel":
 			_show_panel = true
 		elif arg == "--capture-pick":
@@ -205,6 +210,8 @@ func _process(delta: float) -> void:
 	if director.run != null:
 		print("RUN wave=%d phase=%s boss_stage=%s phase_left=%.1f kills=%d" % [director.run.index + 1, WaveRun.Phase.keys()[director.run.phase],
 			WaveRun.BossStage.keys()[director.run.boss_stage], director.run.phase_left, enemies.kills])
+	if _stuck != null:
+		print(_stuck.report())
 	print("SPIT shots=%d pools=%d ticks=%d  THROW shots=%d hits=%d melee=%d" % [
 		enemies.spit_shots, enemies.spit_pools, enemies.spit_ticks, enemies.throw_shots, enemies.throw_hits, enemies.throw_melees])
 	# Headless (dummy renderer) görüntü dokusu yoktur; get_image "Parameter t is null" hatası basar.

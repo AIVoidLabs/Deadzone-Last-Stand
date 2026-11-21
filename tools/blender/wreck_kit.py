@@ -14,8 +14,8 @@ from mathutils import Matrix, Vector
 
 # ortak malzeme tanımları (ad -> taban renk, pürüz, metalik)
 MATS = {
-    "wreck_body": ((1, 1, 1), 0.88, 0.0),     # köşe rengi çarpılır
-    "wreck_glass": ((0.012, 0.02, 0.03), 0.12, 0.1),
+    "wreck_body": ((1, 1, 1), 0.92, 0.0),     # köşe rengi çarpılır
+    "wreck_glass": ((0.012, 0.02, 0.03), 0.6, 0.0),
     "wreck_inside": ((0.008, 0.007, 0.007), 1.0, 0.0),
 }
 
@@ -56,6 +56,7 @@ def make_materials() -> dict:
         bsdf.inputs["Base Color"].default_value = (*base, 1.0)
         bsdf.inputs["Roughness"].default_value = rough
         bsdf.inputs["Metallic"].default_value = metal
+        bsdf.inputs["Specular IOR Level"].default_value = 0.0
         if name == "wreck_body":
             vc = nt.nodes.new("ShaderNodeVertexColor")
             vc.layer_name = "Col"

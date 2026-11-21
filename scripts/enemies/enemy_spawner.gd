@@ -17,6 +17,7 @@ func spawn(kind: StringName, at: Vector2) -> void:
 	var z: Zombie = _m._pool.take(kind)
 	z.configure(row)
 	var r: float = row["radius"]
+	at = _m.free_point(at, r)
 	_m._max_radius = maxf(_m._max_radius, r)
 	_m._pos.append(at)
 	_m._hp.append(row["max_hp"])
@@ -48,10 +49,7 @@ func spawn(kind: StringName, at: Vector2) -> void:
 
 ## Doğma noktası bir bloğun içine düşmüşse en yakın sokağa kaydırır (FEATURE_CITY_GREYBOX kapalıyken aynen).
 func pick_spawn_point() -> Vector2:
-	var p: Vector2 = _pick_raw_spawn_point()
-	if Tuning.FEATURE_CITY_GREYBOX:
-		p = CityLayout.push_out(p, Tuning.CITY_SPAWN_STREET_MARGIN, _m._blocks)
-	return p
+	return _m.free_point(_pick_raw_spawn_point(), Tuning.CITY_SPAWN_STREET_MARGIN)
 
 
 ## Ekranın hemen dışında (FEATURE_SPAWN_OFFSCREEN) ya da arena kenarında, askerden uzak bir nokta.

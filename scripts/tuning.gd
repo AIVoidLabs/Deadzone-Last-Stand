@@ -253,12 +253,32 @@ const CITY_BARRICADE_STEP: float = 1.5
 const CITY_BARRICADE_PIECE_SCALE: float = 1.2
 const CITY_BARRICADE_YAW_JITTER: float = 10.0
 const CITY_PAPER_COUNT: int = 24
+## 8.1g: köşe rengini albedo'ya çarpan malzeme düzeltmesi, çöp/moloz yığınları, 8.2 engel adaları (her biri tek sabitle kapanır).
+const FEATURE_CITY_PROP_COLORS: bool = true
+const FEATURE_CITY_PILES: bool = true
+const FEATURE_CITY_ISLANDS: bool = true
+const CITY_PROP_SPECULAR: float = 0.1
+## Adalar: merkezde bu yarıçapta boş alan, adalar arası en az bu geçit (m).
+const CITY_ISLAND_CLEAR_RADIUS: float = 8.0
+const CITY_ISLAND_MIN_GAP: float = 6.0
 ## Sokak genişliği (m): köşe blokları (ARENA_SIZE / 2 - bu / 2) kareler olur. Kol uzunluğu (alan dışı, görsel).
 const CITY_STREET_WIDTH: float = 22.0
 const CITY_STREET_LENGTH: float = 60.0
 const CITY_SIDEWALK_WIDTH: float = 2.5
 ## Doğma noktası bloktan bu kadar (m) uzağa kaydırılır.
 const CITY_SPAWN_STREET_MARGIN: float = 0.6
+## 8.2: zombiler engelin (bina, prop) etrafından dolaşır; hızlı hareketler (atılış, hücum, iniş) ve tükürük/taş engele çarpar.
+## Kapalıyken eski davranış: zombi düz yürür, engele sürtünerek kayar.
+const FEATURE_OBSTACLE_STEER: bool = true
+## Yönelimde ileriye bakış (m) ve teğete karışım dikliği (1 = yalnız en yakında tam teğet).
+const OBSTACLE_STEER_LOOK: float = 2.5
+const OBSTACLE_STEER_BLEND: float = 0.6
+## Bu adımdan (m/kare) büyük hareketlerde engelden baştan başa geçme denetlenir.
+const OBSTACLE_ANTI_TUNNEL_STEP: float = 0.15
+## Tükürük / taş engele çarpınca durma payı (m) ve çarpışma yarıçapı (m); doğma / iniş kaydırma tur sayısı.
+const OBSTACLE_SHOT_MARGIN: float = 0.15
+const OBSTACLE_SHOT_RADIUS: float = 0.1
+const OBSTACLE_SETTLE_PASSES: int = 3
 ## Alan içi dört blok yüksekliği (m; sıra: -x-z, +x-z, -x+z, +x+z). Kamerayı kapatmasın diye alçak.
 const CITY_INNER_BLOCK_HEIGHTS: Array[float] = [9.0, 12.0, 7.0, 10.0]
 ## Kol ağzındaki ve kol ucundaki barikat kalınlığı ve yüksekliği (m).

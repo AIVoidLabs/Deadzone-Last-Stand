@@ -19,7 +19,7 @@ func marker(i: int, dest: Vector2, row: Dictionary, on: bool) -> void:
 
 ## Sıçrama süresi doldu: işaretli yere iner, askerin altındaysa hasar verir.
 func land(i: int, row: Dictionary, target: Vector2) -> void:
-	var dest: Vector2 = _m._aim[i]
+	var dest: Vector2 = _m.free_point(_m._aim[i], float(row["radius"]))
 	_m._pos[i] = dest
 	_m._targetable[i] = 1
 	_m._nodes[i].event.emit(&"marker", {"on": false})

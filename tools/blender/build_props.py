@@ -25,7 +25,7 @@ OUT = ROOT + "/assets/models/world/props/"
 # kind car: scale=(genişlik, uzunluk, yükseklik) çarpanı, wheel=tekerlek ölçeği, dents=çökme sayısı,
 #   flat=inik lastik ('fl','fr','bl','br'), tilt=derece, door_missing='l'|'r'|None, burned=yanmış
 # kind prop: scale=tek çarpan
-COMMON = dict(sat=0.40, val=0.40, rust=1.0)
+COMMON = dict(sat=0.35, val=0.28, rust=1.0)
 PROPS = [
     dict(name="sedan_wreck", kind="car", src=CARS + "sedan.glb", scale=(1.2, 1.76, 1.15), wheel=1.12,
          seed=11, dents=3, flat="fl", tilt=5.0, missing_glass=1, cracked=2, **COMMON),
