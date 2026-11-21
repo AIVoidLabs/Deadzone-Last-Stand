@@ -29,6 +29,13 @@ Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar v
 - İlk parça seti (Blender betiği, low-poly/stilize): yol + kaldırım karosu, 2–3 tuğla cephe (yangın merdiveni, tabela yeri), terk araba, barikat, çöp konteyneri, çöp/kâğıt yığını. Ateş, neon, ışık 8.3'te.
 - **Ruh hali (Taha):** karanlık ve yıkık bir ortam önemli ("zombi baskını olmuş"). Taha gerekirse ücretsiz, açık lisanslı (CC0/CC-BY) model ve doku indirir; Claude ne arayacağını söyler. İndirilen her asset CREDITS.md'ye girer.
 
+## 2026-11-21 — 8.1 görünüm geri bildirimi ve 8.2 engel yoğunluğu (Taha)
+
+- Sahne, karanlık, kamera (60°, FOV 30) ve köşe binaları **onaylandı**.
+- Proplar (trafik lambası, araçlar) oyunda bembeyaz duruyor: modeller karanlık ortama uyacak şekilde koyulaştırılıp elden geçirilecek (ışık 8.3'te ayrıca).
+- Yerlere çöp ve enkaz yığınları eklenecek.
+- **8.2 engel yoğunluğu: (b) orta** — sokak ortasında 3–4 engel adası (devrik araç, konteyner, kum torbası/yığın); zombiler etrafından kayarak dolaşır, yol bulma yok.
+
 ## 2026-11-21 — Kamera: B + dinamik açı (Taha)
 
 - Varsayılan kamera 60° / 24 m. Koşuya göre dinamik açı (yaw 7°, ileri/geri eğim 5°) Taha'nın hoşuna gitti.
@@ -240,7 +247,6 @@ Aşama 1 geri bildirimi (Taha): vuruş hissi yok, hareket cansız, zombiler tehd
 | Karar | Ne zaman |
 |---|---|
 | İçerik hedefi sayıları | 6 ve 11 |
-| Arenada engel yoğunluğu | 8.2 |
 | Müzik | 8.5 |
 | Gamepad, oyun dili | 9.7 |
 | Kalıcı ilerleme kapsamı | 10 |
