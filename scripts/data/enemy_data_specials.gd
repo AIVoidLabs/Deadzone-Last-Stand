@@ -35,9 +35,11 @@ const ROWS: Dictionary = {
 		"armor_back_factor": 1.3,
 		"armor_turn_rate": 1.8,
 		"look_v": {
-			"model": &"armored_v", "tint": Color.WHITE, "walk_ref_speed": 1.6,
+			"model": &"armored_v", "tint": Color.WHITE, "walk_ref_speed": Tuning.ARMORED_WALK_REF_SPEED,
 			"anim_idle": [&"idle"], "anim_walk": [&"walk"], "anim_attack": [&"attack"], "anim_stagger": [&"stagger"],
 			"anim_death": [&"death_a", &"death_b"], "anim_spawn": [&"spawn"],
+			# Vuruş klipte 0.70 sn (= attack_windup); toparlanmada klip sonuna dek oynar.
+			"recover_finishes_attack": true,
 		},
 	},
 	# Çığlıkçı: mesafe korur (scream_keep_min), scream_time sn çığlık atıp scream_count yürüyen çağırır.

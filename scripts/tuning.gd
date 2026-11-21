@@ -47,7 +47,7 @@ const FEATURE_ZOMBIE_BLOAT: bool = true
 ## Taş fırlatan temas + throw_melee_range içindeyken atış yerine dev kolla yakın vuruş (swat) yapar.
 const FEATURE_THROW_MELEE: bool = true
 ## Model bayrakları: Blender GLB'leri hazır olunca açılır (kapalıyken satır yürüyenin modeli + tint ile çizilir).
-const FEATURE_ARMORED_MODEL: bool = false
+const FEATURE_ARMORED_MODEL: bool = true
 const FEATURE_SCREAMER_MODEL: bool = false
 const FEATURE_SPITTER_MODEL: bool = false
 const FEATURE_THROWER_MODEL: bool = true
@@ -280,7 +280,8 @@ const JUMPER_WALK_REF_SPEED: float = 2.4
 const JUMPER_LEAP_BLEND: float = 0.05
 ## Yeni tank walk klibinin anahtarlandığı hız (m/sn, 1.85 m boyda).
 const TANK_WALK_REF_SPEED: float = 1.2
-## Yeni taş fırlatan ve patlayıcı walk klibinin anahtarlandığı hız (m/sn; satırdaki hız x GAME_PACE ile aynı).
+## Yeni zırhlı, taş fırlatan ve patlayıcı walk klibinin anahtarlandığı hız (m/sn; satırdaki hız x GAME_PACE ile aynı).
+const ARMORED_WALK_REF_SPEED: float = 1.6
 const THROWER_WALK_REF_SPEED: float = 1.84
 const BLOATER_WALK_REF_SPEED: float = 1.92
 ## Senkron klip hızı sınırları ve kare başına yumuşatma payı (0-1).
