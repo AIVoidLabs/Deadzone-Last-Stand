@@ -17,3 +17,4 @@
 | Ses efektleri (atış, isabet, zombi ölümü, adım, dash, asker vurulma) | Projede koddan sentezlendi: `tools/sfx/gen_sfx.py` (dış kaynak yok) | Projenin kendisi | `assets/audio/sfx/` |
 | Car Kit 3.1 | https://kenney.nl/assets/car-kit (Kenney) | CC0 1.0 (paketteki License.txt) | Ham dosya `assets/models/source/kenney_car_kit/` (git'e girmez); yıpratılmış türevleri `assets/models/world/props/` |
 | Barikat, kâğıt enkazı, trafik bariyeri, trafik lambası, çöp kutusu (5 GLB) | Taha indirdi (kaynak linki eklenecek) | CC0 (Taha beyanı, 2026-11-21) | Ham dosya `assets/models/source/*.glb` (git'e girmez); yıpratılmış türevleri `assets/models/world/props/` |
+| Particle Pack 1.1 | https://kenney.nl/assets/particle-pack (Kenney) | CC0 1.0 (paketteki License.txt) | Ham dosya `assets/models/source/kenney_particle_pack/` (git'e girmez); seçilen dokular `assets/textures/fx/kenney/` |
