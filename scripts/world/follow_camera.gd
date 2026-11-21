@@ -8,6 +8,7 @@ var target: Node3D
 var velocity_source: Callable
 
 var _offset: Vector3
+var _pitch_deg: float = Tuning.CAMERA_PITCH_DEG
 var _focus: Vector3
 var _look_ahead: Vector3 = Vector3.ZERO
 var _trauma: float = 0.0
@@ -38,8 +39,14 @@ func _process(delta: float) -> void:
 
 ## Kamera uzaklığını değiştirir (açı sabit kalır).
 func set_distance(distance: float) -> void:
-	var pitch: float = deg_to_rad(Tuning.CAMERA_PITCH_DEG)
+	var pitch: float = deg_to_rad(_pitch_deg)
 	_offset = Vector3(0.0, sin(pitch), cos(pitch)) * distance
+
+
+## Kamera eğimini değiştirir (debug karşılaştırma); uzaklığı da yeniden verin.
+func set_pitch(pitch_deg: float, distance: float) -> void:
+	_pitch_deg = pitch_deg
+	set_distance(distance)
 
 
 ## Sarsıntı ekler (0..1). Etki karesiyle büyür, kendiliğinden söner.

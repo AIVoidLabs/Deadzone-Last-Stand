@@ -58,6 +58,14 @@ static func requested() -> bool:
 	return false
 
 
+## Komut satırı kullanıcı argümanından sayı okur; yoksa varsayılan.
+func _arg_float(prefix: String, fallback: float) -> float:
+	for arg: String in OS.get_cmdline_user_args():
+		if arg.begins_with(prefix):
+			return arg.trim_prefix(prefix).to_float()
+	return fallback
+
+
 func _ready() -> void:
 	name = "Capture"
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -74,6 +82,8 @@ func _ready() -> void:
 			_kill_lead = arg.trim_prefix("--capture-kill=").to_float()
 		elif arg.begins_with("--camera-distance=") and camera != null:
 			camera.set_distance(arg.trim_prefix("--camera-distance=").to_float())
+		elif arg.begins_with("--camera-pitch=") and camera != null:
+			camera.set_pitch(arg.trim_prefix("--camera-pitch=").to_float(), _arg_float("--camera-distance=", Tuning.CAMERA_DISTANCE))
 		elif arg == "--autopilot":
 			_autopilot = true
 		elif arg == "--no-weapons":

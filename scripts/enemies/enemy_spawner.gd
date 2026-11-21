@@ -46,8 +46,16 @@ func spawn(kind: StringName, at: Vector2) -> void:
 	_m._special.on_spawned(index, row)
 
 
-## Ekranın hemen dışında (FEATURE_SPAWN_OFFSCREEN) ya da arena kenarında, askerden uzak bir nokta.
+## Doğma noktası bir bloğun içine düşmüşse en yakın sokağa kaydırır (FEATURE_CITY_GREYBOX kapalıyken aynen).
 func pick_spawn_point() -> Vector2:
+	var p: Vector2 = _pick_raw_spawn_point()
+	if Tuning.FEATURE_CITY_GREYBOX:
+		p = CityLayout.push_out(p, Tuning.CITY_SPAWN_STREET_MARGIN, _m._blocks)
+	return p
+
+
+## Ekranın hemen dışında (FEATURE_SPAWN_OFFSCREEN) ya da arena kenarında, askerden uzak bir nokta.
+func _pick_raw_spawn_point() -> Vector2:
 	var half: float = _m._half - Tuning.SPAWN_EDGE_INSET
 	var from: Vector2 = _m.player.position_2d()
 	if not Tuning.FEATURE_SPAWN_OFFSCREEN:

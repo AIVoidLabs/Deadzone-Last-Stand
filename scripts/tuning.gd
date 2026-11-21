@@ -239,6 +239,38 @@ const ARENA_WALL_HEIGHT: float = 1.2
 const ARENA_WALL_THICKNESS: float = 1.0
 const ARENA_GROUND_MARGIN: float = 30.0
 
+# --- Şehir greybox (8.1a; kavşak oyun alanının içinde, köşelerde çarpışmalı bloklar) ---
+const FEATURE_CITY_GREYBOX: bool = true
+## Sokak genişliği (m): köşe blokları (ARENA_SIZE / 2 - bu / 2) kareler olur. Kol uzunluğu (alan dışı, görsel).
+const CITY_STREET_WIDTH: float = 22.0
+const CITY_STREET_LENGTH: float = 60.0
+const CITY_SIDEWALK_WIDTH: float = 2.5
+## Doğma noktası bloktan bu kadar (m) uzağa kaydırılır.
+const CITY_SPAWN_STREET_MARGIN: float = 0.6
+## Alan içi dört blok yüksekliği (m; sıra: -x-z, +x-z, -x+z, +x+z). Kamerayı kapatmasın diye alçak.
+const CITY_INNER_BLOCK_HEIGHTS: Array[float] = [9.0, 12.0, 7.0, 10.0]
+## Kol ağzındaki ve kol ucundaki barikat kalınlığı ve yüksekliği (m).
+const CITY_BARRICADE_DEPTH: float = 1.4
+const CITY_BARRICADE_HEIGHT: float = 2.2
+## Karanlık önizleme: ortam, güneş (ay) ve arka plan.
+const CITY_AMBIENT_COLOR: Color = Color(0.3, 0.34, 0.45)
+const CITY_AMBIENT_ENERGY: float = 0.6
+const CITY_SUN_COLOR: Color = Color(0.45, 0.5, 0.75)
+const CITY_SUN_ENERGY: float = 0.5
+const CITY_BACKGROUND: Color = Color(0.015, 0.018, 0.03)
+## Islak asfalt zemin (koyu gri, parlak).
+const CITY_GROUND_COLOR: Color = Color(0.13, 0.135, 0.15)
+const CITY_GROUND_ROUGHNESS: float = 0.28
+## Omni ışık menzili (m) ve enerjisi: ateş, sokak lambası, neon.
+const CITY_FIRE_RANGE: float = 11.0
+const CITY_FIRE_ENERGY: float = 9.0
+const CITY_LAMP_RANGE: float = 16.0
+const CITY_LAMP_ENERGY: float = 6.0
+## Zayıf (titrek denen) lambanın enerji çarpanı.
+const CITY_LAMP_WEAK_FACTOR: float = 0.45
+const CITY_NEON_RANGE: float = 16.0
+const CITY_NEON_ENERGY: float = 5.0
+
 # --- Genel tempo ---
 ## Oyunun genel hızı (1.0 = eski oyun). Hızlar çarpılır, süreler değil: asker yürüyüşü (PLAYER_SPEED),
 ## zombi hızları (EnemyData.PACED_KEYS), mermi hızları (WeaponData.get_row). Dash ve zamanlayıcılar aynı kalır.

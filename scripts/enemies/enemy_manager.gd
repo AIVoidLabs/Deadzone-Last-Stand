@@ -70,6 +70,8 @@ var debug_freeze: bool = false
 
 var _grid: SpatialGrid
 var _half: float
+## Şehir bloklarının XZ dikdörtgenleri (FEATURE_CITY_GREYBOX); zombiler içine girmez, kenarda kayar.
+var _blocks: Array[Rect2] = CityLayout.block_rects(Tuning.ARENA_SIZE, Tuning.CITY_STREET_WIDTH)
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 var _max_radius: float = 0.0
 
@@ -277,6 +279,8 @@ func _move(delta: float) -> void:
 			dist = reach
 		var lim: float = _half - _radius[i]
 		p = p.clamp(Vector2(-lim, -lim), Vector2(lim, lim))
+		if Tuning.FEATURE_CITY_GREYBOX:
+			p = CityLayout.push_out(p, _radius[i], _blocks)
 		_pos[i] = p
 		var node: Zombie = _nodes[i]
 		node.position = Vector3(p.x, 0.0, p.y)

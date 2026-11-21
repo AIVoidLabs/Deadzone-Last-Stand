@@ -58,9 +58,23 @@ func _build_environment() -> void:
 	_sun.light_energy = _preset["sun_energy"]
 	_sun.directional_shadow_max_distance = SHADOW_MAX_DISTANCE
 	add_child(_sun)
+	if Tuning.FEATURE_CITY_GREYBOX:
+		_apply_city_dark(env)
+		add_child(CityGreybox.new())
+
+
+## Karanlık şehir önizlemesi: ortam ve güneşi kısar (FEATURE_CITY_GREYBOX kapalıyken çalışmaz).
+func _apply_city_dark(env: Environment) -> void:
+	env.background_color = Tuning.CITY_BACKGROUND
+	env.ambient_light_color = Tuning.CITY_AMBIENT_COLOR
+	env.ambient_light_energy = Tuning.CITY_AMBIENT_ENERGY
+	_sun.light_color = Tuning.CITY_SUN_COLOR
+	_sun.light_energy = Tuning.CITY_SUN_ENERGY
 
 
 func _build_ground() -> void:
+	if Tuning.FEATURE_CITY_GREYBOX:
+		return  # zemini CityGreybox kurar (ıslak asfalt)
 	var plane: PlaneMesh = PlaneMesh.new()
 	var extent: float = Tuning.ARENA_SIZE + Tuning.ARENA_GROUND_MARGIN * 2.0
 	plane.size = Vector2(extent, extent)

@@ -22,6 +22,13 @@ Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar v
 - V.5 kapanmadan önce refactor borcu alt ajanlarla temizlenir (davranış değişmez): `tongue_rope.gd`, `special_attacks.gd`, `enemy_manager.gd`.
   Blender betikleri ve veri tabloları (`tuning.gd`, `enemy_data.gd`) bu turda bölünmez.
 
+## 2026-11-21 — Aşama 8.1 başlangıç kararları (Taha)
+
+- Önce kamera denemesi: kutu sokak (greybox) + 2–3 kamera ayarı ekran görüntüsüyle; parça ölçüsü ve ayrıntı seçilen kameraya göre.
+- Arena biçimi: "+" kavşak; sokak uçları barikatla kapalı. Boyut şimdilik 60 m, kamera seçilince yeniden bakılır.
+- İlk parça seti (Blender betiği, low-poly/stilize): yol + kaldırım karosu, 2–3 tuğla cephe (yangın merdiveni, tabela yeri), terk araba, barikat, çöp konteyneri, çöp/kâğıt yığını. Ateş, neon, ışık 8.3'te.
+- **Ruh hali (Taha):** karanlık ve yıkık bir ortam önemli ("zombi baskını olmuş"). Taha gerekirse ücretsiz, açık lisanslı (CC0/CC-BY) model ve doku indirir; Claude ne arayacağını söyler. İndirilen her asset CREDITS.md'ye girer.
+
 ## 2026-11-20 — Hedef görünüm: gece şehir sokağı, daha üstten ve uzaktan kamera (Taha)
 
 - Taha oyunun bitmiş halinin nasıl görünmesini istediğini bir referans görselle gösterdi (başka bir oyunun ekran görüntüsü; repoya girmez, yerel kopya `build/reference/target_look_city_night.webp`).
