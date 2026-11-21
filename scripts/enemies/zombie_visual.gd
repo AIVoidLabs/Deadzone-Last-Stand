@@ -39,6 +39,8 @@ var _skeleton: Skeleton3D
 var _tint: Vector3 = Vector3.ONE
 ## Dil görüntüsü (yalnız dilci): DilciTongue (yeni model) ya da BeamTongue (eski kutu).
 var _tongue: Node
+## Boss Yığın'ın klip ve parıltı yardımcısı (yalnız boss satırında).
+var _boss: ZombieBossLook
 
 
 func _init(model_kind: StringName = &"walker") -> void:
@@ -101,6 +103,9 @@ func _on_event(event_name: StringName, data: Dictionary) -> void:
 				_flash_left = Tuning.HIT_FLASH_TIME
 				_set_param(&"flash", 1.0)
 				set_process(true)
+		_:
+			if _boss != null:
+				_boss.on_event(event_name, data)
 
 
 func _on_state_changed(new_state: int, old_state: int) -> void:
@@ -114,6 +119,8 @@ func _on_state_changed(new_state: int, old_state: int) -> void:
 		_set_param(&"fade", 0.0)
 	if _tongue != null:
 		_tongue.on_state(new_state, old_state)
+	if _boss != null and _boss.on_state(new_state, _body.state_duration):
+		return
 	match new_state:
 		ZombieRules.State.DYING:
 			_clips.reset_sync()
@@ -122,7 +129,7 @@ func _on_state_changed(new_state: int, old_state: int) -> void:
 			set_process(true)
 			var clip: StringName = _clips.pick_clip(&"anim_death")
 			if clip != &"":
-				_clips.animation.speed_scale = Tuning.ZOMBIE_DEATH_ANIM_SPEED
+				_clips.animation.speed_scale = float(_clips.row.get("death_anim_speed", Tuning.ZOMBIE_DEATH_ANIM_SPEED))
 				_clips.animation.play(clip, Tuning.ZOMBIE_ANIM_BLEND)
 				_clips.animation.seek(0.0)
 		ZombieRules.State.SPAWN:
@@ -231,7 +238,7 @@ func _apply_kind(row: Dictionary) -> void:
 	_clips.row = row
 	var height: float = row["height"]
 	if _tongue == null and EnemyData.tongues(row) and SpecialAttacks.is_special(row) and not Benchmark.flag("--bench-no-tongue"):
-		_make_tongue(height)
+		_tongue = ZombieTongues.make(self, _body, _skeleton, _clips.own_clips, height)
 	if _clips.animation == null:
 		var box: MeshInstance3D = _meshes[0]
 		box.mesh = ZombieMaterials.box_mesh(row)
@@ -244,23 +251,13 @@ func _apply_kind(row: Dictionary) -> void:
 	if _held == null and _clips.own_clips and row.has("held_prop") and _skeleton != null:
 		_held = ZombieHeldProp.new()
 		_held.setup(_skeleton, row["held_prop"])
+	if _boss == null and row.get("boss", false):
+		_boss = ZombieBossLook.new(_clips, _set_param)
+	if _boss != null:
+		_boss.configure(row)
 	var size: float = randf_range(1.0 - Tuning.ZOMBIE_SCALE_VARIANCE, 1.0 + Tuning.ZOMBIE_SCALE_VARIANCE)
 	scale = Vector3.ONE * (size * height / _model_height)
 	_clips.size_scale = scale.x
-
-
-## Dil görüntüsü: yeni modelde Head kemiğine bağlı yordamsal dil, yoksa eski kutu.
-func _make_tongue(height: float) -> void:
-	if _clips.own_clips:
-		var rope: DilciTongue = DilciTongue.new()
-		add_child(rope)
-		rope.setup(_body, _skeleton)
-		_tongue = rope
-	else:
-		var beam: BeamTongue = BeamTongue.new()
-		add_child(beam)
-		beam.setup(_body, height)
-		_tongue = beam
 
 
 ## Asit topunun çıkış noktası (dünya); satırda spit_mouth yoksa ya da iskelet yoksa sıfır vektörü.

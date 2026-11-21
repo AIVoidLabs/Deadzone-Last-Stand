@@ -64,6 +64,10 @@ func _ready() -> void:
 	projectiles.explosion.connect(func(_at: Vector3, _radius: float) -> void:
 		camera.add_trauma(Tuning.CAMERA_SHAKE_ON_EXPLOSION))
 	_add_lob_fx(enemies, camera)
+	if Tuning.FEATURE_BOSS:
+		var boss_fx: BossFx = BossFx.new()
+		boss_fx.setup(enemies, camera, pickups)
+		add_child(boss_fx)
 	var wave: ScreamWave = ScreamWave.new()
 	add_child(wave)
 	enemies.scream_emitted.connect(func(at: Vector3, radius: float) -> void:
@@ -135,7 +139,9 @@ func _add_pickups(player: Player, enemies: EnemyManager, director: SpawnDirector
 	pickups.player = player
 	add_child(pickups)
 	enemies.enemy_killed.connect(func(at: Vector3, row: Dictionary) -> void:
-		pickups.drop(at, row.get("drop_value", 0)))
+		# Boss kristal yağmurunu BossFx yağdırır.
+		if not row.get("boss", false):
+			pickups.drop(at, row.get("drop_value", 0)))
 	pickups.collected.connect(func(value: int) -> void:
 		loot.add(value)
 		if Tuning.FEATURE_SFX:

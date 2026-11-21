@@ -15,6 +15,12 @@ func grow(kind: StringName, count: int) -> void:
 		give(_create(kind))
 
 
+## Her tür için başlangıç düğümleri (yürüyen kalite profilinin üst sınırı kadar, öbürleri satırdaki prewarm).
+func prewarm() -> void:
+	for kind: StringName in EnemyData.TABLE:
+		grow(kind, Quality.max_enemies() if kind == EnemyData.WALKER else int(EnemyData.TABLE[kind].get("prewarm", 0)))
+
+
 func take(kind: StringName) -> Zombie:
 	var pool: Array = _idle.get(kind, [])
 	return pool.pop_back() if not pool.is_empty() else _create(kind)

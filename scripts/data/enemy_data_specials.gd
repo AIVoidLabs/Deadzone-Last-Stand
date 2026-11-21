@@ -208,6 +208,8 @@ static func behavior_enabled(id: StringName) -> bool:
 			return Tuning.FEATURE_ZOMBIE_THROW
 		&"bloater":
 			return Tuning.FEATURE_ZOMBIE_BLOAT
+		&"boss_heap":
+			return Tuning.FEATURE_BOSS
 	return true
 
 

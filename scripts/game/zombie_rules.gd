@@ -6,9 +6,11 @@ extends RefCounted
 ## dilcide WINDUP -> LASH (dil uçuyor; eski mekanikte bağ) -> PULL (yakaladı, çekiyor) -> RECOVER.
 ## Koşucunun yeni saldırısında (FEATURE_RUNNER_SPRINT): CHASE -> WINDUP (çığlık) -> SPRINT (süresiz, durmadan koşu)
 ## <-> STRIKE (koşarken pençe) ; asker çok uzaklaşınca SPRINT -> CHASE.
+## Boss (7.4): CHASE -> WINDUP (yer dövme / hücum hazırlığı / çağrı) -> RECOVER; hücumda WINDUP -> CHARGE -> RECOVER
+## (duvara çarparsa STUN -> CHASE); öfkede ROAR -> CHASE.
 ## Bu durumlarda sendeleme olmaz (kararlı saldırı); havadaki zombi hasar da almaz.
 
-enum State { INACTIVE, SPAWN, CHASE, WINDUP, RECOVER, STAGGER, DYING, LUNGE, JUMP, LASH, PULL, SPRINT, STRIKE }
+enum State { INACTIVE, SPAWN, CHASE, WINDUP, RECOVER, STAGGER, DYING, LUNGE, JUMP, LASH, PULL, SPRINT, STRIKE, CHARGE, STUN, ROAR }
 
 
 ## Süreli bir durumun süresi dolunca geçilecek durum. windup_next: hazırlıktan sonra gelen durum
@@ -17,7 +19,7 @@ static func after_timer(state: State, windup_next: State = State.RECOVER) -> Sta
 	match state:
 		State.WINDUP:
 			return windup_next
-		State.LUNGE, State.JUMP, State.LASH, State.PULL:
+		State.LUNGE, State.JUMP, State.LASH, State.PULL, State.CHARGE:
 			return State.RECOVER
 		State.STRIKE:
 			return State.SPRINT

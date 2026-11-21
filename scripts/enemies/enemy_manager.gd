@@ -20,6 +20,8 @@ signal acid_pool_started(at: Vector3, radius: float, time: float)
 signal bloat_exploded(at: Vector3, radius: float)
 ## Çığlıkçı ses dalgası yaydı (fx ve sarsıntı); radius çağrı halkasının yarıçapı.
 signal scream_emitted(at: Vector3, radius: float)
+## Boss olayı (BossFx): slam / charge_marker / charge_start / charge_dust / stun / summon / roar; veri olaya göre (bkz. BossAttack).
+signal boss_event(event_name: StringName, data: Dictionary)
 ## Zırhlıya önden gelen (azaltılmış) isabet; öldürmeyen vuruşlarda enemy_damaged yerine (kan yok: gri kıvılcım, küçük sayı).
 signal enemy_blocked(at: Vector3, direction: Vector2, amount: float)
 
@@ -119,9 +121,7 @@ func _ready() -> void:
 	_compactor = EnemyCompactor.new(self)
 	_spawner = EnemySpawner.new(self)
 	_combat = EnemyCombat.new(self)
-	for kind: StringName in EnemyData.TABLE:
-		var prewarm: int = Quality.max_enemies() if kind == EnemyData.WALKER else int(EnemyData.TABLE[kind].get("prewarm", 0))
-		_pool.grow(kind, prewarm)
+	_pool.prewarm()
 
 
 func _physics_process(delta: float) -> void:
@@ -135,6 +135,11 @@ func _physics_process(delta: float) -> void:
 	_special.tick(delta)
 	if _burning > 0:
 		_burn.tick(delta)
+
+
+## Boss Yığın'ın saldırı durumu ve sayaçları (BossAttack).
+func boss() -> BossAttack:
+	return _special.boss
 
 
 func active_count() -> int:
@@ -229,7 +234,6 @@ func _move(delta: float) -> void:
 	var target: Vector2 = player.position_2d()
 	var hittable: bool = player.is_hittable()
 	var solid: bool = not (Tuning.FEATURE_DASH_PASS_THROUGH and player.is_dashing())
-	var windup_attack: bool = Tuning.FEATURE_ZOMBIE_WINDUP_ATTACK
 	var sync_walk: bool = Tuning.FEATURE_WALK_SPEED_SYNC
 	var target_vel: Vector2 = Vector2(player.velocity.x, player.velocity.z)
 	for i in _pos.size():
@@ -254,11 +258,9 @@ func _move(delta: float) -> void:
 			if Tuning.FEATURE_SEPARATION:
 				vel += Steering.separation(i, _pos, _grid, _radius[i] * 2.0) * Tuning.ENEMY_SEPARATION_STRENGTH
 			p += vel.limit_length(speed * Tuning.ENEMY_MAX_SPEED_FACTOR) * delta
-		var knock: Vector2 = _knock[i]
-		if knock != Vector2.ZERO:
-			p += knock * delta
-			knock = Knockback.decay(knock, Tuning.KNOCKBACK_DAMPING, delta)
-			_knock[i] = knock if knock.length_squared() > KNOCK_REST_SQ else Vector2.ZERO
+		if _knock[i] != Vector2.ZERO:
+			p += _knock[i] * delta
+			_knock[i] = Knockback.decay_to_rest(_knock[i], Tuning.KNOCKBACK_DAMPING, delta, KNOCK_REST_SQ)
 		# Askerle temas: içine girmez.
 		var reach: float = Tuning.PLAYER_RADIUS + _radius[i]
 		var away: Vector2 = p - target
@@ -268,7 +270,7 @@ func _move(delta: float) -> void:
 			hittable = player.is_hittable()
 		# Havadaki zıplayan üstünden, pençeden sonra koşucu içinden geçer; itişme yok.
 		if solid and dist < reach and _special.is_solid(i, state):
-			if hittable and not windup_attack:
+			if hittable and not Tuning.FEATURE_ZOMBIE_WINDUP_ATTACK:
 				player.take_hit(_damage[i], -away)
 				hittable = player.is_hittable()
 			p = target + (away / dist if dist > 0.0001 else -dir) * reach
@@ -279,9 +281,7 @@ func _move(delta: float) -> void:
 		var node: Zombie = _nodes[i]
 		node.position = Vector3(p.x, 0.0, p.y)
 		if special and SpecialAttacks.faces_in(state):
-			var face: Vector2 = _special.facing(i, p)
-			if face != Vector2.ZERO:
-				node.rotation.y = atan2(face.x, face.y)
+			_special.face_node(i, p, node)
 		if sync_walk and (state == ZombieRules.State.CHASE or steer or (state == ZombieRules.State.SPRINT and _rows[i].has("sprint_ref_speed"))):
 			node.ground_speed.emit(p.distance_to(prev) / delta)
 		# Yalnız kovalarken (ya da mesafe koruyan çığlıkçı beklerken) döner; hazırlanırken yönü kilitlidir.
@@ -290,13 +290,8 @@ func _move(delta: float) -> void:
 			node.rotation.y = atan2(face_dir.x, face_dir.y)
 		if state != ZombieRules.State.CHASE:
 			continue
-		if windup_attack and ZombieRules.wants_attack(dist, reach, SpecialAttacks.start_range(_rows[i])):
-			var windup: float = _rows[i]["attack_windup"]
-			if special:
-				windup = _special.windup_time(i, dist, reach)
-			_enter(i, ZombieRules.State.WINDUP, windup)
-			if special:
-				_special.begin_windup(i, p, target, target_vel)
+		if Tuning.FEATURE_ZOMBIE_WINDUP_ATTACK:
+			_combat.begin_attack(i, p, target, target_vel, dist, reach, special, delta)
 
 
 func _enter(index: int, state: ZombieRules.State, duration: float, restart: bool = false) -> void:

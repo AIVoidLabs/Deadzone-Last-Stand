@@ -43,6 +43,7 @@ func spawn(kind: StringName, at: Vector2) -> void:
 		_m._enter(index, ZombieRules.State.SPAWN, row["spawn_time"])
 	else:
 		_m._enter(index, ZombieRules.State.CHASE, 0.0)
+	_m._special.on_spawned(index, row)
 
 
 ## Ekranın hemen dışında (FEATURE_SPAWN_OFFSCREEN) ya da arena kenarında, askerden uzak bir nokta.

@@ -23,8 +23,9 @@ func _process(_delta: float) -> void:
 
 
 ## Vuruş duraksaması: oyun kısa süre yavaşlar (gerçek zamanla ölçülür). Engine.time_scale'e yalnız burası dokunur.
-func hit_stop(duration: float) -> void:
-	if not Tuning.FEATURE_HIT_STOP or state != State.PLAYING:
+## force: FEATURE_HIT_STOP kapalıyken de uygular (boss ölümü, FEATURE_BOSS_HITSTOP).
+func hit_stop(duration: float, force: bool = false) -> void:
+	if not (Tuning.FEATURE_HIT_STOP or force) or state != State.PLAYING:
 		return
 	if _hit_stop.request(_now(), duration):
 		Engine.time_scale = Tuning.HIT_STOP_TIME_SCALE

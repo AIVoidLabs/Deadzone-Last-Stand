@@ -12,6 +12,7 @@ extends Node
 ## --capture-kind=<tür id> (runner, tank, spitter, thrower ...): --capture-spawn ile bu türden doğurur (varsayılan walker).
 ## --capture-root=S: görüntüden S saniye önce askeri 1 sn bağlar (S<1: çırpınma, S 1.1–1.4: kurtulma karesi).
 ## --capture-near=M: --capture-spawn zombilerini askerin M metre çevresine dizer (özel saldırıları hızlı görmek için).
+## --capture-boss=S: S sn sonra boss Yığın'ı hemen doğurur (--capture-near ile o mesafede). Sonda BOSS satırı sayaçları.
 ## --circle: asker (ölümsüz değil) daire çizerek yürür. --zigzag=S: S saniyede bir yön değiştirerek yürür.
 ## Sonda tür başına atılış istatistiği basılır (LUNGE starts/hits): koşucu kaçış ayarı denetimi; SPIT/THROW satırı yay atışı sayaçları.
 
@@ -43,6 +44,9 @@ var _circle: bool = false
 var _root_lead: float = -1.0
 var _near: float = 0.0
 var _zigzag: float = 0.0
+## --capture-boss: boss'un doğacağı an (sn; < 0 yok) ve öldüğü an (< 0 henüz yaşıyor).
+var _boss_at: float = -1.0
+var _boss_died_at: float = -1.0
 ## --capture-focus: kamera ilk canlı zombiyi izler (yakın görüntü).
 var _focus: Node3D
 
@@ -93,6 +97,8 @@ func _ready() -> void:
 			camera.target = _focus
 		elif arg == "--circle":
 			_circle = true
+		elif arg.begins_with("--capture-boss="):
+			_boss_at = arg.trim_prefix("--capture-boss=").to_float()
 		elif arg.begins_with("--zigzag="):
 			_zigzag = arg.trim_prefix("--zigzag=").to_float()
 		elif arg == "--debug-panel":
@@ -125,6 +131,9 @@ func _ready() -> void:
 		enemies.spawn_many(_spawn, _kind)
 	if _show_panel and debug_panel != null:
 		debug_panel.set_panel_visible(true)
+	enemies.enemy_killed.connect(func(_at: Vector3, row: Dictionary) -> void:
+		if row.get("boss", false):
+			_boss_died_at = _time)
 
 
 func _process(delta: float) -> void:
@@ -157,6 +166,9 @@ func _process(delta: float) -> void:
 	if _wave_end_lead >= 0.0 and _time >= _seconds - _wave_end_lead:
 		_wave_end_lead = -1.0
 		director.end_wave()
+	if _boss_at >= 0.0 and _time >= _boss_at:
+		_boss_at = -1.0
+		_spawn_boss()
 	if _auto_pick:
 		_tick_auto_pick(delta)
 	if _time < _seconds:
@@ -167,6 +179,11 @@ func _process(delta: float) -> void:
 	print("ARMOR front=%d back=%d" % [enemies.armor_front, enemies.armor_back])
 	print("BLOAT primed=%d exploded=%d chain=%d player_hits=%d" % [enemies.bloat_primed, enemies.bloat_exploded_count, enemies.bloat_chains, enemies.bloat_player_hits])
 	print("SCREAM screams=%d summoned=%d" % [enemies.screams, enemies.summoned])
+	var boss: BossAttack = enemies.boss()
+	var status: Dictionary = boss.status()
+	print("BOSS slams=%d ring_hits=%d center_hits=%d charges=%d charge_hits=%d stuns=%d summons=%d rage=%d alive=%s hp=%d died_at=%.1f" % [
+		boss.slams, boss.ring_hits, boss.center_hits, boss.charges, boss.charge_hits, boss.stuns, boss.summons, boss.rage_count,
+		status["alive"], int(status.get("hp", 0.0)), _boss_died_at])
 	print("SPIT shots=%d pools=%d ticks=%d  THROW shots=%d hits=%d melee=%d" % [
 		enemies.spit_shots, enemies.spit_pools, enemies.spit_ticks, enemies.throw_shots, enemies.throw_hits, enemies.throw_melees])
 	# Headless (dummy renderer) görüntü dokusu yoktur; get_image "Parameter t is null" hatası basar.
@@ -177,6 +194,13 @@ func _process(delta: float) -> void:
 		image.save_png(path)
 		print("CAPTURE ", _out)
 	get_tree().quit()
+
+
+func _spawn_boss() -> void:
+	var at: Vector2 = enemies.pick_spawn_point()
+	if _near > 0.0:
+		at = player.position_2d() + Vector2.from_angle(0.4) * _near
+	enemies.spawn(EnemyData.BOSS_HEAP, at)
 
 
 ## Oyun menü için durunca (kart ekranı) kısa aralıklarla 1 tuşuna basar.

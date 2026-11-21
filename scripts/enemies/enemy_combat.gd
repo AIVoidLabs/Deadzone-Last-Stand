@@ -38,6 +38,19 @@ func damage(index: int, amount: float, direction: Vector2, knockback: float, dot
 		_m._enter(index, ZombieRules.State.STAGGER, row["stagger_time"], true)
 
 
+## CHASE'deki zombi saldırıyı başlatır mı: menzile girdiyse hazırlığa (WINDUP) geçer. Boss'ta saldırıyı BossAttack seçer.
+func begin_attack(i: int, p: Vector2, target: Vector2, target_vel: Vector2, dist: float, reach: float, special: bool, delta: float) -> void:
+	var row: Dictionary = _m._rows[i]
+	if special and row["attack_kind"] == &"boss":
+		_m._special.boss.try_start(i, p, target, dist, delta)
+		return
+	if not ZombieRules.wants_attack(dist, reach, SpecialAttacks.start_range(row)):
+		return
+	_m._enter(i, ZombieRules.State.WINDUP, _m._special.windup_time(i, dist, reach) if special else float(row["attack_windup"]))
+	if special:
+		_m._special.begin_windup(i, p, target, target_vel)
+
+
 ## Zırhlıya gelen vuruş: çarpanı _armor_factor'a yazar, önden mi döner; sayaçlar.
 func _armor(index: int, row: Dictionary, direction: Vector2) -> bool:
 	var half: float = deg_to_rad(float(row["armor_front_half_deg"]))
@@ -93,7 +106,7 @@ func kill(index: int, push: Vector2 = Vector2.ZERO, credit: bool = true, corpse:
 	# Ölüm klipleri arkaya düşer: yüzü vuruşun geldiği yöne çevir, sırtüstü vuruş yönüne düşsün.
 	if push != Vector2.ZERO:
 		node.rotation.y = atan2(-push.x, -push.y)
-	var duration: float = Tuning.ZOMBIE_CORPSE_TIME + Tuning.ZOMBIE_FADE_TIME
+	var duration: float = float(_m._rows[index].get("death_duration", Tuning.ZOMBIE_CORPSE_TIME + Tuning.ZOMBIE_FADE_TIME))
 	node.enter_state(ZombieRules.State.DYING, duration)
 	_m._corpses.add(node, push if Tuning.FEATURE_KNOCKBACK else Vector2.ZERO, duration)
 

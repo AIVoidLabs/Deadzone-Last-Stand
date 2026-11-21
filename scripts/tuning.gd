@@ -73,6 +73,36 @@ const BLOAT_BLINK_START_HZ: float = 3.0
 const BLOAT_BLINK_END_HZ: float = 14.0
 const ACID_FADE_TIME: float = 1.0
 const ACID_VIGNETTE_FLASH: float = 0.3
+## 7.4 boss "Yığın" (build/briefs/s74_boss.md; sayılar EnemyDataBoss satırında). Kapalıyken 5. dalga eskisi gibi, boss doğmaz.
+const FEATURE_BOSS: bool = true
+## Boss Blender modeli (assets/models/characters/boss_heap.glb) ZombieModelData'ya eklenince açılır; kapalıyken büyütülmüş tank modeli + kızıl tint.
+const FEATURE_BOSS_MODEL: bool = false
+## Boss ölümünde kısa vuruş duraksaması (FEATURE_HIT_STOP kapalı olsa da yalnız burada).
+const FEATURE_BOSS_HITSTOP: bool = true
+const BOSS_HITSTOP_TIME: float = 0.18
+## Boss uyarısı (yazı + kırmızı kenar nabzı) süresi (sn); boss uyarının bitiminde doğar.
+const BOSS_WARNING_TIME: float = 2.0
+## Boss walk klibinin anahtarlandığı hız (m/sn; satırdaki hız x GAME_PACE ile aynı).
+const BOSS_WALK_REF_SPEED: float = 1.28
+## Boss ölümünde kristal yağmuru: drop_value bu kadar parçaya bölünür.
+const BOSS_CRYSTAL_PIECES: int = 15
+## Kristal yağmurunun saçılma çarpanı (PICKUP_HOP_DISTANCE katı).
+const BOSS_RAIN_SPREAD: float = 4.0
+## Hücumun askere ve zombilere verdiği itme hızı (m/sn; asker itilmesi FEATURE_PLAYER_KNOCKBACK ile kapalıysa yalnız hasar).
+const BOSS_CHARGE_PLAYER_KNOCK: float = 10.0
+const BOSS_CHARGE_ZOMBIE_KNOCK: float = 12.0
+## Boss kamera sarsıntıları: yer dövme, hücum başlangıcı, duvara çarpma, kükreme, ölüm.
+const CAMERA_SHAKE_ON_BOSS_SLAM: float = 0.55
+const CAMERA_SHAKE_ON_BOSS_CHARGE: float = 0.25
+const CAMERA_SHAKE_ON_BOSS_STUN: float = 0.45
+const CAMERA_SHAKE_ON_BOSS_ROAR: float = 0.7
+const CAMERA_SHAKE_ON_BOSS_DEATH: float = 0.8
+## Şok halkası havuzu (en çok aynı anda), halkanın izinin (çatlak) kalma süresi (sn); hücum şeridi havuzu.
+const BOSS_RING_POOL: int = 6
+const BOSS_RING_SCAR_TIME: float = 1.6
+const BOSS_STRIP_POOL: int = 2
+## Hücumda toz izi aralığı (sn).
+const BOSS_CHARGE_DUST_STEP: float = 0.12
 ## Zıplayanın iniş işareti yaklaşan cismin gölgesi gibi çizilir; kapalıyken eski kırmızı halka.
 const FEATURE_JUMP_SHADOW_MARKER: bool = true
 ## Gölge: en koyu opaklık, yumuşaklık (yarıçap oranı; hazırlık başı / iniş anı), kenar çizgisi kalınlığı ve gücü,

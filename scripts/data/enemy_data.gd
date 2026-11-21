@@ -16,6 +16,7 @@ const SCREAMER: StringName = &"screamer"
 const SPITTER: StringName = &"spitter"
 const THROWER: StringName = &"thrower"
 const BLOATER: StringName = &"bloater"
+const BOSS_HEAP: StringName = EnemyDataBoss.ID
 
 const _WALKER_ROW: Dictionary = {
 	"id": &"walker",
@@ -293,7 +294,7 @@ const _OVERRIDES: Dictionary = {
 }
 
 ## Genel tempoyla (Tuning.GAME_PACE) çarpılan hız alanları (m/sn). Referans hızlar (walk_ref_speed) çarpılmaz.
-const PACED_KEYS: Array[String] = ["speed", "lunge_speed", "sprint_speed", "tongue_speed", "tongue_pull_speed"]
+const PACED_KEYS: Array[String] = ["speed", "lunge_speed", "sprint_speed", "tongue_speed", "tongue_pull_speed", "charge_speed"]
 
 static var TABLE: Dictionary = _build()
 
@@ -304,6 +305,7 @@ static func _build() -> Dictionary:
 		walker.merge(_WALKER_LOOK_V, true)
 	var table: Dictionary = {&"walker": _paced(walker.duplicate())}
 	_add_specials(table, walker)
+	table[EnemyDataBoss.ID] = _paced(EnemyDataBoss.build(walker))
 	for id: StringName in _OVERRIDES:
 		var row: Dictionary = _WALKER_ROW.duplicate()
 		row.merge(_OVERRIDES[id], true)

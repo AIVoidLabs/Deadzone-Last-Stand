@@ -15,6 +15,12 @@ static func decay(velocity: Vector2, damping: float, delta: float) -> Vector2:
 	return velocity * exp(-damping * delta)
 
 
+## decay + eşiğin (hızın karesi) altına inen itmeyi sıfırlar.
+static func decay_to_rest(velocity: Vector2, damping: float, delta: float, rest_sq: float) -> Vector2:
+	var next: Vector2 = decay(velocity, damping, delta)
+	return next if next.length_squared() > rest_sq else Vector2.ZERO
+
+
 ## İtmenin sonunda kat edilen toplam yol (m).
 static func travel_distance(force: float, weight: float, damping: float) -> float:
 	return force / maxf(weight, 0.01) / damping

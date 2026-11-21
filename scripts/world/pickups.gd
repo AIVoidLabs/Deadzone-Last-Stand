@@ -47,8 +47,15 @@ func count() -> int:
 	return _pos.size()
 
 
-## at: zombinin yerdeki konumu. Kristal biraz öteye seker.
-func drop(at: Vector3, value: int) -> void:
+## Boss ölümü: toplam değer pieces parçaya bölünüp geniş bir alana yağar (kalan ilk parçaya eklenir).
+func rain(at: Vector3, total: int, pieces: int) -> void:
+	var each: int = total / maxi(pieces, 1)
+	for k in pieces:
+		drop(at, each + (total - each * pieces if k == 0 else 0), Tuning.BOSS_RAIN_SPREAD)
+
+
+## at: zombinin yerdeki konumu. Kristal biraz öteye seker (spread: seğirme mesafesi çarpanı).
+func drop(at: Vector3, value: int, spread: float = 1.0) -> void:
 	if value <= 0:
 		return
 	var origin: Vector2 = Vector2(at.x, at.z)
@@ -58,7 +65,7 @@ func drop(at: Vector3, value: int) -> void:
 		_value[index] += value
 		_write(index, 0.0)
 		return
-	var offset: Vector2 = Vector2.from_angle(randf() * TAU) * randf() * Tuning.PICKUP_HOP_DISTANCE
+	var offset: Vector2 = Vector2.from_angle(randf() * TAU) * randf() * Tuning.PICKUP_HOP_DISTANCE * spread
 	_pos.append(origin + offset)
 	_from.append(origin)
 	_value.append(value)

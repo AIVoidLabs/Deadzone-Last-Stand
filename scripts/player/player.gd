@@ -127,6 +127,12 @@ func take_hit(amount: float, push: Vector2 = Vector2.ZERO) -> void:
 	_die_if_dead()
 
 
+## Boss hücumu gibi sert itme: planar hız (m/sn) askere verilir (FEATURE_PLAYER_KNOCKBACK kapalıysa yok sayılır).
+func shove(planar_velocity: Vector2) -> void:
+	if Tuning.FEATURE_PLAYER_KNOCKBACK and not _rooted:
+		_knock = planar_velocity
+
+
 ## Sürekli hasar (asit havuzu): zırh azaltması uygulanır; dokunulmazlık vermez, itme ve vurulma animasyonu yok
 ## (`dot` olayı: yalnız hafif ekran kızarması). Dash ve dokunulmazlıkta hasar yok.
 func take_dot(amount: float) -> void:

@@ -12,6 +12,11 @@ const KIND_KEYS: Dictionary = {
 	&"throw": ["throw_range", "throw_lock", "throw_lead", "throw_flight", "throw_arc", "throw_radius", "throw_melee_range",
 		"throw_melee_windup", "throw_melee_hit_range", "throw_melee_recover"],
 	&"scream": ["scream_range", "scream_keep_min", "scream_time", "scream_radius", "scream_count", "scream_max_alive", "scream_cooldown"],
+	&"boss": ["boss_pause", "attack_weights", "slam_range", "slam_windup", "slam_recover", "slam_ring_speed", "slam_ring_max", "slam_ring_width", "slam_damage",
+		"slam_center_radius", "slam_center_damage", "slam_ring_gap", "charge_min", "charge_max", "charge_windup", "charge_lock_time", "charge_speed",
+		"charge_time", "charge_damage", "charge_zombie_damage", "charge_recover", "charge_stun_time", "summon_cooldown", "summon_first_delay",
+		"summon_windup", "summon_recover", "summon_count", "summon_kind", "summon_ring_gap", "rage_threshold", "rage_roar", "roar_radius",
+		"rage_speed_factor", "rage_windup_factor"],
 	&"bloat": ["bloat_prime_range", "bloat_prime_time", "bloat_radius", "bloat_player_damage", "bloat_edge_factor", "bloat_zombie_damage", "bloat_death_fuse"],
 }
 

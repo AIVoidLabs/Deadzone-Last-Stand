@@ -58,6 +58,17 @@ func act(i: int, state: ZombieRules.State, p: Vector2, dir: Vector2, delta: floa
 	return p + _m._aim[i] * speed * delta
 
 
+## Atılan (eski mekanik: LUNGE) koşucu askere değdi mi. Dönüş: yeni durum.
+func lunge_contact(i: int, state: ZombieRules.State, p: Vector2, dist: float, reach: float, target: Vector2) -> ZombieRules.State:
+	var row: Dictionary = _m._rows[i]
+	if not _m.player.is_exposed() or not ZombieRules.strike_hits(dist, reach, row["lunge_hit_range"]):
+		return state
+	_m.lunge_hits += 1
+	_m.player.take_hit(_m._damage[i], target - p)
+	_m._enter(i, S.RECOVER, row["attack_recover"])
+	return S.RECOVER
+
+
 ## Askerle temas çözümü uygulanır mı: pençeden sonra geçip giden koşucu askerin içinden geçer.
 func is_solid(i: int, state: ZombieRules.State) -> bool:
 	return state != S.STRIKE or not SprintRules.is_passing(_m._timer[i], float(_m._rows[i]["strike_recover"]))
