@@ -3,7 +3,7 @@ extends RefCounted
 ## 7.4 boss "Yığın" satırı (tek kaynak: build/briefs/s74_boss.md). EnemyData._build() bunu yürüyen satırının üstüne yazar.
 ## Hızlar "tempo öncesi"dir (EnemyData GAME_PACE ile çarpar; charge_speed PACED_KEYS'te). Blender modeli yokken
 ## (FEATURE_BOSS_MODEL kapalı) büyütülmüş tank modeli + kızıl tint; model hazır olunca `look_v` üste yazılır
-## (ZombieModelData.VC_MODELS[boss_heap_v] eklenmeli) ve klipler modelin kendi klipleridir.
+## (ZombieModelData.VC_MODELS[boss_heap_v]) ve klipler modelin kendi klipleridir.
 ## Saldırı düzeni: BossRules + BossAttack. Hazırlık süreleri WINDUP, bekleme RECOVER, hücum CHARGE, duvar sersemi STUN, öfke kükremesi ROAR.
 
 const ID: StringName = &"boss_heap"

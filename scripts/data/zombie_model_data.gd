@@ -53,4 +53,5 @@ const VC_MODELS: Dictionary = {
 		preload("res://assets/models/characters/zombie_tank_heavy.glb"),
 		preload("res://assets/models/characters/zombie_tank_bare.glb"),
 	],
+	&"boss_heap_v": preload("res://assets/models/characters/boss_heap.glb"),
 }

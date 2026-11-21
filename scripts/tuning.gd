@@ -76,7 +76,7 @@ const ACID_VIGNETTE_FLASH: float = 0.3
 ## 7.4 boss "Yığın" (build/briefs/s74_boss.md; sayılar EnemyDataBoss satırında). Kapalıyken 5. dalga eskisi gibi, boss doğmaz.
 const FEATURE_BOSS: bool = true
 ## Boss Blender modeli (assets/models/characters/boss_heap.glb) ZombieModelData'ya eklenince açılır; kapalıyken büyütülmüş tank modeli + kızıl tint.
-const FEATURE_BOSS_MODEL: bool = false
+const FEATURE_BOSS_MODEL: bool = true
 ## Boss ölümünde kısa vuruş duraksaması (FEATURE_HIT_STOP kapalı olsa da yalnız burada).
 const FEATURE_BOSS_HITSTOP: bool = true
 const BOSS_HITSTOP_TIME: float = 0.18
