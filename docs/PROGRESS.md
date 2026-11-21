@@ -5,6 +5,12 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 
 ## Şu an
 
+**Oturum 12 (2026-11-21): Aşama 7 bitti, Taha'nın arenada denemesi ve "devam" demesi bekleniyor.** Taha "alt ajanlarla komple bitir" dedi; tasarımı Claude verdi (DECISIONS 2026-11-20 7.3, spec `build/briefs/s73_design.md`, `s74_boss.md`). Sıradaki ana aşama 8 (arena, atmosfer, ses — hedef görünüm: gece şehir sokağı).
+- **Dene:** `godot --path . -- --arena=armored|screamer|spitter|thrower|bloater|boss_heap` (arena: 1–0 tür, B boss, R doğur, G silah); normal oyunda `--wave=5` boss dalgası.
+- **Ayar soruları (Taha'nın elinde):** zırhlıya daire çizerek dolaşmak zor (yavaş dönüş 1.8 rad/sn ama ölçümde arka isabet az; zigzag işe yarıyor) → `armor_turn_rate` düşürülebilir; çığlıkçının çağrısı WINDUP sonunda (çığlık tepesi 0.55 sn'de değil); boss saldırı ağırlıkları slam 3 / charge 3 / summon 4.
+- **Görsel açıklar:** boss oyun ışığında soluk pembe, göğüs yarığı uzaktan seçilmiyor (Aşama 8 ışığıyla birlikte); zırhlıda ağız fazla açık; tükürücüde kese + karın "iki top"; taş fırlatanın dev kolu yakından "sosis"; çığlıkçının kolları çığlıkta T-poza yakın; ölüm kliplerinde 2–13 cm gömülmeler (boss en çok).
+- **Bilinen:** bot hâlâ 4. dalgada kaybediyor (5. dalga/boss botla denenmedi; denge 11. aşamada); dilci 100'de pahalı; sesler (boss uyarısı, kükreme, tükürme) yok — sesler ayrı oturumda.
+
 **Oturum 11 sonu (2026-11-20): Aşama V bitti, Taha'nın "devam" demesi bekleniyor.** Sıradaki: Aşama 7 kaldığı yerden (7.3 özel türler: kalan zırhlı, çığlıkçı, tükürücü, taş fırlatan, patlayıcı; DECISIONS K7). Önce 7.3 için kararlar sorulur (hangi türler, sıra, imzalar; yeni hatla: konsept → model → klipler → Taha onayı → oyun), kod yazılmaz.
 - Oturum 11'de yapılanlar: sürüklenme takılması (`bb823c3`), tank 2.3 m (`177964b`), dilci hızlandı + `FEATURE_TONGUE_MELEE` (`402a47f`, `2918639`), refactor (`4b88fbc` TongueMeshUpdater, `278e226` TongueAttack + EnemyCombat, `9c4bc1d` compactor `_melee` taşıma + 2 test). 212 test. Hepsi alt ajanlarla (Sonnet uygulayıcı + ayrı Sonnet gözden geçirici), ana döngü doğruladı.
 - Kalan küçük açıklar: tank sırt plakaları üstten tek tepelik gibi; zıplayanın şortu havada yelken gibi; ölüm pozlarında 2–4 cm gömülme; koşucuya karşı daire çizmek ayakta durmaktan kötü; bot 0 galibiyet (7.3'ten beri, 11. aşamada denge); kapanışta ara sıra "2 ObjectDB instances leaked"; Blender betikleri ve `tuning.gd`/`enemy_data.gd` 300 satırı aşıyor (bilerek bölünmedi).
@@ -132,7 +138,7 @@ Oturum 7 (2026-11-18). Aşama 7.1 onaylı. **7.2 kod bitti, Taha'nın oynayıp y
 | 4 | Dikey dilim: zombi | ✔ bitti (2026-11-16) |
 | 5 | Dikey dilim: silah ve vuruş hissi | ✔ bitti (2026-11-17, dikey dilim onaylandı) |
 | 6 | Tur döngüsü | ✔ kod bitti 2026-11-18 (Taha'nın oynayıp onayı bekleniyor: 6.4–6.6) |
-| 7 | Silah ve zombi çeşitliliği | 7.1 ✔, 7.2–7.3 kod var, dondu (V bitince devam) |
+| 7 | Silah ve zombi çeşitliliği | ✔ bitti (2026-11-21, Taha'nın arenada denemesi bekleniyor) |
 | V | Görsel yeniden yön | ✔ bitti (2026-11-20) |
 | 8 | Arena, atmosfer, ses | — |
 | 9 | Arayüz ve akış | — |
@@ -185,9 +191,9 @@ Bitiş ölçütleri `ROADMAP.md`'de. Biten kutunun yanına tarih ve commit yazı
 ### 7 — Silah ve zombi çeşitliliği
 - [x] 7.1 Silah davranış seti — yakın dövüş (bıçak, katana, ışın kılıcı, ateşli kılıç + yanma) 2026-11-18, Taha onayladı. Commit'ler `51062b0`, `962f58a`, `a97f11b`; SMG, plazma, graviton, bomba atar da eklendi
 - [x] 7.2 Koşucu ve tank — kod bitti 2026-11-18, Taha'nın oynayıp yorumu bekliyor (ayrıntı "Şu an"). Zıplayan ve dilci kodlandı (7.3), sürünen sırada
-- [ ] 7.3 Tüküren ve patlayan
-- [ ] 7.4 Boss
-- [ ] 7.5 Yeniden ölçüm
+- [x] 7.3 Özel türler — 2026-11-21: zırhlı, çığlıkçı, tükürücü, taş fırlatan, patlayıcı (mekanik `3b43f6a`, `3007806`, `e585a6e`, `4e01975`, `3535f57`; modeller `822500a`, `b9b18d9`, `ff0d289`, `8d8012e`, `faa7104`; entegrasyon `0da196e`, `a0fb6fb`, `752bd44`, `e46e146`; gözden geçirme `a3956ac`, `0cf3726`, `31a55c1`). Taha'nın arenada denemesi bekleniyor
+- [x] 7.4 Boss "Yığın" — 2026-11-21 (`7b99e3d` saldırı düzeni + öfke, `534b579` boss dalgası + uyarı + can çubuğu, `ac9b9a1` model + klipler, `08c349e` oyuna bağlandı). Taha'nın denemesi bekleniyor
+- [x] 7.5 Yeniden ölçüm — 2026-11-21 (Ölçümler tablosu; profil sınırları değişmedi)
 
 ### V — Görsel yeniden yön
 - [x] V.1 Kurtulma hatası düzeltmesi — 2026-11-19 (`79ca05a`; `break_free` tek sefer, `ZombieClipData`/`PlayerClipData` satırında `loop` alanı, 3 yeni test; oyunda kurtulma sonrası koşu görüntüyle doğrulandı)
@@ -241,6 +247,8 @@ Bitiş ölçütleri `ROADMAP.md`'de. Biten kutunun yanına tarih ve commit yazı
 
 | Ölçüm | Sonuç | Ortam | Tarih |
 |---|---|---|---|
+| **7.5 tür başına 100 zombi** (yeni modeller, high, vsync kapalı, makine sakin) | yürüyen 3.37, zırhlı 3.66, tükürücü 3.43, taş fırlatan 3.71, koşucu 3.52, tank 3.94, zıplayan 4.12 ms/kare; çığlıkçı 12.2 ms (çağrılarla 350 aktif); **dilci 18.9 ms** (dil ağı; dalgalarda az); patlayıcı zincirde tek kare 36 ms sıçrama | RTX 3050 Ti Laptop | 2026-11-21 |
+| 7.5 yürüyen 300 | 10.17 ms (98 FPS) → profil sınırları low 150 / medium 250 / high 350 yeterli, değişmedi | aynı | 2026-11-21 |
 | 60 FPS'te en çok zombi (kutu zombi, high profil, gölge + 4x MSAA, vsync kapalı) | **~1350** (1350: 66–68 FPS, 1400: 44–52 FPS; iki çalıştırma) | RTX 3050 Ti Laptop, i7-11800H, Vulkan Forward+ | 2026-11-15 |
 | 300 zombide | ~850 FPS (1.2 ms/kare) | aynı | 2026-11-15 |
 | **Animasyonlu manken** (2.5 bin üçgen, 25 kemik, zombi başına AnimationPlayer, seyreltme yok), high profil, vsync kapalı: 60 FPS'te en çok zombi | **~500** (500: 62.7 FPS, 550: 53.2 FPS) | aynı | 2026-11-16 |
