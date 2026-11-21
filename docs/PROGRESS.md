@@ -5,6 +5,8 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 
 ## Şu an
 
+**Oturum 13 (2026-11-21): 8.1 sürüyor.** 8.1a kavşak greybox (`8ba35ea`, FEATURE_CITY_GREYBOX: 60 m karenin köşelerinde 4 çarpışmalı blok, karanlık ışık önizlemesi, Quality'de omni_lights/fire_shadows). 8.1b kamera: Taha B'yi seçti (60°/24 m) + koşu yönüne göre dinamik açı (FEATURE_CAMERA_DYNAMIC_ANGLE, yaw 7° / pitch 3°). Sıradaki: Taha'nın kamera hissi geri bildirimi → parça listesi (Taha'nın CC0 paketleri + Blender betikleri). Açık: asker karanlıkta seçilmiyor (8.3), özel saldırılar bloklardan habersiz (8.2).
+
 **YENİ OTURUM BURADAN (Oturum 13): Aşama 8 başlıyor (arena, atmosfer, ses).** Taha Aşama 7'yi oynadı ve onayladı (2026-11-21): "oyun çok güzel bir seviyeye gelmiş", oyunu baştan sona bitirdi; **"şahsen oyun basit ama bunu dengeleriz"** → zorluk/derinlik Aşama 11'de (denge) ele alınır, şimdi kod değişmez. Yeni oturum başlangıcı: ortam kontrolü → bu bölüm → ROADMAP 8.1 satırı + DECISIONS 2026-11-20 hedef görünüm (gece şehir sokağı, üstten/uzak kamera, ortam > zombi sayısı) → 8.1 için kararları sor, kod yazma. Blender açık ve MCP bağlı olmalı. Aşama 8'de boss'un soluk görünmesi ve göğüs yarığının okunmaması ışıkla birlikte ele alınır.
 
 **Oturum 12 (2026-11-21): Aşama 7 bitti, Taha onayladı (yukarıda).** Taha "alt ajanlarla komple bitir" dedi; tasarımı Claude verdi (DECISIONS 2026-11-20 7.3, spec `build/briefs/s73_design.md`, `s74_boss.md`). Sıradaki ana aşama 8 (arena, atmosfer, ses — hedef görünüm: gece şehir sokağı).
