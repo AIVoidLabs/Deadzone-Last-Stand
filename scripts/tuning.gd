@@ -491,8 +491,8 @@ const PROJECTILE_LIFETIME_MARGIN: float = 1.15
 
 # --- Kamera ---
 const CAMERA_PITCH_DEG: float = 60.0
-const CAMERA_DISTANCE: float = 24.0
-const CAMERA_FOV: float = 45.0
+const CAMERA_DISTANCE: float = 37.2
+const CAMERA_FOV: float = 30.0
 const CAMERA_FOLLOW_SHARPNESS: float = 8.0
 ## İleri bakış: kamera, askerin bu kadar saniye sonra olacağı yere doğru kayar.
 const CAMERA_LOOK_AHEAD_TIME: float = 0.25
