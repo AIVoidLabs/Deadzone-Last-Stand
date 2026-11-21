@@ -86,6 +86,11 @@ static func first_hit(a: Vector2, b: Vector2, r: float, rects: Array[Rect2]) -> 
 	return best
 
 
+## a'dan b'ye görüş hattı açık mı (nokta çizgisi; rects içinden geçen kapalı). İçinden başlayan hat engellenmiş sayılmaz.
+static func line_of_sight(from: Vector2, to: Vector2, blocks: Array[Rect2]) -> bool:
+	return first_hit(from, to, 0.0, blocks).x < 0.0
+
+
 ## Tek dikdörtgen için kesişim (first_hit'in çekirdeği); girişi 0..1 aralığında değilse t = -1.
 static func _slab_hit(a: Vector2, d: Vector2, g: Rect2) -> Vector3:
 	var t_in: float = -INF

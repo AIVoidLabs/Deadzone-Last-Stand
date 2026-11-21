@@ -75,3 +75,17 @@ func test_clip_shot_lands_before_wall() -> void:
 	assert_lt(shot.x, Tuning.CITY_STREET_WIDTH * 0.5)
 	var free: Vector3 = CityLayout.clip_shot(Vector2(0.0, 0.0), Vector2(5.0, 0.0), 0.1, 0.15, _rects)
 	assert_eq(free.z, 1.0)
+
+
+
+func test_line_of_sight() -> void:
+	var blocks: Array[Rect2] = CityLayout.block_rects(Tuning.ARENA_SIZE, Tuning.CITY_STREET_WIDTH)
+	var w: float = Tuning.CITY_STREET_WIDTH * 0.5
+	var half: float = Tuning.ARENA_SIZE * 0.5
+	var mid: float = -half * 0.5
+	# Merkezden sokak boyunca: açık.
+	assert_true(CityLayout.line_of_sight(Vector2.ZERO, Vector2(half - 1.0, 0.0), blocks))
+	# Sokaktan bloğun içinden öbür yana: kapalı.
+	assert_false(CityLayout.line_of_sight(Vector2(-w + 1.0, mid), Vector2(-w - 3.0, mid), blocks))
+	# Blok içinden başlayan hat engellenmiş sayılmaz (çarpışma yalnız girişi sayar).
+	assert_true(CityLayout.line_of_sight(Vector2(-w - 3.0, mid), Vector2(-w - 6.0, mid), blocks))

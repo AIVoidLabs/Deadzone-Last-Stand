@@ -166,6 +166,10 @@ func nearest_enemy(from: Vector2, max_range: float) -> int:
 	return _queries.nearest_enemy(from, max_range)
 
 
+func nearest_visible_enemy(from: Vector2, max_range: float, blocks: Array[Rect2]) -> int:
+	return _queries.nearest_visible(from, max_range, blocks)
+
+
 func count_kind(kind: StringName) -> int:
 	return _queries.count_kind(kind)
 

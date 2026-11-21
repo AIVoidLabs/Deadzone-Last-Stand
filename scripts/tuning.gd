@@ -273,6 +273,9 @@ const FEATURE_OBSTACLE_STEER: bool = true
 ## Yönelimde ileriye bakış (m) ve teğete karışım dikliği (1 = yalnız en yakında tam teğet).
 const OBSTACLE_STEER_LOOK: float = 2.5
 const OBSTACLE_STEER_BLEND: float = 0.6
+## 8.2c: yüksek köşe binaları görüş hattını keser: silahlar binanın ardındaki zombiyi hedeflemez, mermiler binaya çarpıp yok olur.
+## Alçak engeller (prop, ada) kesmez. Kapalıyken eski davranış.
+const FEATURE_BUILDING_LOS: bool = true
 ## Bu adımdan (m/kare) büyük hareketlerde engelden baştan başa geçme denetlenir.
 const OBSTACLE_ANTI_TUNNEL_STEP: float = 0.15
 ## Tükürük / taş engele çarpınca durma payı (m) ve çarpışma yarıçapı (m); doğma / iniş kaydırma tur sayısı.

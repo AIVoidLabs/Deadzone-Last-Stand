@@ -29,6 +29,7 @@ var _life_total: PackedFloat32Array = PackedFloat32Array()
 var _arc: PackedFloat32Array = PackedFloat32Array()
 var _hits: Array[PackedInt32Array] = []
 var _active_count: int = 0
+var _sight_blocks: Array[Rect2] = []
 var _mesh: BoxMesh
 var _material: Material
 
@@ -37,6 +38,8 @@ func _ready() -> void:
 	name = "Projectiles"
 	process_physics_priority = PHYSICS_PRIORITY
 	_mesh = BoxMesh.new()
+	if Tuning.FEATURE_BUILDING_LOS:
+		_sight_blocks = CityLayout.block_rects(Tuning.ARENA_SIZE, Tuning.CITY_STREET_WIDTH)
 	if Tuning.FEATURE_TRACERS:
 		_mesh.size = Vector3(Tuning.TRACER_THICKNESS, Tuning.TRACER_THICKNESS, Tuning.TRACER_LENGTH)
 		var tracer: ShaderMaterial = ShaderMaterial.new()
@@ -95,7 +98,16 @@ func _physics_process(delta: float) -> void:
 			continue
 		var a: Vector2 = _pos[i]
 		var b: Vector2 = a + _dir[i] * _speed[i] * delta
-		var hit: int = enemies.find_segment_hit(a, b, Tuning.PROJECTILE_RADIUS, _hits[i])
+		var wall: Vector3 = CityLayout.first_hit(a, b, 0.0, _sight_blocks)
+		var reach: Vector2 = b if wall.x < 0.0 else a.lerp(b, wall.x)
+		var hit: int = enemies.find_segment_hit(a, reach, Tuning.PROJECTILE_RADIUS, _hits[i])
+		if hit < 0 and wall.x >= 0.0:
+			# Bina: mermi duvarda durur (patlayan orada patlar).
+			impact.emit(Vector3(reach.x, Tuning.PROJECTILE_HEIGHT, reach.y), _dir[i])
+			if _explode[i] > 0.0:
+				_detonate(i, reach)
+			_release(i)
+			continue
 		if hit >= 0:
 			# Kıvılcım zombinin merminin geldiği yüzeyinde çıkar.
 			var surface: Vector2 = enemies.enemy_position(hit) - _dir[i] * enemies.enemy_radius(hit)

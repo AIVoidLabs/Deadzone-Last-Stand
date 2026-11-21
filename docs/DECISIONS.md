@@ -29,6 +29,10 @@ Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar v
 - İlk parça seti (Blender betiği, low-poly/stilize): yol + kaldırım karosu, 2–3 tuğla cephe (yangın merdiveni, tabela yeri), terk araba, barikat, çöp konteyneri, çöp/kâğıt yığını. Ateş, neon, ışık 8.3'te.
 - **Ruh hali (Taha):** karanlık ve yıkık bir ortam önemli ("zombi baskını olmuş"). Taha gerekirse ücretsiz, açık lisanslı (CC0/CC-BY) model ve doku indirir; Claude ne arayacağını söyler. İndirilen her asset CREDITS.md'ye girer.
 
+## 2026-11-21 — Görüş hattı: binalar keser (Taha)
+
+- Silah hedef seçimi ve oyuncu mermileri yüksek köşe binalarından geçmez; alçak engeller (araç, kum torbası, konteyner, adalar) görüş hattını kesmez.
+
 ## 2026-11-21 — 8.1 görünüm geri bildirimi ve 8.2 engel yoğunluğu (Taha)
 
 - Sahne, karanlık, kamera (60°, FOV 30) ve köşe binaları **onaylandı**.

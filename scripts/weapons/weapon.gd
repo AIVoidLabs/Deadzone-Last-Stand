@@ -23,6 +23,8 @@ var last_reach: float = 0.0
 const MELEE_TARGET_SLACK: float = 0.4
 
 var _player: Player
+## Görüş hattını kesen yüksek köşe binaları (FEATURE_BUILDING_LOS kapalıysa boş).
+var _sight_blocks: Array[Rect2] = []
 var _tier_row: Dictionary
 var _cooldown: float = 0.0
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
@@ -37,6 +39,8 @@ func setup(id: StringName, p_tier: int, player: Player, p_enemies: EnemyManager,
 	enemies = p_enemies
 	projectiles = p_projectiles
 	_rng.randomize()
+	if Tuning.FEATURE_BUILDING_LOS:
+		_sight_blocks = CityLayout.block_rects(Tuning.ARENA_SIZE, Tuning.CITY_STREET_WIDTH)
 	name = "Weapon_%s" % id
 	if Tuning.FEATURE_FLOATING_WEAPONS:
 		var visual: WeaponVisual = WeaponVisual.new()
@@ -59,7 +63,7 @@ func tick(delta: float) -> void:
 	if row["behavior"] != &"projectile":
 		_tick_area(origin, max_range)
 		return
-	var target: int = enemies.nearest_enemy(origin, max_range)
+	var target: int = _pick_target(origin, max_range)
 	has_target = target >= 0
 	if not has_target:
 		aim = _player.facing
@@ -83,10 +87,16 @@ func tick(delta: float) -> void:
 	fired.emit(direction)
 
 
+func _pick_target(origin: Vector2, reach: float) -> int:
+	if _sight_blocks.is_empty():
+		return enemies.nearest_enemy(origin, reach)
+	return enemies.nearest_visible_enemy(origin, reach, _sight_blocks)
+
+
 ## Alan silahı (yakın dövüş savurması ya da itme patlaması): menzildeki en yakın zombiye döner;
 ## bekleme bitince yayı (ya da tek hedefi) vurur.
 func _tick_area(origin: Vector2, reach: float) -> void:
-	var target: int = enemies.nearest_enemy(origin, reach + MELEE_TARGET_SLACK)
+	var target: int = _pick_target(origin, reach + MELEE_TARGET_SLACK)
 	has_target = target >= 0
 	if not has_target:
 		aim = _player.facing

@@ -17,6 +17,22 @@ func nearest_enemy(from: Vector2, max_range: float) -> int:
 	return _m._grid.nearest(from, max_range, _m._pos, _m._targetable)
 
 
+## nearest_enemy gibi, ama from'a görüş hattı blocks tarafından kesilenler aday değil.
+## Hat yalnız yeni en yakın aday için sınanır (en kötü durumda aday sayısı kadar, 4 dikdörtgenle ucuz).
+func nearest_visible(from: Vector2, max_range: float, blocks: Array[Rect2]) -> int:
+	var best: int = -1
+	var best_sq: float = max_range * max_range
+	var span: Vector2 = Vector2(max_range, max_range)
+	for i in _m._grid.query_rect(from - span, from + span):
+		if i >= _m._targetable.size() or _m._targetable[i] == 0:
+			continue
+		var d_sq: float = _m._pos[i].distance_squared_to(from)
+		if d_sq <= best_sq and CityLayout.line_of_sight(from, _m._pos[i], blocks):
+			best_sq = d_sq
+			best = i
+	return best
+
+
 ## center çevresinde radius içindeki canlı zombi sayısı.
 func count_near(center: Vector2, radius: float) -> int:
 	var count: int = 0
