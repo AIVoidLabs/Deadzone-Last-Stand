@@ -18,6 +18,7 @@ var _animator: PlayerAnimator
 var _move_blend: float = 0.0
 var _blink_left: float = 0.0
 var _dust: CPUParticles3D
+var _lamp: OmniLight3D
 
 
 func _ready() -> void:
@@ -32,6 +33,7 @@ func _ready() -> void:
 	if Tuning.FEATURE_DASH_DUST:
 		_dust = DashDust.create()
 		add_child(_dust)
+	_build_rim_light()
 	_player.event.connect(_on_event)
 	_player.state_changed.connect(_on_state_changed)
 
@@ -127,6 +129,28 @@ func _update_lean(yaw_error: float, delta: float) -> void:
 	# Model +Z'ye bakar: +X ekseninde dönüş öne yatırır; sola dönüşte (yaw artar) sola yatmak için -Z.
 	_pivot.rotation.x = lerpf(_pivot.rotation.x, forward, weight)
 	_pivot.rotation.z = lerpf(_pivot.rotation.z, -side, weight)
+
+
+## 8.3a: askerin üstünde zayıf sıcak ışık (gölgesiz) ve malzemelerde kenar ışığı; profilden.
+func _build_rim_light() -> void:
+	if not Tuning.FEATURE_CHARACTER_RIM:
+		return
+	_lamp = OmniLight3D.new()
+	_lamp.name = "PlayerLamp"
+	_lamp.position = Vector3(0.0, Tuning.PLAYER_LIGHT_HEIGHT, 0.0)
+	_lamp.light_color = Tuning.PLAYER_LIGHT_COLOR
+	_lamp.light_energy = Tuning.PLAYER_LIGHT_ENERGY
+	_lamp.omni_range = Tuning.PLAYER_LIGHT_RANGE
+	_lamp.shadow_enabled = false
+	add_child(_lamp)
+	Quality.profile_changed.connect(func(_id: StringName) -> void: _refresh_rim())
+	_refresh_rim()
+
+
+func _refresh_rim() -> void:
+	_lamp.visible = CityAtmosphere.rim_active()
+	for mesh: MeshInstance3D in _meshes:
+		CityAtmosphere.apply_rim(mesh.material_override as ShaderMaterial)
 
 
 func _set_flash(value: float) -> void:

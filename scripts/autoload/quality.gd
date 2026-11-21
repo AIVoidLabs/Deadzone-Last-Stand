@@ -8,6 +8,12 @@ var current: StringName = QualityProfiles.HIGH
 
 func _ready() -> void:
 	current = QualityProfiles.default_for(OS.has_feature("web"))
+	if OS.is_debug_build():
+		for arg: String in OS.get_cmdline_user_args():
+			if arg.begins_with("--quality="):
+				var wanted: StringName = StringName(arg.trim_prefix("--quality="))
+				if QualityProfiles.TABLE.has(wanted):
+					current = wanted
 
 
 func get_value(key: String) -> Variant:

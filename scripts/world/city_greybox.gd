@@ -3,6 +3,7 @@ extends Node3D
 ## Kaba şehir kavşağı (8.1a): oyun alanı kavşağın kendisi. Köşelerde çarpışmalı bloklar (içeride),
 ## kollar ve dış bloklar yalnız görsel. Düğümler kodla kurulur. Kapatma: Tuning.FEATURE_CITY_GREYBOX.
 
+const WET_SHADER: Shader = preload("res://assets/shaders/wet_asphalt.gdshader")
 const SIDEWALK: Color = Color(0.3, 0.3, 0.32)
 const LANE: Color = Color(0.55, 0.55, 0.5)
 const STAIN: Color = Color(0.02, 0.015, 0.015)
@@ -58,6 +59,7 @@ func _ready() -> void:
 	_build_inner_blocks()
 	_build_decor()
 	_build_lights()
+	add_child(CityFx.new())
 	_apply_quality(Quality.current)
 	Quality.profile_changed.connect(_apply_quality)
 
@@ -110,15 +112,29 @@ func _build_ground() -> void:
 	var extent: float = Tuning.ARENA_SIZE + Tuning.CITY_STREET_LENGTH * 2.0 + 120.0
 	var plane: PlaneMesh = PlaneMesh.new()
 	plane.size = Vector2(extent, extent)
-	var mat: StandardMaterial3D = StandardMaterial3D.new()
-	mat.albedo_color = Tuning.CITY_GROUND_COLOR
-	mat.roughness = Tuning.CITY_GROUND_ROUGHNESS
 	var ground: MeshInstance3D = MeshInstance3D.new()
 	ground.name = "Ground"
 	ground.mesh = plane
-	ground.material_override = mat
+	ground.material_override = _ground_material()
 	ground.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(ground)
+
+
+## Islak asfalt: FEATURE_WET_GROUND açıkken birikintili shader, kapalıyken düz malzeme.
+func _ground_material() -> Material:
+	if Tuning.FEATURE_WET_GROUND:
+		var wet: ShaderMaterial = ShaderMaterial.new()
+		wet.shader = WET_SHADER
+		wet.set_shader_parameter(&"base_color", Tuning.CITY_GROUND_COLOR)
+		wet.set_shader_parameter(&"puddle_scale", Tuning.WET_PUDDLE_SCALE)
+		wet.set_shader_parameter(&"puddle_threshold", Tuning.WET_PUDDLE_THRESHOLD)
+		wet.set_shader_parameter(&"wet_roughness", Tuning.WET_ROUGHNESS)
+		wet.set_shader_parameter(&"dry_roughness", Tuning.WET_DRY_ROUGHNESS)
+		return wet
+	var mat: StandardMaterial3D = StandardMaterial3D.new()
+	mat.albedo_color = Tuning.CITY_GROUND_COLOR
+	mat.roughness = Tuning.CITY_GROUND_ROUGHNESS
+	return mat
 
 
 ## Kaldırım şeritleri blok kenarlarında (sokak tarafı), sokak ortasında kesik şerit çizgisi.
@@ -216,7 +232,8 @@ func _build_decor() -> void:
 	for p: Vector3 in _fire_spots():
 		if not Tuning.FEATURE_CITY_PROPS:
 			_box(p, Vector3(4.4, 1.5, 1.9), RUST_A)
-		_box(p + Vector3(0.0, 1.5, 0.0), FLAME_SIZE, FIRE_COLOR, 0.0, true)
+		if not Tuning.FEATURE_CITY_FIRE_FX:
+			_box(p + Vector3(0.0, 1.5, 0.0), FLAME_SIZE, FIRE_COLOR, 0.0, true)
 	if not Tuning.FEATURE_CITY_PROPS:
 		for i: int in DEAD_CARS.size():
 			_box(DEAD_CARS[i], Vector3(4.4, 1.5, 1.9), RUST_B if i == 0 else RUST_C)

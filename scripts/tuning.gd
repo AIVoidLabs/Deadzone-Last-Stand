@@ -306,6 +306,81 @@ const CITY_LAMP_WEAK_FACTOR: float = 0.45
 const CITY_NEON_RANGE: float = 16.0
 const CITY_NEON_ENERGY: float = 5.0
 
+# --- 8.3b: ateş, duman, kıvılcım, neon, lamba konileri, kül (scripts/fx/city_fx.gd) ---
+const FEATURE_CITY_FIRE_FX: bool = true
+const FEATURE_CITY_NEON: bool = true
+const FEATURE_CITY_LAMP_CONES: bool = true
+const FEATURE_CITY_ASH: bool = true
+## Parçacık adetleri, kalite seviyesine göre [düşük, orta, yüksek] (profilde city_fx = 0/1/2); 0 = kapalı.
+const CITY_FX_FLAME_AMOUNT: Array[int] = [8, 16, 26]
+const CITY_FX_SMOKE_AMOUNT: Array[int] = [0, 7, 12]
+const CITY_FX_SPARK_AMOUNT: Array[int] = [3, 6, 10]
+const CITY_FX_ASH_AMOUNT: Array[int] = [0, 24, 44]
+## Çöp ateşinin boyutu (araç ateşine göre) ve konumları (kaldırım, konteyner yanı; çarpışmasız).
+const CITY_TRASH_FIRE_SCALE: float = 0.5
+const CITY_TRASH_FIRES: Array[Vector3] = [Vector3(10.4, 0.0, -12.9), Vector3(-15.6, 0.0, -10.0)]
+const CITY_FIRE_FLAME_HEIGHT: float = 1.4
+const CITY_FIRE_FLICKER: float = 0.25
+const CITY_FIRE_FLICKER_SPEED: float = 2.2
+const CITY_FIRE_WOBBLE: float = 0.12
+const CITY_SMOKE_LIFETIME: float = 7.0
+const CITY_SMOKE_WIND: Vector3 = Vector3(0.45, 0.0, 0.15)
+const CITY_SMOKE_COLOR: Color = Color(0.05, 0.05, 0.06)
+## Neon: tür (line/arrow/heart), pos (duvar düzleminde orta), u (duvar boyunca yön), size (yarım boy, m), color, broken (düzensiz yanıp söner).
+const CITY_NEON_EMISSION: float = 3.5
+const CITY_NEON_THICKNESS: float = 0.09
+const CITY_NEON_LIGHT_ENERGY: float = 2.0
+const CITY_NEON_LIGHT_RANGE: float = 9.0
+const CITY_NEON_LIGHT_OFFSET: float = 1.2
+const CITY_NEON_SPOTS: Array[Dictionary] = [
+	{"kind": &"heart", "pos": Vector3(-10.8, 5.0, -26.0), "u": Vector3(0, 0, 1), "size": 1.0, "color": Color(1.0, 0.2, 0.6), "broken": true},
+	{"kind": &"arrow", "pos": Vector3(-10.8, 4.6, -14.5), "u": Vector3(0, 0, 1), "size": 1.4, "color": Color(0.2, 1.0, 0.8), "broken": false},
+	{"kind": &"line", "pos": Vector3(-10.8, 4.8, 17.0), "u": Vector3(0, 0, 1), "size": 2.0, "color": Color(0.25, 0.55, 1.0), "broken": false},
+	{"kind": &"arrow", "pos": Vector3(-17.0, 4.8, -10.8), "u": Vector3(1, 0, 0), "size": 1.4, "color": Color(1.0, 0.25, 0.65), "broken": false},
+]
+## Sokak lambası: ampul, aşağı koni.
+const CITY_LAMP_BULB_ENERGY: float = 5.0
+const CITY_LAMP_CONE_RANGE: float = 9.0
+const CITY_LAMP_CONE_ANGLE: float = 40.0
+const CITY_LAMP_CONE_ENERGY: float = 6.0
+const CITY_ASH_BOX: Vector3 = Vector3(16.0, 5.0, 12.0)
+
+# --- 8.3a: atmosfer, ıslak zemin, karakter okunurluğu (her biri tek sabitle kapanır) ---
+## Yükseklik sisi, parıltı (glow), renk ayarı, vinyet, yüksekte SSR ve hacimsel sis (profil açar).
+const FEATURE_CITY_ATMOSPHERE: bool = true
+## Askerin üstünde zayıf sıcak ışık ve asker/zombilerde kenar ışığı.
+const FEATURE_CHARACTER_RIM: bool = true
+## Zeminde birikinti maskesi (düşük pürüzlülük bölgeleri).
+const FEATURE_WET_GROUND: bool = true
+const ATMO_FOG_DENSITY: float = 0.0012
+const ATMO_FOG_COLOR: Color = Color(0.16, 0.2, 0.3)
+const ATMO_FOG_HEIGHT: float = 2.5
+const ATMO_FOG_HEIGHT_DENSITY: float = 0.035
+const ATMO_VOLUMETRIC_DENSITY: float = 0.008
+const ATMO_VOLUMETRIC_ALBEDO: Color = Color(0.45, 0.55, 0.75)
+const ATMO_VOLUMETRIC_LENGTH: float = 50.0
+const ATMO_GLOW_INTENSITY: float = 0.9
+const ATMO_GLOW_THRESHOLD: float = 0.9
+const ATMO_GLOW_BLOOM: float = 0.08
+const ATMO_VIGNETTE_STRENGTH: float = 0.55
+const ATMO_VIGNETTE_INNER: float = 0.5
+## Renk ayarı: gölge ve parlak ton (kanal başına eğri uçları; gölgeler soğuk, ışıklar sıcak).
+const ATMO_GRADE_SHADOW: Color = Color(0.0, 0.01, 0.035)
+const ATMO_GRADE_HIGHLIGHT: Color = Color(1.0, 0.96, 0.88)
+const ATMO_GRADE_MID: Color = Color(0.28, 0.3, 0.34)
+const RIM_COLOR: Color = Color(0.55, 0.7, 1.0)
+const RIM_STRENGTH: float = 0.4
+const RIM_POWER: float = 4.0
+const PLAYER_LIGHT_COLOR: Color = Color(1.0, 0.72, 0.45)
+const PLAYER_LIGHT_ENERGY: float = 1.6
+const PLAYER_LIGHT_RANGE: float = 7.0
+const PLAYER_LIGHT_HEIGHT: float = 3.0
+## Birikinti: gürültü ölçeği (1/m), eşik (büyük = az birikinti), ıslak/kuru pürüzlülük.
+const WET_PUDDLE_SCALE: float = 0.06
+const WET_PUDDLE_THRESHOLD: float = 0.42
+const WET_ROUGHNESS: float = 0.05
+const WET_DRY_ROUGHNESS: float = 0.5
+
 # --- Genel tempo ---
 ## Oyunun genel hızı (1.0 = eski oyun). Hızlar çarpılır, süreler değil: asker yürüyüşü (PLAYER_SPEED),
 ## zombi hızları (EnemyData.PACED_KEYS), mermi hızları (WeaponData.get_row). Dash ve zamanlayıcılar aynı kalır.

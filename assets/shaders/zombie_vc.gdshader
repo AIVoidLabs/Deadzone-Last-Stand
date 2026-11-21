@@ -18,6 +18,11 @@ instance uniform vec3 swell_color = vec3(1.0, 0.38, 0.06);
 // Çeşit renk tonu (sürüde aynı ağın renk farkı), 1 = değişmez.
 instance uniform vec3 tint = vec3(1.0);
 
+// Kenar ışığı (8.3a): 0 = kapalı. Silüet kenarında soğuk emisyon.
+uniform vec4 rim_color : source_color = vec4(0.55, 0.7, 1.0, 1.0);
+uniform float rim_strength = 0.0;
+uniform float rim_power = 2.6;
+
 varying vec3 local_pos;
 
 void vertex() {
@@ -56,6 +61,10 @@ void fragment() {
 		float pulse = 0.65 + 0.35 * sin(TIME * 11.0 + NODE_POSITION_WORLD.x * 3.0);
 		ALBEDO = mix(ALBEDO, vec3(1.0, 0.35, 0.05), burn * 0.35);
 		EMISSION += vec3(1.0, 0.38, 0.06) * burn * pulse * 0.9;
+	}
+	if (rim_strength > 0.0) {
+		float rim = pow(1.0 - clamp(dot(normalize(NORMAL), normalize(VIEW)), 0.0, 1.0), rim_power);
+		EMISSION += rim_color.rgb * rim * rim_strength;
 	}
 	ROUGHNESS = roughness;
 }

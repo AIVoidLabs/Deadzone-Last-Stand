@@ -61,6 +61,8 @@ func _build_environment() -> void:
 	if Tuning.FEATURE_CITY_GREYBOX:
 		_apply_city_dark(env)
 		add_child(CityGreybox.new())
+		if Tuning.FEATURE_CITY_ATMOSPHERE:
+			add_child(CityAtmosphere.new(env))
 
 
 ## Karanlık şehir önizlemesi: ortam ve güneşi kısar (FEATURE_CITY_GREYBOX kapalıyken çalışmaz).

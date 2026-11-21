@@ -14,10 +14,12 @@ const ORDER: Array[StringName] = [&"low", &"medium", &"high"]
 const TABLE: Dictionary = {
 	# spark_amount: isabet başına kıvılcım. muzzle_light: atışta kısa nokta ışığı.
 	# omni_lights: şehir greybox omni ışık üst sınırı; fire_shadows: ateş ışıklarında gölge.
+	# ssr, volumetric_fog, glow, vignette, rim_light: 8.3a atmosfer ve karakter okunurluğu.
+	# city_fx: şehir efekt seviyesi 0/1/2 (adetler Tuning.CITY_FX_*; 0'da duman, kül, lamba konisi kapalı).
 	# blood_amount: isabet başına kan damlası (ölümde katlanır). decal_max: yerde aynı anda en çok leke.
-	&"low": {"max_enemies": 150, "shadows": false, "msaa": 0, "spark_amount": 4, "muzzle_light": false, "blood_amount": 4, "decal_max": 48, "omni_lights": 4, "fire_shadows": false},
-	&"medium": {"max_enemies": 250, "shadows": true, "msaa": 1, "spark_amount": 6, "muzzle_light": true, "blood_amount": 6, "decal_max": 128, "omni_lights": 8, "fire_shadows": false},
-	&"high": {"max_enemies": 350, "shadows": true, "msaa": 2, "spark_amount": 10, "muzzle_light": true, "blood_amount": 9, "decal_max": 256, "omni_lights": 8, "fire_shadows": true},
+	&"low": {"max_enemies": 150, "shadows": false, "msaa": 0, "spark_amount": 4, "muzzle_light": false, "blood_amount": 4, "decal_max": 48, "omni_lights": 4, "fire_shadows": false, "ssr": false, "volumetric_fog": false, "glow": false, "vignette": false, "rim_light": false, "city_fx": 0},
+	&"medium": {"max_enemies": 250, "shadows": true, "msaa": 1, "spark_amount": 6, "muzzle_light": true, "blood_amount": 6, "decal_max": 128, "omni_lights": 8, "fire_shadows": false, "ssr": false, "volumetric_fog": false, "glow": true, "vignette": true, "rim_light": true, "city_fx": 1},
+	&"high": {"max_enemies": 350, "shadows": true, "msaa": 2, "spark_amount": 10, "muzzle_light": true, "blood_amount": 9, "decal_max": 256, "omni_lights": 8, "fire_shadows": true, "ssr": true, "volumetric_fog": true, "glow": true, "vignette": true, "rim_light": true, "city_fx": 2},
 }
 
 
