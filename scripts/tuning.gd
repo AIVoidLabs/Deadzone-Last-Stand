@@ -49,7 +49,7 @@ const FEATURE_THROW_MELEE: bool = true
 ## Model bayrakları: Blender GLB'leri hazır olunca açılır (kapalıyken satır yürüyenin modeli + tint ile çizilir).
 const FEATURE_ARMORED_MODEL: bool = true
 const FEATURE_SCREAMER_MODEL: bool = false
-const FEATURE_SPITTER_MODEL: bool = false
+const FEATURE_SPITTER_MODEL: bool = true
 const FEATURE_THROWER_MODEL: bool = true
 const FEATURE_BLOATER_MODEL: bool = true
 ## Yay atışı (asit topu, kaya): bırakış yüksekliği (m), görsel havuz boyu, kayanın yerde kalma ve solma süresi (sn),
@@ -282,6 +282,7 @@ const JUMPER_LEAP_BLEND: float = 0.05
 const TANK_WALK_REF_SPEED: float = 1.2
 ## Yeni zırhlı, taş fırlatan ve patlayıcı walk klibinin anahtarlandığı hız (m/sn; satırdaki hız x GAME_PACE ile aynı).
 const ARMORED_WALK_REF_SPEED: float = 1.6
+const SPITTER_WALK_REF_SPEED: float = 1.92
 const THROWER_WALK_REF_SPEED: float = 1.84
 const BLOATER_WALK_REF_SPEED: float = 1.92
 ## Senkron klip hızı sınırları ve kare başına yumuşatma payı (0-1).

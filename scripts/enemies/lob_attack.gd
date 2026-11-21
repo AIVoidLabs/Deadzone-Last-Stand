@@ -133,7 +133,10 @@ func _launch(i: int, row: Dictionary) -> void:
 		_m.spit_shots += 1
 	else:
 		_m.throw_shots += 1
-	_m.lob_launched.emit(kind, Vector3(from.x, Tuning.LOB_RELEASE_HEIGHT, from.y), Vector3(dest.x, 0.0, dest.y), flight, _f(row, "arc"), radius)
+	var origin: Vector3 = Vector3(from.x, Tuning.LOB_RELEASE_HEIGHT, from.y)
+	if kind == &"spit" and row.has("spit_mouth"):
+		origin = _m._nodes[i].mouth_position()
+	_m.lob_launched.emit(kind, origin, Vector3(dest.x, 0.0, dest.y), flight, _f(row, "arc"), radius)
 	_m._nodes[i].event.emit(&"lob", {"kind": kind})
 
 

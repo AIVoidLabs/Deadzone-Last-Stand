@@ -61,15 +61,15 @@ func _process(delta: float) -> void:
 	if _flash_left > 0.0:
 		_flash_left -= delta
 		if _flash_left <= 0.0:
-			_set_flash(0.0)
+			_set_param(&"flash", 0.0)
 	if _dying:
 		# Sürenin son ZOMBIE_FADE_TIME saniyesinde solar.
 		_death_left -= delta
-		_set_fade(1.0 - clampf(_death_left / Tuning.ZOMBIE_FADE_TIME, 0.0, 1.0))
+		_set_param(&"fade", 1.0 - clampf(_death_left / Tuning.ZOMBIE_FADE_TIME, 0.0, 1.0))
 	_tick_jump(delta)
 	_marker.tick(delta)
 	if _swell.is_on():
-		_set_swell(_swell.tick(delta))
+		_set_param(&"swell", _swell.tick(delta))
 	if _held != null:
 		_held.tick(delta)
 	if not _dying and _flash_left <= 0.0 and _jump_age < 0.0 and not _marker.is_on() and not _swell.is_on() and not (_held != null and _held.is_waiting()):
@@ -81,7 +81,7 @@ func _on_event(event_name: StringName, data: Dictionary) -> void:
 		&"configure":
 			_apply_kind(data)
 		&"burn":
-			_set_burn(1.0 if data["on"] else 0.0)
+			_set_param(&"burn", 1.0 if data["on"] else 0.0)
 		&"marker":
 			_on_marker(data)
 		&"tongue":
@@ -99,7 +99,7 @@ func _on_event(event_name: StringName, data: Dictionary) -> void:
 		&"hit":
 			if Tuning.FEATURE_HIT_FLASH:
 				_flash_left = Tuning.HIT_FLASH_TIME
-				_set_flash(1.0)
+				_set_param(&"flash", 1.0)
 				set_process(true)
 
 
@@ -111,7 +111,7 @@ func _on_state_changed(new_state: int, old_state: int) -> void:
 		_held.reset()
 	if _dying and new_state != ZombieRules.State.DYING:
 		_dying = false
-		_set_fade(0.0)
+		_set_param(&"fade", 0.0)
 	if _tongue != null:
 		_tongue.on_state(new_state, old_state)
 	match new_state:
@@ -135,6 +135,9 @@ func _on_state_changed(new_state: int, old_state: int) -> void:
 			else:
 				# Klipteki vuruş anı (satırda varsa) hazırlığın sonuna denk gelir; 0 ise klip bütünüyle sığar.
 				_clips.play_timed(&"anim_attack", _clips.row.get("attack_anim_hit_time", 0.0), _body.state_duration)
+				if _clips.row.get("windup_glow", false):
+					_swell.start(_body.state_duration)
+					set_process(true)
 				if _held != null:
 					_held.begin(_clips.row["held_prop"], _body.state_duration, float(_clips.row["attack_anim_hit_time"]))
 					set_process(true)
@@ -173,33 +176,18 @@ func _on_state_changed(new_state: int, old_state: int) -> void:
 		ZombieRules.State.INACTIVE:
 			_hide_extras()
 			_clips.reset_sync()
-			_set_burn(0.0)
+			_set_param(&"burn", 0.0)
 			_flash_left = 0.0
-			_set_flash(0.0)
+			_set_param(&"flash", 0.0)
 			set_process(false)
 			# Havuzdaki (görünmeyen) zombi animasyon hesaplamasın.
 			if _clips.animation != null:
 				_clips.animation.stop()
 
 
-func _set_fade(value: float) -> void:
+func _set_param(param: StringName, value: float) -> void:
 	for mesh: MeshInstance3D in _meshes:
-		mesh.set_instance_shader_parameter(&"fade", value)
-
-
-func _set_burn(value: float) -> void:
-	for mesh: MeshInstance3D in _meshes:
-		mesh.set_instance_shader_parameter(&"burn", value)
-
-
-func _set_swell(value: float) -> void:
-	for mesh: MeshInstance3D in _meshes:
-		mesh.set_instance_shader_parameter(&"swell", value)
-
-
-func _set_flash(value: float) -> void:
-	for mesh: MeshInstance3D in _meshes:
-		mesh.set_instance_shader_parameter(&"flash", value)
+		mesh.set_instance_shader_parameter(param, value)
 
 
 func _build_model(model_kind: StringName) -> void:
@@ -251,6 +239,8 @@ func _apply_kind(row: Dictionary) -> void:
 		box.position.y = height * 0.5
 		return
 	ZombieMaterials.apply_tint(_meshes[0], row, _clips.own_clips, _tint)
+	if _clips.own_clips and row.has("swell_color"):
+		_meshes[0].set_instance_shader_parameter(&"swell_color", row["swell_color"])
 	if _held == null and _clips.own_clips and row.has("held_prop") and _skeleton != null:
 		_held = ZombieHeldProp.new()
 		_held.setup(_skeleton, row["held_prop"])
@@ -273,6 +263,13 @@ func _make_tongue(height: float) -> void:
 		_tongue = beam
 
 
+## Asit topunun çıkış noktası (dünya); satırda spit_mouth yoksa ya da iskelet yoksa sıfır vektörü.
+func mouth_position() -> Vector3:
+	if _skeleton == null or not _clips.row.has("spit_mouth"):
+		return Vector3.ZERO
+	return ZombieMouth.world_position(_skeleton, _clips.row["spit_mouth"])
+
+
 func _is_special() -> bool:
 	return not _clips.row.is_empty() and SpecialAttacks.is_special(_clips.row)
 
@@ -285,7 +282,7 @@ func _on_marker(data: Dictionary) -> void:
 func _hide_extras() -> void:
 	if _swell.is_on():
 		_swell.stop()
-		_set_swell(0.0)
+		_set_param(&"swell", 0.0)
 	_jump_age = -1.0
 	position.y = 0.0
 	_marker.hide_marker()

@@ -14,6 +14,7 @@ instance uniform float fade = 0.0;
 instance uniform float burn = 0.0;
 // Şişme (patlayıcı hazırlığı): kabarcık parıltısını katlar, gövdeye çok hafif turuncu nabız ekler. 0 = yok.
 instance uniform float swell = 0.0;
+instance uniform vec3 swell_color = vec3(1.0, 0.38, 0.06);
 // Çeşit renk tonu (sürüde aynı ağın renk farkı), 1 = değişmez.
 instance uniform vec3 tint = vec3(1.0);
 
@@ -49,8 +50,8 @@ void fragment() {
 	float glow = 1.0 - COLOR.a;
 	ALBEDO = mix(base, flash_color.rgb, flash);
 	EMISSION = flash_color.rgb * flash * 0.6 + COLOR.rgb * glow * glow_strength * (1.0 + swell * 2.5);
-	ALBEDO = mix(ALBEDO, vec3(1.0, 0.45, 0.1), swell * 0.1);
-	EMISSION += vec3(1.0, 0.38, 0.06) * swell * 0.12;
+	ALBEDO = mix(ALBEDO, swell_color, swell * 0.1);
+	EMISSION += swell_color * swell * 0.12;
 	if (burn > 0.0) {
 		float pulse = 0.65 + 0.35 * sin(TIME * 11.0 + NODE_POSITION_WORLD.x * 3.0);
 		ALBEDO = mix(ALBEDO, vec3(1.0, 0.35, 0.05), burn * 0.35);

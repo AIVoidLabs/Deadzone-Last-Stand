@@ -45,6 +45,11 @@ func enter_state(new_state: ZombieRules.State, duration: float = 0.0, restart: b
 	state_changed.emit(new_state, old)
 
 
+## Asit topunun ağız noktası (dünya); modelde tanımlı değilse sıfır vektörü.
+func mouth_position() -> Vector3:
+	return ($Visual as ZombieVisual).mouth_position()
+
+
 func notify_hit(amount: float) -> void:
 	event.emit(&"hit", {"amount": amount})
 

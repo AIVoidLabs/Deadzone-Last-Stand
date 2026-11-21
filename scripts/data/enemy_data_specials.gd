@@ -108,9 +108,14 @@ const ROWS: Dictionary = {
 		"color": Color(0.35, 0.7, 0.25),
 		"tint": Color(0.6, 1.0, 0.5),
 		"look_v": {
-			"model": &"spitter_v", "tint": Color.WHITE, "walk_ref_speed": 1.92,
+			"model": &"spitter_v", "tint": Color.WHITE, "walk_ref_speed": Tuning.SPITTER_WALK_REF_SPEED,
 			"anim_idle": [&"idle"], "anim_walk": [&"walk"], "anim_attack": [&"spit"], "anim_stagger": [&"stagger"],
 			"anim_death": [&"death_a", &"death_b"], "anim_spawn": [&"spawn"],
+			# Bırakış WINDUP'un sonunda (0.80); toparlanmada klip sonuna dek oynar. Top ağızdan (Head kemiği) çıkar;
+			# hazırlıkta kese parlar (yeşil swell).
+			"recover_finishes_attack": true,
+			"spit_mouth": {"bone": "Head", "offset": Vector3(0.0, 0.014, 0.14)},
+			"windup_glow": true, "swell_color": Vector3(0.4, 1.0, 0.15),
 		},
 	},
 	# Taş fırlatan: throw_range'de durur, kaya fırlatır (throw_radius içinde contact_damage); yakında dev kolla vurur (swat).

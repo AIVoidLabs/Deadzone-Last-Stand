@@ -37,6 +37,7 @@ func launch(kind: StringName, from: Vector3, dest: Vector3, flight: float, arc: 
 	_next = (_next + 1) % _slots.size()
 	slot["kind"] = kind
 	slot["from"] = Vector2(from.x, from.z)
+	slot["height"] = from.y
 	slot["dest"] = Vector2(dest.x, dest.z)
 	slot["flight"] = flight
 	slot["arc"] = arc
@@ -104,18 +105,19 @@ func _place(slot: Dictionary, age: float) -> void:
 	var arc: float = slot["arc"]
 	var spit: bool = slot["kind"] == &"spit"
 	var head: Node3D = slot["ball"] if spit else slot["rock"]
-	head.global_position = LobRules.position_at(from, dest, age / flight, arc, Tuning.LOB_RELEASE_HEIGHT)
+	var height: float = slot["height"]
+	head.global_position = LobRules.position_at(from, dest, age / flight, arc, height)
 	if not spit:
 		head.rotation = Vector3(age * 6.0, age * 4.0, 0.0)
 		return
 	var trail: Array = slot["trail"]
 	for k in trail.size():
 		var back: float = maxf(age - Tuning.LOB_TRAIL_STEP * float(k + 1), 0.0)
-		(trail[k] as Node3D).global_position = LobRules.position_at(from, dest, back / flight, arc, Tuning.LOB_RELEASE_HEIGHT)
+		(trail[k] as Node3D).global_position = LobRules.position_at(from, dest, back / flight, arc, height)
 
 
 func _make_slot() -> Dictionary:
-	var slot: Dictionary = {"active": false, "kind": &"spit", "age": 0.0, "flight": 1.0, "arc": 1.0, "from": Vector2.ZERO, "dest": Vector2.ZERO}
+	var slot: Dictionary = {"active": false, "kind": &"spit", "age": 0.0, "flight": 1.0, "arc": 1.0, "from": Vector2.ZERO, "height": Tuning.LOB_RELEASE_HEIGHT, "dest": Vector2.ZERO}
 	var trail: Array[Node3D] = []
 	for factor: float in TRAIL_SCALES:
 		trail.append(_make_ball(factor))
