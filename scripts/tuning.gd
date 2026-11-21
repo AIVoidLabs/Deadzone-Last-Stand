@@ -210,7 +210,7 @@ const FEATURE_IMPACT_SPARKS: bool = true
 ## Vuruş geri bildirimi (5.3): kan sıçraması, yerde lekeler, hasar sayıları, öldürmede duraksama ve sarsıntı.
 const FEATURE_BLOOD: bool = true
 const FEATURE_BLOOD_DECALS: bool = true
-const FEATURE_DAMAGE_NUMBERS: bool = true
+const FEATURE_DAMAGE_NUMBERS: bool = false
 const FEATURE_HIT_STOP: bool = false
 const FEATURE_KILL_SHAKE: bool = true
 ## Asker vurulunca (5.4): ekran kenarı kızarması (can azken nabız) ve vuruştan uzağa kısa itilme.
