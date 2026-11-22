@@ -152,7 +152,8 @@ func _add_pickups(player: Player, enemies: EnemyManager, director: SpawnDirector
 		if not row.get("boss", false):
 			pickups.drop(at, row.get("drop_value", 0)))
 	pickups.collected.connect(func(value: int) -> void:
-		loot.add(value)
+		if loot.add(value) > 0:
+			UiSounds.play(UiSoundData.LEVEL_UP)
 		if Tuning.FEATURE_SFX:
 			Audio.play(SoundData.PICKUP_DARK if Tuning.FEATURE_SFX_PICKUP_DARK else SoundData.PICKUP))
 	director.phase_changed.connect(func(phase: WaveRun.Phase, _wave_index: int) -> void:
@@ -224,6 +225,10 @@ func _add_sounds(player: Player, enemies: EnemyManager, weapons: WeaponRig, proj
 			Audio.play(SoundData.PLAYER_HURT)
 		elif event_name == &"dash_started":
 			Audio.play(SoundData.DASH_ARMORED if Tuning.FEATURE_SFX_DASH_ARMORED else SoundData.DASH))
+	var ui_events: UiEvents = UiEvents.new()
+	ui_events.player = player
+	ui_events.director = director
+	add_child(ui_events)
 	var steps: Footsteps = Footsteps.new()
 	steps.player = player
 	add_child(steps)

@@ -83,6 +83,7 @@ func _open_shop(wave_index: int) -> void:
 	_rerolls = 0
 	_roll()
 	GameFlow.open_menu()
+	UiSounds.play(UiSoundData.CARD_OPEN)
 	_refresh()
 
 
@@ -91,6 +92,7 @@ func _close() -> void:
 		return
 	_open = false
 	_screen.close()
+	UiSounds.play(UiSoundData.CLICK)
 	GameFlow.close_menu()
 	director.skip_break()
 
@@ -117,14 +119,16 @@ func _on_buy(index: int) -> void:
 	if not _open or index >= _offer.size():
 		return
 	var entry: Dictionary = _offer[index]
-	if entry["sold"] or _state_of(entry) != "ok":
+	if entry["sold"] or _state_of(entry) != "ok" or not loot.spend(_price(entry)):
+		UiSounds.play(UiSoundData.DENY)
 		return
-	if not loot.spend(_price(entry)):
-		return
+	var merged: bool = false
 	if entry["kind"] == ShopRules.ITEM:
 		_apply_item(entry["id"])
 	else:
+		merged = weapons.preview_add(entry["id"])["merged"]
 		weapons.add_weapon(entry["id"])
+	UiSounds.play(UiSoundData.MERGE if merged else UiSoundData.BUY)
 	entry["sold"] = true
 	entry["locked"] = false
 	_refresh()
@@ -140,13 +144,18 @@ func _on_lock(index: int) -> void:
 	if not _open or index >= _offer.size() or _offer[index]["sold"]:
 		return
 	_offer[index]["locked"] = not _offer[index]["locked"]
+	UiSounds.play(UiSoundData.CLICK)
 	_refresh()
 
 
 func _on_reroll() -> void:
 	var cost: int = _reroll_cost()
-	if not _open or not loot.spend(cost):
+	if not _open:
 		return
+	if not loot.spend(cost):
+		UiSounds.play(UiSoundData.DENY)
+		return
+	UiSounds.play(UiSoundData.CLICK)
 	_rerolls += 1
 	_roll()
 	_refresh()
@@ -160,6 +169,7 @@ func _on_sell(index: int) -> void:
 	if not weapons.remove_at(index):
 		return
 	loot.refund(_sell_value(slot))
+	UiSounds.play(UiSoundData.SELL)
 	_refresh()
 
 

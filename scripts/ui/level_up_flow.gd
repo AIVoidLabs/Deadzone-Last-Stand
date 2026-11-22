@@ -28,6 +28,7 @@ func _physics_process(_delta: float) -> void:
 		return
 	_open = true
 	GameFlow.open_menu()
+	UiSounds.play(UiSoundData.CARD_OPEN)
 	_show_next()
 
 
@@ -54,6 +55,7 @@ func _show_next() -> void:
 func _on_chosen(index: int) -> void:
 	if not _open:
 		return
+	UiSounds.play(UiSoundData.CARD_PICK)
 	var card: Dictionary = _offer[index]
 	stats.add(card["stat"], card["value"])
 	loot.pending_levels -= 1

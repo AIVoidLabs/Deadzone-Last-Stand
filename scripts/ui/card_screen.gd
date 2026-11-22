@@ -89,6 +89,7 @@ func _build_card(index: int, card: Dictionary) -> Button:
 	button.add_theme_stylebox_override("hover", _card_box(CARD_BG_HOVER, color.lightened(0.25)))
 	button.add_theme_stylebox_override("pressed", _card_box(CARD_BG_HOVER, Color.WHITE))
 	button.pressed.connect(func() -> void: chosen.emit(index))
+	UiSounds.hook(button)
 	var inner: VBoxContainer = VBoxContainer.new()
 	inner.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	inner.alignment = BoxContainer.ALIGNMENT_CENTER

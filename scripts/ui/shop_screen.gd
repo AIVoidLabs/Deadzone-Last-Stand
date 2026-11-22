@@ -137,6 +137,7 @@ func _build_entry(index: int, entry: Dictionary) -> Control:
 	button.add_theme_stylebox_override("pressed", _box(BG_HOVER, Color.WHITE))
 	button.add_theme_stylebox_override("disabled", _box(BG_OFF, border))
 	button.pressed.connect(func() -> void: buy_pressed.emit(index))
+	UiSounds.hook(button)
 	column.add_child(button)
 	var inner: VBoxContainer = VBoxContainer.new()
 	inner.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -197,6 +198,7 @@ static func _button(text: String, min_size: Vector2) -> Button:
 	button.add_theme_stylebox_override("hover", _box(BG_HOVER, TEXT_DIM))
 	button.add_theme_stylebox_override("pressed", _box(BG_HOVER, Color.WHITE))
 	button.add_theme_stylebox_override("disabled", _box(BG_OFF, TEXT_DIM.darkened(0.7)))
+	UiSounds.hook(button)
 	return button
 
 

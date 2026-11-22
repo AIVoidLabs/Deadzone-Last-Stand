@@ -220,6 +220,14 @@ const FEATURE_PLAYER_KNOCKBACK: bool = false
 const FEATURE_PLAYER_LEAN: bool = true
 ## Ses efektleri (5.5): ana anahtar + her ses için ayrı anahtar. Ses satırları scripts/data/sound_data.gd'de.
 const FEATURE_SFX: bool = true
+## Arayüz / akış sesleri (UI yolu): tıklama, mağaza, kart, dalga, seviye, ölüm, son ekranlar. Satırlar scripts/data/ui_sound_data.gd'de.
+const FEATURE_SFX_UI: bool = true
+## Düşük can kalp atışı (FEATURE_SFX_UI'dan ayrı anahtar).
+const FEATURE_SFX_LOW_HEALTH: bool = true
+## Can oranı bu değere ya da altına inince (ölü değilse) kalp atışı çalar.
+const LOW_HEALTH_THRESHOLD: float = 0.3
+## Kalp atışları arası süre (sn).
+const LOW_HEALTH_BEAT_INTERVAL: float = 1.1
 const FEATURE_SFX_SHOT: bool = true
 ## Silah sesleri v2 (8.4c): koyu/kapalı, gerçek .22 kaydı + sentez (w_*.wav). Kapalıysa eski silah sesleri.
 const FEATURE_SFX_WEAPONS_V2: bool = false  # Taha: eski silah sesleri daha iyi (2026-11-22)

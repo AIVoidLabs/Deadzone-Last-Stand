@@ -1,6 +1,7 @@
 extends Node
 ## Ses havuzu: sabit sayıda oynatıcı, her ses SoundData satırından. Oyun kodu yalnız Audio.play(id) çağırır.
-## Sesler "SFX" veri yolundan çıkar (ileride ayarlardaki ses düzeyi buraya bağlanır).
+## Sesler varsayılan "SFX" veri yolundan çıkar; satırdaki "bus" alanı (ör. arayüz sesleri "UI") yolu değiştirir.
+## Düğüm PROCESS_MODE_ALWAYS: mağaza/kart sırasında (oyun duruyken) arayüz sesleri çalar.
 
 const BUS: StringName = &"SFX"
 
@@ -56,6 +57,7 @@ func play(id: StringName, volume_offset_db: float = 0.0) -> void:
 	var variants: Array = _streams[id]
 	var player: AudioStreamPlayer = _players[index]
 	player.stream = variants[_rng.randi() % variants.size()]
+	player.bus = row.get("bus", BUS)
 	player.volume_db = float(row["volume_db"]) + volume_offset_db
 	player.pitch_scale = VoiceLimiter.pitch(row["pitch_variance"], _rng.randf())
 	_playing_id[index] = id
@@ -101,8 +103,9 @@ func _free_player() -> int:
 
 
 func _load_streams() -> void:
-	for id: StringName in SoundData.TABLE:
-		var row: Dictionary = SoundData.TABLE[id]
+	var rows: Dictionary = SoundData.all_rows()
+	for id: StringName in rows:
+		var row: Dictionary = rows[id]
 		if not row["enabled"]:
 			continue
 		var variants: Array[AudioStream] = []

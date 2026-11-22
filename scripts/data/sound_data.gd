@@ -282,9 +282,18 @@ static func explosion_id() -> StringName:
 	return &"w_explosion" if Tuning.FEATURE_SFX_WEAPONS_V2 else &"explosion"
 
 
+## Oyun sesleri + arayüz sesleri (UiSoundData) tek tabloda; ilk istekte birleştirilir.
+static var _all: Dictionary = {}
+
+static func all_rows() -> Dictionary:
+	if _all.is_empty():
+		_all = TABLE.merged(UiSoundData.TABLE)
+	return _all
+
+
 static func get_row(id: StringName) -> Dictionary:
-	assert(TABLE.has(id), "Bilinmeyen ses: %s" % id)
-	return TABLE[id]
+	assert(all_rows().has(id), "Bilinmeyen ses: %s" % id)
+	return all_rows()[id]
 
 
 static func path_of(file: String) -> String:
