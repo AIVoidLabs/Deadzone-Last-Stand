@@ -221,6 +221,8 @@ const FEATURE_PLAYER_LEAN: bool = true
 ## Ses efektleri (5.5): ana anahtar + her ses için ayrı anahtar. Ses satırları scripts/data/sound_data.gd'de.
 const FEATURE_SFX: bool = true
 const FEATURE_SFX_SHOT: bool = true
+## Silah sesleri v2 (8.4c): koyu/kapalı, gerçek .22 kaydı + sentez (w_*.wav). Kapalıysa eski silah sesleri.
+const FEATURE_SFX_WEAPONS_V2: bool = true
 ## Zombiye isabet sesi: Taha'nın isteğiyle kapalı (her vuruşta rahatsız ediciydi); yerine sürü homurtusu.
 const FEATURE_SFX_HIT: bool = false
 ## Askerin yakınındaki zombi sayısı arttıkça sıklaşan ve yükselen homurtu.

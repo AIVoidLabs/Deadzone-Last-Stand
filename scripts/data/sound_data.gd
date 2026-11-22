@@ -222,7 +222,64 @@ const TABLE: Dictionary = {
 		"files": ["z_shield_thunk_1", "z_shield_thunk_2", "z_shield_thunk_3"],
 		"volume_db": -14.0, "pitch_variance": 0.06, "max_voices": 3, "min_interval": 0.08,
 	},
+	# --- Silah sesleri v2 (8.4c; Tuning.FEATURE_SFX_WEAPONS_V2). Silah satırı weapon_data.gd 'sound_v2' ---
+	&"w_pistol": {
+		"enabled": Tuning.FEATURE_SFX_SHOT and Tuning.FEATURE_SFX_WEAPONS_V2, "files": ["w_pistol_1", "w_pistol_2", "w_pistol_3"],
+		"volume_db": -6.0, "pitch_variance": 0.07, "max_voices": 6, "min_interval": 0.03,
+	},
+	&"w_smg": {
+		"enabled": Tuning.FEATURE_SFX_SHOT and Tuning.FEATURE_SFX_WEAPONS_V2, "files": ["w_smg_1", "w_smg_2", "w_smg_3"],
+		"volume_db": -11.5, "pitch_variance": 0.14, "max_voices": 5, "min_interval": 0.05,
+	},
+	&"w_shotgun": {
+		"enabled": Tuning.FEATURE_SFX_SHOT and Tuning.FEATURE_SFX_WEAPONS_V2, "files": ["w_shotgun_1", "w_shotgun_2"],
+		"volume_db": -5.5, "pitch_variance": 0.05, "max_voices": 3, "min_interval": 0.05,
+	},
+	&"w_launcher": {
+		"enabled": Tuning.FEATURE_SFX_SHOT and Tuning.FEATURE_SFX_WEAPONS_V2, "files": ["w_launcher_1", "w_launcher_2"],
+		"volume_db": -9.0, "pitch_variance": 0.05, "max_voices": 2, "min_interval": 0.15,
+	},
+	&"w_explosion": {
+		"enabled": Tuning.FEATURE_SFX_SHOT and Tuning.FEATURE_SFX_WEAPONS_V2, "files": ["w_explosion_1", "w_explosion_2", "w_explosion_3"],
+		"volume_db": -6.0, "pitch_variance": 0.08, "max_voices": 3, "min_interval": 0.10,
+	},
+	&"w_plasma": {
+		"enabled": Tuning.FEATURE_SFX_SHOT and Tuning.FEATURE_SFX_WEAPONS_V2, "files": ["w_plasma_1", "w_plasma_2", "w_plasma_3"],
+		"volume_db": -12.5, "pitch_variance": 0.06, "max_voices": 3, "min_interval": 0.08,
+	},
+	&"w_graviton": {
+		"enabled": Tuning.FEATURE_SFX_SHOT and Tuning.FEATURE_SFX_WEAPONS_V2, "files": ["w_graviton_1", "w_graviton_2"],
+		"volume_db": -9.0, "pitch_variance": 0.05, "max_voices": 2, "min_interval": 0.15,
+	},
+	&"w_swing_light": {
+		"enabled": Tuning.FEATURE_SFX_SHOT and Tuning.FEATURE_SFX_WEAPONS_V2, "files": ["w_swing_light_1", "w_swing_light_2", "w_swing_light_3"],
+		"volume_db": -12.0, "pitch_variance": 0.08, "max_voices": 3, "min_interval": 0.06,
+	},
+	&"w_swing_medium": {
+		"enabled": Tuning.FEATURE_SFX_SHOT and Tuning.FEATURE_SFX_WEAPONS_V2, "files": ["w_swing_medium_1", "w_swing_medium_2", "w_swing_medium_3"],
+		"volume_db": -10.0, "pitch_variance": 0.07, "max_voices": 3, "min_interval": 0.08,
+	},
+	&"w_swing_energy": {
+		"enabled": Tuning.FEATURE_SFX_SHOT and Tuning.FEATURE_SFX_WEAPONS_V2, "files": ["w_swing_energy_1", "w_swing_energy_2", "w_swing_energy_3"],
+		"volume_db": -10.0, "pitch_variance": 0.06, "max_voices": 2, "min_interval": 0.10,
+	},
+	&"w_swing_fire": {
+		"enabled": Tuning.FEATURE_SFX_SHOT and Tuning.FEATURE_SFX_WEAPONS_V2, "files": ["w_swing_fire_1", "w_swing_fire_2", "w_swing_fire_3"],
+		"volume_db": -10.0, "pitch_variance": 0.06, "max_voices": 2, "min_interval": 0.10,
+	},
 }
+
+
+## Silahın atış sesi: v2 açıksa 'sound_v2', yoksa eski 'sound'.
+static func weapon_sound(row: Dictionary) -> StringName:
+	if Tuning.FEATURE_SFX_WEAPONS_V2 and row.has("sound_v2"):
+		return row["sound_v2"]
+	return row.get("sound", SHOT)
+
+
+## Patlama sesi: v2 açıksa alçak w_explosion.
+static func explosion_id() -> StringName:
+	return &"w_explosion" if Tuning.FEATURE_SFX_WEAPONS_V2 else &"explosion"
 
 
 static func get_row(id: StringName) -> Dictionary:
