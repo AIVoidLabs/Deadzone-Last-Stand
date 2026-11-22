@@ -44,6 +44,7 @@ func _ready() -> void:
 	weapons.projectiles = projectiles
 	add_child(weapons)
 	weapons.add_weapon(WeaponData.PISTOL)
+	_add_run_recorder(player, enemies, weapons, director, pickups, loot)
 
 	var camera: FollowCamera = FollowCamera.new()
 	camera.target = player
@@ -137,6 +138,18 @@ func _ready() -> void:
 			bot.weapons = weapons
 			bot.shop = shop
 			add_child(bot)
+
+
+## Tur sayaçları ve tur sonu kaydı (HUD'dan önce eklenir; GameFlow.last_summary hazır olsun).
+func _add_run_recorder(player: Player, enemies: EnemyManager, weapons: WeaponRig, director: SpawnDirector, pickups: Pickups, loot: RunLoot) -> void:
+	var recorder: RunRecorder = RunRecorder.new()
+	recorder.player = player
+	recorder.enemies = enemies
+	recorder.weapons = weapons
+	recorder.director = director
+	recorder.pickups = pickups
+	recorder.loot = loot
+	add_child(recorder)
 
 
 ## Kristaller: öldürmede düşer, toplanınca RunLoot'a eklenir, dalga sonunda hepsi çekilir.

@@ -1,7 +1,6 @@
 class_name StatData
 extends RefCounted
 ## İstatistik tablosu. Değerler kartlardan (ileride eşyalardan) PlayerStats'ta birikir.
-## format: listede gösterim; short: kartta adın altındaki değer (%s yerine sayı).
 
 const MAX_HP: StringName = &"max_hp"
 const DAMAGE: StringName = &"damage"
@@ -15,28 +14,33 @@ const PICKUP_RANGE: StringName = &"pickup_range"
 const DASH_COOLDOWN: StringName = &"dash_cooldown"
 const DASH_DISTANCE: StringName = &"dash_distance"
 
-## Gösterim sırası da budur.
+## Gösterim sırası da budur. category: kart/mağaza rengini seçer (UiPalette.category).
+## Adlar ve biçimler Loc tablosunda (text_content.gd: stat.<id>, stat.<id>.format, stat.<id>.short).
 const TABLE: Dictionary = {
-	&"max_hp": {"name": "Can", "format": "+%s can", "short": "+%s"},
-	&"damage": {"name": "Hasar", "format": "+%s%% hasar", "short": "+%s%%"},
-	&"fire_rate": {"name": "Atış hızı", "format": "+%s%% atış hızı", "short": "+%s%%"},
-	&"range": {"name": "Menzil", "format": "+%s%% menzil", "short": "+%s%%"},
-	&"move_speed": {"name": "Hareket hızı", "format": "+%s%% hareket hızı", "short": "+%s%%"},
-	&"armor": {"name": "Zırh", "format": "+%s zırh", "short": "+%s"},
-	&"luck": {"name": "Şans", "format": "+%s şans", "short": "+%s"},
-	&"hp_regen": {"name": "Can yenileme", "format": "+%s can yenileme", "short": "+%s"},
-	&"pickup_range": {"name": "Toplama menzili", "format": "+%s%% toplama menzili", "short": "+%s%%"},
-	&"dash_cooldown": {"name": "Dash bekleme süresi", "format": "-%s%% dash bekleme", "short": "-%s%%"},
-	&"dash_distance": {"name": "Dash mesafesi", "format": "+%s%% dash mesafesi", "short": "+%s%%"},
+	&"max_hp": {"category": &"survival"},
+	&"damage": {"category": &"combat"},
+	&"fire_rate": {"category": &"combat"},
+	&"range": {"category": &"combat"},
+	&"move_speed": {"category": &"motion"},
+	&"armor": {"category": &"survival"},
+	&"luck": {"category": &"loot"},
+	&"hp_regen": {"category": &"survival"},
+	&"pickup_range": {"category": &"loot"},
+	&"dash_cooldown": {"category": &"motion"},
+	&"dash_distance": {"category": &"motion"},
 }
 
 
+static func category_of(stat: StringName) -> StringName:
+	return TABLE[stat]["category"]
+
+
 static func describe(stat: StringName, value: float) -> String:
-	return _signed(TABLE[stat]["format"], value)
+	return _signed(Loc.stat_format(stat), value)
 
 
 static func short_value(stat: StringName, value: float) -> String:
-	return _signed(TABLE[stat]["short"], value)
+	return _signed(Loc.stat_short(stat), value)
 
 
 ## Eksi değerde baştaki işaret ters çevrilir ("+%s can" → "-5 can", "-%s%% dash" → "+5% dash").
@@ -48,7 +52,7 @@ static func _signed(pattern: String, value: float) -> String:
 
 
 static func display_name(stat: StringName) -> String:
-	return TABLE[stat]["name"]
+	return Loc.stat_name(stat)
 
 
 static func _number(value: float) -> String:

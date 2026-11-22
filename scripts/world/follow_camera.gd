@@ -17,6 +17,9 @@ var _look_ahead: Vector3 = Vector3.ZERO
 var _trauma: float = 0.0
 var _shake_time: float = 0.0
 var _noise: FastNoiseLite = FastNoiseLite.new()
+## Ayarlar (Settings): dinamik açı açık mı, sarsıntı çarpanı (0..1).
+var _dynamic_enabled: bool = true
+var _shake_scale: float = 1.0
 
 
 func _ready() -> void:
@@ -24,6 +27,9 @@ func _ready() -> void:
 	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	fov = Tuning.CAMERA_FOV
 	_noise.frequency = Tuning.CAMERA_SHAKE_FREQUENCY
+	_dynamic_enabled = Settings.get_value(&"game/dynamic_camera")
+	_shake_scale = Settings.get_value(&"game/screen_shake")
+	Settings.changed.connect(_on_setting_changed)
 	set_distance(Tuning.CAMERA_DISTANCE)
 	_focus = _target_point()
 	global_position = _focus + _offset
@@ -61,7 +67,7 @@ func set_pitch(pitch_deg: float, distance: float) -> void:
 ## Sarsıntı ekler (0..1). Etki karesiyle büyür, kendiliğinden söner.
 func add_trauma(amount: float) -> void:
 	if Tuning.FEATURE_CAMERA_SHAKE:
-		_trauma = minf(1.0, _trauma + amount)
+		_trauma = minf(1.0, _trauma + amount * _shake_scale)
 
 
 ## Odak noktasından kameraya ofset; yaw Y ekseni etrafında döndürür.
@@ -76,8 +82,16 @@ static func dynamic_angle(velocity: Vector3, max_speed: float, yaw_deg: float, p
 	return Vector2(-v.x * yaw_deg, v.z * pitch_deg)
 
 
+func _on_setting_changed(key: StringName, value: Variant) -> void:
+	if key == &"game/dynamic_camera":
+		_dynamic_enabled = value
+	elif key == &"game/screen_shake":
+		_shake_scale = value
+
+
+## Dinamik açı kapalıyken hedef sıfır: kamera yumuşakça sabit açıya döner.
 func _dynamic_target() -> Vector2:
-	if not velocity_source.is_valid():
+	if not _dynamic_enabled or not velocity_source.is_valid():
 		return Vector2.ZERO
 	return dynamic_angle(velocity_source.call(), Tuning.PLAYER_SPEED, Tuning.CAMERA_DYN_YAW_DEG, Tuning.CAMERA_DYN_PITCH_DEG)
 

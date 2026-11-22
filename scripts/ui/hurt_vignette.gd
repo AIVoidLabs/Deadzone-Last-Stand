@@ -12,6 +12,8 @@ var _rect: ColorRect
 var _material: ShaderMaterial
 var _flash: float = 0.0
 var _time: float = 0.0
+## Ayar: game/hurt_flash (0..1) vurulma kızarmasının gücünü çarpar; can azken nabız etkilenmez.
+var _flash_scale: float = 1.0
 
 
 func setup(player: Player) -> void:
@@ -29,6 +31,10 @@ func _ready() -> void:
 	_rect.material = _material
 	add_child(_rect)
 	_player.event.connect(_on_player_event)
+	_flash_scale = Settings.get_value(&"game/hurt_flash")
+	Settings.changed.connect(func(key: StringName, value: Variant) -> void:
+		if key == &"game/hurt_flash":
+			_flash_scale = value)
 	_apply(0.0)
 
 
@@ -40,7 +46,7 @@ func _process(delta: float) -> void:
 	if ratio < Tuning.LOW_HP_THRESHOLD and _player.state != Player.State.DEAD:
 		var pulse: float = 0.5 + 0.5 * sin(_time * TAU * Tuning.LOW_HP_PULSE_RATE)
 		low = Tuning.LOW_HP_VIGNETTE * (1.0 - ratio / Tuning.LOW_HP_THRESHOLD) * (0.6 + 0.4 * pulse)
-	_apply(maxf(_flash * Tuning.HURT_VIGNETTE_STRENGTH, low))
+	_apply(maxf(_flash * Tuning.HURT_VIGNETTE_STRENGTH * _flash_scale, low))
 
 
 func _on_player_event(event_name: StringName, _data: Dictionary) -> void:

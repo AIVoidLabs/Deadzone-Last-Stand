@@ -22,6 +22,9 @@ func _ready() -> void:
 	_build_vignette()
 	_apply(Quality.current)
 	Quality.profile_changed.connect(_apply)
+	Settings.changed.connect(func(key: StringName, _value: Variant) -> void:
+		if key == &"display/brightness":
+			_apply_brightness())
 
 
 func _build_grade() -> void:
@@ -50,6 +53,11 @@ func _build_vignette() -> void:
 	layer.add_child(_vignette)
 
 
+## Ayar: display/brightness (1.0 = değişiklik yok).
+func _apply_brightness() -> void:
+	_env.adjustment_brightness = Settings.get_value(&"display/brightness")
+
+
 func _apply(_profile_id: StringName) -> void:
 	var on: bool = Tuning.FEATURE_CITY_ATMOSPHERE
 	_env.fog_enabled = on
@@ -66,5 +74,6 @@ func _apply(_profile_id: StringName) -> void:
 	_env.glow_hdr_threshold = Tuning.ATMO_GLOW_THRESHOLD
 	_env.glow_bloom = Tuning.ATMO_GLOW_BLOOM
 	_env.adjustment_enabled = true
+	_apply_brightness()
 	_env.ssr_enabled = on and bool(Quality.get_value("ssr"))
 	_vignette.visible = on and bool(Quality.get_value("vignette"))

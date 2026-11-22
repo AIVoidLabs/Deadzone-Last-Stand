@@ -25,6 +25,8 @@ var _decals: MultiMeshInstance3D
 var _decal_born: PackedFloat32Array = PackedFloat32Array()
 var _next_decal: int = 0
 var _time: float = 0.0
+## Ayar: game/blood kapalıysa kan ve leke çıkmaz.
+var _enabled: bool = true
 
 
 func _ready() -> void:
@@ -34,6 +36,10 @@ func _ready() -> void:
 		_build_decals()
 	_apply_quality(Quality.current)
 	Quality.profile_changed.connect(_apply_quality)
+	_enabled = Settings.get_value(&"game/blood")
+	Settings.changed.connect(func(key: StringName, value: Variant) -> void:
+		if key == &"game/blood":
+			_enabled = value)
 
 
 func _process(delta: float) -> void:
@@ -44,6 +50,8 @@ func _process(delta: float) -> void:
 
 ## at: zombinin yerdeki konumu; direction: merminin gidiş yönü (kan bu yöne saçılır).
 func on_enemy_damaged(at: Vector3, direction: Vector2, _amount: float, killed: bool) -> void:
+	if not _enabled:
+		return
 	_splash(at, direction, killed)
 	if _decals == null:
 		return

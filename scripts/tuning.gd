@@ -3,6 +3,20 @@ extends RefCounted
 ## Tüm genel oynanış sayıları burada. İçerik satırları (zombi, silah) scripts/data/ tablolarında.
 
 # --- Özellik anahtarları (her özellik tek sabitle kapanır) ---
+# Aşama 9 (arayüz ve akış). Kapalıyken eski yol: doğrudan oyun, eski kart/mağaza/HUD.
+const FEATURE_MAIN_MENU: bool = true
+const FEATURE_PAUSE_MENU: bool = true
+const FEATURE_SETTINGS: bool = true
+## Kapalıyken yalnız Türkçe.
+const FEATURE_LANGUAGE: bool = true
+const FEATURE_SAVE: bool = true
+const FEATURE_NEW_CARDS: bool = true
+const FEATURE_NEW_SHOP: bool = true
+const FEATURE_NEW_HUD: bool = true
+const FEATURE_END_SUMMARY: bool = true
+const FEATURE_KEY_REBIND: bool = true
+const FEATURE_UI_MOTION: bool = true
+const FEATURE_SCENE_FADE: bool = true
 const FEATURE_SEPARATION: bool = true
 const FEATURE_CAMERA_SMOOTHING: bool = true
 const FEATURE_CAMERA_LOOK_AHEAD: bool = true
