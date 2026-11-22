@@ -1,7 +1,7 @@
 class_name AmbienceData
 extends RefCounted
 ## Ortam ses tablosu. Dosya adı değişince (gerçek CC0 dosyalar gelince) yalnız burası değişir.
-## Dosyalar assets/audio/ambience/ altında; üretim: tools/sfx/gen_ambience.py (yer tutucular diskte kalır: fire_crackle, city_rumble, distant_*; CC0 dosyalar *_cc0: tools/sfx/process_ambience.py).
+## Dosyalar assets/audio/ambience/ altında; üretim: tools/sfx/gen_ambience.py (yer tutucular silindi; CC0 dosyalar kullanılıyor: *_cc0, tools/sfx/process_ambience.py).
 
 const DIR: String = "res://assets/audio/ambience/%s.wav"
 const BUS: StringName = &"Ambience"

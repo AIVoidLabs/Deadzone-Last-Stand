@@ -5,6 +5,8 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 
 ## Şu an
 
+**AŞAMA 8 BİTTİ (2026-11-22).** Taha 8.4'ü onayladı, 8.5: müzik yok. Kullanılmayan asset temizliği: silah v2 seti ve 5 ortam yer tutucusu silindi (GLB'lerin dış dokuları kullanımda; silinmez). Sıradaki ana aşama: 9 — Arayüz ve akış; Taha'nın "devam" demesi bekleniyor.
+
 **Oturum 15 (2026-11-22): 8.4 ses başladı; Taha'nın dinlemesi bekleniyor.** Kararlar DECISIONS 2026-11-22 (karma kaynak; sıra ortam → zombi → silah → arayüz). Sonnet alt ajanlar + ayrı gözden geçiren, ana döngü doğruladı.
 - Zırhlı takla sesi (`d1cc2ab`, FEATURE_SFX_DASH_ARMORED; eski ses dosyaları aynen duruyor).
 - 8.4a ortam: Master/SFX/Ambience/UI/Music yolları (`AudioBuses`), askerde AudioListener3D (`AmbienceRig`), 21 konumlu döngü (ateş, neon, bozuk neon, tel uğultusu; `AmbienceData` tablosu), rüzgâr + şehir yatağı, 25–60 sn'de bir uzak ses (siren/köpek/cam; saf `AmbienceScheduler` + 11 test). Taha'nın CC0 dosyaları `tools/sfx/process_ambience.py` ile işlendi (ham kaynak `assets/audio/source/` git dışı); neon/tel/rüzgâr kodla (`gen_ambience.py`). FEATURE_SFX_AMBIENCE (+ _EMITTERS/_BEDS/_DISTANT). 326 test.
@@ -227,11 +229,11 @@ Bitiş ölçütleri `ROADMAP.md`'de. Biten kutunun yanına tarih ve commit yazı
 - [x] V.6 Asker animasyon cilası — 2026-11-20 yapılmadı, Taha: "askerin animasyonları güzel kalsın" (DECISIONS)
 
 ### 8 — Arena, atmosfer, ses
-- [ ] 8.1 Şehir sokağı parçaları
-- [ ] 8.2 Engeller ve kaçınma
-- [ ] 8.3 Işık, sis, ekran efektleri
-- [ ] 8.4 Tam ses seti
-- [ ] 8.5 Müzik kararı
+- [x] 8.1 Şehir sokağı parçaları — 2026-11-21
+- [x] 8.2 Engeller ve kaçınma — 2026-11-21
+- [x] 8.3 Işık, sis, ekran efektleri — 2026-11-22 (Taha onayı)
+- [x] 8.4 Tam ses seti — 2026-11-22 (ortam, zombi, sürü inilti, takla, kristal, arayüz; silahta eski sesler; `9284d67`)
+- [x] 8.5 Müzik kararı — 2026-11-22: müzik yok (Taha)
 
 ### 9 — Arayüz ve akış
 - [ ] 9.1 Ana menü ve duraklatma

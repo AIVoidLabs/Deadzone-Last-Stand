@@ -150,97 +150,12 @@ def wind(rng: random.Random) -> list[float]:
     return normalize(loop_seam(sig, fade), 0.8)
 
 
-def city_rumble(rng: random.Random) -> list[float]:
-    secs, fade = 12.0, 2.0
-    n = n_of(secs + fade)
-    sig = lowpass(noise(n, rng), 110.0, 3)
-    mod = [0.7 + 0.3 * math.sin(TAU * i / SR / 5.0) for i in range(n)]
-    sig = [s * m for s, m in zip(sig, mod)]
-    return normalize(loop_seam(sig, fade), 0.8)
-
-
-def fire_crackle(rng: random.Random) -> list[float]:
-    """YER TUTUCU: alcak ruzgar + rastgele cat sesleri."""
-    secs, fade = 6.0, 1.0
-    n = n_of(secs + fade)
-    roar = lowpass(noise(n, rng), 380.0, 2)
-    mod = lowpass(noise(n, rng), 3.0, 2)
-    mod = [0.7 + 2.5 * m for m in mod]
-    sig = [r * max(0.2, m) for r, m in zip(roar, mod)]
-    sig = normalize(sig, 0.5)
-    t = 0.0
-    while t < secs + fade - 0.1:
-        t += rng.expovariate(14.0)
-        a = n_of(t)
-        length = n_of(rng.uniform(0.002, 0.012))
-        amp = rng.uniform(0.15, 0.7) ** 1.5
-        pop = highpass(noise(length, rng), 1500.0)
-        for i in range(length):
-            if a + i < n:
-                sig[a + i] += pop[i] * amp * math.exp(-5.0 * i / length)
-    return normalize(loop_seam(sig, fade), PEAK)
-
-
-# --- Uzak tek seferlikler (yer tutucu) -------------------------------------------------------
-
-def distant_siren(rng: random.Random) -> list[float]:
-    secs = 5.0
-    n = n_of(secs)
-    sig = []
-    ph = 0.0
-    for i in range(n):
-        t = i / SR
-        f = 700.0 + 260.0 * math.sin(TAU * t / 2.5)
-        ph += TAU * f / SR
-        sig.append(math.sin(ph) + 0.3 * math.sin(2 * ph))
-    sig = lowpass(sig, 1500.0, 2)
-    env = [math.sin(math.pi * i / n) ** 2 for i in range(n)]
-    return normalize([s * e for s, e in zip(sig, env)], 0.7)
-
-
-def distant_dog(rng: random.Random) -> list[float]:
-    out = [0.0] * n_of(2.0)
-    t = 0.1
-    for _ in range(3):
-        length = n_of(0.16)
-        base = rng.uniform(380.0, 460.0)
-        ph = 0.0
-        for i in range(length):
-            f = base * (1.0 - 0.35 * i / length)
-            ph += TAU * f / SR
-            env = math.sin(math.pi * i / length) ** 0.7
-            v = (math.sin(ph) + 0.5 * math.sin(2 * ph) + 0.3 * math.sin(3 * ph)) * env
-            out[n_of(t) + i] += v + rng.uniform(-0.15, 0.15) * env
-        t += rng.uniform(0.4, 0.55)
-    return normalize(lowpass(out, 2200.0, 1), 0.7)
-
-
-def distant_glass(rng: random.Random) -> list[float]:
-    n = n_of(1.6)
-    sig = [0.0] * n
-    sig_n = highpass(noise(n, rng), 3000.0)
-    for i in range(n_of(0.3)):
-        sig[i] += sig_n[i] * math.exp(-14.0 * i / SR)
-    for _ in range(14):
-        a = n_of(rng.uniform(0.05, 1.2))
-        f = rng.uniform(3000.0, 7500.0)
-        for i in range(n_of(0.15)):
-            if a + i < n:
-                sig[a + i] += 0.35 * math.sin(TAU * f * i / SR) * math.exp(-35.0 * i / SR)
-    return normalize(sig, 0.7)
-
-
 def main() -> int:
     items = [
         ("neon_buzz", neon_buzz(random.Random(101), False)),
         ("neon_broken", neon_buzz(random.Random(102), True)),
         ("wire_hum", wire_hum(random.Random(103))),
         ("wind", wind(random.Random(104))),
-        ("city_rumble", city_rumble(random.Random(105))),
-        ("fire_crackle", fire_crackle(random.Random(106))),
-        ("distant_siren", fade_edges(distant_siren(random.Random(107)))),
-        ("distant_dog", fade_edges(distant_dog(random.Random(108)))),
-        ("distant_glass", fade_edges(distant_glass(random.Random(109)))),
     ]
     for name, sig in items:
         print(f"{name}.wav  {write_wav(name, sig):.2f} s  first={int(sig[0]*32767)} last={int(sig[-1]*32767)} slope_first={int((sig[1]-sig[0])*32767)} slope_last={int((sig[-1]-sig[-2])*32767)}")
