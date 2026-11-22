@@ -12,6 +12,7 @@ const HIT: StringName = &"hit"
 const ZOMBIE_DEATH: StringName = &"zombie_death"
 const FOOTSTEP: StringName = &"footstep"
 const DASH: StringName = &"dash"
+const DASH_ARMORED: StringName = &"dash_armored"
 const PLAYER_HURT: StringName = &"player_hurt"
 const HORDE_GROAN: StringName = &"horde_groan"
 const PICKUP: StringName = &"pickup"
@@ -91,6 +92,11 @@ const TABLE: Dictionary = {
 		"enabled": Tuning.FEATURE_SFX_DASH,
 		"files": ["dash_1", "dash_2", "dash_3"],
 		"volume_db": -13.0, "pitch_variance": 0.05, "max_voices": 1, "min_interval": 0.2,
+	},
+	&"dash_armored": {
+		"enabled": Tuning.FEATURE_SFX_DASH,
+		"files": ["dash_armored_1", "dash_armored_2", "dash_armored_3"],
+		"volume_db": -11.0, "pitch_variance": 0.04, "max_voices": 1, "min_interval": 0.2,
 	},
 	&"horde_groan": {
 		"enabled": Tuning.FEATURE_SFX_HORDE_GROAN,

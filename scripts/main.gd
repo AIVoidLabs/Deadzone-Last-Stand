@@ -212,7 +212,7 @@ func _add_sounds(player: Player, enemies: EnemyManager, weapons: WeaponRig, proj
 		if event_name == &"hit":
 			Audio.play(SoundData.PLAYER_HURT)
 		elif event_name == &"dash_started":
-			Audio.play(SoundData.DASH))
+			Audio.play(SoundData.DASH_ARMORED if Tuning.FEATURE_SFX_DASH_ARMORED else SoundData.DASH))
 	var steps: Footsteps = Footsteps.new()
 	steps.player = player
 	add_child(steps)

@@ -327,6 +327,70 @@ def dash(rng: random.Random) -> list[float]:
     return soft_clip(out, 1.2)
 
 
+def metal_hit(rng: random.Random, base: float, tau: float, ratios=(1.0, 2.76, 5.4, 8.9)) -> list[float]:
+    """Zırh/tokalı metal vuruşu: sönümlü uyumsuz kısmi sesler."""
+    amps = (1.0, 0.6, 0.35, 0.2)
+    specs = [(base * r * rng.uniform(0.98, 1.02), tau / (1.0 + 0.5 * k), a)
+             for k, (r, a) in enumerate(zip(ratios, amps)) if base * r < SR * 0.42]
+    return partials(frames(tau * 4.0), specs)
+
+
+def thud(rng: random.Random, f_hi: float, f_lo: float, tau: float, grit_hz: float, grit_gain: float) -> list[float]:
+    """Gövde/bot darbesi: hızlı perde düşüşlü alçak tok ses + kısa kumlu gürültü patlaması."""
+    n = frames(tau * 4.0)
+    low = sine_sweep(n, lambda t: f_lo + (f_hi - f_lo) * math.exp(-t / 0.025))
+    out = apply(low, env_exp(n, tau, 0.002))
+    grit = filt(noise(n, rng), "lp", grit_hz, 0.9)
+    mix_into(out, apply(grit, env_exp(n, tau * 0.4, 0.001)), grit_gain)
+    return out
+
+
+def dash_armored(rng: random.Random) -> list[float]:
+    """Zırhlı askerin takla atması: kumaş hışırtısı, omuz darbesi, asfaltta sürtünme,
+    zırh/tokalı şıngırtısı ve diz-bot inişi. Havalı hışırtı yok denecek kadar az."""
+    total = rng.uniform(0.52, 0.58)
+    n = frames(total)
+    out = [0.0] * n
+    ti = total * rng.uniform(0.27, 0.33)  # omuz yere çarpar
+    tl = total - rng.uniform(0.11, 0.14)  # diz/bot inişi
+    # 1) kalkışta kumaş/ekipman hışırtısı
+    rn = frames(0.085)
+    rustle = filt(noise(rn, rng), "bp", rng.uniform(1600.0, 2400.0), 0.8)
+    mix_into(out, apply(rustle, env_swell(rn, 0.2, 1.3)), 0.35)
+    # çok hafif hava
+    air = filt(noise(n, rng), "bp", 1000.0, 0.8)
+    mix_into(out, apply(air, env_swell(n, 0.3, 1.8)), 0.05)
+    # 2) omuz darbesi
+    mix_into(out, thud(rng, rng.uniform(115.0, 125.0), rng.uniform(58.0, 66.0), 0.07, 1500.0, 0.55), 1.0, ti)
+    mix_into(out, gear_clunk(rng), 0.45, ti + 0.004)
+    # 3) asfaltta sürtünme: yavaş genlik modülasyonlu kumlu gürültü
+    sn = frames(max(0.05, tl - ti - 0.01))
+    scr_t0 = ti + 0.03
+    sn = max(0, min(sn, n - frames(scr_t0)))
+    sweep = lambda t: 500.0 + 1200.0 * math.sin(math.pi * min(1.0, t / max(0.01, sn / SR))) ** 1.2
+    scrape = filt(noise(sn, rng), "bp", sweep, 0.9)
+    am_raw = filt(noise(sn, rng), "lp", 45.0, 0.7)
+    am_peak = max(abs(v) for v in am_raw) or 1.0
+    am = [0.45 + 0.55 * abs(v) / am_peak for v in am_raw]
+    scrape = apply(apply(scrape, am), env_swell(sn, 0.25, 1.4))
+    mix_into(out, scrape, 0.55, scr_t0)
+    # 4) zırh/tokalı şıngırtısı: darbe çevresinde ve sonda 5 vuruş
+    for k in range(5):
+        around_end = k >= 3
+        at = (tl + rng.uniform(-0.03, 0.05)) if around_end else (ti + rng.uniform(0.01, 0.11))
+        mix_into(out, metal_hit(rng, rng.uniform(1100.0, 3600.0), rng.uniform(0.02, 0.07)),
+                 rng.uniform(0.07, 0.17), min(max(0.0, at), total - 0.1))
+    # 5) toparlanma: ikinci küçük darbe + son kısa şıngırtı
+    mix_into(out, thud(rng, rng.uniform(95.0, 105.0), rng.uniform(52.0, 58.0), 0.05, 900.0, 0.35), 0.5, tl)
+    mix_into(out, metal_hit(rng, rng.uniform(1800.0, 3000.0), 0.03), 0.1, min(tl + 0.03, total - 0.1))
+    # DC'yi at, hafif sınırla, kısa giriş
+    mean = sum(out) / n
+    out = [v - mean for v in out]
+    for i in range(frames(0.003)):
+        out[i] *= i / frames(0.003)
+    return soft_clip(out, 1.1)
+
+
 def swing(rng: random.Random, total: float, low: float, high: float, hum: float = 0.0, crackle: float = 0.0, ring: float = 0.0) -> list[float]:
     """Yakın dövüş savurması: hava hışırtısı (süpürülen bant). hum: enerji uğultusu (Hz, 0 yok),
     crackle: ateş çıtırtısı payı, ring: metal tınısı payı (kılıç)."""
@@ -478,6 +542,8 @@ def main() -> int:
         write_wav(f"footstep_{i}", footstep(random.Random(seed)))
     for i, seed in enumerate((501, 502, 503), start=1):
         write_wav(f"dash_{i}", dash(random.Random(seed)))
+    for i, seed in enumerate((511, 512, 513), start=1):
+        write_wav(f"dash_armored_{i}", dash_armored(random.Random(seed)))
     groans = ((701, 88.0, 1.3), (702, 72.0, 1.6), (703, 104.0, 1.1), (704, 80.0, 1.8), (705, 96.0, 1.4))
     for i, (seed, base, length) in enumerate(groans, start=1):
         write_wav(f"horde_groan_{i}", horde_groan(random.Random(seed), base, length))

@@ -2,6 +2,13 @@
 
 Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar verilince "Açık kararlar"dan çıkarılıp tarihli bölüme yazılır.
 
+## 2026-11-22 — 8.4 ses seti: kaynak ve sıra (Taha)
+
+- **Kaynak karma:** gerçekçi sesler (ateş, gece şehir uğultusu, uzak siren/köpek/cam, ileride zombi sesleri, patlama) CC0 paketten; Taha indirir (Freesound "Creative Commons 0" filtresi ya da OpenGameArt CC0), Claude arama kelimesini ve lisansı söyler, her dosya CREDITS.md'ye. Basit/elektrik sesleri (neon vızıltısı, tel uğultusu, rüzgâr) ve arayüz kodla (`tools/sfx/gen_ambience.py`).
+- **Sıra:** ortam → zombi → silah → arayüz; her grup bitince Taha dinleyip onaylar.
+- **Takla sesi değişir:** Taha "oyunumuza hiç uymuyor, zırhlı bir bireyin taklası gibi olmalı" dedi. Yeni ses: gövdenin asfalta tok çarpması, kumaş/plaka sürtünmesi, plaka ve toka tıngırtısı; eski ses `FEATURE_SFX_DASH_ARMORED=false` ile geri gelir.
+- Claude'un kararları: Master / SFX / Ambience / UI / Music veri yolları; konumlu sesleri kamera (37 m) değil asker dinler (AudioListener3D askerde).
+
 ## 2026-11-20 — 7.3 beş özel tür tasarımı (Claude; Taha "komple bitir" dedi, arenada gözden geçirecek)
 
 - Taha: "devam, alt ajanlarla işi yönet, komple bitir bana öyle gel". Bu yüzden konsept onayı ara adımı atlandı; tasarım ve görsel kararları Claude verdi, hepsi bayrakla kapatılabilir.
