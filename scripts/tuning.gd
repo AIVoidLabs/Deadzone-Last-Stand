@@ -232,6 +232,7 @@ const FEATURE_SFX_DASH: bool = true
 const FEATURE_SFX_DASH_ARMORED: bool = true  # zırhlı takla sesi (kapalıysa eski dash)
 const FEATURE_SFX_PLAYER_HURT: bool = true
 const FEATURE_SFX_PICKUP: bool = true
+const FEATURE_SFX_PICKUP_DARK: bool = true  # koyu/kapalı kristal sesi (kapalıysa eski pickup)
 ## Ortam sesleri (8.4a): ana anahtar. Hepsi kapalıyken oyun eskisi gibi; alt anahtarlar tek tek kapatır.
 const FEATURE_SFX_AMBIENCE: bool = true
 ## Ateş / neon / tel konumlarında 3B döngü sesleri (alıcı askerin üstünde).

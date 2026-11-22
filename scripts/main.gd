@@ -152,7 +152,7 @@ func _add_pickups(player: Player, enemies: EnemyManager, director: SpawnDirector
 	pickups.collected.connect(func(value: int) -> void:
 		loot.add(value)
 		if Tuning.FEATURE_SFX:
-			Audio.play(SoundData.PICKUP))
+			Audio.play(SoundData.PICKUP_DARK if Tuning.FEATURE_SFX_PICKUP_DARK else SoundData.PICKUP))
 	director.phase_changed.connect(func(phase: WaveRun.Phase, _wave_index: int) -> void:
 		if phase == WaveRun.Phase.CLEAR:
 			pickups.collect_all()

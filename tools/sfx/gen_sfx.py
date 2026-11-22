@@ -327,68 +327,74 @@ def dash(rng: random.Random) -> list[float]:
     return soft_clip(out, 1.2)
 
 
-def metal_hit(rng: random.Random, base: float, tau: float, ratios=(1.0, 2.76, 5.4, 8.9)) -> list[float]:
-    """Zırh/tokalı metal vuruşu: sönümlü uyumsuz kısmi sesler."""
-    amps = (1.0, 0.6, 0.35, 0.2)
-    specs = [(base * r * rng.uniform(0.98, 1.02), tau / (1.0 + 0.5 * k), a)
-             for k, (r, a) in enumerate(zip(ratios, amps)) if base * r < SR * 0.42]
-    return partials(frames(tau * 4.0), specs)
+def lp2(sig: list[float], freq: float) -> list[float]:
+    """İki kademe alçak geçiren: üstte tını kalmasın."""
+    return filt(filt(sig, "lp", freq, 0.707), "lp", freq, 0.707)
 
 
-def thud(rng: random.Random, f_hi: float, f_lo: float, tau: float, grit_hz: float, grit_gain: float) -> list[float]:
-    """Gövde/bot darbesi: hızlı perde düşüşlü alçak tok ses + kısa kumlu gürültü patlaması."""
+def thud(rng: random.Random, f_hi: float, f_lo: float, tau: float, body_hz: float, body_gain: float) -> list[float]:
+    """Gövde/bot darbesi: perde düşüşlü alçak tok ses + 200-500 Hz 'gövde' gürültüsü (küçük hoparlörde duyulsun)."""
     n = frames(tau * 4.0)
     low = sine_sweep(n, lambda t: f_lo + (f_hi - f_lo) * math.exp(-t / 0.025))
     out = apply(low, env_exp(n, tau, 0.002))
-    grit = filt(noise(n, rng), "lp", grit_hz, 0.9)
-    mix_into(out, apply(grit, env_exp(n, tau * 0.4, 0.001)), grit_gain)
+    body = lp2(filt(noise(n, rng), "bp", body_hz, 0.8), 900.0)
+    mix_into(out, apply(body, env_exp(n, tau * 0.6, 0.001)), body_gain)
     return out
 
 
+def pad_knock(rng: random.Random) -> list[float]:
+    """Kumaş kaplı plakanın yere değmesi: <25 ms, ~800 Hz altı gürültü patlaması, tını yok."""
+    n = frames(rng.uniform(0.016, 0.024))
+    return apply(lp2(noise(n, rng), rng.uniform(600.0, 800.0)), env_exp(n, 0.006, 0.001))
+
+
 def dash_armored(rng: random.Random) -> list[float]:
-    """Zırhlı askerin takla atması: kumaş hışırtısı, omuz darbesi, asfaltta sürtünme,
-    zırh/tokalı şıngırtısı ve diz-bot inişi. Havalı hışırtı yok denecek kadar az."""
+    """Zırhlı askerin takla atması, kapalı/boğuk tonlu: kayış-kumaş hışırtısı, omuz darbesi,
+    asfaltta kumlu sürtünme, 1-3 yastıklı vuruş, diz-bot inişi. Tınlayan metal yok."""
     total = rng.uniform(0.52, 0.58)
     n = frames(total)
     out = [0.0] * n
     ti = total * rng.uniform(0.27, 0.33)  # omuz yere çarpar
     tl = total - rng.uniform(0.11, 0.14)  # diz/bot inişi
-    # 1) kalkışta kumaş/ekipman hışırtısı
-    rn = frames(0.085)
-    rustle = filt(noise(rn, rng), "bp", rng.uniform(1600.0, 2400.0), 0.8)
-    mix_into(out, apply(rustle, env_swell(rn, 0.2, 1.3)), 0.35)
-    # çok hafif hava
-    air = filt(noise(n, rng), "bp", 1000.0, 0.8)
-    mix_into(out, apply(air, env_swell(n, 0.3, 1.8)), 0.05)
-    # 2) omuz darbesi
-    mix_into(out, thud(rng, rng.uniform(115.0, 125.0), rng.uniform(58.0, 66.0), 0.07, 1500.0, 0.55), 1.0, ti)
-    mix_into(out, gear_clunk(rng), 0.45, ti + 0.004)
-    # 3) asfaltta sürtünme: yavaş genlik modülasyonlu kumlu gürültü
-    sn = frames(max(0.05, tl - ti - 0.01))
-    scr_t0 = ti + 0.03
-    sn = max(0, min(sn, n - frames(scr_t0)))
-    sweep = lambda t: 500.0 + 1200.0 * math.sin(math.pi * min(1.0, t / max(0.01, sn / SR))) ** 1.2
-    scrape = filt(noise(sn, rng), "bp", sweep, 0.9)
+    # kalkışta kayış/kumaş hışırtısı (400-1800 Hz)
+    rn = frames(0.09)
+    rustle = lp2(filt(noise(rn, rng), "bp", rng.uniform(800.0, 1100.0), 0.7), 1800.0)
+    mix_into(out, apply(rustle, env_swell(rn, 0.25, 1.3)), 0.7)
+    # omuz darbesi: alçak tok ses + gövde katmanı + kısa kumlu patlama
+    mix_into(out, thud(rng, rng.uniform(120.0, 138.0), rng.uniform(58.0, 66.0), 0.075, rng.uniform(280.0, 380.0), 0.9), 1.0, ti)
+    gn = frames(0.07)
+    grit = lp2(noise(gn, rng), 1400.0)
+    mix_into(out, apply(grit, env_exp(gn, 0.02, 0.001)), 0.5, ti)
+    # asfalt sürtünmesi: ~2 kHz üstü kesik, yavaş genlik modülasyonlu
+    t0 = ti + 0.03
+    sn = max(0, min(frames(tl - ti - 0.01), n - frames(t0)))
+    sweep = lambda t: 450.0 + 900.0 * math.sin(math.pi * min(1.0, t / max(0.01, sn / SR))) ** 1.2
+    scrape = lp2(filt(noise(sn, rng), "bp", sweep, 0.8), 1900.0)
     am_raw = filt(noise(sn, rng), "lp", 45.0, 0.7)
     am_peak = max(abs(v) for v in am_raw) or 1.0
-    am = [0.45 + 0.55 * abs(v) / am_peak for v in am_raw]
-    scrape = apply(apply(scrape, am), env_swell(sn, 0.25, 1.4))
-    mix_into(out, scrape, 0.55, scr_t0)
-    # 4) zırh/tokalı şıngırtısı: darbe çevresinde ve sonda 5 vuruş
-    for k in range(5):
-        around_end = k >= 3
-        at = (tl + rng.uniform(-0.03, 0.05)) if around_end else (ti + rng.uniform(0.01, 0.11))
-        mix_into(out, metal_hit(rng, rng.uniform(1100.0, 3600.0), rng.uniform(0.02, 0.07)),
-                 rng.uniform(0.07, 0.17), min(max(0.0, at), total - 0.1))
-    # 5) toparlanma: ikinci küçük darbe + son kısa şıngırtı
-    mix_into(out, thud(rng, rng.uniform(95.0, 105.0), rng.uniform(52.0, 58.0), 0.05, 900.0, 0.35), 0.5, tl)
-    mix_into(out, metal_hit(rng, rng.uniform(1800.0, 3000.0), 0.03), 0.1, min(tl + 0.03, total - 0.1))
-    # DC'yi at, hafif sınırla, kısa giriş
+    am = [0.4 + 0.6 * abs(v) / am_peak for v in am_raw]
+    mix_into(out, apply(apply(scrape, am), env_swell(sn, 0.25, 1.4)), 1.1, t0)
+    # yastıklı vuruşlar (1-3)
+    for _ in range(rng.randint(1, 3)):
+        at = rng.choice((ti + rng.uniform(0.03, 0.12), tl + rng.uniform(-0.04, 0.02)))
+        mix_into(out, pad_knock(rng), rng.uniform(0.35, 0.6), min(max(0.0, at), total - 0.05))
+    # toparlanma: ikinci küçük darbe
+    mix_into(out, thud(rng, rng.uniform(100.0, 112.0), rng.uniform(52.0, 58.0), 0.055, rng.uniform(250.0, 350.0), 0.7), 0.55, tl)
     mean = sum(out) / n
     out = [v - mean for v in out]
     for i in range(frames(0.003)):
         out[i] *= i / frames(0.003)
-    return soft_clip(out, 1.1)
+    return lp2(soft_clip(out, 1.1), 2600.0)
+
+
+def pickup_dark(rng: random.Random, base: float) -> list[float]:
+    """Kapalı, boğuk 'thup': alçak geçirilmiş yumuşak blip, hafif aşağı kayma, altta tok vuruş. Parlak tını yok."""
+    n = frames(0.13)
+    tone = sine_sweep(n, lambda t: base * (1.0 + 0.18 * math.exp(-t / 0.03)))
+    out = apply(tone, env_exp(n, 0.032, 0.004))
+    sub = sine_sweep(n, lambda t: 90.0 + 30.0 * math.exp(-t / 0.02))
+    mix_into(out, apply(sub, env_exp(n, 0.03, 0.004)), 0.45)
+    return lp2(out, 1200.0)
 
 
 def swing(rng: random.Random, total: float, low: float, high: float, hum: float = 0.0, crackle: float = 0.0, ring: float = 0.0) -> list[float]:
@@ -566,6 +572,8 @@ def main() -> int:
     write_wav("player_hurt_1", player_hurt(random.Random(601)))
     for i, (seed, base) in enumerate(((801, 1320.0), (802, 1480.0), (803, 1180.0)), start=1):
         write_wav(f"pickup_{i}", pickup(random.Random(seed), base))
+    for i, (seed, base) in enumerate(((811, 300.0), (812, 340.0), (813, 270.0)), start=1):
+        write_wav(f"pickup_dark_{i}", pickup_dark(random.Random(seed), base))
     return 0
 
 

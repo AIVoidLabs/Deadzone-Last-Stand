@@ -16,6 +16,7 @@ const DASH_ARMORED: StringName = &"dash_armored"
 const PLAYER_HURT: StringName = &"player_hurt"
 const HORDE_GROAN: StringName = &"horde_groan"
 const PICKUP: StringName = &"pickup"
+const PICKUP_DARK: StringName = &"pickup_dark"
 
 const TABLE: Dictionary = {
 	&"shot": {
@@ -107,6 +108,11 @@ const TABLE: Dictionary = {
 		"enabled": Tuning.FEATURE_SFX_PICKUP,
 		"files": ["pickup_1", "pickup_2", "pickup_3"],
 		"volume_db": -17.0, "pitch_variance": 0.08, "max_voices": 3, "min_interval": 0.035,
+	},
+	&"pickup_dark": {
+		"enabled": Tuning.FEATURE_SFX_PICKUP,
+		"files": ["pickup_dark_1", "pickup_dark_2", "pickup_dark_3"],
+		"volume_db": -14.0, "pitch_variance": 0.08, "max_voices": 3, "min_interval": 0.035,
 	},
 	&"player_hurt": {
 		"enabled": Tuning.FEATURE_SFX_PLAYER_HURT,
