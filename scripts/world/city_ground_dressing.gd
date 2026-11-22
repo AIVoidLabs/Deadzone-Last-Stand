@@ -28,7 +28,7 @@ func _ready() -> void:
 	if Tuning.FEATURE_CITY_BLOOD_DECALS or Tuning.FEATURE_CITY_GROUND_DECALS:
 		add_child(CityDecals.new(_blocked, corpse_spots, _hot))
 	_build_debris()
-	_build_cones()
+	_build_cones(corpse_spots)
 	_build_signs()
 	_apply_quality(Quality.current)
 	Quality.profile_changed.connect(_apply_quality)
@@ -110,7 +110,7 @@ func _build_debris() -> void:
 	_add_group(quad, xfs, colors, 0.95, mat, customs)
 
 
-func _build_cones() -> void:
+func _build_cones(corpse_spots: Array[Vector3]) -> void:
 	var cone: CylinderMesh = CylinderMesh.new()
 	cone.top_radius = 0.03
 	cone.bottom_radius = 0.16
@@ -123,6 +123,8 @@ func _build_cones() -> void:
 	var colors: Array[Color] = []
 	for i: int in Tuning.DRESS_CONES:
 		var p: Vector3 = _free_point(1.0)
+		if Tuning.FEATURE_CITY_CONE_CLEAR:
+			p = CityConePlacement.pick_spot(p, corpse_spots, _blocked, Tuning.DRESS_CONE_CORPSE_GAP, PROP_CLEARANCE, Tuning.CITY_STREET_WIDTH * 0.5 - 1.0)
 		var yaw: Basis = Basis(Vector3.UP, _rng.randf() * TAU)
 		if _rng.randf() < 0.75:
 			xfs.append(Transform3D(yaw * Basis(Vector3.FORWARD, PI * 0.5), Vector3(p.x, 0.2, p.z)))

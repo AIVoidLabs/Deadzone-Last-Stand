@@ -64,9 +64,13 @@ func _ready() -> void:
 	_build_inner_blocks()
 	if Tuning.FEATURE_CITY_FACADE_LIGHTS:
 		add_child(CityFacadeLights.new())
+	if Tuning.FEATURE_CITY_OUTER_WINDOWS:
+		add_child(CityOuterWindows.new())
 	_build_decor()
 	_build_lights()
 	add_child(CityFx.new())
+	if Tuning.FEATURE_CITY_WEST_LIGHT:
+		add_child(CityWestLight.new())
 	if Tuning.FEATURE_CITY_GROUND_DRESSING:
 		add_child(CityGroundDressing.new())
 	if Tuning.FEATURE_CITY_WIRES:

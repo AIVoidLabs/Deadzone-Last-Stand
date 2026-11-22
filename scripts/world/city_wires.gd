@@ -4,6 +4,11 @@ extends Node3D
 ## Kapatma: Tuning.FEATURE_CITY_WIRES.
 
 const SEGMENTS: int = 16
+const POLE_SHADER: Shader = preload("res://assets/shaders/pole_fade.gdshader")
+const POLE_COLOR: Color = Color(0.1, 0.075, 0.055)
+
+var _poles: Array[Dictionary] = []   # {base: Vector3, mat: ShaderMaterial, fade: float}
+var _player: Node3D
 ## Blok indeksleri: 0 = -x-z, 1 = +x-z, 2 = -x+z, 3 = +x+z (CITY_INNER_BLOCK_HEIGHTS sırası).
 
 
@@ -40,9 +45,7 @@ func _ready() -> void:
 
 ## Basit low-poly elektrik direği: gövde + iki çapraz kol.
 func _add_pole(base: Vector3) -> void:
-	var mat: StandardMaterial3D = StandardMaterial3D.new()
-	mat.albedo_color = Color(0.1, 0.075, 0.055)
-	mat.roughness = 0.9
+	var mat: Material = _pole_material(base)
 	var parts: Array = [
 		[Vector3(0.28, Tuning.POLE_HEIGHT, 0.28), Vector3(0.0, Tuning.POLE_HEIGHT * 0.5, 0.0)],
 		[Vector3(0.18, 0.18, 3.2), Vector3(0.0, Tuning.POLE_HEIGHT - 0.4, 0.0)],
@@ -56,6 +59,50 @@ func _add_pole(base: Vector3) -> void:
 		box.material_override = mat
 		box.position = base + (p[1] as Vector3)
 		add_child(box)
+		if Tuning.FEATURE_POLE_FADE:
+			# gölge değişmesin: görünen kopya gölgesiz, düz malzemeli kopya yalnız gölge atar
+			box.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			var shadow: MeshInstance3D = MeshInstance3D.new()
+			shadow.mesh = mesh
+			shadow.material_override = _plain_pole_material()
+			shadow.position = box.position
+			shadow.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY
+			add_child(shadow)
+
+
+func _plain_pole_material() -> StandardMaterial3D:
+	var mat: StandardMaterial3D = StandardMaterial3D.new()
+	mat.albedo_color = POLE_COLOR
+	mat.roughness = 0.9
+	return mat
+
+
+## Direk malzemesi: fade açıkken direk başına ayrı shader malzemesi.
+func _pole_material(base: Vector3) -> Material:
+	if not Tuning.FEATURE_POLE_FADE:
+		return _plain_pole_material()
+	var mat: ShaderMaterial = ShaderMaterial.new()
+	mat.shader = POLE_SHADER
+	mat.set_shader_parameter(&"albedo", POLE_COLOR)
+	mat.set_shader_parameter(&"roughness", 0.9)
+	_poles.append({"base": base, "mat": mat, "fade": 0.0})
+	return mat
+
+
+func _process(delta: float) -> void:
+	if not Tuning.FEATURE_POLE_FADE or _poles.is_empty():
+		return
+	var camera: Camera3D = get_viewport().get_camera_3d()
+	if not is_instance_valid(_player):
+		_player = get_tree().current_scene.get_node_or_null("Player") as Node3D if get_tree().current_scene != null else null
+	if camera == null or _player == null:
+		return
+	var target: Vector3 = _player.global_position + Vector3(0.0, Tuning.POLE_FADE_TARGET_HEIGHT, 0.0)
+	for pole: Dictionary in _poles:
+		var covers: bool = PoleFadeRules.occludes(camera.global_position, target, pole["base"], Tuning.POLE_HEIGHT, Tuning.POLE_FADE_RADIUS)
+		var goal: float = Tuning.POLE_FADE_AMOUNT if covers else 0.0
+		pole["fade"] = move_toward(pole["fade"], goal, Tuning.POLE_FADE_SPEED * delta)
+		(pole["mat"] as ShaderMaterial).set_shader_parameter(&"fade", pole["fade"])
 
 
 ## Sarkık eğri boyunca kare kesitli ince boru.

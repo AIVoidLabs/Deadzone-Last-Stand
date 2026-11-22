@@ -457,6 +457,10 @@ const DASH_DUST_LIFETIME: float = 0.45
 ## Asker dokusunun çarpıldığı renk: Tripo dokusu açık tonlu, yukarıdan ışıkta beyaza kaçıyor.
 ## Biraz koyu ve maviye çekilince lacivert zırh ve gri plakalar okunur. Color.WHITE = doku olduğu gibi.
 const PLAYER_ALBEDO_TINT: Color = Color(0.62, 0.66, 0.82)
+## 8.3j: gece zeminde ayrışsın diye daha açık albedo (yalnız albedo + pürüzlülük; ışık/emission yok). Kapalıyken eski tint.
+const FEATURE_PLAYER_BRIGHT_ALBEDO: bool = true
+const PLAYER_BRIGHT_ALBEDO_TINT: Color = Color(1.1, 1.15, 1.5)
+const PLAYER_BRIGHT_ROUGHNESS: float = 0.7
 ## Animasyonlar arası geçiş süresi (sn).
 const PLAYER_ANIM_BLEND: float = 0.15
 ## Vurulma klibinin girip çıkma süresi (sn).
@@ -719,6 +723,9 @@ const DRESS_CONES: int = 14
 const DRESS_SIGNS: int = 6
 const DRESS_CORPSES: int = 9
 const DRESS_SEED: int = 8304
+## 8.3j: koniler cesetlere bu mesafeden (m) yakın durmaz; yalnız çakışan koni taşınır.
+const FEATURE_CITY_CONE_CLEAR: bool = true
+const DRESS_CONE_CORPSE_GAP: float = 2.2
 ## Dekorun yayıldığı yer: merkezde yoğun (alan içi payı) ve kol uzunluğu boyunca.
 const DRESS_ARENA_SHARE: float = 0.75
 const DRESS_DEBRIS_SIZE: Vector2 = Vector2(0.1, 0.6)
@@ -756,6 +763,24 @@ const CITY_FACADE_LAMP_COLOR: Color = Color(1.0, 0.62, 0.25)
 const CITY_FACADE_LAMP_RADIUS: float = 2.3
 const CITY_FACADE_LAMP_WALL_ENERGY: float = 0.4
 const CITY_FACADE_LAMP_GROUND_ENERGY: float = 0.28
+## 8.3j: dış blokların (OUTER_BLOCKS, eğik olmayan) sokağa bakan yüzlerine pencere ızgarası; tek MultiMesh, gölgesiz.
+## Kapalı: duvarlar simsiyah olduğu için yanan pencere boşlukta asılı görünüyor.
+const FEATURE_CITY_OUTER_WINDOWS: bool = false
+const CITY_OUTER_WINDOW_COL_STEP: float = 3.6
+const CITY_OUTER_WINDOW_FLOOR_STEP: float = 3.4
+const CITY_OUTER_WINDOW_FIRST_Z: float = 3.2
+const CITY_OUTER_WINDOW_TOP_MARGIN: float = 2.2
+const CITY_OUTER_WINDOW_EDGE_MARGIN: float = 1.8
+## Yüzün sokak kolu şeridine bitişikliği: blok kenarı bu mesafeden (m) yakınsa yüz sokağa bakar.
+const CITY_OUTER_WINDOW_STREET_REACH: float = 16.0
+const CITY_OUTER_WINDOW_LIT_CHANCE: float = 0.07
+const CITY_OUTER_WINDOW_LIT_COLOR: Color = Color(0.5, 0.25, 0.07, 0.95)
+const CITY_OUTER_WINDOW_DARK_COLOR: Color = Color(0.012, 0.012, 0.016, 0.55)
+## 8.3j: bina modelindeki yanan pencere malzemesi ("warm", emisyon gücü 7) patlıyordu; çalışma zamanında sönük ambere indirilir.
+const FEATURE_CITY_WINDOW_DIM: bool = true
+const CITY_WINDOW_DIM_MATERIAL: String = "warm"
+const CITY_WINDOW_DIM_ENERGY: float = 1.3
+const CITY_WINDOW_DIM_COLOR: Color = Color(1.0, 0.5, 0.13)
 ## Çift sarı orta şerit: renk, çizgi eni, iki çizgi arası (m).
 const CITY_LANE_COLOR: Color = Color(0.62, 0.44, 0.1)
 const CITY_LANE_WIDTH: float = 0.13
@@ -767,8 +792,24 @@ const WIRE_RADIUS: float = 0.03
 const POLE_HEIGHT: float = 8.5
 const WIRE_COUNT: int = 4
 const WIRE_SPACING: float = 0.7
+## 8.3j: direk askeri kapatınca yarı saydam (noktalı eleme). Yarıçap (m) kamera-asker ışınının direk eksenine yakınlığı,
+## hedef = elenen nokta oranı (0-1), hız = saniyedeki değişim, hedef yüksekliği askerin gövdesi (m).
+const FEATURE_POLE_FADE: bool = true
+const POLE_FADE_RADIUS: float = 1.1
+const POLE_FADE_AMOUNT: float = 0.85
+const POLE_FADE_SPEED: float = 4.0
+const POLE_FADE_TARGET_HEIGHT: float = 1.0
 ## Merkez kavşak ışığı (trafik lambası): asker merkezde başlar.
 const CITY_CENTER_LIGHT_ENERGY: float = 8.0
 const CITY_CENTER_LIGHT_RANGE: float = 12.0
 const CITY_CENTER_LIGHT_COLOR: Color = Color(1.0, 0.72, 0.4)
+## 8.3j: batı kolu (x < -10) doğudan karanlıktı; görünür kaynaklar: sönmekte olan çöp ateşleri (küçük ateş + zemin sızıntısı), omni yok.
+const FEATURE_CITY_WEST_LIGHT: bool = true
+const CITY_WEST_FIRES: Array[Vector3] = [Vector3(-18.5, 0.0, 5.5), Vector3(-26.5, 0.0, -7.0)]
+const CITY_WEST_FIRE_SCALE: float = 0.3
+## Her kaynağın ek sıcak zemin sızıntısı: yarıçap (m), güç (glow_quad energy), titreme.
+const CITY_WEST_GLOW_RADIUS: float = 8.0
+const CITY_WEST_GLOW_ENERGY: float = 0.03
+const CITY_WEST_GLOW_FLICKER: float = 0.35
+const CITY_WEST_GLOW_COLOR: Color = Color(1.0, 0.58, 0.2)
 const WIRE_COLOR: Color = Color(0.015, 0.012, 0.012)

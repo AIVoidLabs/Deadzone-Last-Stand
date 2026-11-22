@@ -27,8 +27,28 @@ func _ready() -> void:
 		var c: Vector2 = rect.get_center()
 		_building(Vector3(c.x, 0.0, c.y), _quarter(c))
 	_flush_windows()
+	if Tuning.FEATURE_CITY_WINDOW_DIM:
+		_dim_model_windows()
 	_apply_quality(Quality.current)
 	Quality.profile_changed.connect(_apply_quality)
+
+
+## Bina modelindeki yanan pencere malzemesi (paylaşılan kaynak) sönük amber olur; glb dosyası değişmez.
+func _dim_model_windows() -> void:
+	var scene: PackedScene = load(Tuning.CITY_BUILDING_SCENE) as PackedScene
+	if scene == null:
+		return
+	var root: Node = scene.instantiate()
+	for mi: Node in root.find_children("*", "MeshInstance3D", true, false):
+		var mesh: Mesh = (mi as MeshInstance3D).mesh
+		if mesh == null:
+			continue
+		for s: int in mesh.get_surface_count():
+			var mat: StandardMaterial3D = mesh.surface_get_material(s) as StandardMaterial3D
+			if mat != null and mat.resource_name == Tuning.CITY_WINDOW_DIM_MATERIAL:
+				mat.emission = Tuning.CITY_WINDOW_DIM_COLOR
+				mat.emission_energy_multiplier = Tuning.CITY_WINDOW_DIM_ENERGY
+	root.free()
 
 
 ## Bina A'nın gerçek pencere ızgarası (tools/blender/build_city_building.py: WIN_U, WIN_Z, WINDOWS) dünyaya döndürülür.
