@@ -6,6 +6,8 @@ const BUS: StringName = &"SFX"
 
 ## Açılıştan beri çalınan ses sayısı (debug paneli).
 var played_total: int = 0
+## Dinleyici konumunu veren çağrı (Vector3 döner); ana sahne atar. Boşsa play_at kısmaz.
+var listener: Callable = Callable()
 
 var _streams: Dictionary = {}
 var _players: Array[AudioStreamPlayer] = []
@@ -37,6 +39,7 @@ func _exit_tree() -> void:
 		player.stop()
 		player.stream = null
 	_streams.clear()
+	listener = Callable()
 
 
 ## volume_offset_db: tablo düzeyine eklenir (ör. sürü homurtusu yoğunluğa göre kısılır).
@@ -58,6 +61,19 @@ func play(id: StringName, volume_offset_db: float = 0.0) -> void:
 	_playing_id[index] = id
 	player.play()
 	played_total += 1
+
+
+## Konumlu ses: dinleyiciye (listener) uzaklığa göre kısılır, MAX ötesinde çalmaz. listener atanmamışsa kısılmadan çalar.
+func play_at(id: StringName, at: Vector3, volume_offset_db: float = 0.0) -> void:
+	if not Tuning.FEATURE_SFX or not _streams.has(id):
+		return
+	var offset: float = volume_offset_db
+	if listener.is_valid():
+		var distance: float = SoundDistance.flat_distance(at, listener.call())
+		if not SoundDistance.audible(distance, Tuning.SFX_DISTANCE_MAX):
+			return
+		offset += SoundDistance.offset_db(distance, Tuning.SFX_DISTANCE_FULL, Tuning.SFX_DISTANCE_MAX, Tuning.SFX_DISTANCE_MIN_DB)
+	play(id, offset)
 
 
 ## Debug paneli için: şu an çalan ses sayısı.

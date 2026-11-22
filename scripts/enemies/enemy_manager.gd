@@ -25,6 +25,11 @@ signal boss_event(event_name: StringName, data: Dictionary)
 ## Zırhlıya önden gelen (azaltılmış) isabet; öldürmeyen vuruşlarda enemy_damaged yerine (kan yok: gri kıvılcım, küçük sayı).
 signal enemy_blocked(at: Vector3, direction: Vector2, amount: float)
 
+## Özel saldırı başladı (ses için): kind &"runner" / &"jump"; phase &"sprint" / &"lunge" / &"takeoff"; at yerde.
+signal special_started(kind: StringName, phase: StringName, at: Vector3)
+## Dilci olayı (ses için): kind &"shoot" / &"attach" / &"melee"; at dilcinin yerdeki konumu.
+signal tongue_event(kind: StringName, at: Vector3)
+
 const PHYSICS_PRIORITY: int = -10
 ## Bu hızın (karesi) altındaki itme sıfırlanır.
 const KNOCK_REST_SQ: float = 0.0025

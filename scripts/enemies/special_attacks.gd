@@ -174,6 +174,8 @@ func begin_windup(i: int, p: Vector2, target: Vector2, target_vel: Vector2) -> v
 	if row["attack_kind"] == &"scream":
 		_scream.aim_tick(i, p, target)
 		return
+	if row["attack_kind"] == &"sprint" or row["attack_kind"] == &"lunge":
+		_m.special_started.emit(&"runner", &"windup", Vector3(p.x, 0.1, p.y))
 	_windup_tick(i, row, p, target, target_vel)
 
 
@@ -184,10 +186,12 @@ func end_windup(i: int, target: Vector2) -> ZombieRules.State:
 		&"lunge":
 			_m.lunge_starts += 1
 			_m._enter(i, S.LUNGE, row["lunge_time"])
+			_m.special_started.emit(&"runner", &"lunge", Vector3(_m._pos[i].x, 0.1, _m._pos[i].y))
 			return S.LUNGE
 		&"sprint":
 			return _sprint.begin(i)
 		&"jump":
+			_m.special_started.emit(&"jump", &"takeoff", Vector3(_m._pos[i].x, 0.1, _m._pos[i].y))
 			_m._targetable[i] = 0
 			_m._enter(i, S.JUMP, row["jump_time"])
 			return S.JUMP

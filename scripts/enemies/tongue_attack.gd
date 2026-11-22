@@ -111,6 +111,7 @@ func _melee_strike(i: int, row: Dictionary, target: Vector2) -> ZombieRules.Stat
 		_m.player.take_hit(_m._damage[i], target - p)
 	_m._enter(i, S.RECOVER, row["tongue_melee_recover"])
 	_m._nodes[i].event.emit(&"melee", {})
+	_m.tongue_event.emit(&"melee", _ground_point(p))
 	return S.RECOVER
 
 
@@ -122,6 +123,7 @@ func _shoot_tongue(i: int, row: Dictionary) -> ZombieRules.State:
 	_m.tongue_shots += 1
 	_m._enter(i, S.LASH, flight)
 	_m._nodes[i].event.emit(&"tongue", {"shoot": true, "to": _player_point(end), "time": flight})
+	_m.tongue_event.emit(&"shoot", _ground_point(_m._pos[i]))
 	return S.LASH
 
 
@@ -144,6 +146,7 @@ func _tongue_flight(i: int, row: Dictionary, p: Vector2, delta: float, target: V
 	_m.latched = _m._nodes[i]
 	_m._enter(i, S.PULL, pull_time)
 	_m._nodes[i].event.emit(&"tongue", {"attach": true, "to": _player_point(target)})
+	_m.tongue_event.emit(&"attach", _ground_point(p))
 
 
 ## Yakalanan asker dilciye doğru yavaşça çekilir; yakına gelince dilci ısırır ve bırakır.
@@ -185,10 +188,16 @@ func _fire_tongue(i: int, row: Dictionary, target: Vector2) -> ZombieRules.State
 		_m.latched = node
 		_m._enter(i, S.LASH, row["root_time"])
 		node.event.emit(&"tongue", {"shoot": true, "to": _player_point(target), "time": OLD_EXTEND_TIME})
+		_m.tongue_event.emit(&"shoot", _ground_point(p))
 		return S.LASH
 	node.event.emit(&"tongue", {"shoot": true, "to": Vector3(end.x, 1.3, end.y), "time": OLD_EXTEND_TIME, "hold": Tuning.TONGUE_MISS_SHOW_TIME})
+	_m.tongue_event.emit(&"shoot", _ground_point(p))
 	_m._enter(i, S.RECOVER, row["tongue_miss_recover"])
 	return S.RECOVER
+
+
+static func _ground_point(p: Vector2) -> Vector3:
+	return Vector3(p.x, 0.1, p.y)
 
 
 static func _player_point(target: Vector2) -> Vector3:

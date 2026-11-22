@@ -17,6 +17,22 @@ const PLAYER_HURT: StringName = &"player_hurt"
 const HORDE_GROAN: StringName = &"horde_groan"
 const PICKUP: StringName = &"pickup"
 const PICKUP_DARK: StringName = &"pickup_dark"
+const ZOMBIE_GROAN: StringName = &"zombie_groan"
+const Z_RUNNER_SCREECH: StringName = &"z_runner_screech"
+const Z_SCREAMER_SCREAM: StringName = &"z_screamer_scream"
+const Z_BOSS_ROAR: StringName = &"z_boss_roar"
+const Z_BOSS_WARNING: StringName = &"z_boss_warning"
+const Z_BOSS_CHARGE: StringName = &"z_boss_charge"
+const Z_TONGUE_LASH: StringName = &"z_tongue_lash"
+const Z_TONGUE_SLURP: StringName = &"z_tongue_slurp"
+const Z_SPIT: StringName = &"z_spit"
+const Z_ACID_SPLASH: StringName = &"z_acid_splash"
+const Z_BLOATER_BURST: StringName = &"z_bloater_burst"
+const Z_THROWER_GRUNT: StringName = &"z_thrower_grunt"
+const Z_BODYFALL: StringName = &"z_bodyfall"
+const Z_HEAVY_IMPACT: StringName = &"z_heavy_impact"
+const Z_ROCK_IMPACT: StringName = &"z_rock_impact"
+const Z_SHIELD_THUNK: StringName = &"z_shield_thunk"
 
 const TABLE: Dictionary = {
 	&"shot": {
@@ -118,6 +134,87 @@ const TABLE: Dictionary = {
 		"enabled": Tuning.FEATURE_SFX_PLAYER_HURT,
 		"files": ["player_hurt_1"],
 		"volume_db": -3.0, "pitch_variance": 0.05, "max_voices": 1, "min_interval": 0.15,
+	},
+	# --- Zombi sesleri (8.4b; Tuning.FEATURE_SFX_ZOMBIES) ---
+	&"zombie_groan": {
+		"enabled": Tuning.FEATURE_SFX_ZOMBIES,
+		"files": ["z_groan_1", "z_groan_2", "z_groan_3", "z_groan_4", "z_groan_5", "z_groan_6"],
+		"volume_db": -12.0, "pitch_variance": 0.12, "max_voices": 4, "min_interval": 0.15,
+	},
+	&"z_runner_screech": {
+		"enabled": Tuning.FEATURE_SFX_ZOMBIES,
+		"files": ["z_runner_screech_1", "z_runner_screech_2"],
+		"volume_db": -10.0, "pitch_variance": 0.06, "max_voices": 2, "min_interval": 1.0,
+	},
+	&"z_screamer_scream": {
+		"enabled": Tuning.FEATURE_SFX_ZOMBIES,
+		"files": ["z_screamer_scream_1", "z_screamer_scream_2"],
+		"volume_db": -8.0, "pitch_variance": 0.05, "max_voices": 1, "min_interval": 2.0,
+	},
+	&"z_boss_roar": {
+		"enabled": Tuning.FEATURE_SFX_ZOMBIES,
+		"files": ["z_boss_roar_1", "z_boss_roar_2"],
+		"volume_db": -6.0, "pitch_variance": 0.04, "max_voices": 1, "min_interval": 4.0,
+	},
+	&"z_boss_warning": {
+		"enabled": Tuning.FEATURE_SFX_ZOMBIES,
+		"files": ["z_boss_warning_1"],
+		"volume_db": -6.0, "pitch_variance": 0.0, "max_voices": 1, "min_interval": 0.0,
+	},
+	&"z_boss_charge": {
+		"enabled": Tuning.FEATURE_SFX_ZOMBIES,
+		"files": ["z_boss_charge_1"],
+		"volume_db": -8.0, "pitch_variance": 0.04, "max_voices": 1, "min_interval": 1.5,
+	},
+	&"z_tongue_lash": {
+		"enabled": Tuning.FEATURE_SFX_ZOMBIES,
+		"files": ["z_tongue_lash_1", "z_tongue_lash_2"],
+		"volume_db": -11.0, "pitch_variance": 0.06, "max_voices": 2, "min_interval": 0.4,
+	},
+	&"z_tongue_slurp": {
+		"enabled": Tuning.FEATURE_SFX_ZOMBIES,
+		"files": ["z_tongue_slurp_1"],
+		"volume_db": -11.0, "pitch_variance": 0.06, "max_voices": 1, "min_interval": 0.8,
+	},
+	&"z_spit": {
+		"enabled": Tuning.FEATURE_SFX_ZOMBIES,
+		"files": ["z_spit_1", "z_spit_2"],
+		"volume_db": -12.0, "pitch_variance": 0.06, "max_voices": 2, "min_interval": 0.3,
+	},
+	&"z_acid_splash": {
+		"enabled": Tuning.FEATURE_SFX_ZOMBIES,
+		"files": ["z_acid_splash_1", "z_acid_splash_2"],
+		"volume_db": -12.0, "pitch_variance": 0.06, "max_voices": 2, "min_interval": 0.25,
+	},
+	&"z_bloater_burst": {
+		"enabled": Tuning.FEATURE_SFX_ZOMBIES,
+		"files": ["z_bloater_burst_1", "z_bloater_burst_2"],
+		"volume_db": -8.0, "pitch_variance": 0.06, "max_voices": 2, "min_interval": 0.3,
+	},
+	&"z_thrower_grunt": {
+		"enabled": Tuning.FEATURE_SFX_ZOMBIES,
+		"files": ["z_thrower_grunt_1", "z_thrower_grunt_2"],
+		"volume_db": -12.0, "pitch_variance": 0.06, "max_voices": 2, "min_interval": 0.5,
+	},
+	&"z_bodyfall": {
+		"enabled": Tuning.FEATURE_SFX_ZOMBIES and Tuning.FEATURE_SFX_ZOMBIE_BODYFALL,
+		"files": ["z_bodyfall_1", "z_bodyfall_2", "z_bodyfall_3"],
+		"volume_db": -16.0, "pitch_variance": 0.1, "max_voices": 2, "min_interval": 0.12,
+	},
+	&"z_heavy_impact": {
+		"enabled": Tuning.FEATURE_SFX_ZOMBIES,
+		"files": ["z_heavy_impact_1", "z_heavy_impact_2", "z_heavy_impact_3"],
+		"volume_db": -8.0, "pitch_variance": 0.06, "max_voices": 2, "min_interval": 0.2,
+	},
+	&"z_rock_impact": {
+		"enabled": Tuning.FEATURE_SFX_ZOMBIES,
+		"files": ["z_rock_impact_1", "z_rock_impact_2"],
+		"volume_db": -12.0, "pitch_variance": 0.06, "max_voices": 2, "min_interval": 0.15,
+	},
+	&"z_shield_thunk": {
+		"enabled": Tuning.FEATURE_SFX_ZOMBIES,
+		"files": ["z_shield_thunk_1", "z_shield_thunk_2", "z_shield_thunk_3"],
+		"volume_db": -14.0, "pitch_variance": 0.06, "max_voices": 3, "min_interval": 0.08,
 	},
 }
 

@@ -233,6 +233,10 @@ const FEATURE_SFX_DASH_ARMORED: bool = true  # zırhlı takla sesi (kapalıysa e
 const FEATURE_SFX_PLAYER_HURT: bool = true
 const FEATURE_SFX_PICKUP: bool = true
 const FEATURE_SFX_PICKUP_DARK: bool = true  # koyu/kapalı kristal sesi (kapalıysa eski pickup)
+## Zombi sesleri (8.4b): özel saldırı / yay / patlama / boss / zırh sesleri + yeni homurtu dosyaları. Kapalıyken eski sesler.
+const FEATURE_SFX_ZOMBIES: bool = true
+## Zombi düşme sesi (yalnız FEATURE_SFX_ZOMBIES ile birlikte işe yarar).
+const FEATURE_SFX_ZOMBIE_BODYFALL: bool = true
 ## Ortam sesleri (8.4a): ana anahtar. Hepsi kapalıyken oyun eskisi gibi; alt anahtarlar tek tek kapatır.
 const FEATURE_SFX_AMBIENCE: bool = true
 ## Ateş / neon / tel konumlarında 3B döngü sesleri (alıcı askerin üstünde).
@@ -673,6 +677,10 @@ const CAMERA_SHAKE_ON_PLAYER_HIT: float = 0.45
 # --- Ses ---
 ## Aynı anda çalabilecek en çok ses (havuzdaki oynatıcı sayısı).
 const SFX_POOL_SIZE: int = 32
+## Konumlu sesler (Audio.play_at): bu yarıçapa (m) kadar tam ses, MAX'ta MIN_DB kadar kısık, ötesinde çalmaz.
+const SFX_DISTANCE_FULL: float = 8.0
+const SFX_DISTANCE_MAX: float = 34.0
+const SFX_DISTANCE_MIN_DB: float = -18.0
 ## Ses yolları (bus) düzeyi, dB. Master -> SFX / Ambience / UI / Music (UI ve Music şimdilik boş).
 const BUS_VOLUME_SFX_DB: float = 0.0
 const BUS_VOLUME_AMBIENCE_DB: float = -4.0

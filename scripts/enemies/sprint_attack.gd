@@ -23,6 +23,7 @@ func scream_tick(i: int, p: Vector2, target: Vector2) -> void:
 ## Çığlık bitti: koşu başlar (süresiz).
 func begin(i: int) -> ZombieRules.State:
 	_m._enter(i, S.SPRINT, 0.0)
+	_m.special_started.emit(&"runner", &"sprint", Vector3(_m._pos[i].x, 0.1, _m._pos[i].y))
 	return S.SPRINT
 
 

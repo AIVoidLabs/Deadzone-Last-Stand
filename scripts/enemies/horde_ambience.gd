@@ -29,6 +29,6 @@ func _process(delta: float) -> void:
 	_groan_left -= delta
 	if _groan_left > 0.0:
 		return
-	Audio.play(SoundData.HORDE_GROAN, HordeGroan.volume_offset(_level, Tuning.HORDE_GROAN_SPARSE_DB))
+	Audio.play(SoundData.ZOMBIE_GROAN if Tuning.FEATURE_SFX_ZOMBIES else SoundData.HORDE_GROAN, HordeGroan.volume_offset(_level, Tuning.HORDE_GROAN_SPARSE_DB))
 	_groan_left = HordeGroan.interval(_level, Tuning.HORDE_GROAN_INTERVAL_SPARSE, Tuning.HORDE_GROAN_INTERVAL_DENSE,
 		Tuning.HORDE_GROAN_JITTER, _rng.randf())

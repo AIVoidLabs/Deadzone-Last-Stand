@@ -60,7 +60,8 @@ func _ready() -> void:
 	enemies.jump_landed.connect(func(at: Vector3, radius: float) -> void:
 		LandingFx.play(self, at, radius)
 		camera.add_trauma(Tuning.CAMERA_SHAKE_ON_LAND)
-		Audio.play(&"explosion"))
+		if not Tuning.FEATURE_SFX_ZOMBIES:
+			Audio.play(&"explosion"))
 	projectiles.explosion.connect(func(_at: Vector3, _radius: float) -> void:
 		camera.add_trauma(Tuning.CAMERA_SHAKE_ON_EXPLOSION))
 	_add_lob_fx(enemies, camera)
@@ -76,8 +77,9 @@ func _ready() -> void:
 	enemies.bloat_exploded.connect(func(at: Vector3, radius: float) -> void:
 		ExplosionFx.play(self, at, radius)
 		camera.add_trauma(Tuning.CAMERA_SHAKE_ON_BLOAT)
-		Audio.play(&"explosion"))
-	_add_sounds(player, enemies, weapons, projectiles)
+		if not Tuning.FEATURE_SFX_ZOMBIES:
+			Audio.play(&"explosion"))
+	_add_sounds(player, enemies, weapons, projectiles, director)
 
 	if Tuning.FEATURE_HURT_VIGNETTE:
 		var vignette: HurtVignette = HurtVignette.new()
@@ -197,7 +199,7 @@ func _add_lob_fx(enemies: EnemyManager, camera: FollowCamera) -> void:
 
 
 ## Ses efektleri: olaylar Audio.play'e bağlanır; hangi sesin açık olduğu SoundData/Tuning'den.
-func _add_sounds(player: Player, enemies: EnemyManager, weapons: WeaponRig, projectiles: ProjectilePool) -> void:
+func _add_sounds(player: Player, enemies: EnemyManager, weapons: WeaponRig, projectiles: ProjectilePool, director: SpawnDirector) -> void:
 	if Tuning.FEATURE_SFX_AMBIENCE:
 		var rig: AmbienceRig = AmbienceRig.new()
 		rig.target = player
@@ -211,7 +213,12 @@ func _add_sounds(player: Player, enemies: EnemyManager, weapons: WeaponRig, proj
 	enemies.enemy_damaged.connect(func(_at: Vector3, _dir: Vector2, _amount: float, killed: bool) -> void:
 		Audio.play(SoundData.ZOMBIE_DEATH if killed else SoundData.HIT))
 	enemies.enemy_blocked.connect(func(_at: Vector3, _dir: Vector2, _amount: float) -> void:
-		Audio.play(SoundData.HIT))
+		if not Tuning.FEATURE_SFX_ZOMBIES:
+			Audio.play(SoundData.HIT))
+	if Tuning.FEATURE_SFX_ZOMBIES:
+		Audio.listener = func() -> Vector3:
+			return player.global_position if is_instance_valid(player) else Vector3.ZERO
+		ZombieSounds.wire(enemies, director)
 	player.event.connect(func(event_name: StringName, _data: Dictionary) -> void:
 		if event_name == &"hit":
 			Audio.play(SoundData.PLAYER_HURT)
