@@ -232,6 +232,14 @@ const FEATURE_SFX_DASH: bool = true
 const FEATURE_SFX_DASH_ARMORED: bool = true  # zırhlı takla sesi (kapalıysa eski dash)
 const FEATURE_SFX_PLAYER_HURT: bool = true
 const FEATURE_SFX_PICKUP: bool = true
+## Ortam sesleri (8.4a): ana anahtar. Hepsi kapalıyken oyun eskisi gibi; alt anahtarlar tek tek kapatır.
+const FEATURE_SFX_AMBIENCE: bool = true
+## Ateş / neon / tel konumlarında 3B döngü sesleri (alıcı askerin üstünde).
+const FEATURE_SFX_AMBIENCE_EMITTERS: bool = true
+## Her zaman açık rüzgar ve uzak şehir uğultusu.
+const FEATURE_SFX_AMBIENCE_BEDS: bool = true
+## Ara sıra uzaktan siren / köpek / cam kırılması.
+const FEATURE_SFX_AMBIENCE_DISTANT: bool = true
 
 # --- Arena ---
 ## Işık ve zemin ön ayarı (LightingData tablosundan).
@@ -664,6 +672,22 @@ const CAMERA_SHAKE_ON_PLAYER_HIT: float = 0.45
 # --- Ses ---
 ## Aynı anda çalabilecek en çok ses (havuzdaki oynatıcı sayısı).
 const SFX_POOL_SIZE: int = 32
+## Ses yolları (bus) düzeyi, dB. Master -> SFX / Ambience / UI / Music (UI ve Music şimdilik boş).
+const BUS_VOLUME_SFX_DB: float = 0.0
+const BUS_VOLUME_AMBIENCE_DB: float = -4.0
+const BUS_VOLUME_UI_DB: float = 0.0
+const BUS_VOLUME_MUSIC_DB: float = 0.0
+## Ortam: tohum (başlangıç ofsetleri, uzak ses seçimi) ve uzak sesler.
+const AMBIENCE_SEED: int = 8401
+## Uzak seslerin iki çalış arası süre aralığı (sn) ve ilk sesten önceki en kısa bekleme.
+const AMBIENCE_DISTANT_INTERVAL_MIN: float = 25.0
+const AMBIENCE_DISTANT_INTERVAL_MAX: float = 60.0
+## Uzak sesin askerden uzaklığı (m); yön rastgele, düzey sabit (yalnız panlama yönü verir).
+const AMBIENCE_DISTANT_DISTANCE: float = 60.0
+## Uzak sesler için sabit oynatıcı sayısı.
+const AMBIENCE_DISTANT_POOL_SIZE: int = 2
+## Ateş/neon/tel yayıcılarının ses yüksekliği (m; yerden).
+const AMBIENCE_EMITTER_HEIGHT: float = 1.2
 ## Adım sesi: koşu klibinin bir döngüsündeki adım sayısı (adım boyu klipten türetilir).
 const FOOTSTEP_STEPS_PER_CYCLE: int = 2
 ## Bu hızın altında adım sesi çalmaz (m/sn).

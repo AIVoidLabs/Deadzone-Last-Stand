@@ -46,6 +46,7 @@ func _ready() -> void:
 ## Basit low-poly elektrik direği: gövde + iki çapraz kol.
 func _add_pole(base: Vector3) -> void:
 	var mat: Material = _pole_material(base)
+	AmbienceEmitter.attach(self, &"wire_hum", base + Vector3(0.0, Tuning.POLE_HEIGHT - 0.4, 0.0))
 	var parts: Array = [
 		[Vector3(0.28, Tuning.POLE_HEIGHT, 0.28), Vector3(0.0, Tuning.POLE_HEIGHT * 0.5, 0.0)],
 		[Vector3(0.18, 0.18, 3.2), Vector3(0.0, Tuning.POLE_HEIGHT - 0.4, 0.0)],

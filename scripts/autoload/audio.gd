@@ -101,9 +101,4 @@ func _load_streams() -> void:
 
 
 func _ensure_bus() -> void:
-	if AudioServer.get_bus_index(BUS) >= 0:
-		return
-	AudioServer.add_bus()
-	var index: int = AudioServer.bus_count - 1
-	AudioServer.set_bus_name(index, BUS)
-	AudioServer.set_bus_send(index, &"Master")
+	AudioBuses.ensure()

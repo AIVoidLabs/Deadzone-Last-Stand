@@ -76,7 +76,15 @@ func _build_text() -> String:
 		"Can %.0f / %.0f   ölümsüz %s" % [player.health.current, player.health.maximum, "AÇIK" if player.god_mode else "kapalı"],
 		"Kartlar: %s" % CardScreen.stats_text(player.stats),
 		"Profil %s   ses %d / %d çalıyor (toplam %d)" % [Quality.current, Audio.active_voices(), Tuning.SFX_POOL_SIZE, Audio.played_total],
+		_ambience_line(),
 		"F4 +%d zombi · F5 ölümsüz · F6 profil · F7 +silah · F8 dalgayı bitir · F9 +seviye" % Tuning.DEBUG_SPAWN_BATCH,
 		"(Fn gerekmeden: Ctrl+3 … Ctrl+9 aynı sırayla)",
 	])
 	return "\n".join(lines)
+
+
+func _ambience_line() -> String:
+	if not Tuning.FEATURE_SFX_AMBIENCE:
+		return "Ortam sesi: kapalı"
+	var c: Vector2i = AmbienceEmitter.counts(get_tree())
+	return "Ortam yayıcı %d   duyulan %d (max_distance içinde)" % [c.x, c.y]

@@ -12,6 +12,7 @@ func _ready() -> void:
 		var fire: CityFire = CityFire.new(Tuning.CITY_WEST_FIRE_SCALE, Vector3(0.9, 0.05, 0.45) * Tuning.CITY_WEST_FIRE_SCALE, Tuning.CITY_FIRE_TRASH_HEIGHT)
 		fire.position = p
 		add_child(fire)
+		AmbienceEmitter.attach(self, &"fire", p + Vector3(0.0, Tuning.AMBIENCE_EMITTER_HEIGHT, 0.0))
 		_fires.append(fire)
 		add_child(CityFxAssets.glow_quad(p, Tuning.CITY_WEST_GLOW_RADIUS, Tuning.CITY_WEST_GLOW_COLOR, Tuning.CITY_WEST_GLOW_ENERGY, Tuning.CITY_WEST_GLOW_FLICKER))
 	_apply_quality(Quality.current)

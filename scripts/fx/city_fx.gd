@@ -86,6 +86,7 @@ func _add_fire(pos: Vector3, size_mul: float, extents: Vector3 = Vector3(0.9, 0.
 	var fire: CityFire = CityFire.new(size_mul, extents, lift)
 	fire.position = pos
 	add_child(fire)
+	AmbienceEmitter.attach(self, &"fire", pos + Vector3(0.0, Tuning.AMBIENCE_EMITTER_HEIGHT, 0.0))
 	_fires.append(fire)
 	_all_fire_pos.append(pos)
 

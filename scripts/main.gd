@@ -198,6 +198,10 @@ func _add_lob_fx(enemies: EnemyManager, camera: FollowCamera) -> void:
 
 ## Ses efektleri: olaylar Audio.play'e bağlanır; hangi sesin açık olduğu SoundData/Tuning'den.
 func _add_sounds(player: Player, enemies: EnemyManager, weapons: WeaponRig, projectiles: ProjectilePool) -> void:
+	if Tuning.FEATURE_SFX_AMBIENCE:
+		var rig: AmbienceRig = AmbienceRig.new()
+		rig.target = player
+		add_child(rig)
 	if not Tuning.FEATURE_SFX:
 		return
 	weapons.weapon_fired.connect(func(row: Dictionary) -> void:

@@ -68,6 +68,7 @@ func _build_sign(spot: Dictionary, index: int) -> void:
 		light.omni_range = Tuning.CITY_NEON_LIGHT_RANGE
 		add_child(light)
 		lights.append(light)
+	AmbienceEmitter.attach(self, &"neon_broken" if spot["broken"] else &"neon", center)
 	if spot["broken"] and letter_count > 1:
 		mats[1].emission_energy_multiplier = 0.15
 		_signs.append({"flicker": BrokenFlicker.new(7 + index), "flick_mat": mats[letter_count - 1], "spill": spill.material_override, "light": light})

@@ -31,3 +31,6 @@ desktop.ini
 assets/models/source/
 *.blend1
 __pycache__/
+
+# Ham ses kaynakları (indirilen CC0 dosyalar; işlenmiş türevleri assets/audio/ambience/)
+assets/audio/source/
