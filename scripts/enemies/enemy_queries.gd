@@ -42,6 +42,20 @@ func count_near(center: Vector2, radius: float) -> int:
 	return count
 
 
+## center çevresinde radius içindeki canlı zombilerden biri (roll [0, 1) ile seçilir); yoksa Vector2.INF. Havuz/dizi yaratmaz.
+func pick_near(center: Vector2, radius: float, roll: float) -> Vector2:
+	var count: int = count_near(center, radius)
+	if count == 0:
+		return Vector2.INF
+	var target: int = mini(int(roll * float(count)), count - 1)
+	for i in _m._grid.query_radius(center, radius, _m._pos):
+		if i < _m._alive.size() and _m._alive[i] != 0:
+			if target == 0:
+				return _m._pos[i]
+			target -= 1
+	return Vector2.INF
+
+
 ## origin'den dir yönüne açılan yayın (arc_rad, reach) içindeki canlı zombiler (yakın dövüş savurması).
 func query_arc(origin: Vector2, dir: Vector2, reach: float, arc_rad: float) -> PackedInt32Array:
 	var out: PackedInt32Array = PackedInt32Array()

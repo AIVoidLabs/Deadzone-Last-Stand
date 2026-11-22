@@ -225,6 +225,8 @@ const FEATURE_SFX_SHOT: bool = true
 const FEATURE_SFX_HIT: bool = false
 ## Askerin yakınındaki zombi sayısı arttıkça sıklaşan ve yükselen homurtu.
 const FEATURE_SFX_HORDE_GROAN: bool = true
+## Kalabalıkta zombi inlemesi katmanı (yalnız FEATURE_SFX_ZOMBIES ile birlikte): sürüden tek zombinin konumunda çalar.
+const FEATURE_SFX_HORDE_MOANS: bool = true
 ## Zombi ölüm sesi: Taha'nın isteğiyle kapalı.
 const FEATURE_SFX_ZOMBIE_DEATH: bool = false
 const FEATURE_SFX_FOOTSTEP: bool = true
@@ -713,6 +715,11 @@ const HORDE_GROAN_JITTER: float = 0.4
 const HORDE_GROAN_SPARSE_DB: float = -10.0
 ## Yoğunluk kaç saniyede bir sayılır.
 const HORDE_GROAN_CHECK_TIME: float = 0.25
+## İnleme katmanı: bu sayının altında kapalı; iki inleme arası süre (sn) bu sayıda HORDE_MOAN_INTERVAL_SPARSE, HORDE_GROAN_FULL_COUNT'ta DENSE; ± oransal rastgele pay.
+const HORDE_MOAN_MIN_COUNT: int = 12
+const HORDE_MOAN_INTERVAL_SPARSE: float = 2.5
+const HORDE_MOAN_INTERVAL_DENSE: float = 0.6
+const HORDE_MOAN_JITTER: float = 0.3
 
 # --- Uzay ızgarası ---
 const GRID_CELL_SIZE: float = 1.5

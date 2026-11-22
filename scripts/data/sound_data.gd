@@ -18,6 +18,7 @@ const HORDE_GROAN: StringName = &"horde_groan"
 const PICKUP: StringName = &"pickup"
 const PICKUP_DARK: StringName = &"pickup_dark"
 const ZOMBIE_GROAN: StringName = &"zombie_groan"
+const Z_MOAN: StringName = &"z_moan"
 const Z_RUNNER_SCREECH: StringName = &"z_runner_screech"
 const Z_SCREAMER_SCREAM: StringName = &"z_screamer_scream"
 const Z_BOSS_ROAR: StringName = &"z_boss_roar"
@@ -140,6 +141,11 @@ const TABLE: Dictionary = {
 		"enabled": Tuning.FEATURE_SFX_ZOMBIES,
 		"files": ["z_groan_1", "z_groan_2", "z_groan_3", "z_groan_4", "z_groan_5", "z_groan_6"],
 		"volume_db": -12.0, "pitch_variance": 0.12, "max_voices": 4, "min_interval": 0.15,
+	},
+	&"z_moan": {
+		"enabled": Tuning.FEATURE_SFX_ZOMBIES and Tuning.FEATURE_SFX_HORDE_MOANS,
+		"files": ["z_moan_1", "z_moan_2", "z_moan_3", "z_moan_4", "z_moan_5", "z_moan_6", "z_moan_7", "z_moan_8", "z_moan_9"],
+		"volume_db": -13.0, "pitch_variance": 0.06, "max_voices": 3, "min_interval": 0.3,
 	},
 	&"z_runner_screech": {
 		"enabled": Tuning.FEATURE_SFX_ZOMBIES,

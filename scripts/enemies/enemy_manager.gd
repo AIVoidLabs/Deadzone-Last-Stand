@@ -183,6 +183,10 @@ func count_near(center: Vector2, radius: float) -> int:
 	return _queries.count_near(center, radius)
 
 
+func pick_near(center: Vector2, radius: float, roll: float) -> Vector2:
+	return _queries.pick_near(center, radius, roll)
+
+
 func query_arc(origin: Vector2, dir: Vector2, reach: float, arc_rad: float) -> PackedInt32Array:
 	return _queries.query_arc(origin, dir, reach, arc_rad)
 

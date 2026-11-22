@@ -76,6 +76,12 @@ SPECS: dict[str, tuple[str, float, float, float, float, str]] = {
     "z_bodyfall_3": (IMPACT + "impactsplat03.mp3.flac", 0.10, 0.4, -3.0, 1000, "lowshelf=f=120:g=3"),
 }
 
+# kalabalik inlemesi katmani: 3 inleme x 3 perde (-4, -1.5, +1.5 yari-ton), z_groan ile ayni filtre zinciri
+MOAN_FILES = [("5 - ZombieMoan1.wav", 2.1), ("6 - ZombieMoan2.wav", 1.85), ("7 - ZombieMoan3.wav", 1.5)]
+for _n, (_f, _d) in enumerate(MOAN_FILES):
+    for _k, _p in enumerate((-4.0, -1.5, 1.5)):
+        SPECS["z_moan_%d" % (_n * 3 + _k + 1)] = (MOAN + _f, 0.0, _d, _p, 5000, "")
+
 
 def extract() -> None:
     for a in ARCHIVES:
