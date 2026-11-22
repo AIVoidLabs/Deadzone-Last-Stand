@@ -222,7 +222,7 @@ const FEATURE_PLAYER_LEAN: bool = true
 const FEATURE_SFX: bool = true
 const FEATURE_SFX_SHOT: bool = true
 ## Silah sesleri v2 (8.4c): koyu/kapalı, gerçek .22 kaydı + sentez (w_*.wav). Kapalıysa eski silah sesleri.
-const FEATURE_SFX_WEAPONS_V2: bool = true
+const FEATURE_SFX_WEAPONS_V2: bool = false  # Taha: eski silah sesleri daha iyi (2026-11-22)
 ## Zombiye isabet sesi: Taha'nın isteğiyle kapalı (her vuruşta rahatsız ediciydi); yerine sürü homurtusu.
 const FEATURE_SFX_HIT: bool = false
 ## Askerin yakınındaki zombi sayısı arttıkça sıklaşan ve yükselen homurtu.
