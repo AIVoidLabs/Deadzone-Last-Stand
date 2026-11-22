@@ -2,6 +2,12 @@
 
 Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar verilince "Açık kararlar"dan çıkarılıp tarihli bölüme yazılır.
 
+## 2026-11-22 — 8.5 müzik yok; 8.4 onayı (Taha)
+
+- **Oyunda müzik olmayacak** (8.5 kararı). Atmosferi ortam sesleri taşır; Music veri yolu boş kalır.
+- 8.4 ses seti onaylandı: ortam, zombi, sürü inilti katmanı, takla, kristal, arayüz. Silah seslerinde eski (5.5) sentez kalır; v2 seti reddedildi ve kaldırıldı.
+- Kullanılmayan asset'ler temizlenir; onaylanmış yeni seslerin eski yedekleri (bayrak kapalıyken çalan dosyalar) kalır.
+
 ## 2026-11-22 — 8.4 ses seti: kaynak ve sıra (Taha)
 
 - **Kaynak karma:** gerçekçi sesler (ateş, gece şehir uğultusu, uzak siren/köpek/cam, ileride zombi sesleri, patlama) CC0 paketten; Taha indirir (Freesound "Creative Commons 0" filtresi ya da OpenGameArt CC0), Claude arama kelimesini ve lisansı söyler, her dosya CREDITS.md'ye. Basit/elektrik sesleri (neon vızıltısı, tel uğultusu, rüzgâr) ve arayüz kodla (`tools/sfx/gen_ambience.py`).

@@ -51,7 +51,7 @@ const TABLE: Dictionary = {
 		"recoil": 0.12,
 		"muzzle_offset": 0.25,
 		# Atış sesi (SoundData satırı).
-		"sound": &"shot", "sound_v2": &"w_pistol",
+		"sound": &"shot",
 	},
 	# Pompalı: yakın menzil, yavaş, saçılan atış ve güçlü itme (saçma başına itme toplanır).
 	&"shotgun": {
@@ -72,7 +72,7 @@ const TABLE: Dictionary = {
 		"muzzle_offset": 0.66,
 		"flash_scale": 1.7,
 		"fire_shake": 0.1,
-		"sound": &"shotgun", "sound_v2": &"w_shotgun",
+		"sound": &"shotgun",
 	},
 	# --- Uzak silahlar (7.1) ---
 	# SMG: çok hızlı, düşük hasar, hafif sapmalı sürekli ateş.
@@ -81,7 +81,7 @@ const TABLE: Dictionary = {
 		"damage": 4.5, "fire_interval": 0.1, "max_range": 10.0, "projectile_speed": 34.0, "knockback": 1.0,
 		"aim_jitter_deg": 7.0,
 		"model": &"Smg", "model_scale": 1.8, "recoil": 0.07, "muzzle_offset": 0.4, "flash_scale": 0.7,
-		"sound": &"smg", "sound_v2": &"w_smg", "weight": 1.0, "min_wave": 1,
+		"sound": &"smg", "weight": 1.0, "min_wave": 1,
 	},
 	# Plazma tüfeği: delip geçen enerji mermisi, hattaki zombilerin hepsine vurur.
 	&"plasma_rifle": {
@@ -89,7 +89,7 @@ const TABLE: Dictionary = {
 		"damage": 14.0, "fire_interval": 0.55, "max_range": 14.0, "projectile_speed": 24.0, "knockback": 2.0,
 		"pierce": 4, "projectile_color": Color(0.3, 0.8, 1.0), "projectile_size": 1.5,
 		"model": &"PlasmaRifle", "model_scale": 1.4, "recoil": 0.1, "muzzle_offset": 0.5, "flash_scale": 1.2,
-		"sound": &"plasma", "sound_v2": &"w_plasma", "base_glow": 0.35, "weight": 0.4, "min_wave": 5,
+		"sound": &"plasma", "base_glow": 0.35, "weight": 0.4, "min_wave": 5,
 	},
 	# Graviton topu: önündeki koniyi bir kerede iter, hasarı düşük; kalabalığı geri savurur.
 	&"gravity_gun": {
@@ -97,7 +97,7 @@ const TABLE: Dictionary = {
 		"behavior": &"burst", "damage": 3.0, "fire_interval": 1.3, "max_range": 5.0,
 		"melee_arc_deg": 80.0, "melee_swing_time": 0.28, "knockback": 16.0,
 		"model": &"GravityGun", "model_scale": 1.5, "recoil": 0.15, "muzzle_offset": 0.25, "flash_scale": 1.2,
-		"sound": &"graviton", "sound_v2": &"w_graviton", "slash_color": Color(0.65, 0.4, 1.0), "base_glow": 0.3, "weight": 0.6, "min_wave": 3,
+		"sound": &"graviton", "slash_color": Color(0.65, 0.4, 1.0), "base_glow": 0.3, "weight": 0.6, "min_wave": 3,
 	},
 	# Bomba atar: yay çizen bomba, çarpınca ya da hedefe varınca alan hasarıyla patlar.
 	&"grenade_launcher": {
@@ -105,7 +105,7 @@ const TABLE: Dictionary = {
 		"damage": 26.0, "fire_interval": 1.8, "max_range": 12.0, "projectile_speed": 13.0, "knockback": 8.0,
 		"explode_radius": 3.0, "projectile_size": 2.6, "projectile_color": Color(1.0, 0.55, 0.15), "projectile_arc": 1.4, "projectile_length": 0.4,
 		"model": &"GrenadeLauncher", "model_scale": 1.3, "recoil": 0.25, "muzzle_offset": 0.45, "flash_scale": 1.8, "fire_shake": 0.08,
-		"sound": &"launcher", "sound_v2": &"w_launcher", "weight": 0.4, "min_wave": 5,
+		"sound": &"launcher", "weight": 0.4, "min_wave": 5,
 	},
 	# --- Yakın dövüş (7.1): enerji çemberinden fırlayıp savrulur; mermi yok, kendi hasar alanı var. ---
 	# Bıçak: çok hızlı, tek hedefe dürtme, kısa menzil.
@@ -114,7 +114,7 @@ const TABLE: Dictionary = {
 		"behavior": &"melee", "damage": 9.0, "fire_interval": 0.28, "max_range": 1.9,
 		"melee_arc_deg": 0.0, "melee_swing_time": 0.14, "knockback": 1.5,
 		"model": &"Knife", "model_scale": 2.0, "recoil": 0.0, "muzzle_offset": 0.0,
-		"sound": &"swing_light", "sound_v2": &"w_swing_light", "slash_color": Color(0.85, 0.9, 1.0),
+		"sound": &"swing_light", "slash_color": Color(0.85, 0.9, 1.0),
 		"weight": 1.0, "min_wave": 1,
 	},
 	# Katana: yay şeklinde savurma, önündeki herkese vurur.
@@ -123,7 +123,7 @@ const TABLE: Dictionary = {
 		"behavior": &"melee", "damage": 18.0, "fire_interval": 0.7, "max_range": 2.8,
 		"melee_arc_deg": 110.0, "melee_swing_time": 0.22, "knockback": 3.0,
 		"model": &"Katana", "model_scale": 1.3, "recoil": 0.0, "muzzle_offset": 0.0,
-		"sound": &"swing_medium", "sound_v2": &"w_swing_medium", "slash_color": Color(0.9, 0.95, 1.0),
+		"sound": &"swing_medium", "slash_color": Color(0.9, 0.95, 1.0),
 		"weight": 0.7, "min_wave": 3,
 	},
 	# Işın kılıcı: geniş savurma, yüksek hasar, yakar.
@@ -133,7 +133,7 @@ const TABLE: Dictionary = {
 		"melee_arc_deg": 200.0, "melee_swing_time": 0.3, "knockback": 5.0,
 		"burn_dps": 6.0, "burn_time": 2.0,
 		"model": &"Lightsaber", "model_scale": 1.3, "recoil": 0.0, "muzzle_offset": 0.0,
-		"sound": &"swing_energy", "sound_v2": &"w_swing_energy", "slash_color": Color(0.3, 0.75, 1.0), "base_glow": 0.7,
+		"sound": &"swing_energy", "slash_color": Color(0.3, 0.75, 1.0), "base_glow": 0.7,
 		"weight": 0.2, "min_wave": 8,
 	},
 	# Ateşli kılıç: orta yay, güçlü yanma.
@@ -143,7 +143,7 @@ const TABLE: Dictionary = {
 		"melee_arc_deg": 130.0, "melee_swing_time": 0.26, "knockback": 3.0,
 		"burn_dps": 10.0, "burn_time": 3.0,
 		"model": &"FlameSword", "model_scale": 1.3, "recoil": 0.0, "muzzle_offset": 0.0,
-		"sound": &"swing_fire", "sound_v2": &"w_swing_fire", "slash_color": Color(1.0, 0.5, 0.1), "base_glow": 0.6,
+		"sound": &"swing_fire", "slash_color": Color(1.0, 0.5, 0.1), "base_glow": 0.6,
 		"weight": 0.3, "min_wave": 6,
 	},
 }

@@ -61,7 +61,7 @@ func _ready() -> void:
 		LandingFx.play(self, at, radius)
 		camera.add_trauma(Tuning.CAMERA_SHAKE_ON_LAND)
 		if not Tuning.FEATURE_SFX_ZOMBIES:
-			Audio.play(SoundData.explosion_id()))
+			Audio.play(&"explosion"))
 	projectiles.explosion.connect(func(_at: Vector3, _radius: float) -> void:
 		camera.add_trauma(Tuning.CAMERA_SHAKE_ON_EXPLOSION))
 	_add_lob_fx(enemies, camera)
@@ -78,7 +78,7 @@ func _ready() -> void:
 		ExplosionFx.play(self, at, radius)
 		camera.add_trauma(Tuning.CAMERA_SHAKE_ON_BLOAT)
 		if not Tuning.FEATURE_SFX_ZOMBIES:
-			Audio.play(SoundData.explosion_id()))
+			Audio.play(&"explosion"))
 	_add_sounds(player, enemies, weapons, projectiles, director)
 
 	if Tuning.FEATURE_HURT_VIGNETTE:
@@ -208,9 +208,9 @@ func _add_sounds(player: Player, enemies: EnemyManager, weapons: WeaponRig, proj
 	if not Tuning.FEATURE_SFX:
 		return
 	weapons.weapon_fired.connect(func(row: Dictionary) -> void:
-		Audio.play(SoundData.weapon_sound(row)))
+		Audio.play(row.get("sound", SoundData.SHOT)))
 	projectiles.explosion.connect(func(_at: Vector3, _radius: float) -> void:
-		Audio.play(SoundData.explosion_id()))
+		Audio.play(&"explosion"))
 	enemies.enemy_damaged.connect(func(_at: Vector3, _dir: Vector2, _amount: float, killed: bool) -> void:
 		Audio.play(SoundData.ZOMBIE_DEATH if killed else SoundData.HIT))
 	enemies.enemy_blocked.connect(func(_at: Vector3, _dir: Vector2, _amount: float) -> void:

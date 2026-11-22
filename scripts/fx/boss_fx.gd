@@ -98,7 +98,7 @@ func _on_boss_event(event_name: StringName, data: Dictionary) -> void:
 				LandingFx.play(self, data["at"], SLAM_DUST_RADIUS)
 				_shake(Tuning.CAMERA_SHAKE_ON_BOSS_SLAM)
 				if not Tuning.FEATURE_SFX_ZOMBIES:
-					Audio.play(SoundData.explosion_id())
+					Audio.play(&"explosion")
 			_start_ring(data)
 		&"charge_marker":
 			_show_strip(data)
@@ -110,7 +110,7 @@ func _on_boss_event(event_name: StringName, data: Dictionary) -> void:
 			LandingFx.play(self, data["at"], SLAM_DUST_RADIUS)
 			_shake(Tuning.CAMERA_SHAKE_ON_BOSS_STUN)
 			if not Tuning.FEATURE_SFX_ZOMBIES:
-				Audio.play(SoundData.explosion_id())
+				Audio.play(&"explosion")
 		&"summon":
 			LandingFx.play(self, data["at"], 1.8)
 		&"roar":
