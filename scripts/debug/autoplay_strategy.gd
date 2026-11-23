@@ -5,6 +5,9 @@ extends RefCounted
 ## stat'lara göre puanlanır (value × ağırlık), bu yüzden yeni eşyalar kendiliğinden sınıflanır.
 
 const DEFAULT: StringName = &"default"
+## Alışveriş: dalga başına en çok bu kadar yenileme; yenileme sonrası en az RESERVE kristal kalmalı.
+const REROLL_LIMIT: int = 20
+const RESERVE: int = 10
 
 const STRATEGIES: Dictionary = {
 	&"guns": {
@@ -45,6 +48,8 @@ func stat_score(stat: StringName, value: float) -> float:
 
 
 func item_score(id: StringName) -> float:
+	if is_default():
+		return 1.0
 	var score: float = 0.0
 	for effect: Dictionary in ItemData.get_row(id)["effects"]:
 		score += stat_score(effect["stat"], effect["value"])
@@ -52,6 +57,8 @@ func item_score(id: StringName) -> float:
 
 
 func weapon_score(id: StringName) -> float:
+	if is_default():
+		return 1.0
 	var weights: Dictionary = STRATEGIES[name]["weapons"]
 	var melee: bool = WeaponData.get_row(id)["behavior"] == &"melee"
 	return float(weights["melee" if melee else "ranged"])

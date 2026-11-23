@@ -78,10 +78,7 @@ func _process(delta: float) -> void:
 		_key_wait = KEY_DELAY
 		return
 	if shop.is_open():
-		if _strategy.is_default():
-			shop.debug_autobuy(_max_weapons)
-		else:
-			_strategy_buy()
+		_strategy_buy()
 		return
 	_key_wait -= delta
 	if _key_wait > 0.0:
@@ -147,27 +144,52 @@ func _spawn_summary() -> String:
 	return " ".join(parts)
 
 
-## Strateji alışverişi: en yüksek puanlı alınabilir teklifi (puan > 0) sırayla alır, sonra mağazayı kapatır.
+## Alışveriş (tüm stratejiler): önce silah (birleşen teklif, sonra boş yuvaya stratejiye uyan), sonra puanı pozitif
+## eşyalar; alınacak kalmadıysa ve para yetiyorsa yeniler (REROLL_LIMIT, RESERVE). Satma yok.
 func _strategy_buy() -> void:
+	var rerolls: int = 0
+	_log("  SHOP open crystals %d" % loot.crystals)
 	while true:
-		var best: int = -1
-		var best_score: float = 0.0
-		var offer: Array[Dictionary] = shop.debug_offer()
-		for i: int in offer.size():
-			var entry: Dictionary = offer[i]
-			if shop.debug_state_of(entry) != "ok":
-				continue
-			var is_weapon: bool = entry["kind"] == ShopRules.WEAPON
-			if is_weapon and weapons.count() >= _max_weapons and not weapons.preview_add(entry["id"])["merged"]:
-				continue
-			var score: float = _strategy.weapon_score(entry["id"]) if is_weapon else _strategy.item_score(entry["id"])
-			if score > best_score:
-				best = i
-				best_score = score
-		if best < 0:
+		while _buy_best():
+			pass
+		var price: int = shop.debug_reroll_price()
+		if rerolls >= AutoplayStrategy.REROLL_LIMIT or loot.crystals <= price + AutoplayStrategy.RESERVE:
 			break
-		shop.debug_buy(best)
+		rerolls += 1
+		shop.debug_reroll()
+	_log("  SHOP close crystals %d rerolls %d" % [loot.crystals, rerolls])
 	shop.debug_close()
+
+
+## Tek alım dener; aldıysa true.
+func _buy_best() -> bool:
+	var offer: Array[Dictionary] = shop.debug_offer()
+	var best: int = -1
+	var best_score: float = 0.0
+	for i: int in offer.size():
+		var entry: Dictionary = offer[i]
+		if shop.debug_state_of(entry) != "ok":
+			continue
+		var score: float = _offer_score(entry)
+		if score > best_score:
+			best = i
+			best_score = score
+	if best < 0:
+		return false
+	shop.debug_buy(best)
+	return true
+
+
+## Silah önceliği: birleşen teklif en yüksek, sonra stratejiye uyan silah (yuva varsa), en son eşya.
+func _offer_score(entry: Dictionary) -> float:
+	if entry["kind"] != ShopRules.WEAPON:
+		return _strategy.item_score(entry["id"])
+	if weapons.preview_add(entry["id"])["merged"]:
+		return 2000.0
+	if weapons.count() >= _max_weapons:
+		return 0.0
+	var score: float = _strategy.weapon_score(entry["id"])
+	return 1000.0 + score if score > 0.0 else 0.0
 
 
 ## Alınan eşyalar: id:adet listesi.

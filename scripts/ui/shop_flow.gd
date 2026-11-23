@@ -69,6 +69,14 @@ func debug_close() -> void:
 	_close()
 
 
+func debug_reroll() -> void:
+	_on_reroll()
+
+
+func debug_reroll_price() -> int:
+	return _reroll_cost()
+
+
 func debug_owned() -> Dictionary:
 	return _owned
 
