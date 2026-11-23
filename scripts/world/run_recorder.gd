@@ -12,6 +12,8 @@ var director: SpawnDirector
 ## Kristaller kapalıyken null.
 var pickups: Pickups
 var loot: RunLoot
+## Ödül çantaları kapalıyken null.
+var bags: RewardBags
 
 
 func _ready() -> void:
@@ -28,6 +30,8 @@ func _ready() -> void:
 	weapons.weapon_fired.connect(func(_row: Dictionary) -> void: stats.on_shot())
 	if pickups != null:
 		pickups.collected.connect(stats.on_crystal)
+	if bags != null:
+		bags.collected.connect(stats.on_bag)
 	director.phase_changed.connect(func(_phase: WaveRun.Phase, wave_index: int) -> void:
 		stats.set_wave(wave_index + 1))
 	GameFlow.game_over_started.connect(_finish.bind(false), CONNECT_ONE_SHOT)

@@ -929,3 +929,49 @@ const CITY_WEST_GLOW_ENERGY: float = 0.03
 const CITY_WEST_GLOW_FLICKER: float = 0.35
 const CITY_WEST_GLOW_COLOR: Color = Color(1.0, 0.58, 0.2)
 const WIRE_COLOR: Color = Color(0.015, 0.012, 0.012)
+
+# --- Ödül çantaları (haritada süzülen para / XP çantası) ---
+## Ana bayrak: kapalıyken oyun eskisi gibi (çanta yok). Ok: ekran dışı çantayı kenarda gösterir. Model: assets/models/props/reward_bag.glb varsa yer tutucu yerine yüklenir.
+const FEATURE_REWARD_BAGS: bool = true
+const FEATURE_BAG_ARROW: bool = true
+const FEATURE_BAG_MODEL: bool = true
+const BAG_MODEL_PATH: String = "res://assets/models/props/reward_bag.glb"
+## Dalga içinde ilk çanta (sn), sonrakiler arası süre (sn), dalga başına en çok çanta (aynı anda en çok 1).
+const BAG_FIRST_DELAY: float = 15.0
+const BAG_INTERVAL: float = 25.0
+const BAG_MAX_PER_WAVE: int = 3
+## Değer: BASE + PER_WAVE x dalga no (1. dalga 20). Para çantası yalnız para, XP çantası yalnız XP verir.
+const BAG_VALUE_BASE: int = 15
+const BAG_VALUE_PER_WAVE: int = 5
+## Askere uzaklık aralığı (m), bina/engele en az boşluk (m), arena kenarından iç pay (m), konum deneme sayısı.
+const BAG_MIN_DIST: float = 12.0
+const BAG_MAX_DIST: float = 24.0
+const BAG_CLEARANCE: float = 0.8
+const BAG_ARENA_MARGIN: float = 2.0
+const BAG_PLACE_TRIES: int = 24
+## Ömür (sn); son BAG_BLINK_TIME sn BAG_BLINK_RATE Hz ile yanıp söner.
+const BAG_LIFETIME: float = 15.0
+const BAG_BLINK_TIME: float = 3.0
+const BAG_BLINK_RATE: float = 4.0
+## Toplama yarıçapı (m; mıknatıs yok).
+const BAG_COLLECT_RADIUS: float = 1.0
+## Görünüm: yerden yükseklik, süzülme genliği (m) ve hızı (rad/sn), dönme hızı (rad/sn), boy çarpanı, zemin halkası yarıçapı (m).
+const BAG_HOVER_HEIGHT: float = 0.55
+const BAG_BOB_AMPLITUDE: float = 0.12
+const BAG_BOB_SPEED: float = 2.2
+const BAG_SPIN_SPEED: float = 0.9
+const BAG_SCALE: float = 2.2
+## Toplama patlamasının tutucu düğümünün silinme süresi (sn; MergeBurst 0.75 sn sürer).
+const BAG_BURST_HOLD_TIME: float = 1.0
+## GLB kristallerinin (BagTint) tür rengindeki parlama gücü.
+const BAG_CRYSTAL_GLOW: float = 2.5
+const BAG_RING_RADIUS: float = 0.95
+const BAG_LIGHT_ENERGY: float = 0.9
+const BAG_LIGHT_RANGE: float = 4.5
+const BAG_MONEY_COLOR: Color = Color(1.0, 0.68, 0.14)
+const BAG_XP_COLOR: Color = Color(0.3, 0.62, 1.0)
+## Ekran dışı oku: kenardan pay ve boy (px).
+const BAG_ARROW_MARGIN: float = 56.0
+const BAG_ARROW_SIZE: float = 16.0
+## Debug --capture-bag: çanta askerin bu ofsetinde (m) hemen belirir.
+const BAG_DEBUG_OFFSET: Vector2 = Vector2(3.0, -5.0)

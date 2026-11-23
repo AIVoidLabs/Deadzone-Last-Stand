@@ -17,6 +17,7 @@ extends Node
 ## --capture-near=M: --capture-spawn zombilerini askerin M metre çevresine dizer (özel saldırıları hızlı görmek için).
 ## --capture-boss=S: S sn sonra boss Yığın'ı hemen doğurur (--capture-near ile o mesafede). Sonda BOSS satırı sayaçları.
 ## --circle: asker (ölümsüz değil) daire çizerek yürür. --zigzag=S: S saniyede bir yön değiştirerek yürür.
+## --capture-bag=money|xp: o türden ödül çantası askerin ~6 m önünde hemen belirir (ömrü dolmaz; RewardBags okur).
 ## --capture-stuck: kovalayan zombilerin takılmasını ölçer (StuckMeter); sonda STUCK satırı.
 ## Sonda tür başına atılış istatistiği basılır (LUNGE starts/hits): koşucu kaçış ayarı denetimi; SPIT/THROW satırı yay atışı sayaçları.
 

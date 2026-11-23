@@ -12,14 +12,14 @@ const HIGH: StringName = &"high"
 const ORDER: Array[StringName] = [&"low", &"medium", &"high"]
 
 const TABLE: Dictionary = {
-	# spark_amount: isabet başına kıvılcım. muzzle_light: atışta kısa nokta ışığı.
+	# spark_amount: isabet başına kıvılcım. muzzle_light: atışta kısa nokta ışığı. bag_light: ödül çantasının nokta ışığı.
 	# omni_lights: şehir greybox omni ışık üst sınırı; fire_shadows: ateş ışıklarında gölge.
 	# ssr, volumetric_fog, glow, vignette: 8.3a atmosfer. ground_dressing: yer dekoru adet çarpanı (8.3d).
 	# city_fx: şehir efekt seviyesi 0/1/2 (adetler Tuning.CITY_FX_*; 0'da duman, kül, lamba konisi kapalı).
 	# blood_amount: isabet başına kan damlası (ölümde katlanır). decal_max: yerde aynı anda en çok leke.
-	&"low": {"max_enemies": 150, "shadows": false, "msaa": 0, "spark_amount": 4, "muzzle_light": false, "blood_amount": 4, "decal_max": 48, "omni_lights": 4, "fire_shadows": false, "ssr": false, "volumetric_fog": false, "glow": false, "vignette": false, "city_fx": 0, "ground_dressing": 0.5},
-	&"medium": {"max_enemies": 250, "shadows": true, "msaa": 1, "spark_amount": 6, "muzzle_light": true, "blood_amount": 6, "decal_max": 128, "omni_lights": 8, "fire_shadows": false, "ssr": false, "volumetric_fog": false, "glow": true, "vignette": true, "city_fx": 1, "ground_dressing": 1.0},
-	&"high": {"max_enemies": 350, "shadows": true, "msaa": 2, "spark_amount": 10, "muzzle_light": true, "blood_amount": 9, "decal_max": 256, "omni_lights": 8, "fire_shadows": true, "ssr": true, "volumetric_fog": true, "glow": true, "vignette": true, "city_fx": 2, "ground_dressing": 1.0},
+	&"low": {"max_enemies": 150, "shadows": false, "msaa": 0, "spark_amount": 4, "muzzle_light": false, "bag_light": false, "blood_amount": 4, "decal_max": 48, "omni_lights": 4, "fire_shadows": false, "ssr": false, "volumetric_fog": false, "glow": false, "vignette": false, "city_fx": 0, "ground_dressing": 0.5},
+	&"medium": {"max_enemies": 250, "shadows": true, "msaa": 1, "spark_amount": 6, "muzzle_light": true, "bag_light": true, "blood_amount": 6, "decal_max": 128, "omni_lights": 8, "fire_shadows": false, "ssr": false, "volumetric_fog": false, "glow": true, "vignette": true, "city_fx": 1, "ground_dressing": 1.0},
+	&"high": {"max_enemies": 350, "shadows": true, "msaa": 2, "spark_amount": 10, "muzzle_light": true, "bag_light": true, "blood_amount": 9, "decal_max": 256, "omni_lights": 8, "fire_shadows": true, "ssr": true, "volumetric_fog": true, "glow": true, "vignette": true, "city_fx": 2, "ground_dressing": 1.0},
 }
 
 

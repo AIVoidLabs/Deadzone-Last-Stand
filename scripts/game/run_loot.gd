@@ -18,6 +18,16 @@ static func xp_needed(at_level: int) -> int:
 ## value kadar kristal ekler. Dönüş: atlanan seviye sayısı.
 func add(value: int) -> int:
 	crystals += value
+	return add_xp(value)
+
+
+## Yalnız para (para çantası): kristal artar, XP değişmez.
+func add_money(value: int) -> void:
+	crystals += value
+
+
+## Yalnız XP (XP çantası): para değişmez. Dönüş: atlanan seviye sayısı.
+func add_xp(value: int) -> int:
 	xp += value
 	var gained: int = 0
 	while xp >= xp_needed(level):

@@ -22,6 +22,8 @@ func _ready() -> void:
 	var loot: RunLoot = RunLoot.new()
 	var pickups: Pickups = PickupLoot.install(self, player, enemies, director, loot)
 
+	var bags: RewardBags = RewardBags.install(self, player, director, loot)
+
 	var projectiles: ProjectilePool = ProjectilePool.new()
 	projectiles.enemies = enemies
 	add_child(projectiles)
@@ -43,7 +45,7 @@ func _ready() -> void:
 	weapons.projectiles = projectiles
 	add_child(weapons)
 	weapons.add_weapon(WeaponData.PISTOL)
-	_add_run_recorder(player, enemies, weapons, director, pickups, loot)
+	_add_run_recorder(player, enemies, weapons, director, pickups, loot, bags)
 
 	var camera: FollowCamera = FollowCamera.new()
 	camera.target = player
@@ -154,7 +156,7 @@ func _add_hud(player: Player, enemies: EnemyManager, director: SpawnDirector, lo
 
 
 ## Tur sayaçları ve tur sonu kaydı (HUD'dan önce eklenir; GameFlow.last_summary hazır olsun).
-func _add_run_recorder(player: Player, enemies: EnemyManager, weapons: WeaponRig, director: SpawnDirector, pickups: Pickups, loot: RunLoot) -> void:
+func _add_run_recorder(player: Player, enemies: EnemyManager, weapons: WeaponRig, director: SpawnDirector, pickups: Pickups, loot: RunLoot, bags: RewardBags) -> void:
 	var recorder: RunRecorder = RunRecorder.new()
 	recorder.player = player
 	recorder.enemies = enemies
@@ -162,6 +164,7 @@ func _add_run_recorder(player: Player, enemies: EnemyManager, weapons: WeaponRig
 	recorder.director = director
 	recorder.pickups = pickups
 	recorder.loot = loot
+	recorder.bags = bags
 	add_child(recorder)
 
 

@@ -8,6 +8,8 @@ var kills: int = 0
 var kills_by_kind: Dictionary = {}
 ## Toplanan kristal (harcananlar düşmez).
 var crystals: int = 0
+## XP çantalarından gelen XP (para çantası crystals'a yazılır).
+var bag_xp: int = 0
 var damage_taken: float = 0.0
 var damage_dealt: float = 0.0
 var dashes: int = 0
@@ -45,6 +47,13 @@ func on_damage_taken(amount: float) -> void:
 
 func on_crystal(value: int) -> void:
 	crystals += value
+
+
+func on_bag(kind: StringName, value: int) -> void:
+	if kind == BagRules.KIND_MONEY:
+		crystals += value
+	else:
+		bag_xp += value
 
 
 func on_dash() -> void:
@@ -90,7 +99,7 @@ func finish(did_win: bool) -> void:
 func summary() -> Dictionary:
 	return {
 		"won": won, "time": time, "kills": kills, "kills_by_kind": kills_by_kind.duplicate(),
-		"crystals": crystals, "damage_taken": damage_taken, "damage_dealt": damage_dealt,
+		"crystals": crystals, "bag_xp": bag_xp, "damage_taken": damage_taken, "damage_dealt": damage_dealt,
 		"dashes": dashes, "shots": shots, "level": level, "wave": wave,
 		"cards": cards.duplicate(true), "items": items.duplicate(), "weapons": weapons.duplicate(true),
 	}
