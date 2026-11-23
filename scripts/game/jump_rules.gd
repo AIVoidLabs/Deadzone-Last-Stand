@@ -21,6 +21,14 @@ static func height_at(progress: float, peak: float) -> float:
 	return 4.0 * peak * t * (1.0 - t)
 
 
+## Seri zıplamada ilk zıplamadan sonraki ek zıplama sayısı: toplam min_total..max_total'dan roll (0..1) ile seçilir.
+static func extra_hops(roll: float, min_total: int, max_total: int) -> int:
+	var lo: int = maxi(min_total, 1)
+	var hi: int = maxi(max_total, lo)
+	var total: int = lo + mini(int(clampf(roll, 0.0, 0.9999) * float(hi - lo + 1)), hi - lo)
+	return total - 1
+
+
 ## İniş şoku askeri kapsıyor mu.
 static func lands_on(player_pos: Vector2, land_point: Vector2, radius: float, player_radius: float) -> bool:
 	return player_pos.distance_to(land_point) <= radius + player_radius

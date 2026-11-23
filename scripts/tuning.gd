@@ -87,6 +87,13 @@ const CAMERA_SHAKE_ON_BLOAT: float = 0.3
 const BLOAT_BLINK_START_HZ: float = 3.0
 const BLOAT_BLINK_END_HZ: float = 14.0
 const ACID_FADE_TIME: float = 1.0
+## 11.5C asit havuzu: havuzdayken hareket yavaşlar (yüzde), havuzdan çıkınca ACID_BURN_LINGER sn yanma sürer
+## (saniyede ACID_BURN_DPS, ACID_BURN_TICK'te bir parça; zırh uygulanır) ve yavaşlama da o süre sürer. Kapalıyken yalnız havuz tiki.
+const FEATURE_ACID_POOL_SLOW_BURN: bool = true
+const ACID_SLOW_PERCENT: float = 0.4
+const ACID_BURN_DPS: float = 6.0
+const ACID_BURN_LINGER: float = 0.5
+const ACID_BURN_TICK: float = 0.25
 const ACID_VIGNETTE_FLASH: float = 0.3
 ## 7.4 boss "Yığın" (build/briefs/s74_boss.md; sayılar EnemyDataBoss satırında). Kapalıyken 5. dalga eskisi gibi, boss doğmaz.
 ## 11.2: dalgaya göre zombi can/hasar çarpanı (WaveData enemy_hp_mult / enemy_damage_mult). Kapalıyken çarpan 1.0.
@@ -133,6 +140,11 @@ const JUMP_SHADOW_SOFT_END: float = 0.12
 const JUMP_SHADOW_EDGE_WIDTH: float = 0.035
 const JUMP_SHADOW_EDGE_STRENGTH: float = 0.28
 const JUMP_SHADOW_LOCK_PULSE_TIME: float = 0.25
+## 11.5C zıplayan seri zıplar (çekirge): toplam JUMPER_CHAIN_MIN..MAX zıplama, aralarında satırdaki chain_pause sn
+## iniş-bekleme (her inişin işareti yine önceden görünür); sonra normal toparlanma. Kapalıyken tek zıplama.
+const FEATURE_JUMPER_CHAIN: bool = true
+const JUMPER_CHAIN_MIN: int = 2
+const JUMPER_CHAIN_MAX: int = 3
 ## Dil ıskalayınca ekranda kalma süresi (sn) ve bağlıyken dilin askerde bittiği yükseklik (m).
 const TONGUE_MISS_SHOW_TIME: float = 0.25
 ## Dilci Blender'da üretilen yeni modeliyle (köşe renkli, kendi klipleri, yordamsal dil) çizilir;

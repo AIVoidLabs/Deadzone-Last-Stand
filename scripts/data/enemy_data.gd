@@ -141,6 +141,8 @@ const _OVERRIDES: Dictionary = {
 		"jump_lock_time": 0.3,
 		"jump_lead": 0.9,
 		"jump_max_range": 9.0,
+		# 11.5C seri zıplama (FEATURE_JUMPER_CHAIN): zıplamalar arası iniş-bekleme (sn).
+		"chain_pause": 0.4,
 		"land_radius": 1.5,
 		"attack_anim_hit_time": 0.0,
 		"prewarm": 12,
@@ -183,8 +185,8 @@ const _OVERRIDES: Dictionary = {
 		"tongue_pull_speed": 1.8,
 		"tongue_pull_time": 3.0,
 		"tongue_release_gap": 0.25,
-		"attack_recover": 3.0, # eski 5.0
-		"tongue_miss_recover": 1.2, # eski 2.0
+		"attack_recover": 1.95, # eski 5.0, 11.5C: 3.0 (-%35)
+		"tongue_miss_recover": 0.78, # eski 2.0, 11.5C: 1.2 (-%35)
 		"attack_anim_hit_time": 0.0,
 		"prewarm": 8,
 		"drop_value": 8,
@@ -214,14 +216,14 @@ const _OVERRIDES: Dictionary = {
 		"id": &"runner",
 		"model": &"runner",
 		"max_hp": 18.0,
-		"speed": 3.8,
+		"speed": 4.56, # 11.5C: eski 3.8 (+%20)
 		"contact_damage": 14.0,
 		"radius": 0.38,
 		"attack_kind": &"lunge",
 		"lunge_range": 4.2,
 		"attack_windup": 0.65,
-		"attack_recover": 0.9,
-		"lunge_speed": 9.0,
+		"attack_recover": 0.63, # 11.5C: eski 0.9 (-%30)
+		"lunge_speed": 10.8, # 11.5C: eski 9.0 (+%20)
 		"lunge_time": 0.6,
 		"lunge_lead": 0.9,
 		"lunge_lock_time": 0.22,
@@ -250,13 +252,13 @@ const _OVERRIDES: Dictionary = {
 			"attack_kind": &"sprint",
 			"sprint_trigger_range": 9.0,
 			"scream_time": 0.6,
-			"sprint_speed": 6.5,
+			"sprint_speed": 7.8, # 11.5C: eski 6.5 (+%20)
 			"sprint_turn_rate": 2.4,
 			"sprint_give_up_factor": 2.0,
 			"strike_range": 0.5,
 			"strike_hit_range": 0.9,
 			"strike_hit_time": 0.25,
-			"strike_recover": 0.5,
+			"strike_recover": 0.35, # 11.5C: eski 0.5 (-%30)
 			"strike_move_factor": 0.8,
 			"strike_recover_factor": 1.0,
 			"strike_face_dot": 0.5,

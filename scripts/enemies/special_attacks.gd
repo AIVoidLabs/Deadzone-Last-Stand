@@ -174,6 +174,8 @@ func begin_windup(i: int, p: Vector2, target: Vector2, target_vel: Vector2) -> v
 	if row["attack_kind"] == &"scream":
 		_scream.aim_tick(i, p, target)
 		return
+	if row["attack_kind"] == &"jump":
+		_jump.begin_chain(i)
 	if row["attack_kind"] == &"sprint" or row["attack_kind"] == &"lunge":
 		_m.special_started.emit(&"runner", &"windup", Vector3(p.x, 0.1, p.y))
 	_windup_tick(i, row, p, target, target_vel)
@@ -215,7 +217,7 @@ func finish(i: int, state: ZombieRules.State, target: Vector2) -> ZombieRules.St
 		return boss.finish(i, state)
 	var recover: float = row["attack_recover"]
 	if state == S.JUMP:
-		_jump.land(i, row, target)
+		return _jump.land(i, row, target)
 	elif state == S.LASH or state == S.PULL:
 		recover = _tongue.finish(i, state, row)
 	_m._enter(i, S.RECOVER, recover)
@@ -230,6 +232,7 @@ func lunge_contact(i: int, state: ZombieRules.State, p: Vector2, dist: float, re
 ## Sıkıştırma: örneğe bağlı özel diziler paralel dizilerle birlikte kayar.
 func swap_from_last(i: int, last: int) -> void:
 	_tongue.swap_from_last(i, last)
+	_jump.swap_from_last(i, last)
 	_lob.swap_from_last(i, last)
 	_scream.swap_from_last(i, last)
 	boss.swap_from_last(i, last)
@@ -237,6 +240,7 @@ func swap_from_last(i: int, last: int) -> void:
 
 func shrink(last: int) -> void:
 	_tongue.shrink(last)
+	_jump.shrink(last)
 	_lob.shrink(last)
 	_scream.shrink(last)
 
@@ -267,6 +271,7 @@ func on_removed(i: int) -> void:
 		node.event.emit(&"marker", {"on": false})
 	_tongue.on_removed(i, node, kind)
 	_lob.on_removed(i)
+	_jump.on_removed(i)
 	_scream.on_removed(i)
 	boss.on_removed(i)
 	_m._targetable[i] = 0

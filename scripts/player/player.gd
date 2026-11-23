@@ -30,6 +30,8 @@ var _root_left: float = 0.0
 var _rooted: bool = false
 ## Bağlıyken dilcinin bu kare uyguladığı çekiş hızı (XZ); her karede yeniden verilir.
 var _pull: Vector2 = Vector2.ZERO
+## Asit havuzu yavaşlaması ve yanması (FEATURE_ACID_POOL_SLOW_BURN).
+var acid: AcidExposure = AcidExposure.new(Tuning.ACID_SLOW_PERCENT, Tuning.ACID_BURN_DPS, Tuning.ACID_BURN_LINGER, Tuning.ACID_BURN_TICK)
 
 
 func _init() -> void:
@@ -54,6 +56,7 @@ func _physics_process(delta: float) -> void:
 		return
 	_iframes_left = maxf(0.0, _iframes_left - delta)
 	health.heal(stats.regen_per_second() * delta)
+	_tick_acid(delta)
 	var input: Vector2 = _read_input()
 	if _rooted:
 		_root_left -= delta
@@ -76,7 +79,7 @@ func _physics_process(delta: float) -> void:
 		_knock = Knockback.decay(_knock, Tuning.PLAYER_KNOCKBACK_DAMPING, delta)
 	else:
 		planar = Locomotion.step(
-			Vector2(velocity.x, velocity.z), input, stats.move_speed(), Tuning.PLAYER_ACCEL, Tuning.PLAYER_FRICTION, delta)
+			Vector2(velocity.x, velocity.z), input, stats.move_speed() * acid.speed_multiplier(), Tuning.PLAYER_ACCEL, Tuning.PLAYER_FRICTION, delta)
 		if input != Vector2.ZERO:
 			facing = input.normalized()
 		planar += _knock
@@ -86,6 +89,18 @@ func _physics_process(delta: float) -> void:
 	global_position.y = 0.0
 	if not dash.is_active():
 		_set_state(State.MOVE if planar.length_squared() > 0.01 else State.IDLE)
+
+
+## Asit havuzundaki asker (havuz her karede çağırır): yavaşlama ve çıkışta yanma için.
+func acid_touch() -> void:
+	if Tuning.FEATURE_ACID_POOL_SLOW_BURN:
+		acid.touch()
+
+
+func _tick_acid(delta: float) -> void:
+	var burn: float = acid.tick(delta)
+	if burn > 0.0:
+		take_dot(burn)
 
 
 func planar_speed() -> float:
