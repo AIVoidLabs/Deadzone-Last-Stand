@@ -33,7 +33,7 @@ func armor() -> float:
 
 
 func move_speed() -> float:
-	return Tuning.PLAYER_SPEED * _percent(StatData.MOVE_SPEED)
+	return Tuning.PLAYER_SPEED * maxf(Tuning.MIN_STAT_MULTIPLIER, 1.0 + minf(bonus(StatData.MOVE_SPEED), Tuning.MOVE_SPEED_BONUS_CAP) / 100.0)
 
 
 ## Saniyede yenilenen can.

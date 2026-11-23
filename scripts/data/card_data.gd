@@ -6,17 +6,17 @@ extends RefCounted
 ## şans istatistiği bu olasılığı (1 + şans/100) ile çarpar. İlk kademe her zaman olasıdır.
 
 const CARDS: Array = [
-	{"stat": &"max_hp", "values": [10.0, 20.0, 30.0, 40.0]},
-	{"stat": &"damage", "values": [5.0, 8.0, 12.0, 16.0]},
-	{"stat": &"fire_rate", "values": [5.0, 10.0, 15.0, 20.0]},
-	{"stat": &"range", "values": [5.0, 10.0, 15.0, 20.0]},
-	{"stat": &"move_speed", "values": [4.0, 8.0, 12.0, 16.0]},
-	{"stat": &"armor", "values": [1.0, 2.0, 3.0, 4.0]},
-	{"stat": &"luck", "values": [5.0, 10.0, 15.0, 20.0]},
-	{"stat": &"hp_regen", "values": [1.0, 2.0, 3.0, 4.0]},
-	{"stat": &"pickup_range", "values": [15.0, 30.0, 45.0, 60.0]},
-	{"stat": &"dash_cooldown", "values": [6.0, 12.0, 18.0, 24.0]},
-	{"stat": &"dash_distance", "values": [8.0, 16.0, 24.0, 32.0]},
+	{"stat": &"max_hp", "values": [5.0, 10.0, 15.0, 20.0]},
+	{"stat": &"damage", "values": [2.5, 4.0, 6.0, 8.0]},
+	{"stat": &"fire_rate", "values": [2.5, 5.0, 7.5, 10.0]},
+	{"stat": &"range", "values": [2.5, 5.0, 7.5, 10.0]},
+	{"stat": &"move_speed", "values": [2.0, 4.0, 6.0, 8.0]},
+	{"stat": &"armor", "values": [1.0, 1.0, 2.0, 2.0]},
+	{"stat": &"luck", "values": [2.5, 5.0, 7.5, 10.0]},
+	{"stat": &"hp_regen", "values": [1.0, 1.0, 2.0, 2.0]},
+	{"stat": &"pickup_range", "values": [7.5, 15.0, 22.5, 30.0]},
+	{"stat": &"dash_cooldown", "values": [3.0, 6.0, 9.0, 12.0]},
+	{"stat": &"dash_distance", "values": [4.0, 8.0, 12.0, 16.0]},
 ]
 
 const TIERS: Array = [

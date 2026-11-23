@@ -50,3 +50,19 @@ func test_readiness_grows_with_time() -> void:
 	dash.start()
 	dash.tick(Tuning.DASH_COOLDOWN * 0.5)
 	assert_almost_eq(dash.readiness(), 0.5, 0.0001)
+
+
+func test_early_window_only_first_part() -> void:
+	var dash: Dash = _make()
+	assert_false(dash.in_early_window(Tuning.DASH_IFRAMES), "aktif değil")
+	dash.start()
+	assert_true(dash.in_early_window(Tuning.DASH_IFRAMES), "başlangıçta pencere açık")
+	dash.tick(Tuning.DASH_IFRAMES + 0.01)
+	assert_false(dash.in_early_window(Tuning.DASH_IFRAMES), "pencere kapandı")
+	assert_true(dash.is_active())
+
+
+func test_move_speed_bonus_capped() -> void:
+	var stats: PlayerStats = PlayerStats.new()
+	stats.add(StatData.MOVE_SPEED, 500.0)
+	assert_almost_eq(stats.move_speed(), Tuning.PLAYER_SPEED * (1.0 + Tuning.MOVE_SPEED_BONUS_CAP / 100.0), 0.0001)

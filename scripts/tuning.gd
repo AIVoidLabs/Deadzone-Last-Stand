@@ -37,6 +37,8 @@ const FEATURE_START_FULLSCREEN: bool = true
 const FEATURE_DASH: bool = true
 ## Dash sırasında asker zombilerin içinden geçer (kapalıysa onları iter).
 const FEATURE_DASH_PASS_THROUGH: bool = true
+## Takla dokunulmazlığı yalnız ilk DASH_IFRAMES sn; sonrası ve çıkış hasar alır (kapalıyken: tüm takla + çıkış payı).
+const FEATURE_DASH_EARLY_IFRAMES: bool = true
 const FEATURE_DASH_DUST: bool = true
 ## Kapalıyken asker Aşama 1'deki kapsülle çizilir.
 const FEATURE_PLAYER_MODEL: bool = true
@@ -488,7 +490,9 @@ const PLAYER_TURN_SHARPNESS: float = 14.0
 # --- Dash ---
 const DASH_SPEED: float = 15.0
 const DASH_DURATION: float = 0.35
-const DASH_COOLDOWN: float = 1.4
+const DASH_COOLDOWN: float = 8.0 # 11.5A: 1.4 → 8.0
+## Takla başlangıcından itibaren yalnız bu kadar sn dokunulmaz (FEATURE_DASH_EARLY_IFRAMES).
+const DASH_IFRAMES: float = 0.15
 ## Dash bittikten sonraki kısa dokunulmazlık (sn).
 const DASH_EXIT_IFRAMES: float = 0.12
 ## Takla klibinin oynatıldığı süre (sn); dash'ten biraz uzun, kalkış koşuya karışır.
@@ -636,6 +640,8 @@ const CARD_OFFER_COUNT: int = 3
 const HP_REGEN_PER_POINT: float = 0.2 # 11.4: 0.25 → 0.2 (tank kurulumu)
 ## Dash bekleme süresi en çok bu yüzde kadar kısalır.
 const DASH_COOLDOWN_CUT_CAP: float = 60.0
+## Hareket hızı bonusu en çok bu yüzde olur (11.5A).
+const MOVE_SPEED_BONUS_CAP: float = 50.0
 ## Yüzdelik istatistik eksiye düşse bile çarpan bunun altına inmez (ileride eksi veren eşyalar).
 const MIN_STAT_MULTIPLIER: float = 0.1
 

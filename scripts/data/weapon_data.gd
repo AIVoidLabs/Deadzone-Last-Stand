@@ -153,9 +153,9 @@ const TABLE: Dictionary = {
 ## tint: model rengi çarpanı; glow: kendi ışıma payı; scale: model büyütme çarpanı.
 const TIERS: Array[Dictionary] = [
 	{"damage_mult": 1.0, "rate_mult": 1.0, "tint": Color(1.0, 1.0, 1.0), "glow": 0.0, "scale": 1.0},
-	{"damage_mult": 1.5, "rate_mult": 1.12, "tint": Color(0.45, 1.0, 0.55), "glow": 0.3, "scale": 1.07},
-	{"damage_mult": 2.2, "rate_mult": 1.25, "tint": Color(0.4, 0.65, 1.0), "glow": 0.5, "scale": 1.14},
-	{"damage_mult": 3.2, "rate_mult": 1.4, "tint": Color(1.0, 0.78, 0.2), "glow": 0.8, "scale": 1.22},
+	{"damage_mult": 1.32, "rate_mult": 1.08, "tint": Color(0.45, 1.0, 0.55), "glow": 0.3, "scale": 1.07},
+	{"damage_mult": 1.76, "rate_mult": 1.16, "tint": Color(0.4, 0.65, 1.0), "glow": 0.5, "scale": 1.14},
+	{"damage_mult": 2.4, "rate_mult": 1.25, "tint": Color(1.0, 0.78, 0.2), "glow": 0.8, "scale": 1.22},
 ]
 
 
