@@ -5,6 +5,8 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 
 ## Şu an
 
+**AŞAMA 12 — Yayın (2026-11-23):** web yok; ücretsiz açık kaynak, itch.io indirilebilir + bağış, GitHub Release (DECISIONS). 12.1: Windows (142 MB) ve Linux (106 MB) release çıktıları hatasız (`build/windows/`, `build/linux/`; iki dışa aktarımı paralel çalıştırma, `.godot/exported` önbelleği çakışıyor). Windows exe menüde 12 sn hatasız çalıştı. Bekleyen: Taha'nın exe ile tam tur testi, Linux makinede deneme, kod lisansı onayı (öneri MIT, Tower Climb gibi).
+
 **AŞAMA 11 BİTTİ (2026-11-23), Taha onayladı** (11.5–11.8 ve 11.F dahil; açık küçük UI hataları — kaydırıcıda "100%", kesilen "Takla bekleme süresi" satırı — Taha kararıyla olduğu gibi kalır). **Sıradaki ana aşama: 12 — Yayın; Taha'nın "devam" demesi bekleniyor.**
 
 **AŞAMA 9 BİTTİ (2026-11-23), Taha onayladı.** AŞAMA 11 — Taha'nın ilk oyun geri bildirimi (2026-11-23): oynanış beğenildi, oyun hâlâ basit. Plan aşağıda.
