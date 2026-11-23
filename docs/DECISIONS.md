@@ -273,11 +273,12 @@ Aşama 1 geri bildirimi (Taha): vuruş hissi yok, hareket cansız, zombiler tehd
 
 - 2026-11-23: Aşama 10 (kalıcı ilerleme) tümden iptal. Kalıcı para, asker sınıfı, silah açılımı ve yükseltme yok; ölen oyuncu her seferinde ilk seviye ve ilk silahla baştan başlar. Zorluk "zora yakın" hedeflenir (Aşama 11).
 
+- 2026-11-23 (Aşama 11, Taha Claude'un önerisine uydu): **zorluk orta–zor**; **10 dalga** (~10–12 dk tur); eşya ~30 (yeni eşyalar önce stat amblemi, kendi amblemleri sonra ayrı onayla); **silah 10'da kalır** (yeni model yok). Hedef sayılar: bot kazanma %15–30, ortalama ölüm dalgası son dalganın %60–80'i, ilk üçte birde ölüm yok, orta dalgalardan sonra her dalgada can en az bir kez %50 altı; dalga başı artış ~%8–12, boss dalgalarında sıçrama. Son ölçü Taha: ilk denemelerde ~3 turda 1 kazanmak.
+
 ## Açık kararlar
 
 | Karar | Ne zaman |
 |---|---|
-| İçerik hedefi sayıları | 6 ve 11 |
 | Müzik | 8.5 |
 | Gamepad, oyun dili | 9.7 |
 | Kod lisansı (MIT?), Linux deneme ortamı | 12'den önce |
