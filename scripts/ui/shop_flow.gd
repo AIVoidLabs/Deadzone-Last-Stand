@@ -138,7 +138,7 @@ func _wave_index() -> int:
 
 func _price(entry: Dictionary) -> int:
 	var base: int = ItemData.get_row(entry["id"])["price"] if entry["kind"] == ShopRules.ITEM else WeaponData.get_row(entry["id"])["price"]
-	return ShopRules.price(roundi(float(base) * Tuning.SHOP_PRICE_MULT), _wave_index(), Tuning.SHOP_PRICE_WAVE_GROWTH)
+	return ShopRules.price(ShopRules.list_price(base, Tuning.SHOP_PRICE_MULT), _wave_index(), Tuning.SHOP_PRICE_WAVE_GROWTH)
 
 
 func _reroll_cost() -> int:
@@ -208,7 +208,8 @@ func _on_sell(index: int) -> void:
 
 func _sell_value(slot: Dictionary) -> int:
 	var base: int = WeaponData.get_row(slot["id"])["price"]
-	return ShopRules.sell_value(base, slot["tier"], Tuning.SHOP_SELL_FRACTION)
+	# İade, ödenen (SHOP_PRICE_MULT uygulanmış) taban fiyatın kesri.
+	return ShopRules.sell_value(ShopRules.list_price(base, Tuning.SHOP_PRICE_MULT), slot["tier"], Tuning.SHOP_SELL_FRACTION)
 
 
 ## "ok" alınabilir, "poor" kristal yetmez, "full" yuva dolu ve birleşmez, "sold" satın alındı.
@@ -250,7 +251,7 @@ func _refresh() -> void:
 		"reroll_cost": cost,
 		"owned": _owned.duplicate(),
 		"stats": stats,
-		"owned_text": "%s\n%s" % [_owned_text(), CardScreen.stats_text(stats)],
+		"owned_text": "%s\n%s" % [ShopTexts.owned_text(_owned), CardScreen.stats_text(stats)],
 	})
 
 
@@ -263,57 +264,15 @@ func _entry_view(entry: Dictionary) -> Dictionary:
 		var owned: int = int(_owned.get(entry["id"], 0))
 		view["subtitle"] = "EŞYA" if owned == 0 else "EŞYA  ·  sende ×%d" % owned
 		for effect: Dictionary in row["effects"]:
-			view["lines"].append({"text": StatData.describe(effect["stat"], effect["value"]), "good": _is_good(effect)})
+			view["lines"].append({"text": StatData.describe(effect["stat"], effect["value"]), "good": ShopTexts.is_good(effect)})
 		return view
 	var weapon: Dictionary = WeaponData.get_row(entry["id"])
 	var plan: Dictionary = weapons.preview_add(entry["id"])
-	var tier: int = _new_tier(plan, entry["id"])
+	var tier: int = ShopTexts.new_tier(plan, entry["id"], weapons.slot_list())
 	view["merged"] = plan["merged"]
 	view["tier"] = tier
 	view["title"] = weapon["name"]
 	view["color"] = WeaponData.tier_row(tier)["tint"]
 	view["subtitle"] = "SİLAH" if not plan["merged"] else "SİLAH  ·  BİRLEŞİR → K%d" % tier
-	view["lines"] = _weapon_lines(weapon, tier)
+	view["lines"] = ShopTexts.weapon_lines(weapon, tier)
 	return view
-
-
-## Eşyanın etkisi oyuncu lehine mi (dash bekleme düşüşü de lehinedir).
-static func _is_good(effect: Dictionary) -> bool:
-	var value: float = effect["value"]
-	return value > 0.0
-
-
-func _weapon_lines(row: Dictionary, tier: int) -> Array:
-	var tier_row: Dictionary = WeaponData.tier_row(tier)
-	var damage: float = float(row["damage"]) * float(tier_row["damage_mult"])
-	var pellets: int = row["pellets"]
-	var damage_text: String = "Hasar %d" % roundi(damage) if pellets == 1 else "Hasar %d × %d" % [roundi(damage), pellets]
-	var rate: float = float(tier_row["rate_mult"]) / float(row["fire_interval"])
-	return [
-		{"text": damage_text, "good": true},
-		{"text": "%.1f atış/sn" % rate, "good": true},
-		{"text": "Menzil %d m" % roundi(row["max_range"]), "good": true},
-	]
-
-
-## Eklemede yeni oluşan yuvanın kademesi (birleşmede üst kademe, yoksa 1).
-func _new_tier(plan: Dictionary, id: StringName) -> int:
-	if not plan["ok"]:
-		return 1
-	var remaining: Array[Dictionary] = weapons.slot_list()
-	for slot: Dictionary in plan["slots"]:
-		var found: int = remaining.find(slot)
-		if found >= 0:
-			remaining.remove_at(found)
-		elif slot["id"] == id:
-			return slot["tier"]
-	return 1
-
-
-func _owned_text() -> String:
-	if _owned.is_empty():
-		return "Henüz eşyan yok"
-	var parts: PackedStringArray = PackedStringArray()
-	for id: StringName in _owned:
-		parts.append("%s ×%d" % [ItemData.get_row(id)["name"], _owned[id]])
-	return "Eşyalar: " + "   ·   ".join(parts)

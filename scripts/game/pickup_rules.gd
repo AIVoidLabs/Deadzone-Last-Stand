@@ -36,3 +36,12 @@ static func in_magnet(pos: Vector2, player: Vector2, radius: float) -> bool:
 ## Kristalin görüntü boyu: değeri büyüdükçe (birleşince) biraz büyür.
 static func value_scale(value: int, per_value: float, max_scale: float) -> float:
 	return minf(max_scale, 1.0 + per_value * float(maxi(0, value - 1)))
+
+
+## Kristallerin toplam değeri; state verilirse yalnız o durumdakiler (-1: hepsi).
+static func total_value(values: PackedInt32Array, states: PackedByteArray, only_state: int = -1) -> int:
+	var sum: int = 0
+	for i in values.size():
+		if only_state < 0 or states[i] == only_state:
+			sum += values[i]
+	return sum

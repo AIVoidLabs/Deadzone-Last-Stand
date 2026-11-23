@@ -37,7 +37,7 @@ func on_removed(i: int) -> void:
 func begin_chain(i: int) -> void:
 	if i >= _hops.size():
 		_hops.resize(_m._pos.size())
-	_hops[i] = JumpRules.extra_hops(randf(), Tuning.JUMPER_CHAIN_MIN, Tuning.JUMPER_CHAIN_MAX) if Tuning.FEATURE_JUMPER_CHAIN else 0
+	_hops[i] = JumpRules.extra_hops(_m._rng.randf(), Tuning.JUMPER_CHAIN_MIN, Tuning.JUMPER_CHAIN_MAX) if Tuning.FEATURE_JUMPER_CHAIN else 0
 
 
 ## Kalan ek zıplama var mı; varsa birini harcar.

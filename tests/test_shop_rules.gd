@@ -20,6 +20,18 @@ func test_price_grows_with_wave() -> void:
 	assert_eq(ShopRules.price(1, 0, 0.0), 1)
 
 
+func test_list_price_applies_multiplier() -> void:
+	assert_eq(ShopRules.list_price(20, 1.0), 20)
+	assert_eq(ShopRules.list_price(20, Tuning.SHOP_PRICE_MULT), roundi(20.0 * Tuning.SHOP_PRICE_MULT))
+	assert_gt(ShopRules.list_price(20, 2.0), ShopRules.list_price(20, 1.0))
+
+
+func test_sell_refund_follows_paid_price() -> void:
+	var paid: int = ShopRules.list_price(30, Tuning.SHOP_PRICE_MULT)
+	assert_eq(ShopRules.sell_value(paid, 1, Tuning.SHOP_SELL_FRACTION), floori(float(paid) * Tuning.SHOP_SELL_FRACTION))
+	assert_gte(ShopRules.sell_value(paid, 1, Tuning.SHOP_SELL_FRACTION), ShopRules.sell_value(30, 1, Tuning.SHOP_SELL_FRACTION))
+
+
 func test_reroll_cost_exp() -> void:
 	assert_eq(ShopRules.reroll_cost_exp(0, 5, 5, 100000), 5)
 	assert_eq(ShopRules.reroll_cost_exp(1, 5, 5, 100000), 25)

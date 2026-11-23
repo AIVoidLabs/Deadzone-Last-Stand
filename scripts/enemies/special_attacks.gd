@@ -69,42 +69,14 @@ static func faces_in(state: ZombieRules.State) -> bool:
 	return state == S.WINDUP or state == S.LUNGE or state == S.JUMP or state == S.SPRINT or state == S.STRIKE or state == S.CHARGE
 
 
-## Kovalarken saldırıyı başlatan mesafe payı (temasın üstüne).
+## Kovalarken saldırıyı başlatan mesafe payı (temasın üstüne); tablo SpecialAttackTable'da.
 static func start_range(row: Dictionary) -> float:
-	if not is_special(row):
-		return row["attack_range"]
-	match row["attack_kind"]:
-		&"lunge":
-			return row["lunge_range"]
-		&"sprint":
-			return row["sprint_trigger_range"]
-		&"jump":
-			return row["jump_range"]
-		&"spit":
-			return row["spit_range"]
-		&"throw":
-			return row["throw_range"]
-		&"bloat":
-			return row["bloat_prime_range"]
-		&"scream":
-			return row["scream_range"]
-	return row["tongue_range"]
+	return SpecialAttackTable.start_range(row)
 
 
 ## Hazırlıktan sonra geçilecek durum (özel saldırı kapalıysa RECOVER: yürüyenin vuruşu).
 static func windup_next(row: Dictionary) -> ZombieRules.State:
-	if not is_special(row):
-		return S.RECOVER
-	match row["attack_kind"]:
-		&"lunge":
-			return S.LUNGE
-		&"sprint":
-			return S.SPRINT
-		&"jump":
-			return S.JUMP
-		&"spit", &"throw", &"bloat", &"scream":
-			return S.RECOVER
-	return S.LASH
+	return SpecialAttackTable.windup_next(row)
 
 
 ## Özel durumda (hazırlık, atılış, havada, dil) bu karede ne yapılır. Dönüş: yeni konum.

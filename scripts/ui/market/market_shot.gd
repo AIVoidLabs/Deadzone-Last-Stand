@@ -31,4 +31,4 @@ static func build(host: Node, opts: Dictionary) -> void:
 	screen.focus_card(int(opts.get("focus", -1)))
 	var hover: int = int(opts.get("hover", -1))
 	if hover >= 0:
-		host.get_tree().create_timer(0.6, true, false, true).timeout.connect(screen.hover_slot.bind(hover))
+		host.get_tree().create_timer(Tuning.UI_SHOT_SETTLE_TIME, true, false, true).timeout.connect(screen.hover_slot.bind(hover))

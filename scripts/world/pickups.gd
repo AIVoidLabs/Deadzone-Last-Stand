@@ -52,8 +52,23 @@ func is_settled() -> bool:
 	return Tuning.FEATURE_WAVE_END_NO_AUTOCOLLECT or _pos.size() == 0
 
 
-## Yeni dalga: yerde kalan kristaller silinir (havuza döner).
+## Yeni dalga: askere uçanlar (PULL) toplanmış sayılır, yerde kalanlar silinir (havuza döner).
 func clear_all() -> void:
+	var pulled: int = PickupRules.total_value(_value, _state, State.PULL)
+	_reset()
+	if pulled > 0:
+		collected.emit(pulled)
+
+
+## Tur sonu (son dalga): yerdeki her kristal anında toplanmış sayılır (collected tek seferde toplam değerle gelir).
+func take_all() -> void:
+	var total: int = PickupRules.total_value(_value, _state)
+	_reset()
+	if total > 0:
+		collected.emit(total)
+
+
+func _reset() -> void:
 	_pos.resize(0)
 	_from.resize(0)
 	_value.resize(0)
@@ -92,8 +107,8 @@ func drop(at: Vector3, value: int, spread: float = 1.0) -> void:
 	_write(index, 0.0)
 
 
-## Dalga sonu: hepsi askere çekilir; dalga bitene kadar yeni düşenler de çekilir (temizlikte
-## devrilen zombilerin kristali yerde kalıp mağazayı/kartları bekletmesin).
+## Eski akış (FEATURE_WAVE_END_NO_AUTOCOLLECT kapalıyken): dalga sonu hepsi askere çekilir; dalga bitene kadar
+## yeni düşenler de çekilir. Açıkken kullanılmaz: dalga arası kristaller yerde bekler, tur sonunda take_all toplar.
 func collect_all() -> void:
 	pull_all = true
 	for i in _pos.size():

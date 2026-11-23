@@ -1,7 +1,8 @@
 class_name LevelUpFlow
 extends Node
-## Bekleyen seviyeler için kart seçimi. Dalgalar açıkken dalga arasında, yerdeki kristaller
-## toplandıktan sonra açılır; dalgalar kapalıyken seviye atlar atlamaz. Seçim sırasında oyun durur.
+## Bekleyen seviyeler için kart seçimi. Dalgalar açıkken dalga arasında açılır (kristaller yerde
+## beklerse beklemez, eski otomatik toplamada toplanmalarını bekler); dalgalar kapalıyken seviye atlar atlamaz.
+## Seçim sırasında oyun durur.
 
 var loot: RunLoot
 var stats: PlayerStats

@@ -66,3 +66,58 @@ func test_move_speed_bonus_capped() -> void:
 	var stats: PlayerStats = PlayerStats.new()
 	stats.add(StatData.MOVE_SPEED, 500.0)
 	assert_almost_eq(stats.move_speed(), Tuning.PLAYER_SPEED * (1.0 + Tuning.MOVE_SPEED_BONUS_CAP / 100.0), 0.0001)
+
+
+func test_cancel_ends_dash_but_keeps_cooldown() -> void:
+	var d: Dash = _new_dash()
+	d.start()
+	d.cancel()
+	assert_false(d.is_active())
+	assert_false(d.can_start(), "bekleme akmaya devam eder")
+
+
+func _dashing_player() -> Player:
+	var player: Player = Player.new()
+	add_child_autofree(player)
+	player.request_dash()
+	player._physics_process(0.001)
+	return player
+
+
+func test_root_rejected_in_dash_iframe_window() -> void:
+	if not (Tuning.FEATURE_DASH_EARLY_IFRAMES and Tuning.FEATURE_ROOT):
+		pending("takla dokunulmazlığı / bağlama kapalı")
+		return
+	var player: Player = _dashing_player()
+	assert_true(player.is_dashing())
+	player.root(1.0)
+	assert_false(player.is_rooted(), "dokunulmaz pencerede bağ reddedilir")
+	assert_true(player.is_dashing())
+
+
+func test_root_in_late_dash_cuts_dash_then_roots() -> void:
+	if not (Tuning.FEATURE_DASH_EARLY_IFRAMES and Tuning.FEATURE_ROOT):
+		pending("takla dokunulmazlığı / bağlama kapalı")
+		return
+	var player: Player = _dashing_player()
+	watch_signals(player)
+	while player.dash.is_active() and player.dash.in_early_window(Tuning.DASH_IFRAMES):
+		player._physics_process(0.005)
+	assert_true(player.is_dashing(), "pencere bitti ama takla sürüyor")
+	player.root(1.0)
+	assert_true(player.is_rooted())
+	assert_false(player.is_dashing())
+	assert_false(player.dash.is_active())
+	assert_signal_emitted(player, "state_changed")
+	assert_signal_emitted(player, "event")
+
+
+func test_hit_during_dash_leaves_no_stale_knock() -> void:
+	if not Tuning.FEATURE_DASH_EARLY_IFRAMES:
+		pending("takla dokunulmazlığı kapalı")
+		return
+	var player: Player = _dashing_player()
+	while player.dash.in_early_window(Tuning.DASH_IFRAMES):
+		player._physics_process(0.005)
+	player.take_hit(1.0, Vector2.RIGHT)
+	assert_eq(player._knock, Vector2.ZERO, "takla sırasında itme yazılmaz")

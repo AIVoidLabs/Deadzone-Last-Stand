@@ -194,7 +194,7 @@ static func ui_shot(host: Node, opts: Dictionary) -> void:
 	hud.set_demo(values)
 	var hover: int = int(opts.get("hover", -1))
 	if hover >= 0:
-		host.get_tree().create_timer(0.6, true, false, true).timeout.connect(hud.hover_slot.bind(hover))
+		host.get_tree().create_timer(Tuning.UI_SHOT_SETTLE_TIME, true, false, true).timeout.connect(hud.hover_slot.bind(hover))
 	if tab == 2:
 		hud._banner.flash(Loc.t(&"hud.final_wave"), BANNER_LAST_COLOR, 5.0)
 	else:

@@ -26,4 +26,3 @@ func test_chance_matches_rate() -> void:
 func test_rows_carry_chances() -> void:
 	assert_eq(float(EnemyData.TABLE[&"walker"]["drop_chance"]), Tuning.DROP_CHANCE_WALKER)
 	assert_eq(float(EnemyData.TABLE[&"tank"]["drop_chance"]), Tuning.DROP_CHANCE_SPECIAL)
-	assert_eq(float(EnemyData.TABLE[EnemyDataBoss.ID]["drop_chance"]), Tuning.DROP_CHANCE_BOSS)

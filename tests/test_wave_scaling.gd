@@ -5,7 +5,14 @@ extends GutTest
 func test_wave_rows_carry_the_planned_curve() -> void:
 	var first: Dictionary = WaveData.WAVES[0]
 	var last: Dictionary = WaveData.WAVES[WaveData.WAVES.size() - 1]
-	assert_gte(float(first["enemy_hp_mult"]), 1.0)
+	var walker: Dictionary = EnemyData.get_row(EnemyData.WALKER)
+	assert_eq(WaveScaling.hp_mult(first, walker, true), float(first["enemy_hp_mult"]), "ilk dalga tablodaki değer")
+	assert_eq(WaveScaling.damage_mult(first, walker, true), float(first["enemy_damage_mult"]))
+	for k in range(1, WaveData.WAVES.size()):
+		var prev: Dictionary = WaveData.WAVES[k - 1]
+		var cur: Dictionary = WaveData.WAVES[k]
+		assert_gte(float(cur["enemy_hp_mult"]), float(prev["enemy_hp_mult"]), "can çarpanı dalgayla düşmez (dalga %d)" % (k + 1))
+		assert_gte(float(cur["enemy_damage_mult"]), float(prev["enemy_damage_mult"]), "hasar çarpanı dalgayla düşmez (dalga %d)" % (k + 1))
 	assert_gt(float(last["enemy_hp_mult"]), float(first["enemy_hp_mult"]))
 	assert_gt(float(last["enemy_damage_mult"]), float(first["enemy_damage_mult"]))
 

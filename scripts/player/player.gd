@@ -137,7 +137,8 @@ func request_dash() -> void:
 func take_hit(amount: float, push: Vector2 = Vector2.ZERO) -> void:
 	if not is_hittable():
 		return
-	if Tuning.FEATURE_PLAYER_KNOCKBACK:
+	# Takla sırasında itme yazılmaz (takla bitince bayat itme uygulanmasın).
+	if Tuning.FEATURE_PLAYER_KNOCKBACK and state != State.DASH:
 		_knock = Knockback.impulse(push, Tuning.PLAYER_HIT_KNOCKBACK, 1.0)
 	var dealt: float = health.take_damage(CombatMath.mitigate(amount, stats.armor()))
 	if Tuning.FEATURE_PLAYER_IFRAMES:
@@ -173,6 +174,10 @@ func _die_if_dead() -> void:
 func root(duration: float) -> void:
 	if not is_exposed() or not Tuning.FEATURE_ROOT:
 		return
+	# Geç takla penceresi (dokunulmazlık bitti): taklayı kes, sonra bağla (state_changed sırası: MOVE, rooted).
+	if state == State.DASH:
+		dash.cancel()
+		_end_dash()
 	_root_left = duration
 	_rooted = true
 	velocity = Vector3.ZERO
@@ -220,6 +225,7 @@ func _end_dash() -> void:
 	if not Tuning.FEATURE_DASH_EARLY_IFRAMES:
 		_iframes_left = maxf(_iframes_left, Tuning.DASH_EXIT_IFRAMES)
 	velocity = Vector3(_dash_direction.x, 0.0, _dash_direction.y) * stats.move_speed()
+	_knock = Vector2.ZERO
 	_set_state(State.MOVE)
 	event.emit(&"dash_ended", {})
 

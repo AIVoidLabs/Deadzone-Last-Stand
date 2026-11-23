@@ -8,6 +8,11 @@ const WEAPON: StringName = &"weapon"
 
 
 ## Dalga ilerledikçe fiyat artar (wave_index 0 tabanlı).
+## Tablo fiyatına fiyat çarpanı uygulanmış taban fiyat (dalga artışından önce).
+static func list_price(base: int, mult: float) -> int:
+	return roundi(float(base) * mult)
+
+
 static func price(base: int, wave_index: int, growth: float) -> int:
 	return maxi(1, roundi(float(base) * (1.0 + growth * float(wave_index))))
 

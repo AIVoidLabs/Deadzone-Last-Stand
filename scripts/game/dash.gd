@@ -26,6 +26,11 @@ func start() -> bool:
 	return true
 
 
+## Dash'i hemen keser (süre biter; bekleme akmaya devam eder).
+func cancel() -> void:
+	time_left = 0.0
+
+
 ## Dash bu adımda bittiyse true.
 func tick(delta: float) -> bool:
 	cooldown_left = maxf(0.0, cooldown_left - delta)

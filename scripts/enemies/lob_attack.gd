@@ -175,9 +175,11 @@ func _add_pool(at: Vector2, row: Dictionary) -> void:
 ## Havuzun içindeki (açıktaki) askere her acid_tick sn'de acid_damage: dokunulmazlık vermez, vurulma animasyonu yok.
 func _pool_tick(k: int, delta: float, target: Vector2) -> void:
 	var row: Dictionary = _pool_row[k]
-	if not _m.player.is_exposed() or not LobRules.in_pool(target, _pool_pos[k], float(row["acid_radius"])):
+	if not LobRules.in_pool(target, _pool_pos[k], float(row["acid_radius"])):
 		return
-	_m.player.acid_touch()
+	_m.player.acid_touch()  # yavaşlama dokunulmazken de uygulanır
+	if not _m.player.is_exposed():
+		return
 	var step: Vector2 = LobRules.advance_tick(_pool_acc[k], delta, float(row["acid_tick"]))
 	_pool_acc[k] = step.x
 	for _t in int(step.y):

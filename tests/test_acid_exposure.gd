@@ -30,7 +30,8 @@ func test_burn_lingers_after_leaving_then_stops() -> void:
 	while t < Tuning.ACID_BURN_LINGER + 0.5:
 		burn += a.tick(1.0 / 60.0)
 		t += 1.0 / 60.0
-	assert_almost_eq(burn, Tuning.ACID_BURN_DPS * Tuning.ACID_BURN_LINGER, Tuning.ACID_BURN_DPS * Tuning.ACID_BURN_TICK + 0.01)
+	# Tek tik hasarın yarısı tolerans: bir tik eksik/fazla olursa test kırılır.
+	assert_almost_eq(burn, Tuning.ACID_BURN_DPS * Tuning.ACID_BURN_LINGER, Tuning.ACID_BURN_DPS * Tuning.ACID_BURN_TICK * 0.5)
 	assert_eq(a.speed_multiplier(), 1.0, "süre bitince yavaşlama kalkar")
 	assert_eq(a.tick(0.1), 0.0)
 

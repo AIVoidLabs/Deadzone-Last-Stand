@@ -662,7 +662,6 @@ const XP_LEVEL_POWER: float = 2.2
 const FEATURE_DROP_CHANCE: bool = true
 const DROP_CHANCE_WALKER: float = 0.5
 const DROP_CHANCE_SPECIAL: float = 0.8
-const DROP_CHANCE_BOSS: float = 1.0
 const DROP_CHANCE_DEFAULT: float = 1.0
 ## Dalga sonunda yerdeki kristaller otomatik toplanmaz; yeni dalga başlayınca silinir (kapalıyken eski otomatik toplama).
 const FEATURE_WAVE_END_NO_AUTOCOLLECT: bool = true
@@ -805,6 +804,8 @@ const PLAYER_BLINK_RATE: float = 20.0
 # --- Debug ---
 const DEBUG_SPAWN_BATCH: int = 50
 const DEBUG_PANEL_REFRESH: float = 0.25
+## Ekran görüntüsü araçları (battle_hud / market_shot): hover çağrılmadan önce arayüzün oturmasını bekleme süresi (sn).
+const UI_SHOT_SETTLE_TIME: float = 0.6
 ## Capture --capture-pick: kart ekranında tuşa basmadan önce bekleme (sn).
 const CAPTURE_PICK_DELAY: float = 0.5
 const BENCH_STEP_ENEMIES: int = 50

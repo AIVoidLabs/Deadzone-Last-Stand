@@ -20,7 +20,7 @@ const ROW: Dictionary = {
 	"spawn_time": 2.0,
 	"prewarm": 1,
 	"drop_value": 150,
-	"drop_chance": Tuning.DROP_CHANCE_BOSS,
+	# drop_chance yok: boss her zaman kristal yağmuru bırakır (BossFx).
 	"weight": 50.0,
 	"stagger_time": 0.0,
 	"height": 3.6,

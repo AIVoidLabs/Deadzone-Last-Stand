@@ -1,10 +1,6 @@
 extends Node3D
 ## Ana sahne: dünyayı kodla kurar ve parçaları birbirine bağlar.
 
-## Kristal düşme zarı.
-var _drop_rng: RandomNumberGenerator = RandomNumberGenerator.new()
-
-
 func _ready() -> void:
 	# 1v1 debug arenası: dalga, kart ve mağaza kapalı (DebugArena.active SpawnDirector'u da etkiler).
 	var arena_mode: bool = DebugArena.requested()
@@ -24,7 +20,7 @@ func _ready() -> void:
 	add_child(director)
 
 	var loot: RunLoot = RunLoot.new()
-	var pickups: Pickups = _add_pickups(player, enemies, director, loot)
+	var pickups: Pickups = PickupLoot.install(self, player, enemies, director, loot)
 
 	var projectiles: ProjectilePool = ProjectilePool.new()
 	projectiles.enemies = enemies
@@ -167,40 +163,6 @@ func _add_run_recorder(player: Player, enemies: EnemyManager, weapons: WeaponRig
 	recorder.pickups = pickups
 	recorder.loot = loot
 	add_child(recorder)
-
-
-## Zombi satırının drop_chance'ine göre kristal düşer mi (FEATURE_DROP_CHANCE kapalıysa hep).
-func _rolls_drop(row: Dictionary) -> bool:
-	if not Tuning.FEATURE_DROP_CHANCE:
-		return true
-	return PickupRules.should_drop(float(row.get("drop_chance", Tuning.DROP_CHANCE_DEFAULT)), _drop_rng)
-
-
-## Kristaller: öldürmede düşer, toplanınca RunLoot'a eklenir, dalga sonunda hepsi çekilir.
-## Kapalıyken null döner.
-func _add_pickups(player: Player, enemies: EnemyManager, director: SpawnDirector, loot: RunLoot) -> Pickups:
-	if not Tuning.FEATURE_PICKUPS:
-		return null
-	var pickups: Pickups = Pickups.new()
-	pickups.player = player
-	add_child(pickups)
-	enemies.enemy_killed.connect(func(at: Vector3, row: Dictionary) -> void:
-		# Boss kristal yağmurunu BossFx yağdırır.
-		if not row.get("boss", false) and _rolls_drop(row):
-			pickups.drop(at, row.get("drop_value", 0)))
-	pickups.collected.connect(func(value: int) -> void:
-		if loot.add(value) > 0:
-			UiSounds.play(UiSoundData.LEVEL_UP)
-		if Tuning.FEATURE_SFX:
-			Audio.play(SoundData.PICKUP_DARK if Tuning.FEATURE_SFX_PICKUP_DARK else SoundData.PICKUP))
-	director.phase_changed.connect(func(phase: WaveRun.Phase, _wave_index: int) -> void:
-		if phase == WaveRun.Phase.CLEAR and not Tuning.FEATURE_WAVE_END_NO_AUTOCOLLECT:
-			pickups.collect_all()
-		elif phase == WaveRun.Phase.WAVE:
-			pickups.pull_all = false
-			if Tuning.FEATURE_WAVE_END_NO_AUTOCOLLECT:
-				pickups.clear_all())
-	return pickups
 
 
 ## Vuruş geri bildirimi: kan, lekeler, hasar sayıları, öldürmede duraksama ve sarsıntı.
