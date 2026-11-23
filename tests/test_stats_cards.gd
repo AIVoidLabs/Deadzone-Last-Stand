@@ -43,6 +43,20 @@ func test_flat_and_capped_stats() -> void:
 	assert_almost_eq(stats.dash_cooldown(), Tuning.DASH_COOLDOWN * (1.0 - Tuning.DASH_COOLDOWN_CUT_CAP / 100.0), 0.0001)
 
 
+func test_max_hp_has_floor() -> void:
+	var stats: PlayerStats = PlayerStats.new()
+	stats.add(StatData.MAX_HP, -Tuning.PLAYER_MAX_HP * 2.0)
+	assert_eq(stats.max_hp(), Tuning.PLAYER_MIN_HP)
+
+
+func test_player_health_stays_equal_to_stats_max_hp() -> void:
+	var player: Player = Player.new()
+	for amount: float in [-Tuning.PLAYER_MAX_HP, -15.0, 40.0, -Tuning.PLAYER_MAX_HP, 25.0]:
+		player.stats.add(StatData.MAX_HP, amount)
+		assert_eq(player.health.maximum, player.stats.max_hp(), "amount %s" % amount)
+	player.free()
+
+
 func test_changed_signal_carries_amount() -> void:
 	var stats: PlayerStats = PlayerStats.new()
 	watch_signals(stats)

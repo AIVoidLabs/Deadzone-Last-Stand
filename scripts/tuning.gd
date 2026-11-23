@@ -197,7 +197,7 @@ const FEATURE_SHOP: bool = true
 const SHOP_OFFER_COUNT: int = 4
 const SHOP_WEAPON_CHANCE: float = 0.4
 ## Fiyat artışı: her dalgada temel fiyatın bu kesri kadar.
-const SHOP_PRICE_WAVE_GROWTH: float = 0.07  # eski 0.15: 10 dalgada 9. dalgada x1.63 (eskisi x2.35 olurdu)
+const SHOP_PRICE_WAVE_GROWTH: float = 0.07  # eski 0.15: son mağaza (9. dalga sonrası, sıra 8) x1.56; eskisi x2.2
 ## Yenileme: ilk bedel ve her yenilemede artış (kristal); dalga başında sıfırlanır.
 const SHOP_REROLL_BASE: int = 5
 const SHOP_REROLL_STEP: int = 2
@@ -476,6 +476,8 @@ const PLAYER_ACCEL: float = 55.0
 const PLAYER_FRICTION: float = 50.0
 const PLAYER_MAX_HP: float = 100.0
 const PLAYER_ARMOR: float = 0.0
+## Can tabanı: eksi can bonusları max canı bunun altına indiremez.
+const PLAYER_MIN_HP: float = 20.0
 const PLAYER_RADIUS: float = 0.4
 const PLAYER_HEIGHT: float = 1.8
 const PLAYER_HIT_IFRAMES: float = 0.5
@@ -520,6 +522,14 @@ const PLAYER_LEAN_SHARPNESS: float = 10.0
 
 # --- Hasar ---
 const MIN_DAMAGE_AFTER_ARMOR: float = 1.0
+## Zırh azalan verimli yüzde: hasar x 100 / (100 + ARMOR_PERCENT_PER_POINT x zırh).
+## 3 zırh ~ %15, 10 zırh ~ %37.5, 14 zırh ~ %46 indirim.
+const ARMOR_PERCENT_PER_POINT: float = 6.0
+## Eksi zırh: puan başına yüzde fazla hasar, en çok ARMOR_NEGATIVE_MAX_BONUS (0.5 = +%50).
+const ARMOR_NEGATIVE_PER_POINT: float = 4.0
+const ARMOR_NEGATIVE_MAX_BONUS: float = 0.5
+## Kapalıyken eski düz çıkarma (hasar - zırh).
+const FEATURE_ARMOR_PERCENT: bool = true
 
 # --- Zombi sürüsü ---
 const ENEMY_SEPARATION_STRENGTH: float = 7.0

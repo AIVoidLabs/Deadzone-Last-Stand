@@ -85,7 +85,7 @@ func test_wave_mix_follows_spec_and_flags() -> void:
 	assert_true(w[2]["mix"].has(&"armored"))
 	assert_false(w[2]["mix"].has(&"spitter"))
 	assert_true(w[3]["mix"].has(&"spitter") and w[3]["mix"].has(&"bloater"))
-	assert_true(w[5]["mix"].has(&"thrower") and w[6]["mix"].has(&"screamer"))
+	assert_true(w[5]["mix"].has(&"tongue") and w[6]["mix"].has(&"thrower") and w[6]["mix"].has(&"screamer"))
 	assert_eq(w[6]["max_alive_kind"][&"screamer"], 2)
 	assert_eq(w[last]["max_alive_kind"][&"screamer"], 2)
 	var mix: Dictionary = WaveData.active_mix(w[last]["mix"])

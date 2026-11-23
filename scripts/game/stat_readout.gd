@@ -19,7 +19,7 @@ static func is_percent(stat: StringName) -> bool:
 static func raw_value(stat: StringName, bonus: float) -> float:
 	match stat:
 		StatData.MAX_HP:
-			return Tuning.PLAYER_MAX_HP + bonus
+			return PlayerStats.max_hp_for(bonus)
 		StatData.ARMOR:
 			return Tuning.PLAYER_ARMOR + bonus
 		StatData.HP_REGEN:

@@ -20,7 +20,12 @@ func bonus(stat: StringName) -> float:
 
 
 func max_hp() -> float:
-	return Tuning.PLAYER_MAX_HP + bonus(StatData.MAX_HP)
+	return max_hp_for(bonus(StatData.MAX_HP))
+
+
+## Taban can + bonus, PLAYER_MIN_HP altına inmez (ekranlar da bunu gösterir).
+static func max_hp_for(hp_bonus: float) -> float:
+	return maxf(Tuning.PLAYER_MIN_HP, Tuning.PLAYER_MAX_HP + hp_bonus)
 
 
 func armor() -> float:

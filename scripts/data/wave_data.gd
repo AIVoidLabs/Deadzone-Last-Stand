@@ -6,7 +6,7 @@ extends RefCounted
 ## mix: tür → ağırlık (EnemyData satırları); davranış bayrağı kapalı tür karışımdan düşer (active_mix).
 ## max_alive_kind (isteğe bağlı): tür → aynı anda en çok canlı sayısı; sınırdaki tür yerine başkası seçilir (SpawnRules.pick_kind_capped).
 ## boss (isteğe bağlı): {kind, spawn_time, horde_factor?}; WaveRun boss akışı (spawn_time'da uyarı, uyarı sonunda doğar, ölünce dalga biter).
-## 11.2 taslağı: 10 dalga. Türler kademeli girer (2 koşan, 3 zırhlı+sıçrayan, 4 tükürücü+şişkin, 5 tank, 6 fırlatıcı+dilci, 7 çığlıkçı); 5. ve 10. dalgada baskı sıçraması, 10. dalgada boss. Kesin sayılar botla ayarlanır.
+## 11.2 taslağı: 10 dalga. Türler kademeli girer (2 koşan, 3 zırhlı+sıçrayan, 4 tükürücü+şişkin, 5 tank, 6 dilci, 7 fırlatıcı+çığlıkçı); 10. dalgada boss. Sayılar 11.2 bot ölçümüyle ayarlandı (DECISIONS 2026-11-23 hedef bandı).
 
 const WAVES: Array = [
 	{
@@ -39,21 +39,21 @@ const WAVES: Array = [
 	},
 	{
 		"duration": 40.0,
-		"interval_start": 0.8, "interval_end": 0.5,
-		"batch_start": 2, "batch_end": 4,
+		"interval_start": 0.86, "interval_end": 0.56, # 11.2: bot 5–6. dalgada yığılıyordu; sıçrama korunur, yumuşar
+		"batch_start": 1, "batch_end": 3,
 		"max_alive": 130,
 		"mix": {&"walker": 1.0, &"runner": 0.18, &"armored": 0.05, &"jumper": 0.07, &"spitter": 0.04, &"bloater": 0.05, &"tank": 0.02},
 	},
 	{
 		"duration": 45.0,
-		"interval_start": 0.78, "interval_end": 0.48,
+		"interval_start": 0.86, "interval_end": 0.56, # 11.2: 6–8. dalga duvarı yumuşatıldı
 		"batch_start": 2, "batch_end": 4,
 		"max_alive": 150,
-		"mix": {&"walker": 1.0, &"runner": 0.19, &"armored": 0.06, &"jumper": 0.09, &"spitter": 0.05, &"bloater": 0.06, &"tank": 0.03, &"thrower": 0.03, &"tongue": 0.02},
+		"mix": {&"walker": 1.0, &"runner": 0.19, &"armored": 0.06, &"jumper": 0.09, &"spitter": 0.05, &"bloater": 0.06, &"tank": 0.03, &"tongue": 0.025}, # 11.2: atıcı 7. dalgaya kaydı (6. dalga duvarı)
 	},
 	{
 		"duration": 50.0,
-		"interval_start": 0.74, "interval_end": 0.45,
+		"interval_start": 0.82, "interval_end": 0.52,
 		"batch_start": 2, "batch_end": 4,
 		"max_alive": 170,
 		"mix": {&"walker": 1.0, &"runner": 0.2, &"armored": 0.06, &"jumper": 0.1, &"spitter": 0.05, &"bloater": 0.06, &"tank": 0.035, &"thrower": 0.04, &"tongue": 0.03, &"screamer": 0.01},
@@ -61,7 +61,7 @@ const WAVES: Array = [
 	},
 	{
 		"duration": 55.0,
-		"interval_start": 0.7, "interval_end": 0.42,
+		"interval_start": 0.76, "interval_end": 0.46,
 		"batch_start": 2, "batch_end": 5,
 		"max_alive": 200,
 		"mix": {&"walker": 1.0, &"runner": 0.21, &"armored": 0.065, &"jumper": 0.1, &"spitter": 0.055, &"bloater": 0.065, &"tank": 0.04, &"thrower": 0.045, &"tongue": 0.04, &"screamer": 0.015},
@@ -69,7 +69,7 @@ const WAVES: Array = [
 	},
 	{
 		"duration": 60.0,
-		"interval_start": 0.65, "interval_end": 0.38,
+		"interval_start": 0.6, "interval_end": 0.34, # 11.2: son dalgalar hayatta kalana rahattı
 		"batch_start": 2, "batch_end": 5,
 		"max_alive": 230,
 		"mix": {&"walker": 1.0, &"runner": 0.22, &"armored": 0.07, &"jumper": 0.11, &"spitter": 0.06, &"bloater": 0.07, &"tank": 0.045, &"thrower": 0.05, &"tongue": 0.045, &"screamer": 0.018},
@@ -77,7 +77,7 @@ const WAVES: Array = [
 	},
 	{
 		"duration": 70.0,
-		"interval_start": 0.6, "interval_end": 0.3,
+		"interval_start": 0.55, "interval_end": 0.27,
 		"batch_start": 2, "batch_end": 5,
 		"max_alive": 260,
 		"mix": {&"walker": 1.0, &"runner": 0.22, &"armored": 0.07, &"jumper": 0.12, &"spitter": 0.06, &"bloater": 0.07, &"tank": 0.05, &"thrower": 0.05, &"tongue": 0.05, &"screamer": 0.02},

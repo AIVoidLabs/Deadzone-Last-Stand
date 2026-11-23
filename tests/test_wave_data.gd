@@ -2,8 +2,8 @@ extends GutTest
 ## Dalga tablosu bütünlüğü (sayılar değil yapı): dalga sayısından türer.
 
 
-func test_table_has_ten_waves_at_least() -> void:
-	assert_gte(WaveData.WAVES.size(), 2)
+func test_table_has_ten_waves() -> void:
+	assert_eq(WaveData.WAVES.size(), 10) # karar: 10 dalga (DECISIONS 2026-11-23)
 
 
 func test_every_wave_has_positive_duration_and_sane_spawn_fields() -> void:

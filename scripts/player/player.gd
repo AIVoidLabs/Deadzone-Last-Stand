@@ -207,7 +207,7 @@ func _end_dash() -> void:
 func _on_stat_changed(stat: StringName, amount: float) -> void:
 	match stat:
 		StatData.MAX_HP:
-			health.raise_maximum(amount)
+			health.raise_maximum(stats.max_hp() - health.maximum)  # taban dahil: Health ile stats ayrışmaz
 		StatData.DASH_COOLDOWN:
 			dash.cooldown = stats.dash_cooldown()
 

@@ -1,8 +1,26 @@
 extends GutTest
 
 
-func test_mitigate_subtracts_armor() -> void:
-	assert_almost_eq(CombatMath.mitigate(10.0, 3.0), 7.0, 0.0001)
+func test_mitigate_percent_armor() -> void:
+	for a: float in [0.0, 3.0, 14.0]:
+		var expected: float = 10.0 * 100.0 / (100.0 + Tuning.ARMOR_PERCENT_PER_POINT * a)
+		assert_almost_eq(CombatMath.mitigate(10.0, a), maxf(Tuning.MIN_DAMAGE_AFTER_ARMOR, expected), 0.0001)
+	assert_lt(CombatMath.mitigate(10.0, 14.0), CombatMath.mitigate(10.0, 3.0))
+
+
+func test_mitigate_negative_armor_adds_damage_and_caps() -> void:
+	var minus6: float = 10.0 * (1.0 + minf(Tuning.ARMOR_NEGATIVE_MAX_BONUS, Tuning.ARMOR_NEGATIVE_PER_POINT * 6.0 / 100.0))
+	assert_almost_eq(CombatMath.mitigate(10.0, -6.0), minus6, 0.0001)
+	assert_almost_eq(CombatMath.mitigate(10.0, -20.0), 10.0 * (1.0 + Tuning.ARMOR_NEGATIVE_MAX_BONUS), 0.0001, "eksi zırh üst sınırı")
+	assert_gt(CombatMath.mitigate(10.0, -6.0), 10.0)
+
+
+func test_mitigate_old_flat_behavior_when_feature_off() -> void:
+	# Sabit const: kapalı yolu doğrudan sınanamaz; açıkken çarpan formülünden türeyen değer beklenir.
+	if Tuning.FEATURE_ARMOR_PERCENT:
+		assert_almost_eq(CombatMath.mitigate(10.0, 3.0), 10.0 * CombatMath.armor_multiplier(3.0), 0.0001)
+	else:
+		assert_almost_eq(CombatMath.mitigate(10.0, 3.0), 7.0, 0.0001)
 
 
 func test_mitigate_has_floor() -> void:

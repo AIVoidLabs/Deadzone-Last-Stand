@@ -52,6 +52,27 @@ func is_open() -> bool:
 	return _open
 
 
+## Debug uçları (yalnız otomatik oyun botu çağırır; oyun akışı kullanmaz).
+func debug_offer() -> Array[Dictionary]:
+	return _offer
+
+
+func debug_state_of(entry: Dictionary) -> String:
+	return _state_of(entry)
+
+
+func debug_buy(index: int) -> void:
+	_on_buy(index)
+
+
+func debug_close() -> void:
+	_close()
+
+
+func debug_owned() -> Dictionary:
+	return _owned
+
+
 ## Debug (otomatik oyun botu): alınabilir silahları (en çok max_weapons yuva ya da birleşiyorsa), sonra eşyaları
 ## alır ve mağazayı kapatır.
 func debug_autobuy(max_weapons: int) -> void:

@@ -34,6 +34,19 @@ func _physics_process(_delta: float) -> void:
 
 
 ## Kart ekranı açık ya da seçim bekleyen seviye var (mağaza bunu bekler).
+## Debug uçları (yalnız otomatik oyun botu çağırır).
+func debug_is_open() -> bool:
+	return _open
+
+
+func debug_offer() -> Array[Dictionary]:
+	return _offer
+
+
+func debug_choose(index: int) -> void:
+	_on_chosen(index)
+
+
 func is_busy() -> bool:
 	return _open or loot.pending_levels > 0
 
