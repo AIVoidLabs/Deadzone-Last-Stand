@@ -100,7 +100,7 @@ Amaç: düz low-poly zombiden, askerle uyumlu stilize-gerçekçi dokulu modeller
 ### 10 — Kalıcı ilerleme ✘ iptal (Taha, 2026-11-23: kalıcı ilerleme yok; her tur baştan başlar)
 (Aşağıdaki alt aşamalar yapılmayacak, kayıt için duruyor.) 10.1 Kalıcı para ve kayıt · 10.2 Asker sınıfları (Tripo modelleri) · 10.3 Başlangıç silahı açılımları · 10.4 Kalıcı yükseltmeler. Gerçek para yok. — Taha: kapsam onayı, diğer asker modelleri.
 
-### 11 — İçerik ve denge
+### 11 — İçerik ve denge ✔ bitti (2026-11-23, Taha onayladı)
 11.1 Silah ve eşya sayısı hedefe · 11.2 Dalga sayısı ve zorluk eğrisi · 11.3 Fiyatlar ve düşme oranları · 11.4 En az üç farklı kurulum işe yarıyor. İçerik hedefi (öneri, bu aşamada kesinleşir): 20 dalga, 12 silah × 4 kademe, ~30 eşya, 6 zombi türü + 1 boss, 3 asker sınıfı, 1 arena. — Taha: oynayış geri bildirimi.
 
 ### 12 — Yayın

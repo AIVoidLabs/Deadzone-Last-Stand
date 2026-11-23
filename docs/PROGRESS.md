@@ -5,7 +5,9 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 
 ## Şu an
 
-**AŞAMA 9 BİTTİ (2026-11-23), Taha onayladı.** **AŞAMA 11 — Taha'nın ilk oyun geri bildirimi (2026-11-23): oynanış beğenildi, oyun hâlâ basit. Plan aşağıda; geliştirme yeni oturumda başlar.**
+**AŞAMA 11 BİTTİ (2026-11-23), Taha onayladı** (11.5–11.8 ve 11.F dahil; açık küçük UI hataları — kaydırıcıda "100%", kesilen "Takla bekleme süresi" satırı — Taha kararıyla olduğu gibi kalır). **Sıradaki ana aşama: 12 — Yayın; Taha'nın "devam" demesi bekleniyor.**
+
+**AŞAMA 9 BİTTİ (2026-11-23), Taha onayladı.** AŞAMA 11 — Taha'nın ilk oyun geri bildirimi (2026-11-23): oynanış beğenildi, oyun hâlâ basit. Plan aşağıda.
 **11.8 denge + tavan dürüstlüğü (2026-11-23, Taha):** WEAPON_DAMAGE_MULT 1.3 (tüm silah temel hasarı), kristal düşme %65/%90. Tavanlı statlar (hareket hızı +%50, takla kısalması %60) panelde kırpılmış + MAX; olumlu etkisinin hepsi tavanda olan kart sona atılır / eşya teklif edilmez (havuz daralırsa geri gelir); karışık eşyada tavandaki satır soluk + MAX (FEATURE_STAT_CAP_HONESTY, StatCaps). 528 test.
 
 **11.F boss yeni saldırıları (2026-11-23, Taha seçenek 1+2):** kusmuk yağmuru (asker 10–30 m, >14 m'de ağırlık ×2; 1.3 sn hazırlık, 5/öfkede 7 asit topu yelpaze, kaçış boşluğu engel/arena/havuz hesaplı; tükürücü havuzu), öfkede zincir hücum (3 hücum, 0.45 sn yeniden nişan, duvara çarpınca biter + sersem), hücumda yanan yarık izi (3.5 sn, 10 dps; Voronoi çatlak shader). Boss ölünce uçan topları iptal, iz hasarı durur. `spew` klibi Blender'da elle anahtarlandı (`boss_moves.py`, kusma anı 0.85 sn). FEATURE_BOSS_SPEW / _SPEW_CLIP / _CHAIN_CHARGE / _CHARGE_TRAIL; debug `--boss-attack=slam|charge|summon|spew --boss-rage`. Opus gözden geçirme bulguları düzeltildi. 512 test. Taha'nın oyunda denemesi bekleniyor.
