@@ -53,7 +53,7 @@ func test_readiness_grows_with_time() -> void:
 
 
 func test_early_window_only_first_part() -> void:
-	var dash: Dash = _make()
+	var dash: Dash = _new_dash()
 	assert_false(dash.in_early_window(Tuning.DASH_IFRAMES), "aktif değil")
 	dash.start()
 	assert_true(dash.in_early_window(Tuning.DASH_IFRAMES), "başlangıçta pencere açık")
