@@ -21,6 +21,7 @@ func _ready() -> void:
 
 	var loot: RunLoot = RunLoot.new()
 	var pickups: Pickups = PickupLoot.install(self, player, enemies, director, loot)
+	WaveHeal.install(self, player, director)
 
 	var bags: RewardBags = RewardBags.install(self, player, director, loot)
 

@@ -932,6 +932,9 @@ const WIRE_COLOR: Color = Color(0.015, 0.012, 0.012)
 
 # --- Ödül çantaları (haritada süzülen para / XP çantası) ---
 ## Ana bayrak: kapalıyken oyun eskisi gibi (çanta yok). Ok: ekran dışı çantayı kenarda gösterir. Model: assets/models/props/reward_bag.glb varsa yer tutucu yerine yüklenir.
+## Dalga sonu nefes payı (Taha 2026-11-23): kalan can bu kata çıkar, üst sınırı geçmez. Kapalıyken dalga arası can dolmaz.
+const FEATURE_WAVE_END_HEAL: bool = true
+const WAVE_END_HEAL_FACTOR: float = 2.0
 const FEATURE_REWARD_BAGS: bool = true
 const FEATURE_BAG_ARROW: bool = true
 const FEATURE_BAG_MODEL: bool = true

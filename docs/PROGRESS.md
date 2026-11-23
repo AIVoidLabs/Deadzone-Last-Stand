@@ -6,6 +6,8 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 ## Şu an
 
 **AŞAMA 9 BİTTİ (2026-11-23), Taha onayladı.** **AŞAMA 11 — Taha'nın ilk oyun geri bildirimi (2026-11-23): oynanış beğenildi, oyun hâlâ basit. Plan aşağıda; geliştirme yeni oturumda başlar.**
+**11.7 dalga sonu nefes payı (2026-11-23, Taha): dalga bitince (CLEAR) kalan can 2 katına çıkar, üst sınırı geçmez (FEATURE_WAVE_END_HEAL, WAVE_END_HEAL_FACTOR 2.0, saf `WaveHealRules`). 480 test.**
+
 **11.6 ödül çantaları (2026-11-23): takla 8 → 6 sn (Taha). Haritada süzülen PARA (yalnız para) ve XP (yalnız XP) çantaları: dalgada 15. sn + 25 sn'de bir, en çok 3, 15 sn ömür (son 3 sn yanıp söner), değer 15 + 5×dalga, askere 12–24 m; ekran dışı ok; model `tools/blender/build_reward_bag.py` → `assets/models/props/reward_bag.glb` (kristaller BagTint, tür rengi). FEATURE_REWARD_BAGS / _BAG_ARROW / _BAG_MODEL; ışık kalite profilinde `bag_light`. 477 test. Taha'nın modeli ve oyunda hissi onaylaması bekleniyor.**
 
 **11.5 geri bildirim A–E YAPILDI (2026-11-23, 63ed8aa…8d7aa25), Taha'nın oyun testi bekleniyor; F (boss) seçimi bekleniyor.** Kararlar: takla bekleme 8.0 sn, dokunulmazlık yalnız ilk 0.15 sn; kristal yürüyen %50 / özel %80 / boss her zaman; dalga 60→96 sn (savaş ~13 dk). 464 test.
