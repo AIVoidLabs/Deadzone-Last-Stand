@@ -513,7 +513,7 @@ const PLAYER_TURN_SHARPNESS: float = 14.0
 # --- Dash ---
 const DASH_SPEED: float = 15.0
 const DASH_DURATION: float = 0.35
-const DASH_COOLDOWN: float = 8.0 # 11.5A: 1.4 → 8.0
+const DASH_COOLDOWN: float = 6.0 # 11.5A: 1.4 → 8.0
 ## Takla başlangıcından itibaren yalnız bu kadar sn dokunulmaz (FEATURE_DASH_EARLY_IFRAMES).
 const DASH_IFRAMES: float = 0.15
 ## Dash bittikten sonraki kısa dokunulmazlık (sn).
