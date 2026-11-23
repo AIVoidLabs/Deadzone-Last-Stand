@@ -24,7 +24,7 @@ func test_mitigate_old_flat_behavior_when_feature_off() -> void:
 
 
 func test_mitigate_has_floor() -> void:
-	assert_almost_eq(CombatMath.mitigate(5.0, 100.0), Tuning.MIN_DAMAGE_AFTER_ARMOR, 0.0001)
+	assert_almost_eq(CombatMath.mitigate(5.0, 10000.0), Tuning.MIN_DAMAGE_AFTER_ARMOR, 0.0001) # çok yüksek zırh: taban devrede
 
 
 func test_mitigate_zero_damage_stays_zero() -> void:

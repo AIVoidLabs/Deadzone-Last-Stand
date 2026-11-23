@@ -48,7 +48,7 @@ func aim_tick(i: int, p: Vector2, target: Vector2) -> void:
 func end_windup(i: int, row: Dictionary) -> ZombieRules.State:
 	var at: Vector2 = _m._pos[i]
 	_m._combat.kill(i, Vector2.ZERO, false, false)
-	_blast(at, row, false)
+	_blast(at, _m.scaled_row(i, row), false)
 	return S.DYING
 
 
@@ -56,7 +56,7 @@ func end_windup(i: int, row: Dictionary) -> ZombieRules.State:
 func queue_death_fuse(i: int, row: Dictionary) -> void:
 	_fuse_pos.append(_m._pos[i])
 	_fuse_left.append(float(row["bloat_death_fuse"]))
-	_fuse_row.append(row)
+	_fuse_row.append(_m.scaled_row(i, row))
 	_fuse_chain.append(1 if _blasting else 0)
 
 

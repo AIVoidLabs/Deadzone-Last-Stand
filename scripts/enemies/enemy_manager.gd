@@ -84,6 +84,9 @@ var _pos: PackedVector2Array = PackedVector2Array()
 var _hp: PackedFloat32Array = PackedFloat32Array()
 var _speed: PackedFloat32Array = PackedFloat32Array()
 var _damage: PackedFloat32Array = PackedFloat32Array()
+## Doğan zombinin dalga hasar çarpanı (özel saldırı hasarları için) ve dalga çarpanları (yönetmen ayarlar).
+var _dmg_mult: PackedFloat32Array = PackedFloat32Array()
+var wave_row: Dictionary = {}
 var _radius: PackedFloat32Array = PackedFloat32Array()
 var _alive: PackedByteArray = PackedByteArray()
 var _state: PackedByteArray = PackedByteArray()
@@ -207,6 +210,11 @@ func find_segment_hit(a: Vector2, b: Vector2, radius: float, exclude: PackedInt3
 ## dot: sürekli hasar (yanma); zırh uygulanmaz.
 func damage(index: int, amount: float, direction: Vector2 = Vector2.ZERO, knockback: float = 0.0, dot: bool = false) -> void:
 	_combat.damage(index, amount, direction, knockback, dot)
+
+
+## Özel saldırı hasarları için zombinin dalga çarpanıyla ölçeklenmiş satır (çarpan 1 ise satırın kendisi).
+func scaled_row(i: int, row: Dictionary) -> Dictionary:
+	return WaveScaling.scaled_row(row, _dmg_mult[i])
 
 
 func spawn(kind: StringName, at: Vector2) -> void:

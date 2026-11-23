@@ -32,6 +32,7 @@ func _swap_from_last(i: int, last: int) -> void:
 	_m._hp[i] = _m._hp[last]
 	_m._speed[i] = _m._speed[last]
 	_m._damage[i] = _m._damage[last]
+	_m._dmg_mult[i] = _m._dmg_mult[last]
 	_m._radius[i] = _m._radius[last]
 	_m._alive[i] = _m._alive[last]
 	_m._targetable[i] = _m._targetable[last]
@@ -52,6 +53,7 @@ func _shrink(last: int) -> void:
 	_m._hp.resize(last)
 	_m._speed.resize(last)
 	_m._damage.resize(last)
+	_m._dmg_mult.resize(last)
 	_m._radius.resize(last)
 	_m._alive.resize(last)
 	_m._targetable.resize(last)

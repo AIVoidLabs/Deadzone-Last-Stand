@@ -89,6 +89,8 @@ const BLOAT_BLINK_END_HZ: float = 14.0
 const ACID_FADE_TIME: float = 1.0
 const ACID_VIGNETTE_FLASH: float = 0.3
 ## 7.4 boss "Yığın" (build/briefs/s74_boss.md; sayılar EnemyDataBoss satırında). Kapalıyken 5. dalga eskisi gibi, boss doğmaz.
+## 11.2: dalgaya göre zombi can/hasar çarpanı (WaveData enemy_hp_mult / enemy_damage_mult). Kapalıyken çarpan 1.0.
+const FEATURE_WAVE_ENEMY_SCALING: bool = true
 const FEATURE_BOSS: bool = true
 ## Boss Blender modeli (assets/models/characters/boss_heap.glb) ZombieModelData'ya eklenince açılır; kapalıyken büyütülmüş tank modeli + kızıl tint.
 const FEATURE_BOSS_MODEL: bool = true
@@ -197,7 +199,7 @@ const FEATURE_SHOP: bool = true
 const SHOP_OFFER_COUNT: int = 4
 const SHOP_WEAPON_CHANCE: float = 0.4
 ## Fiyat artışı: her dalgada temel fiyatın bu kesri kadar.
-const SHOP_PRICE_WAVE_GROWTH: float = 0.07  # eski 0.15: son mağaza (9. dalga sonrası, sıra 8) x1.56; eskisi x2.2
+const SHOP_PRICE_WAVE_GROWTH: float = 0.11  # 11.4: 0.07 bolluk (bot dalga başına ~30 eşya), 0.2 kıtlık (bot %0); son mağaza x1.88
 ## Yenileme: ilk bedel ve her yenilemede artış (kristal); dalga başında sıfırlanır.
 const SHOP_REROLL_BASE: int = 5
 const SHOP_REROLL_STEP: int = 2
@@ -524,7 +526,7 @@ const PLAYER_LEAN_SHARPNESS: float = 10.0
 const MIN_DAMAGE_AFTER_ARMOR: float = 1.0
 ## Zırh azalan verimli yüzde: hasar x 100 / (100 + ARMOR_PERCENT_PER_POINT x zırh).
 ## 3 zırh ~ %15, 10 zırh ~ %37.5, 14 zırh ~ %46 indirim.
-const ARMOR_PERCENT_PER_POINT: float = 6.0
+const ARMOR_PERCENT_PER_POINT: float = 3.5 # 11.4: 6.0 → 3.5, tank kurulumu bota %75–88 kazandırıyordu (3 zırh ≈ %9.5, 10 ≈ %26, 14 ≈ %33)
 ## Eksi zırh: puan başına yüzde fazla hasar, en çok ARMOR_NEGATIVE_MAX_BONUS (0.5 = +%50).
 const ARMOR_NEGATIVE_PER_POINT: float = 4.0
 const ARMOR_NEGATIVE_MAX_BONUS: float = 0.5
@@ -631,7 +633,7 @@ const XP_LEVEL_OFFSET: int = 3
 # --- İstatistikler ve kartlar (satırlar StatData / CardData'da) ---
 const CARD_OFFER_COUNT: int = 3
 ## Bir can yenileme puanı saniyede bu kadar can.
-const HP_REGEN_PER_POINT: float = 0.25
+const HP_REGEN_PER_POINT: float = 0.2 # 11.4: 0.25 → 0.2 (tank kurulumu)
 ## Dash bekleme süresi en çok bu yüzde kadar kısalır.
 const DASH_COOLDOWN_CUT_CAP: float = 60.0
 ## Yüzdelik istatistik eksiye düşse bile çarpan bunun altına inmez (ileride eksi veren eşyalar).

@@ -26,6 +26,7 @@ func _ready() -> void:
 	if Tuning.FEATURE_WAVES and not DebugArena.active:
 		run = WaveRun.new(WaveData.WAVES, Tuning.WAVE_CLEAR_TIME, Tuning.WAVE_BREAK_TIME, Tuning.FEATURE_BOSS, Tuning.BOSS_WARNING_TIME)
 		enemies.enemy_killed.connect(_on_enemy_killed)
+		enemies.wave_row = run.current()
 		_announce.call_deferred()
 	else:
 		_spawn_timer = SpawnRules.interval_at(0.0)
@@ -81,6 +82,7 @@ func _announce() -> void:
 
 func _on_phase_entered() -> void:
 	_spawn_timer = 0.0
+	enemies.wave_row = run.current()
 	if run.phase == WaveRun.Phase.BREAK or run.phase == WaveRun.Phase.WON:
 		enemies.dismiss(enemies.active_count())
 	_announce()

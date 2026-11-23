@@ -132,7 +132,7 @@ func _launch(i: int, row: Dictionary) -> void:
 	_lob_from.append(from)
 	_lob_dest.append(dest)
 	_lob_left.append(flight)
-	_lob_row.append(row)
+	_lob_row.append(_m.scaled_row(i, row))
 	var radius: float = float(row["acid_radius"]) if kind == &"spit" else float(row["throw_radius"])
 	if kind == &"spit":
 		_m.spit_shots += 1
