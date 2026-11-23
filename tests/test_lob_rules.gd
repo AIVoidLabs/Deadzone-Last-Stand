@@ -81,13 +81,14 @@ func test_pick_kind_capped_drops_kinds_at_their_limit() -> void:
 
 func test_wave_mix_follows_spec_and_flags() -> void:
 	var w: Array = WaveData.WAVES
-	assert_true(w[1]["mix"].has(&"armored"))
-	assert_false(w[1]["mix"].has(&"spitter"))
-	assert_true(w[2]["mix"].has(&"spitter") and w[2]["mix"].has(&"bloater"))
-	assert_true(w[3]["mix"].has(&"thrower") and w[3]["mix"].has(&"screamer"))
-	assert_eq(w[3]["max_alive_kind"][&"screamer"], 2)
-	assert_eq(w[4]["max_alive_kind"][&"screamer"], 2)
-	var mix: Dictionary = WaveData.active_mix(w[4]["mix"])
+	var last: int = w.size() - 1
+	assert_true(w[2]["mix"].has(&"armored"))
+	assert_false(w[2]["mix"].has(&"spitter"))
+	assert_true(w[3]["mix"].has(&"spitter") and w[3]["mix"].has(&"bloater"))
+	assert_true(w[5]["mix"].has(&"thrower") and w[6]["mix"].has(&"screamer"))
+	assert_eq(w[6]["max_alive_kind"][&"screamer"], 2)
+	assert_eq(w[last]["max_alive_kind"][&"screamer"], 2)
+	var mix: Dictionary = WaveData.active_mix(w[last]["mix"])
 	assert_eq(mix.has(&"spitter"), Tuning.FEATURE_ZOMBIE_SPIT)
 	assert_eq(mix.has(&"thrower"), Tuning.FEATURE_ZOMBIE_THROW)
 	assert_true(mix.has(&"walker"))

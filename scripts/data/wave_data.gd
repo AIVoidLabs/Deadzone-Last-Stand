@@ -6,48 +6,83 @@ extends RefCounted
 ## mix: tür → ağırlık (EnemyData satırları); davranış bayrağı kapalı tür karışımdan düşer (active_mix).
 ## max_alive_kind (isteğe bağlı): tür → aynı anda en çok canlı sayısı; sınırdaki tür yerine başkası seçilir (SpawnRules.pick_kind_capped).
 ## boss (isteğe bağlı): {kind, spawn_time, horde_factor?}; WaveRun boss akışı (spawn_time'da uyarı, uyarı sonunda doğar, ölünce dalga biter).
-## 6.6 ilk denge: tabanca + 1–2 mağaza alımıyla 3. dalgayı, 3–4 silahla 5. dalgayı geçebilecek tırmanış.
+## 11.2 taslağı: 10 dalga. Türler kademeli girer (2 koşan, 3 zırhlı+sıçrayan, 4 tükürücü+şişkin, 5 tank, 6 fırlatıcı+dilci, 7 çığlıkçı); 5. ve 10. dalgada baskı sıçraması, 10. dalgada boss. Kesin sayılar botla ayarlanır.
 
 const WAVES: Array = [
 	{
 		"duration": 20.0,
 		"interval_start": 1.1, "interval_end": 0.8,
 		"batch_start": 1, "batch_end": 1,
-		"max_alive": 60,
+		"max_alive": 50,
 		"mix": {&"walker": 1.0},
 	},
 	{
+		"duration": 25.0,
+		"interval_start": 1.05, "interval_end": 0.74,
+		"batch_start": 1, "batch_end": 2,
+		"max_alive": 70,
+		"mix": {&"walker": 1.0, &"runner": 0.1},
+	},
+	{
 		"duration": 30.0,
-		"interval_start": 0.9, "interval_end": 0.55,
+		"interval_start": 0.99, "interval_end": 0.68,
 		"batch_start": 1, "batch_end": 2,
 		"max_alive": 90,
-		"mix": {&"walker": 1.0, &"runner": 0.12, &"armored": 0.04},
+		"mix": {&"walker": 1.0, &"runner": 0.14, &"armored": 0.04, &"jumper": 0.05},
+	},
+	{
+		"duration": 35.0,
+		"interval_start": 0.93, "interval_end": 0.62,
+		"batch_start": 1, "batch_end": 3,
+		"max_alive": 110,
+		"mix": {&"walker": 1.0, &"runner": 0.16, &"armored": 0.05, &"jumper": 0.06, &"spitter": 0.03, &"bloater": 0.04},
 	},
 	{
 		"duration": 40.0,
 		"interval_start": 0.8, "interval_end": 0.5,
-		"batch_start": 1, "batch_end": 3,
-		"max_alive": 120,
-		"mix": {&"walker": 1.0, &"runner": 0.18, &"jumper": 0.06, &"armored": 0.05, &"spitter": 0.04, &"bloater": 0.05},
+		"batch_start": 2, "batch_end": 4,
+		"max_alive": 130,
+		"mix": {&"walker": 1.0, &"runner": 0.18, &"armored": 0.05, &"jumper": 0.07, &"spitter": 0.04, &"bloater": 0.05, &"tank": 0.02},
+	},
+	{
+		"duration": 45.0,
+		"interval_start": 0.78, "interval_end": 0.48,
+		"batch_start": 2, "batch_end": 4,
+		"max_alive": 150,
+		"mix": {&"walker": 1.0, &"runner": 0.19, &"armored": 0.06, &"jumper": 0.09, &"spitter": 0.05, &"bloater": 0.06, &"tank": 0.03, &"thrower": 0.03, &"tongue": 0.02},
 	},
 	{
 		"duration": 50.0,
-		"interval_start": 0.7, "interval_end": 0.4,
+		"interval_start": 0.74, "interval_end": 0.45,
 		"batch_start": 2, "batch_end": 4,
-		"max_alive": 180,
-		"mix": {&"walker": 1.0, &"runner": 0.2, &"jumper": 0.09, &"tongue": 0.03, &"tank": 0.03,
-				&"armored": 0.06, &"spitter": 0.05, &"thrower": 0.04, &"bloater": 0.06, &"screamer": 0.015},
+		"max_alive": 170,
+		"mix": {&"walker": 1.0, &"runner": 0.2, &"armored": 0.06, &"jumper": 0.1, &"spitter": 0.05, &"bloater": 0.06, &"tank": 0.035, &"thrower": 0.04, &"tongue": 0.03, &"screamer": 0.01},
+		"max_alive_kind": {&"screamer": 2},
+	},
+	{
+		"duration": 55.0,
+		"interval_start": 0.7, "interval_end": 0.42,
+		"batch_start": 2, "batch_end": 5,
+		"max_alive": 200,
+		"mix": {&"walker": 1.0, &"runner": 0.21, &"armored": 0.065, &"jumper": 0.1, &"spitter": 0.055, &"bloater": 0.065, &"tank": 0.04, &"thrower": 0.045, &"tongue": 0.04, &"screamer": 0.015},
 		"max_alive_kind": {&"screamer": 2},
 	},
 	{
 		"duration": 60.0,
+		"interval_start": 0.65, "interval_end": 0.38,
+		"batch_start": 2, "batch_end": 5,
+		"max_alive": 230,
+		"mix": {&"walker": 1.0, &"runner": 0.22, &"armored": 0.07, &"jumper": 0.11, &"spitter": 0.06, &"bloater": 0.07, &"tank": 0.045, &"thrower": 0.05, &"tongue": 0.045, &"screamer": 0.018},
+		"max_alive_kind": {&"screamer": 2},
+	},
+	{
+		"duration": 70.0,
 		"interval_start": 0.6, "interval_end": 0.3,
 		"batch_start": 2, "batch_end": 5,
 		"max_alive": 260,
-		"mix": {&"walker": 1.0, &"runner": 0.22, &"jumper": 0.12, &"tongue": 0.05, &"tank": 0.05,
-				&"armored": 0.07, &"spitter": 0.06, &"thrower": 0.05, &"bloater": 0.07, &"screamer": 0.02},
+		"mix": {&"walker": 1.0, &"runner": 0.22, &"armored": 0.07, &"jumper": 0.12, &"spitter": 0.06, &"bloater": 0.07, &"tank": 0.05, &"thrower": 0.05, &"tongue": 0.05, &"screamer": 0.02},
 		"max_alive_kind": {&"screamer": 2},
-		"boss": {"kind": &"boss_heap", "spawn_time": 12.0},
+		"boss": {"kind": &"boss_heap", "spawn_time": 15.0},
 	},
 ]
 

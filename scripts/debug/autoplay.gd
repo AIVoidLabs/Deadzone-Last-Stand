@@ -2,7 +2,7 @@ class_name Autoplay
 extends Node
 ## Debug: botla tam turu baştan sona oynar ve dalga başına rapor yazar (denge ölçümü, 6.6).
 ## Bot zombilerden kaçar, yaklaşınca dash atar, kart seçer (1) ve mağazada elindeki parayla alır.
-## Çalıştırma: godot --headless --path . --fixed-fps 60 -- --autoplay [--autoplay-weapons=4] [--autoplay-crystals=N]
+## Çalıştırma: godot --headless --path . --fixed-fps 60 -- --autoplay [--autoplay-weapons=4] [--autoplay-crystals=N] [--autoplay-strategy=default|guns|melee|tank]
 ## Ölümsüz değildir; zorluğun kaba göstergesi olarak ölürse hangi dalgada öldüğünü raporlar.
 
 const FLEE_RANGE: float = 7.0
@@ -24,6 +24,8 @@ var _lines: PackedStringArray = PackedStringArray()
 var _key_wait: float = 0.0
 var _last_hp: float = 0.0
 var _damage_taken: float = 0.0
+var _wave_min_hp: float = 1.0
+var _strategy: AutoplayStrategy = AutoplayStrategy.new()
 var _wave_start_kills: int = 0
 var _wave_start_crystals: int = 0
 var _wave_start_spawns: Dictionary = {}
@@ -44,6 +46,7 @@ func _ready() -> void:
 			_max_weapons = arg.trim_prefix("--autoplay-weapons=").to_int()
 		elif arg.begins_with("--autoplay-crystals="):
 			loot.crystals += arg.trim_prefix("--autoplay-crystals=").to_int()
+	_strategy = AutoplayStrategy.from_args()
 	player.use_input_override = true
 	_last_hp = player.health.current
 	director.phase_changed.connect(_on_phase)
@@ -58,6 +61,7 @@ func _physics_process(delta: float) -> void:
 	if player.health.current < _last_hp:
 		_damage_taken += _last_hp - player.health.current
 	_last_hp = player.health.current
+	_wave_min_hp = minf(_wave_min_hp, player.health.current / maxf(player.health.maximum, 1.0))
 	_steer()
 	if _time > MAX_RUN_TIME:
 		_log("TAKILDI faz %s kalan %.1f hold %s duraklatildi %s magaza %s bekleyen_seviye %d kristal_yerde %d" % [
@@ -71,12 +75,18 @@ func _process(delta: float) -> void:
 		_key_wait = KEY_DELAY
 		return
 	if shop.is_open():
-		shop.debug_autobuy(_max_weapons)
+		if _strategy.is_default():
+			shop.debug_autobuy(_max_weapons)
+		else:
+			_strategy_buy()
 		return
 	_key_wait -= delta
 	if _key_wait > 0.0:
 		return
 	_key_wait = KEY_DELAY
+	if not _strategy.is_default() and shop.level_up != null and shop.level_up._open:
+		shop.level_up._on_chosen(_strategy.best_card(shop.level_up._offer))
+		return
 	var key: InputEventKey = InputEventKey.new()
 	key.physical_keycode = KEY_1
 	key.pressed = true
@@ -105,6 +115,7 @@ func _on_phase(phase: WaveRun.Phase, wave_index: int) -> void:
 		_wave_start_spawns = enemies.spawn_counts().duplicate()
 		_wave_started_at = _time
 		_damage_taken = 0.0
+		_wave_min_hp = player.health.current / maxf(player.health.maximum, 1.0)
 	elif phase == WaveRun.Phase.CLEAR:
 		_report_wave(wave_index)
 
@@ -113,10 +124,10 @@ func _report_wave(wave_index: int) -> void:
 	var slots: PackedStringArray = PackedStringArray()
 	for slot: Dictionary in weapons.slot_list():
 		slots.append("%s%d" % [String(slot["id"]).substr(0, 1).to_upper(), slot["tier"]])
-	var line: String = "WAVE %d  kills %d  crystals +%d (total %d)  damage_taken %d  hp %d/%d  level %d  weapons [%s]  alive_at_end %d  %.0fs" % [
+	var line: String = "WAVE %d  kills %d  crystals +%d (total %d)  damage_taken %d  hp %d/%d  level %d  weapons [%s]  alive_at_end %d  %.0fs  min_hp_pct %d" % [
 		wave_index + 1, enemies.kills - _wave_start_kills, loot.crystals - _wave_start_crystals, loot.crystals,
 		roundi(_damage_taken), roundi(player.health.current), roundi(player.health.maximum), loot.level,
-		" ".join(slots), enemies.active_count(), _time - _wave_started_at,
+		" ".join(slots), enemies.active_count(), _time - _wave_started_at, roundi(_wave_min_hp * 100.0),
 	]
 	_log(line)
 	_log("  SPAWNS %d: %s" % [wave_index + 1, _spawn_summary()])
@@ -131,11 +142,41 @@ func _spawn_summary() -> String:
 	return " ".join(parts)
 
 
+## Strateji alışverişi: en yüksek puanlı alınabilir teklifi (puan > 0) sırayla alır, sonra mağazayı kapatır.
+func _strategy_buy() -> void:
+	while true:
+		var best: int = -1
+		var best_score: float = 0.0
+		for i: int in shop._offer.size():
+			var entry: Dictionary = shop._offer[i]
+			if shop._state_of(entry) != "ok":
+				continue
+			var is_weapon: bool = entry["kind"] == ShopRules.WEAPON
+			if is_weapon and weapons.count() >= _max_weapons and not weapons.preview_add(entry["id"])["merged"]:
+				continue
+			var score: float = _strategy.weapon_score(entry["id"]) if is_weapon else _strategy.item_score(entry["id"])
+			if score > best_score:
+				best = i
+				best_score = score
+		if best < 0:
+			break
+		shop._on_buy(best)
+	shop._close()
+
+
+## Alınan eşyalar: id:adet listesi.
+func _items_text() -> String:
+	var parts: PackedStringArray = PackedStringArray()
+	for id: StringName in shop._owned:
+		parts.append("%s:%d" % [id, shop._owned[id]])
+	return ",".join(parts) if not parts.is_empty() else "-"
+
+
 func _finish(won: bool) -> void:
 	if _done:
 		return
 	_done = true
-	_log("RESULT %s  wave %d/%d  kills %d  level %d  time %.0fs" % ["WIN" if won else "LOSS", director.run.index + 1, director.run.wave_count(), enemies.kills, loot.level, _time])
+	_log("RESULT %s  wave %d/%d  kills %d  level %d  time %.0fs  strategy %s  items %s" % ["WIN" if won else "LOSS", director.run.index + 1, director.run.wave_count(), enemies.kills, loot.level, _time, _strategy.name, _items_text()])
 	var file: FileAccess = FileAccess.open(RESULT_FILE, FileAccess.WRITE)
 	if file != null:
 		file.store_string("\n".join(_lines) + "\n")

@@ -1,7 +1,50 @@
-# Botla tam turu birkaç kez oynar ve dalga başına raporları yazar (denge ölçümü, 6.6).
-# Kullanım: powershell -File tools/autoplay_runs.ps1 [-Runs 5] [-Weapons 4]
-param([int]$Runs = 5, [int]$Weapons = 4)
+# Botla tam turu birkaç kez oynar, dalga başına raporları ve sonda SUMMARY özetini yazar (denge ölçümü).
+# Kullanım: powershell -File tools/autoplay_runs.ps1 [-Runs 5] [-Weapons 4] [-Strategy default|guns|melee|tank] [-Parallel 1]
+param([int]$Runs = 5, [int]$Weapons = 4, [string]$Strategy = "default", [int]$Parallel = 1)
+$dir = "build/autoplay"
+New-Item -ItemType Directory -Force $dir | Out-Null
+$stamp = Get-Date -Format "yyyyMMdd_HHmmss"
+$gameArgs = "--headless --path . --fixed-fps 60 -- --autoplay --autoplay-weapons=$Weapons --autoplay-strategy=$Strategy"
+$files = @()
+$pending = @()
 for ($i = 1; $i -le $Runs; $i++) {
-    Write-Output "--- Çalıştırma $i ---"
-    godot --headless --path . --fixed-fps 60 -- --autoplay --autoplay-weapons=$Weapons 2>&1 | Select-String "AUTOPLAY" | ForEach-Object { $_.Line -replace "^AUTOPLAY ", "" }
+    $out = Join-Path $dir "run_$($stamp)_$i.txt"
+    $files += $out
+    $p = Start-Process godot -ArgumentList $gameArgs -RedirectStandardOutput $out -RedirectStandardError "$out.err" -NoNewWindow -PassThru
+    $pending += $p
+    while (@($pending | Where-Object { -not $_.HasExited }).Count -ge $Parallel) { Start-Sleep -Milliseconds 200 }
+}
+$pending | ForEach-Object { $_.WaitForExit() }
+
+$deaths = @{}; $wins = 0; $deathWaves = @(); $times = @(); $minHp = @{}
+for ($i = 0; $i -lt $files.Count; $i++) {
+    Write-Output "--- Calistirma $($i + 1) ---"
+    $lines = Get-Content $files[$i] | Where-Object { $_ -match "^AUTOPLAY " } | ForEach-Object { $_ -replace "^AUTOPLAY ", "" }
+    $lines
+    foreach ($l in $lines) {
+        if ($l -match "^WAVE (\d+) .* min_hp_pct (\d+)") {
+            $w = [int]$Matches[1]
+            if (-not $minHp.ContainsKey($w)) { $minHp[$w] = @() }
+            $minHp[$w] += [int]$Matches[2]
+        }
+        if ($l -match "^RESULT (WIN|LOSS)\s+wave (\d+)/\d+.* time (\d+)s") {
+            if ($Matches[1] -eq "WIN") { $wins++ } else { $deathWaves += [int]$Matches[2]; $deaths[[int]$Matches[2]] = 1 + [int]$deaths[[int]$Matches[2]] }
+            $times += [int]$Matches[3]
+        }
+    }
+}
+$n = $times.Count
+Write-Output "--- OZET ---"
+Write-Output "SUMMARY strategy $Strategy  runs $n"
+if ($n -gt 0) {
+    Write-Output ("SUMMARY win_rate {0:N0}%  ({1}/{2})" -f (100.0 * $wins / $n), $wins, $n)
+    if ($deathWaves.Count -gt 0) {
+        $sorted = $deathWaves | Sort-Object
+        $mid = [math]::Floor($sorted.Count / 2)
+        $median = if ($sorted.Count % 2) { $sorted[$mid] } else { ($sorted[$mid - 1] + $sorted[$mid]) / 2 }
+        Write-Output ("SUMMARY death_wave avg {0:N1}  median {1}" -f ($deathWaves | Measure-Object -Average).Average, $median)
+        Write-Output ("SUMMARY death_dist " + (($deaths.Keys | Sort-Object | ForEach-Object { "w$($_):$($deaths[$_])" }) -join " "))
+    } else { Write-Output "SUMMARY death_wave none" }
+    Write-Output ("SUMMARY min_hp_pct_by_wave " + (($minHp.Keys | Sort-Object | ForEach-Object { "w$($_):{0:N0}" -f ($minHp[$_] | Measure-Object -Average).Average }) -join " "))
+    Write-Output ("SUMMARY avg_time {0:N0}s" -f ($times | Measure-Object -Average).Average)
 }

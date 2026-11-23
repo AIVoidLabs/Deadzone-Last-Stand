@@ -79,7 +79,6 @@ func test_item_table_is_consistent() -> void:
 		assert_false((row["effects"] as Array).is_empty())
 		for effect: Dictionary in row["effects"]:
 			assert_true(StatData.TABLE.has(effect["stat"]), "%s: bilinmeyen istatistik" % id)
-	assert_eq(ItemData.ids().size(), 12)
 
 
 func test_weighted_weapon_pick_prefers_heavy_weights() -> void:

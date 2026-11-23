@@ -85,32 +85,32 @@ const TABLE: Dictionary = {
 	},
 	# Plazma tüfeği: delip geçen enerji mermisi, hattaki zombilerin hepsine vurur.
 	&"plasma_rifle": {
-		"id": &"plasma_rifle", "name": "Plazma Tüfeği", "price": 150,
+		"id": &"plasma_rifle", "name": "Plazma Tüfeği", "price": 260,  # eski 150
 		"damage": 14.0, "fire_interval": 0.55, "max_range": 14.0, "projectile_speed": 24.0, "knockback": 2.0,
 		"pierce": 4, "projectile_color": Color(0.3, 0.8, 1.0), "projectile_size": 1.5,
 		"model": &"PlasmaRifle", "model_scale": 1.4, "recoil": 0.1, "muzzle_offset": 0.5, "flash_scale": 1.2,
-		"sound": &"plasma", "base_glow": 0.35, "weight": 0.4, "min_wave": 5,
+		"sound": &"plasma", "base_glow": 0.35, "weight": 0.4, "min_wave": 7,  # eski 5 (5 dalgalı tur)
 	},
 	# Graviton topu: önündeki koniyi bir kerede iter, hasarı düşük; kalabalığı geri savurur.
 	&"gravity_gun": {
-		"id": &"gravity_gun", "name": "Graviton Topu", "price": 130,
+		"id": &"gravity_gun", "name": "Graviton Topu", "price": 200,  # eski 130
 		"behavior": &"burst", "damage": 3.0, "fire_interval": 1.3, "max_range": 5.0,
 		"melee_arc_deg": 80.0, "melee_swing_time": 0.28, "knockback": 16.0,
 		"model": &"GravityGun", "model_scale": 1.5, "recoil": 0.15, "muzzle_offset": 0.25, "flash_scale": 1.2,
-		"sound": &"graviton", "slash_color": Color(0.65, 0.4, 1.0), "base_glow": 0.3, "weight": 0.6, "min_wave": 3,
+		"sound": &"graviton", "slash_color": Color(0.65, 0.4, 1.0), "base_glow": 0.3, "weight": 0.6, "min_wave": 5,  # eski 3
 	},
 	# Bomba atar: yay çizen bomba, çarpınca ya da hedefe varınca alan hasarıyla patlar.
 	&"grenade_launcher": {
-		"id": &"grenade_launcher", "name": "Bomba Atar", "price": 190,
+		"id": &"grenade_launcher", "name": "Bomba Atar", "price": 320,  # eski 190
 		"damage": 26.0, "fire_interval": 1.8, "max_range": 12.0, "projectile_speed": 13.0, "knockback": 8.0,
 		"explode_radius": 3.0, "projectile_size": 2.6, "projectile_color": Color(1.0, 0.55, 0.15), "projectile_arc": 1.4, "projectile_length": 0.4,
 		"model": &"GrenadeLauncher", "model_scale": 1.3, "recoil": 0.25, "muzzle_offset": 0.45, "flash_scale": 1.8, "fire_shake": 0.08,
-		"sound": &"launcher", "weight": 0.4, "min_wave": 5,
+		"sound": &"launcher", "weight": 0.4, "min_wave": 8,  # eski 5
 	},
 	# --- Yakın dövüş (7.1): enerji çemberinden fırlayıp savrulur; mermi yok, kendi hasar alanı var. ---
 	# Bıçak: çok hızlı, tek hedefe dürtme, kısa menzil.
 	&"knife": {
-		"id": &"knife", "name": "Bıçak", "price": 35,
+		"id": &"knife", "name": "Bıçak", "price": 30,  # eski 35: 1. dalga sonu bir alım yetsin
 		"behavior": &"melee", "damage": 9.0, "fire_interval": 0.28, "max_range": 1.9,
 		"melee_arc_deg": 0.0, "melee_swing_time": 0.14, "knockback": 1.5,
 		"model": &"Knife", "model_scale": 2.0, "recoil": 0.0, "muzzle_offset": 0.0,
@@ -119,26 +119,26 @@ const TABLE: Dictionary = {
 	},
 	# Katana: yay şeklinde savurma, önündeki herkese vurur.
 	&"katana": {
-		"id": &"katana", "name": "Katana", "price": 90,
+		"id": &"katana", "name": "Katana", "price": 110,  # eski 90
 		"behavior": &"melee", "damage": 18.0, "fire_interval": 0.7, "max_range": 2.8,
 		"melee_arc_deg": 110.0, "melee_swing_time": 0.22, "knockback": 3.0,
 		"model": &"Katana", "model_scale": 1.3, "recoil": 0.0, "muzzle_offset": 0.0,
 		"sound": &"swing_medium", "slash_color": Color(0.9, 0.95, 1.0),
-		"weight": 0.7, "min_wave": 3,
+		"weight": 0.7, "min_wave": 4,  # eski 3
 	},
 	# Işın kılıcı: geniş savurma, yüksek hasar, yakar.
 	&"lightsaber": {
-		"id": &"lightsaber", "name": "Işın Kılıcı", "price": 240,
+		"id": &"lightsaber", "name": "Işın Kılıcı", "price": 400,  # eski 240
 		"behavior": &"melee", "damage": 26.0, "fire_interval": 0.95, "max_range": 3.6,
 		"melee_arc_deg": 200.0, "melee_swing_time": 0.3, "knockback": 5.0,
 		"burn_dps": 6.0, "burn_time": 2.0,
 		"model": &"Lightsaber", "model_scale": 1.3, "recoil": 0.0, "muzzle_offset": 0.0,
 		"sound": &"swing_energy", "slash_color": Color(0.3, 0.75, 1.0), "base_glow": 0.7,
-		"weight": 0.2, "min_wave": 8,
+		"weight": 0.2, "min_wave": 9,  # eski 8
 	},
 	# Ateşli kılıç: orta yay, güçlü yanma.
 	&"flame_sword": {
-		"id": &"flame_sword", "name": "Ateşli Kılıç", "price": 200,
+		"id": &"flame_sword", "name": "Ateşli Kılıç", "price": 300,  # eski 200
 		"behavior": &"melee", "damage": 20.0, "fire_interval": 0.8, "max_range": 3.0,
 		"melee_arc_deg": 130.0, "melee_swing_time": 0.26, "knockback": 3.0,
 		"burn_dps": 10.0, "burn_time": 3.0,

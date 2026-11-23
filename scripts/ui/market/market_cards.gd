@@ -29,9 +29,12 @@ static func _item_body(entry: Dictionary) -> Dictionary:
 	var owned: int = int(entry.get("owned", 0))
 	if owned > 0:
 		lines.append({"text": Loc.t(&"run.shop.owned_count", [owned]), "color": UiPalette.ASH})
+	var emblem: StringName = StringName("item_" + id)
+	if not Emblems.has(emblem):
+		emblem = StringName("stat_" + String(effects[0]["stat"])) # kendi amblemi yoksa ilk etkinin stat amblemi
 	return {
 		"category_id": category, "category": Loc.category_name(category), "title": Loc.item_name(id),
-		"emblem": StringName("item_" + id), "tier": -1, "lines": lines,
+		"emblem": emblem, "tier": -1, "lines": lines,
 	}
 
 
