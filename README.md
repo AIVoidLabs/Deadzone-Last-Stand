@@ -13,12 +13,13 @@ Deadzone Last Stand, Godot 4 ile yapılmış ücretsiz ve açık kaynak bir 3D d
 | ![Boss dalgası](docs/screenshots/boss.png) | ![Mağaza](docs/screenshots/shop.png) |
 | ![Kart seçimi](docs/screenshots/cards.png) | ![Ana menü](docs/screenshots/menu.png) |
 
-**[⬇ Windows ve Linux için indir](https://github.com/AIVoidLabs/Deadzone-Last-Stand/releases/latest)**
+**[⬇ Windows ve Linux için indir](https://github.com/AIVoidLabs/Deadzone-Last-Stand/releases/latest)** · **[🎮 itch.io sayfası](https://tahapek5454.itch.io/deadzone-last-stand)**
 
 ![Sürüm](https://img.shields.io/badge/s%C3%BCr%C3%BCm-1.0.0-e8551c)
 ![Godot](https://img.shields.io/badge/Godot-4.7-478cbf?logo=godotengine&logoColor=white)
 ![Lisans](https://img.shields.io/badge/lisans-MIT-f4b942)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux-555)
+[![itch.io](https://img.shields.io/badge/itch.io-oyna-fa5c5c?logo=itchdotio&logoColor=white)](https://tahapek5454.itch.io/deadzone-last-stand)
 
 ---
 
@@ -54,7 +55,7 @@ Tuşlar ayarlardan değiştirilebilir. Nişan almazsın: silahlar en yakın zomb
 
 ## İndir ve oyna
 
-1. [Son sürümün sayfasından](https://github.com/AIVoidLabs/Deadzone-Last-Stand/releases/latest) sistemine uygun dosyayı indir:
+1. [itch.io sayfasından](https://tahapek5454.itch.io/deadzone-last-stand) ya da [GitHub'daki son sürümden](https://github.com/AIVoidLabs/Deadzone-Last-Stand/releases/latest) sistemine uygun dosyayı indir:
    - Windows: `DeadzoneLastStand-v1.0.0-windows.zip`
    - Linux: `DeadzoneLastStand-v1.0.0-linux.zip`
 2. Zip'i bir klasöre çıkar ve oyunu çalıştır. Kurulum gerekmez.

@@ -103,7 +103,7 @@ Amaç: düz low-poly zombiden, askerle uyumlu stilize-gerçekçi dokulu modeller
 ### 11 — İçerik ve denge ✔ bitti (2026-11-23, Taha onayladı)
 11.1 Silah ve eşya sayısı hedefe · 11.2 Dalga sayısı ve zorluk eğrisi · 11.3 Fiyatlar ve düşme oranları · 11.4 En az üç farklı kurulum işe yarıyor. İçerik hedefi (öneri, bu aşamada kesinleşir): 20 dalga, 12 silah × 4 kademe, ~30 eşya, 6 zombi türü + 1 boss, 3 asker sınıfı, 1 arena. — Taha: oynayış geri bildirimi.
 
-### 12 — Yayın
+### 12 — Yayın ✔ bitti (2026-11-23: GitHub Release v1.0.0 + itch.io)
 12.1 Windows ve Linux çıktıları temiz makinede · 12.2 README, CREDITS, ekran görüntüleri · 12.3 itch.io sayfası · ~~12.4 Web denemesi~~ iptal (Taha, 2026-11-23: web yok). — Taha: yayın onayı.
 
 
