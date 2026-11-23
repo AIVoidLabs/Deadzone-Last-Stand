@@ -104,7 +104,7 @@ func _can_open() -> bool:
 		return false
 	if level_up != null and level_up.is_busy():
 		return false
-	return pickups == null or pickups.count() == 0
+	return pickups == null or pickups.is_settled()
 
 
 func _open_shop(wave_index: int) -> void:
@@ -138,10 +138,12 @@ func _wave_index() -> int:
 
 func _price(entry: Dictionary) -> int:
 	var base: int = ItemData.get_row(entry["id"])["price"] if entry["kind"] == ShopRules.ITEM else WeaponData.get_row(entry["id"])["price"]
-	return ShopRules.price(base, _wave_index(), Tuning.SHOP_PRICE_WAVE_GROWTH)
+	return ShopRules.price(roundi(float(base) * Tuning.SHOP_PRICE_MULT), _wave_index(), Tuning.SHOP_PRICE_WAVE_GROWTH)
 
 
 func _reroll_cost() -> int:
+	if Tuning.FEATURE_SHOP_REROLL_EXP:
+		return ShopRules.reroll_cost_exp(_rerolls, Tuning.SHOP_REROLL_BASE, Tuning.SHOP_REROLL_FACTOR, Tuning.SHOP_REROLL_MAX_COST)
 	return ShopRules.reroll_cost(_rerolls, Tuning.SHOP_REROLL_BASE, Tuning.SHOP_REROLL_STEP)
 
 

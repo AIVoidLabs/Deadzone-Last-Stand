@@ -58,7 +58,7 @@ func _can_open() -> bool:
 		return true
 	if director.run.phase != WaveRun.Phase.BREAK:
 		return false
-	return pickups == null or pickups.count() == 0
+	return pickups == null or pickups.is_settled()
 
 
 func _show_next() -> void:

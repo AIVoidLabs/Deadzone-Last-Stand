@@ -1,7 +1,7 @@
 class_name RunLoot
 extends RefCounted
 ## Tur içinde toplanan kristaller: her kristal hem para hem XP sayılır (Brotato'daki gibi tek kaynak).
-## Seviye için gereken XP: (seviye + XP_LEVEL_OFFSET)². Sahneden bağımsız.
+## Seviye için gereken XP: XP_LEVEL_SCALE x (seviye + XP_LEVEL_OFFSET)^XP_LEVEL_POWER. Sahneden bağımsız.
 
 var crystals: int = 0
 var level: int = 1
@@ -12,8 +12,7 @@ var pending_levels: int = 0
 
 
 static func xp_needed(at_level: int) -> int:
-	var base: int = at_level + Tuning.XP_LEVEL_OFFSET
-	return base * base
+	return maxi(1, roundi(Tuning.XP_LEVEL_SCALE * pow(float(at_level + Tuning.XP_LEVEL_OFFSET), Tuning.XP_LEVEL_POWER)))
 
 
 ## value kadar kristal ekler. Dönüş: atlanan seviye sayısı.

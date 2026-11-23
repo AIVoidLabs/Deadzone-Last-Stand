@@ -20,6 +20,14 @@ func test_price_grows_with_wave() -> void:
 	assert_eq(ShopRules.price(1, 0, 0.0), 1)
 
 
+func test_reroll_cost_exp() -> void:
+	assert_eq(ShopRules.reroll_cost_exp(0, 5, 5, 100000), 5)
+	assert_eq(ShopRules.reroll_cost_exp(1, 5, 5, 100000), 25)
+	assert_eq(ShopRules.reroll_cost_exp(2, 5, 5, 100000), 125)
+	assert_eq(ShopRules.reroll_cost_exp(3, 5, 5, 100000), 625)
+	assert_eq(ShopRules.reroll_cost_exp(30, 5, 5, 1000), 1000)
+
+
 func test_reroll_cost_rises_per_reroll() -> void:
 	assert_eq(ShopRules.reroll_cost(0, 5, 2), 5)
 	assert_eq(ShopRules.reroll_cost(3, 5, 2), 11)

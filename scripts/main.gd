@@ -1,6 +1,9 @@
 extends Node3D
 ## Ana sahne: dünyayı kodla kurar ve parçaları birbirine bağlar.
 
+## Kristal düşme zarı.
+var _drop_rng: RandomNumberGenerator = RandomNumberGenerator.new()
+
 
 func _ready() -> void:
 	# 1v1 debug arenası: dalga, kart ve mağaza kapalı (DebugArena.active SpawnDirector'u da etkiler).
@@ -166,6 +169,13 @@ func _add_run_recorder(player: Player, enemies: EnemyManager, weapons: WeaponRig
 	add_child(recorder)
 
 
+## Zombi satırının drop_chance'ine göre kristal düşer mi (FEATURE_DROP_CHANCE kapalıysa hep).
+func _rolls_drop(row: Dictionary) -> bool:
+	if not Tuning.FEATURE_DROP_CHANCE:
+		return true
+	return PickupRules.should_drop(float(row.get("drop_chance", Tuning.DROP_CHANCE_DEFAULT)), _drop_rng)
+
+
 ## Kristaller: öldürmede düşer, toplanınca RunLoot'a eklenir, dalga sonunda hepsi çekilir.
 ## Kapalıyken null döner.
 func _add_pickups(player: Player, enemies: EnemyManager, director: SpawnDirector, loot: RunLoot) -> Pickups:
@@ -176,7 +186,7 @@ func _add_pickups(player: Player, enemies: EnemyManager, director: SpawnDirector
 	add_child(pickups)
 	enemies.enemy_killed.connect(func(at: Vector3, row: Dictionary) -> void:
 		# Boss kristal yağmurunu BossFx yağdırır.
-		if not row.get("boss", false):
+		if not row.get("boss", false) and _rolls_drop(row):
 			pickups.drop(at, row.get("drop_value", 0)))
 	pickups.collected.connect(func(value: int) -> void:
 		if loot.add(value) > 0:
@@ -184,10 +194,12 @@ func _add_pickups(player: Player, enemies: EnemyManager, director: SpawnDirector
 		if Tuning.FEATURE_SFX:
 			Audio.play(SoundData.PICKUP_DARK if Tuning.FEATURE_SFX_PICKUP_DARK else SoundData.PICKUP))
 	director.phase_changed.connect(func(phase: WaveRun.Phase, _wave_index: int) -> void:
-		if phase == WaveRun.Phase.CLEAR:
+		if phase == WaveRun.Phase.CLEAR and not Tuning.FEATURE_WAVE_END_NO_AUTOCOLLECT:
 			pickups.collect_all()
 		elif phase == WaveRun.Phase.WAVE:
-			pickups.pull_all = false)
+			pickups.pull_all = false
+			if Tuning.FEATURE_WAVE_END_NO_AUTOCOLLECT:
+				pickups.clear_all())
 	return pickups
 
 
