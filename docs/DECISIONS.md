@@ -2,6 +2,10 @@
 
 Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar verilince "Açık kararlar"dan çıkarılıp tarihli bölüme yazılır.
 
+## 2026-11-23 — Yayın biçimi (Taha)
+- Oyun ücretsiz ve açık kaynak: GitHub'da public repo, itch.io'da indirilebilir + bağış (ne istersen öde), indirme dosyaları ayrıca GitHub Release olarak.
+- Asker modeli Tripo kalır; CREDITS'te Tripo ile üretildiği belirtilir. Diğer ses ve asset'ler CC0 (Taha beyanı); ek kaynak linki aranmaz.
+
 ## 2026-11-23 — Web yok (Taha)
 - Oyun yalnız Windows + Linux için yayınlanır; web sürümü yapılmaz (12.4 iptal).
 
