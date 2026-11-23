@@ -7,60 +7,61 @@ extends RefCounted
 ## max_alive_kind (isteğe bağlı): tür → aynı anda en çok canlı sayısı; sınırdaki tür yerine başkası seçilir (SpawnRules.pick_kind_capped).
 ## boss (isteğe bağlı): {kind, spawn_time, horde_factor?}; WaveRun boss akışı (spawn_time'da uyarı, uyarı sonunda doğar, ölünce dalga biter).
 ## enemy_hp_mult / enemy_damage_mult (isteğe bağlı, yoksa 1.0): o dalgada doğan zombilerin can ve asker hasarı çarpanı (boss hariç; WaveScaling).
+## 11.5D: dalga süresi 60→96 sn (toplam 780 sn), ilk 3 dalga ~1.7x sık doğar, can ×1.15→×2.1, hasar ×1.1→×1.5.
 ## 11.2 taslağı: 10 dalga. Türler kademeli girer (2 koşan, 3 zırhlı+sıçrayan, 4 tükürücü+şişkin, 5 tank, 6 dilci, 7 fırlatıcı+çığlıkçı); 10. dalgada boss. Sayılar 11.2 bot ölçümüyle ayarlandı (DECISIONS 2026-11-23 hedef bandı).
 
 const WAVES: Array = [
 	{
-		"enemy_hp_mult": 1.00, "enemy_damage_mult": 1.00,
-		"duration": 20.0,
-		"interval_start": 1.1, "interval_end": 0.8,
+		"enemy_hp_mult": 1.15, "enemy_damage_mult": 1.10,
+		"duration": 60.0,
+		"interval_start": 0.6, "interval_end": 0.5,
 		"batch_start": 1, "batch_end": 1,
-		"max_alive": 50,
+		"max_alive": 60,
 		"mix": {&"walker": 1.0},
 	},
 	{
-		"enemy_hp_mult": 1.00, "enemy_damage_mult": 1.00,
-		"duration": 25.0,
-		"interval_start": 1.05, "interval_end": 0.74,
+		"enemy_hp_mult": 1.26, "enemy_damage_mult": 1.14,
+		"duration": 64.0,
+		"interval_start": 0.65, "interval_end": 0.45,
 		"batch_start": 1, "batch_end": 2,
-		"max_alive": 70,
+		"max_alive": 80,
 		"mix": {&"walker": 1.0, &"runner": 0.1},
 	},
 	{
-		"enemy_hp_mult": 1.00, "enemy_damage_mult": 1.00,
-		"duration": 30.0,
-		"interval_start": 0.99, "interval_end": 0.68,
+		"enemy_hp_mult": 1.36, "enemy_damage_mult": 1.19,
+		"duration": 68.0,
+		"interval_start": 0.6, "interval_end": 0.42,
 		"batch_start": 1, "batch_end": 2,
-		"max_alive": 90,
+		"max_alive": 100,
 		"mix": {&"walker": 1.0, &"runner": 0.14, &"armored": 0.04, &"jumper": 0.05},
 	},
 	{
-		"enemy_hp_mult": 1.04, "enemy_damage_mult": 1.00,
-		"duration": 35.0,
-		"interval_start": 0.93, "interval_end": 0.62,
+		"enemy_hp_mult": 1.47, "enemy_damage_mult": 1.23,
+		"duration": 72.0,
+		"interval_start": 0.78, "interval_end": 0.52,
 		"batch_start": 1, "batch_end": 3,
 		"max_alive": 110,
 		"mix": {&"walker": 1.0, &"runner": 0.16, &"armored": 0.05, &"jumper": 0.06, &"spitter": 0.03, &"bloater": 0.04},
 	},
 	{
-		"enemy_hp_mult": 1.08, "enemy_damage_mult": 1.03,
-		"duration": 40.0,
-		"interval_start": 0.86, "interval_end": 0.56, # 11.2: bot 5–6. dalgada yığılıyordu; sıçrama korunur, yumuşar
+		"enemy_hp_mult": 1.57, "enemy_damage_mult": 1.28,
+		"duration": 76.0,
+		"interval_start": 0.74, "interval_end": 0.50, # 11.2: bot 5–6. dalgada yığılıyordu; sıçrama korunur, yumuşar
 		"batch_start": 1, "batch_end": 3,
 		"max_alive": 130,
 		"mix": {&"walker": 1.0, &"runner": 0.18, &"armored": 0.05, &"jumper": 0.07, &"spitter": 0.04, &"bloater": 0.05, &"tank": 0.02},
 	},
 	{
-		"enemy_hp_mult": 1.10, "enemy_damage_mult": 1.05,
-		"duration": 45.0,
+		"enemy_hp_mult": 1.68, "enemy_damage_mult": 1.32,
+		"duration": 80.0,
 		"interval_start": 0.9, "interval_end": 0.6, # 11.2: 6–8. dalga duvarı yumuşatıldı
 		"batch_start": 2, "batch_end": 4,
 		"max_alive": 150,
 		"mix": {&"walker": 1.0, &"runner": 0.19, &"armored": 0.06, &"jumper": 0.09, &"spitter": 0.05, &"bloater": 0.06, &"tank": 0.03, &"tongue": 0.025}, # 11.2: atıcı 7. dalgaya kaydı (6. dalga duvarı)
 	},
 	{
-		"enemy_hp_mult": 1.20, "enemy_damage_mult": 1.09,
-		"duration": 50.0,
+		"enemy_hp_mult": 1.78, "enemy_damage_mult": 1.36,
+		"duration": 84.0,
 		"interval_start": 0.82, "interval_end": 0.52,
 		"batch_start": 2, "batch_end": 4,
 		"max_alive": 170,
@@ -68,8 +69,8 @@ const WAVES: Array = [
 		"max_alive_kind": {&"screamer": 2},
 	},
 	{
-		"enemy_hp_mult": 1.32, "enemy_damage_mult": 1.14,
-		"duration": 55.0,
+		"enemy_hp_mult": 1.89, "enemy_damage_mult": 1.41,
+		"duration": 88.0,
 		"interval_start": 0.76, "interval_end": 0.46,
 		"batch_start": 2, "batch_end": 5,
 		"max_alive": 200,
@@ -77,8 +78,8 @@ const WAVES: Array = [
 		"max_alive_kind": {&"screamer": 2},
 	},
 	{
-		"enemy_hp_mult": 1.48, "enemy_damage_mult": 1.20,
-		"duration": 60.0,
+		"enemy_hp_mult": 2.00, "enemy_damage_mult": 1.45,
+		"duration": 92.0,
 		"interval_start": 0.56, "interval_end": 0.31, # 11.2: son dalgalar hayatta kalana rahattı
 		"batch_start": 2, "batch_end": 5,
 		"max_alive": 230,
@@ -86,14 +87,14 @@ const WAVES: Array = [
 		"max_alive_kind": {&"screamer": 2},
 	},
 	{
-		"enemy_hp_mult": 1.70, "enemy_damage_mult": 1.26,
-		"duration": 70.0,
+		"enemy_hp_mult": 2.10, "enemy_damage_mult": 1.50,
+		"duration": 96.0,
 		"interval_start": 0.5, "interval_end": 0.25,
 		"batch_start": 2, "batch_end": 5,
 		"max_alive": 260,
 		"mix": {&"walker": 1.0, &"runner": 0.22, &"armored": 0.07, &"jumper": 0.12, &"spitter": 0.06, &"bloater": 0.07, &"tank": 0.05, &"thrower": 0.05, &"tongue": 0.05, &"screamer": 0.02},
 		"max_alive_kind": {&"screamer": 2},
-		"boss": {"kind": &"boss_heap", "spawn_time": 15.0},
+		"boss": {"kind": &"boss_heap", "spawn_time": 20.0},
 	},
 ]
 
