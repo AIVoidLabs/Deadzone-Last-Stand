@@ -30,3 +30,21 @@ func test_landing_hits_only_inside_radius() -> void:
 	assert_true(JumpRules.lands_on(Vector2(1.0, 0), Vector2.ZERO, 1.5, 0.4))
 	assert_true(JumpRules.lands_on(Vector2(1.9, 0), Vector2.ZERO, 1.5, 0.4))
 	assert_false(JumpRules.lands_on(Vector2(2.0, 0), Vector2.ZERO, 1.5, 0.4))
+
+
+func test_extra_hops_stay_within_chain_bounds() -> void:
+	var lo: int = Tuning.JUMPER_CHAIN_MIN - 1
+	var hi: int = Tuning.JUMPER_CHAIN_MAX - 1
+	for roll in [0.0, 0.3, 0.5, 0.7, 0.9999, 1.0]:
+		var extra: int = JumpRules.extra_hops(roll, Tuning.JUMPER_CHAIN_MIN, Tuning.JUMPER_CHAIN_MAX)
+		assert_between(extra, lo, hi)
+	assert_eq(JumpRules.extra_hops(0.0, Tuning.JUMPER_CHAIN_MIN, Tuning.JUMPER_CHAIN_MAX), lo)
+	assert_eq(JumpRules.extra_hops(1.0, Tuning.JUMPER_CHAIN_MIN, Tuning.JUMPER_CHAIN_MAX), hi)
+	assert_eq(JumpRules.extra_hops(0.5, 1, 1), 0, "tek zıplama")
+
+
+func test_chain_pause_is_short_and_shows_marker_before_next_jump() -> void:
+	var jumper: Dictionary = EnemyData.get_row(EnemyData.JUMPER)
+	var pause: float = float(jumper["chain_pause"])
+	assert_between(pause, 0.3, 0.5)
+	assert_lt(pause, float(jumper["attack_windup"]))

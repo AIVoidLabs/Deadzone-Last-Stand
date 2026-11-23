@@ -20,7 +20,7 @@ func test_runner_row_uses_sprint_when_enabled() -> void:
 		return
 	assert_eq(row["attack_kind"], &"sprint")
 	assert_eq(float(row["attack_windup"]), float(row["scream_time"]), "çığlık = hazırlık")
-	assert_almost_eq(float(row["sprint_speed"]), 6.5 * Tuning.GAME_PACE, 0.0001, "hız tempoyla çarpılır")
+	assert_almost_eq(float(row["sprint_speed"]), 7.8 * Tuning.GAME_PACE, 0.0001, "hız tempoyla çarpılır")
 	assert_eq(SpecialAttacks.start_range(row), float(row["sprint_trigger_range"]))
 	assert_eq(SpecialAttacks.windup_next(row), S.SPRINT)
 
