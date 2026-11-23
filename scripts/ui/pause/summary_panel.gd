@@ -115,7 +115,7 @@ func _chip(g: Dictionary) -> PanelContainer:
 	h.add_theme_constant_override("separation", 7)
 	h.add_child(_icon(StringName("stat_" + g["stat"]), CHIP_ICON))
 	var l: Label = Label.new()
-	l.text = StatData.describe(g["stat"], g["value"])
+	l.text = StatData.describe(g["stat"], g["value"]) + (" " + Loc.t(&"run.cap.max") if g.get("capped", false) else "")
 	l.add_theme_font_override("font", UiFonts.bold())
 	l.add_theme_font_size_override("font_size", 16)
 	l.add_theme_color_override("font_color", hot.lerp(UiPalette.BONE, 0.55))

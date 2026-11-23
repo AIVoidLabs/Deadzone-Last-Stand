@@ -10,6 +10,8 @@ const ROW_GAP: int = 3
 const CHIP_SIZE: float = 38.0
 const CHIP_GAP: int = 5
 const COUNT_FONT: int = 13
+const MAX_FONT: int = 10
+const MAX_COLOR: Color = Color(0.85, 0.65, 0.18, 0.7)
 
 var _stats_header: Label
 var _rows: Dictionary = {}
@@ -35,6 +37,9 @@ func refresh(stats: PlayerStats, owned: Dictionary) -> void:
 		(row["name"] as Label).text = StatData.display_name(stat)
 		var value: Label = row["value"]
 		value.text = StatReadout.display(stat, bonus)
+		var tag: String = StatReadout.cap_tag(stat, bonus)
+		(row["max"] as Label).text = tag
+		(row["max"] as Label).visible = not tag.is_empty()
 		value.add_theme_color_override("font_color", UiPalette.GOOD if bonus > 0.0 else (UiPalette.BAD if bonus < 0.0 else UiPalette.ASH))
 	_refresh_owned(owned)
 
@@ -70,7 +75,11 @@ func _build_row(stat: StringName) -> HBoxContainer:
 	var value_label: Label = _label(UiFonts.bold(), UiPalette.ASH)
 	value_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	row.add_child(value_label)
-	_rows[stat] = {"name": name_label, "value": value_label}
+	var max_label: Label = _label(UiFonts.bold(), MAX_COLOR) # tavan etiketi (StatReadout.cap_tag)
+	max_label.add_theme_font_size_override("font_size", MAX_FONT)
+	max_label.visible = false
+	row.add_child(max_label)
+	_rows[stat] = {"name": name_label, "value": value_label, "max": max_label}
 	return row
 
 

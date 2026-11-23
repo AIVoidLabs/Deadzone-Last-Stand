@@ -148,12 +148,18 @@ func _card_data(index: int) -> Dictionary:
 	var tier: int = card["tier"]
 	var category: StringName = StatData.category_of(stat)
 	var bonus: float = _stats.bonus(stat) if _stats != null else 0.0
+	var capped: bool = Tuning.FEATURE_STAT_CAP_HONESTY and StatCaps.is_capped(stat, bonus)
+	var change: String = "%s > %s" % [StatReadout.display(stat, bonus), StatReadout.display(stat, bonus + float(card["value"]))]
+	var change_line: Dictionary = {"text": change}
+	if capped:
+		# Tavandaki stat (yalnız havuz daralınca teklif edilir): etkisiz, soluk + MAX.
+		change_line = {"text": StatReadout.display_tagged(stat, bonus), "color": Color(UiPalette.ASH, 0.65)}
 	return {
 		"category_id": category, "category": Loc.category_name(category), "title": Loc.card_title(stat),
 		"emblem": StringName("stat_" + stat), "tier": tier, "tier_name": Loc.tier_name(tier), "hint": str(index + 1),
 		"lines": [
 			{"text": StatData.display_name(stat), "bold": true},
-			{"text": "%s > %s" % [StatReadout.display(stat, bonus), StatReadout.display(stat, bonus + float(card["value"]))]},
+			change_line,
 		],
 	}
 

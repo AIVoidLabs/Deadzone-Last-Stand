@@ -16,7 +16,9 @@ static func is_percent(stat: StringName) -> bool:
 
 
 ## Oyuncunun gerçek değeri: can/zırh temelle birlikte, yenileme saniyelik, yüzdeler artışın kendisi.
-static func raw_value(stat: StringName, bonus: float) -> float:
+static func raw_value(stat: StringName, bonus: float, caps: bool = Tuning.FEATURE_STAT_CAP_HONESTY) -> float:
+	if caps:
+		bonus = StatCaps.effective_bonus(stat, bonus) # tavandan fazlası etkisiz: gerçek değeri göster
 	match stat:
 		StatData.MAX_HP:
 			return PlayerStats.max_hp_for(bonus)
@@ -42,11 +44,11 @@ static func number_fine(value: float, decimal: String) -> String:
 	return text.replace(".", decimal)
 
 
-static func format(stat: StringName, bonus: float, style: Dictionary = DEFAULT_STYLE) -> String:
+static func format(stat: StringName, bonus: float, style: Dictionary = DEFAULT_STYLE, caps: bool = Tuning.FEATURE_STAT_CAP_HONESTY) -> String:
 	if stat == StatData.DASH_COOLDOWN:
 		# Yüzde yerine gerçek süre: "1,4 sn".
 		return number_fine(PlayerStats.dash_cooldown_for(bonus), style["decimal"]) + String(style.get("seconds", "s"))
-	var value: float = raw_value(stat, bonus)
+	var value: float = raw_value(stat, bonus, caps)
 	var minus: bool = value < 0.0
 	var body: String = number(absf(value), style["decimal"])
 	var sign_text: String = "-" if minus and not is_zero_approx(snappedf(value, 0.1)) else ""
@@ -55,6 +57,17 @@ static func format(stat: StringName, bonus: float, style: Dictionary = DEFAULT_S
 	if stat == StatData.HP_REGEN:
 		return sign_text + body + String(style["per_second"])
 	return sign_text + body
+
+
+## Tavandaysa değerin yanına etiket ("12 MAX"); değilse yalnız değer. tag: yerelleştirilmiş "MAX".
+static func tagged(stat: StringName, bonus: float, tag: String, style: Dictionary = DEFAULT_STYLE, caps: bool = Tuning.FEATURE_STAT_CAP_HONESTY) -> String:
+	var text: String = format(stat, bonus, style, caps)
+	return text + " " + tag if caps and StatCaps.is_capped(stat, bonus) else text
+
+
+## Panelde yan etiket gerekiyorsa "MAX", yoksa "" (bayrak kapalıyken hep "").
+static func cap_tag(stat: StringName, bonus: float) -> String:
+	return Loc.t(&"run.cap.max") if Tuning.FEATURE_STAT_CAP_HONESTY and StatCaps.is_capped(stat, bonus) else ""
 
 
 static func style() -> Dictionary:
@@ -70,13 +83,18 @@ static func display(stat: StringName, bonus: float) -> String:
 	return format(stat, bonus, style())
 
 
+## display + tavandaysa " MAX".
+static func display_tagged(stat: StringName, bonus: float) -> String:
+	return tagged(stat, bonus, Loc.t(&"run.cap.max"), style())
+
+
 ## Sıfırdan farklı istatistikler tek satırda ("Hasar %12,5     Can 110").
 static func strip(stats: PlayerStats) -> String:
 	var parts: PackedStringArray = PackedStringArray()
 	for stat: StringName in StatData.TABLE:
 		var bonus: float = stats.bonus(stat)
 		if not is_zero_approx(bonus):
-			parts.append("%s %s" % [StatData.display_name(stat), display(stat, bonus)])
+			parts.append("%s %s" % [StatData.display_name(stat), display_tagged(stat, bonus)])
 	if parts.is_empty():
 		return Loc.t(&"run.perk.none")
 	return STRIP_SEPARATOR.join(parts)

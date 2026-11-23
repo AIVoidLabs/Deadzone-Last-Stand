@@ -10,7 +10,10 @@ static func gains(bonus_of: Callable) -> Array[Dictionary]:
 	for stat: StringName in StatData.TABLE:
 		var value: float = bonus_of.call(stat)
 		if not is_zero_approx(value):
-			rows.append({"stat": stat, "value": value, "category": StatData.category_of(stat)})
+			var capped: bool = Tuning.FEATURE_STAT_CAP_HONESTY and StatCaps.is_capped(stat, value)
+			if Tuning.FEATURE_STAT_CAP_HONESTY:
+				value = StatCaps.effective_bonus(stat, value)
+			rows.append({"stat": stat, "value": value, "category": StatData.category_of(stat), "capped": capped})
 	return rows
 
 

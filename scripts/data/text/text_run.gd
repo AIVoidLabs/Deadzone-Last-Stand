@@ -31,6 +31,7 @@ const TABLE: Dictionary = {
 	&"run.shop.state_full": {"tr": "YUVALAR DOLU", "en": "SLOTS FULL"},
 	&"run.shop.state_sold": {"tr": "SATILDI", "en": "SOLD"},
 	&"run.shop.merge": {"tr": "BİRLEŞİR  >  K%d", "en": "MERGES  >  T%d"},
+	&"run.cap.max": {"tr": "MAX", "en": "MAX"},
 	&"run.shop.owned_count": {"tr": "Sende  x%d", "en": "Owned  x%d"},
 	&"run.shop.damage": {"tr": "Hasar %d", "en": "Damage %d"},
 	&"run.shop.damage_pellets": {"tr": "Hasar %d x %d", "en": "Damage %d x %d"},

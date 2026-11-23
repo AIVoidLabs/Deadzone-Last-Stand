@@ -23,7 +23,8 @@ static func roll_tier(rng: RandomNumberGenerator, tiers: Array, level: int, luck
 
 
 ## count kart: her biri farklı istatistik. Öğeler: {stat, tier, value}.
-static func roll_offer(rng: RandomNumberGenerator, cards: Array, tiers: Array, count: int, level: int, luck: float) -> Array[Dictionary]:
+## bonus_of(stat) -> bonus verilirse tavandaki statın kartları sona atılır (StatCaps); yetmezse onlarla tamamlanır.
+static func roll_offer(rng: RandomNumberGenerator, cards: Array, tiers: Array, count: int, level: int, luck: float, bonus_of: Callable = Callable()) -> Array[Dictionary]:
 	var order: Array = range(cards.size())
 	# Karıştırma rng ile (tekrarlanabilir testler için Array.shuffle kullanılmaz).
 	for i in range(order.size() - 1, 0, -1):
@@ -31,9 +32,24 @@ static func roll_offer(rng: RandomNumberGenerator, cards: Array, tiers: Array, c
 		var tmp: int = order[i]
 		order[i] = order[j]
 		order[j] = tmp
+	if bonus_of.is_valid():
+		order = _useful_first(order, cards, bonus_of)
 	var offer: Array[Dictionary] = []
 	for k in mini(count, order.size()):
 		var card: Dictionary = cards[order[k]]
 		var tier: int = roll_tier(rng, tiers, level, luck)
 		offer.append({"stat": card["stat"], "tier": tier, "value": (card["values"] as Array)[tier]})
 	return offer
+
+
+## Sırayı bozmadan tavanı dolmamış statların kartlarını öne alır (kararlı bölme).
+static func _useful_first(order: Array, cards: Array, bonus_of: Callable) -> Array:
+	var useful: Array = []
+	var capped: Array = []
+	for index: int in order:
+		var stat: StringName = cards[index]["stat"]
+		if StatCaps.is_capped(stat, float(bonus_of.call(stat))):
+			capped.append(index)
+		else:
+			useful.append(index)
+	return useful + capped

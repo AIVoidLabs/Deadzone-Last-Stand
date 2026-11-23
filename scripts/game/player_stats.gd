@@ -33,7 +33,7 @@ func armor() -> float:
 
 
 func move_speed() -> float:
-	return Tuning.PLAYER_SPEED * maxf(Tuning.MIN_STAT_MULTIPLIER, 1.0 + minf(bonus(StatData.MOVE_SPEED), Tuning.MOVE_SPEED_BONUS_CAP) / 100.0)
+	return Tuning.PLAYER_SPEED * maxf(Tuning.MIN_STAT_MULTIPLIER, 1.0 + StatCaps.effective_bonus(StatData.MOVE_SPEED, bonus(StatData.MOVE_SPEED)) / 100.0)
 
 
 ## Saniyede yenilenen can.
@@ -47,7 +47,7 @@ func dash_cooldown() -> float:
 
 ## Takla beklemesi (sn): bonus yüzde kısaltma (üst sınırlı), eksi bonus uzatır. Ekranlar da bunu gösterir.
 static func dash_cooldown_for(cut_percent: float) -> float:
-	return Tuning.DASH_COOLDOWN * (1.0 - minf(cut_percent, Tuning.DASH_COOLDOWN_CUT_CAP) / 100.0)
+	return Tuning.DASH_COOLDOWN * (1.0 - StatCaps.effective_bonus(StatData.DASH_COOLDOWN, cut_percent) / 100.0)
 
 
 ## Dash hızı (süre sabit, mesafe buna bağlı).

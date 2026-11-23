@@ -129,7 +129,16 @@ func _close() -> void:
 
 func _roll() -> void:
 	var pool: Dictionary = WeaponData.shop_pool(_wave_index() + 1)
-	_offer = ShopRules.roll_offer(_rng, ItemData.ids(), pool.keys(), Tuning.SHOP_OFFER_COUNT, Tuning.SHOP_WEAPON_CHANCE, _offer, pool)
+	_offer = ShopRules.roll_offer(_rng, _item_pool(), pool.keys(), Tuning.SHOP_OFFER_COUNT, Tuning.SHOP_WEAPON_CHANCE, _offer, pool)
+
+
+## Tavandaki statı boşa çıkaran eşyalar elenir (FEATURE_STAT_CAP_HONESTY); havuz daralırsa geri katılır.
+func _item_pool() -> Array:
+	var ids: Array = ItemData.ids()
+	if not Tuning.FEATURE_STAT_CAP_HONESTY:
+		return ids
+	var effects_of: Callable = func(id: StringName) -> Array: return ItemData.get_row(id)["effects"]
+	return StatCaps.filter_wasted(ids, effects_of, stats.bonus, Tuning.SHOP_OFFER_COUNT)
 
 
 func _wave_index() -> int:
@@ -263,6 +272,8 @@ func _entry_view(entry: Dictionary) -> Dictionary:
 		view["color"] = ITEM_COLOR
 		var owned: int = int(_owned.get(entry["id"], 0))
 		view["subtitle"] = "EŞYA" if owned == 0 else "EŞYA  ·  sende ×%d" % owned
+		if Tuning.FEATURE_STAT_CAP_HONESTY:
+			view["capped"] = StatCaps.capped_stats(row["effects"], stats.bonus)
 		for effect: Dictionary in row["effects"]:
 			view["lines"].append({"text": StatData.describe(effect["stat"], effect["value"]), "good": ShopTexts.is_good(effect)})
 		return view

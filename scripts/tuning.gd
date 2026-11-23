@@ -20,6 +20,8 @@ const FEATURE_WEAPON_TOOLTIP: bool = true
 const FEATURE_END_SUMMARY: bool = true
 const FEATURE_KEY_REBIND: bool = true
 const FEATURE_UI_MOTION: bool = true
+## Tavandaki statlarda yanıltma yok: panel etkin değeri + MAX gösterir, kart/eşya teklifleri tavandaki statı elemeye çalışır (StatCaps).
+const FEATURE_STAT_CAP_HONESTY: bool = true
 const FEATURE_SCENE_FADE: bool = true
 const FEATURE_SEPARATION: bool = true
 const FEATURE_CAMERA_SMOOTHING: bool = true
@@ -522,7 +524,7 @@ const PLAYER_TURN_SHARPNESS: float = 14.0
 # --- Dash ---
 const DASH_SPEED: float = 15.0
 const DASH_DURATION: float = 0.35
-const DASH_COOLDOWN: float = 6.0  # 11.5A: 1.4 → 8.0, Taha: 8 → 6
+const DASH_COOLDOWN: float = 5.0  # 11.5A: 1.4 → 8.0, Taha: 8 → 5
 ## Takla başlangıcından itibaren yalnız bu kadar sn dokunulmaz (FEATURE_DASH_EARLY_IFRAMES).
 const DASH_IFRAMES: float = 0.15
 ## Dash bittikten sonraki kısa dokunulmazlık (sn).

@@ -23,9 +23,16 @@ static func _item_body(entry: Dictionary) -> Dictionary:
 	var effects: Array = ItemData.get_row(id)["effects"]
 	var category: StringName = StatData.category_of(effects[0]["stat"])
 	var lines: Array = []
+	var capped: Array = entry.get("capped", [])
 	for effect: Dictionary in effects:
 		var good: bool = float(effect["value"]) > 0.0
-		lines.append({"text": StatData.describe(effect["stat"], effect["value"]), "color": UiPalette.GOOD if good else UiPalette.BAD, "bold": lines.is_empty()})
+		var text: String = StatData.describe(effect["stat"], effect["value"])
+		var color: Color = UiPalette.GOOD if good else UiPalette.BAD
+		if good and capped.has(effect["stat"]):
+			# Tavandaki stat: etkisiz, soluk renk + MAX (StatCaps).
+			text += " " + Loc.t(&"run.cap.max")
+			color = Color(UiPalette.ASH, 0.65)
+		lines.append({"text": text, "color": color, "bold": lines.is_empty()})
 	var owned: int = int(entry.get("owned", 0))
 	if owned > 0:
 		lines.append({"text": Loc.t(&"run.shop.owned_count", [owned]), "color": UiPalette.ASH})

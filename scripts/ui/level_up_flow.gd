@@ -63,7 +63,8 @@ func _can_open() -> bool:
 
 
 func _show_next() -> void:
-	_offer = CardRules.roll_offer(_rng, CardData.CARDS, CardData.TIERS, Tuning.CARD_OFFER_COUNT, loot.level, stats.luck())
+	var bonus_of: Callable = stats.bonus if Tuning.FEATURE_STAT_CAP_HONESTY else Callable()
+	_offer = CardRules.roll_offer(_rng, CardData.CARDS, CardData.TIERS, Tuning.CARD_OFFER_COUNT, loot.level, stats.luck(), bonus_of)
 	_screen.show_offer(_offer, loot.pending_levels, stats)
 
 
