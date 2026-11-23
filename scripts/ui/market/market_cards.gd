@@ -46,15 +46,32 @@ static func _weapon_body(entry: Dictionary) -> Dictionary:
 	var lines: Array = []
 	if entry.get("merged", false):
 		lines.append({"text": Loc.t(&"run.shop.merge", [tier]), "color": UiPalette.GOLD, "bold": true})
-	var damage_key: StringName = &"run.shop.damage" if stats["pellets"] == 1 else &"run.shop.damage_pellets"
-	var damage_args: Array = [stats["damage"]] if stats["pellets"] == 1 else [stats["damage"], stats["pellets"]]
-	lines.append({"text": Loc.t(damage_key, damage_args), "bold": lines.is_empty()})
-	lines.append({"text": Loc.t(&"run.shop.rate", [StatReadout.number(stats["rate"], decimal)])})
-	lines.append({"text": Loc.t(&"run.shop.range", [stats["range"]])})
+		if Tuning.FEATURE_SHOP_MERGE_PREVIEW:
+			lines.append_array(_merge_preview_lines(id, tier))
+	if lines.size() < 2:
+		lines.append_array(_stat_lines(stats, decimal, lines.is_empty()))
 	return {
 		"category_id": WEAPON_CATEGORY, "category": Loc.category_name(WEAPON_CATEGORY), "title": Loc.weapon_name(id),
 		"emblem": StringName("weapon_" + id), "tier": tier - 1, "tier_name": Loc.tier_name(tier - 1), "lines": lines,
 	}
+
+
+## Birleşince ne değişir: önce -> sonra satırları (yeşil). Değişen yoksa boş (tam sayılar gösterilir).
+static func _merge_preview_lines(id: StringName, tier: int) -> Array:
+	var lines: Array = []
+	for text: String in WeaponReadout.merge_lines(id, tier - 1, tier):
+		lines.append({"text": text, "color": UiPalette.GOOD})
+	return lines
+
+
+static func _stat_lines(stats: Dictionary, decimal: String, first_bold: bool) -> Array:
+	var lines: Array = []
+	var damage_key: StringName = &"run.shop.damage" if stats["pellets"] == 1 else &"run.shop.damage_pellets"
+	var damage_args: Array = [stats["damage"]] if stats["pellets"] == 1 else [stats["damage"], stats["pellets"]]
+	lines.append({"text": Loc.t(damage_key, damage_args), "bold": first_bold})
+	lines.append({"text": Loc.t(&"run.shop.rate", [StatReadout.number(stats["rate"], decimal)])})
+	lines.append({"text": Loc.t(&"run.shop.range", [stats["range"]])})
+	return lines
 
 
 ## Silah satırı + kademe satırı -> gösterilen sayılar (saf).

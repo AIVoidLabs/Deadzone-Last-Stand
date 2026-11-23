@@ -4,6 +4,9 @@ extends VBoxContainer
 ## Son silah satılamaz (sarsılır). Esc silahlı yuvayı bırakır (MarketScreen sorar).
 
 signal sell_pressed(index: int)
+## Silah ipucu (FEATURE_WEAPON_TOOLTIP): fare/odak yuvaya girince (dolu yuva), çıkınca.
+signal slot_hovered(slot: MarketSlot, id: StringName, tier: int)
+signal slot_unhovered
 
 const SLOT_SIZE: float = 62.0
 const SLOT_GAP: int = 6
@@ -34,6 +37,11 @@ func _init() -> void:
 		var slot: MarketSlot = MarketSlot.new()
 		slot.custom_minimum_size = Vector2(SLOT_SIZE, SLOT_SIZE)
 		slot.pressed.connect(_on_slot_pressed.bind(i))
+		if Tuning.FEATURE_WEAPON_TOOLTIP:
+			for enter: Signal in [slot.mouse_entered, slot.focus_entered]:
+				enter.connect(_on_slot_entered.bind(i))
+			for leave: Signal in [slot.mouse_exited, slot.focus_exited]:
+				leave.connect(slot_unhovered.emit)
 		UiSounds.hook(slot)
 		row.add_child(slot)
 		_slots.append(slot)
@@ -55,6 +63,7 @@ func sync(weapons: Array) -> void:
 		sig.append([weapon["id"], weapon["tier"]])
 	if sig != _signature:
 		disarm()
+		slot_unhovered.emit()
 		_signature = sig
 	for i: int in _slots.size():
 		if i < weapons.size():
@@ -70,6 +79,16 @@ func disarm() -> void:
 	if _armed >= 0 and _armed < _slots.size():
 		_slots[_armed].armed = false
 	_armed = -1
+
+
+## Görüntü aracı: i. yuvanın ipucunu açar.
+func hover_for_shot(index: int) -> void:
+	_on_slot_entered(index)
+
+
+func _on_slot_entered(index: int) -> void:
+	if index < _weapons.size():
+		slot_hovered.emit(_slots[index], _weapons[index]["id"], int(_weapons[index]["tier"]))
 
 
 func _on_slot_pressed(index: int) -> void:

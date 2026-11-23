@@ -31,6 +31,7 @@ var _vitals: HudVitals = null
 var _clock: HudClock = null
 var _tally: HudTally = null
 var _slots: HudSlots = null
+var _tooltip: WeaponTooltip = null
 var _banner: WaveBanner = null
 var _shown_level: int = 1
 ## Etiket metinleri yalnız değer değişince kurulur (her karede dize üretilmesin).
@@ -65,6 +66,11 @@ func _ready() -> void:
 	for group: HudGroup in [_vitals, _clock, _tally, _slots]:
 		_root.add_child(group)
 	_slots.visible = SHOW_WEAPON_SLOTS
+	if Tuning.FEATURE_WEAPON_TOOLTIP:
+		_tooltip = WeaponTooltip.new()
+		_root.add_child(_tooltip)
+		_slots.slot_hovered.connect(_on_slot_hovered)
+		_slots.slot_unhovered.connect(_tooltip.hide_tip)
 	_banner = WaveBanner.new()
 	_root.add_child(_banner)
 	Settings.changed.connect(_on_setting_changed)
@@ -73,6 +79,15 @@ func _ready() -> void:
 		_director.phase_changed.connect(_on_wave_phase)
 	else:
 		set_demo({})
+
+
+func _on_slot_hovered(cell: Control, id: StringName, tier: int) -> void:
+	_tooltip.show_for(cell, id, tier)
+
+
+## Görüntü aracı: i. silah yuvasının ipucunu açar.
+func hover_slot(index: int) -> void:
+	_slots.hover_cell(index)
 
 
 func _on_setting_changed(key: StringName, _value: Variant) -> void:
@@ -177,6 +192,9 @@ static func ui_shot(host: Node, opts: Dictionary) -> void:
 	elif tab == 2:
 		values = {"wave": 5, "time": 41.0, "dash": 0.7}
 	hud.set_demo(values)
+	var hover: int = int(opts.get("hover", -1))
+	if hover >= 0:
+		host.get_tree().create_timer(0.6, true, false, true).timeout.connect(hud.hover_slot.bind(hover))
 	if tab == 2:
 		hud._banner.flash(Loc.t(&"hud.final_wave"), BANNER_LAST_COLOR, 5.0)
 	else:

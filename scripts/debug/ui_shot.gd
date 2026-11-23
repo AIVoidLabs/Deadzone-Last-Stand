@@ -2,7 +2,7 @@ class_name UiShot
 extends Node
 ## Arayüz görüntü aracı (yalnız debug): bir ekranı kurar, bekler, PNG kaydeder ve çıkar.
 ## godot --path . -- --ui-shot=build/shots/x.png --ui-screen=<ad> [--ui-tab=N] [--ui-seconds=1.5] [--ui-lang=en]
-##   [--ui-size=1920x1080] [--ui-focus=N]
+##   [--ui-size=1920x1080] [--ui-focus=N] [--ui-hover-slot=N]
 ## Ekran kaydı: SCREENS tablosuna kimlik -> betik yolu eklenir; betik şu statik işlevi sunar:
 ##   static func ui_shot(host: Node, opts: Dictionary) -> void   (host: tam ekran Control; opts: tab, focus, lang, seconds, size)
 ## Çalışma anında da UiShot.register(id, callable(host, opts)) ile eklenebilir.
@@ -57,7 +57,7 @@ func _run() -> void:
 	var opts: Dictionary = {
 		"tab": int(arg("--ui-tab=", "0")), "focus": int(arg("--ui-focus=", "-1")), "lang": lang,
 		"seconds": float(arg("--ui-seconds=", str(DEFAULT_SECONDS))), "size": arg("--ui-size=", ""),
-		"screen": arg("--ui-screen=", "main"),
+		"screen": arg("--ui-screen=", "main"), "hover": int(arg("--ui-hover-slot=", "-1")),
 	}
 	_build(StringName(opts["screen"]), host, opts)
 	await get_tree().create_timer(maxf(opts["seconds"], 0.0), true, false, true).timeout
