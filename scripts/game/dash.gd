@@ -35,6 +35,16 @@ func tick(delta: float) -> bool:
 	return time_left <= 0.0
 
 
+## Dash başlangıcından geçen süre (aktif değilse 0).
+func elapsed() -> float:
+	return duration - time_left if time_left > 0.0 else 0.0
+
+
+## Dash'in ilk window sn'si içinde mi (dokunulmazlık penceresi).
+func in_early_window(window: float) -> bool:
+	return is_active() and elapsed() < window
+
+
 func is_active() -> bool:
 	return time_left > 0.0
 

@@ -106,7 +106,11 @@ func is_hittable() -> bool:
 
 ## Dash, dokunulmazlık payı ve ölüm dışında vurulabilir durumda (ölümsüz modu hariç tutmadan; ölçümler için).
 func is_exposed() -> bool:
-	return state != State.DEAD and state != State.DASH and _iframes_left <= 0.0
+	if state == State.DEAD or _iframes_left > 0.0:
+		return false
+	if state == State.DASH:
+		return Tuning.FEATURE_DASH_EARLY_IFRAMES and not dash.in_early_window(Tuning.DASH_IFRAMES)
+	return true
 
 
 ## Klavye dışından dash isteği (debug araçları).
@@ -198,7 +202,8 @@ func _try_start_dash(input: Vector2) -> void:
 
 func _end_dash() -> void:
 	# Dash biter bitmez yakalanmasın diye kısa bir dokunulmazlık payı.
-	_iframes_left = maxf(_iframes_left, Tuning.DASH_EXIT_IFRAMES)
+	if not Tuning.FEATURE_DASH_EARLY_IFRAMES:
+		_iframes_left = maxf(_iframes_left, Tuning.DASH_EXIT_IFRAMES)
 	velocity = Vector3(_dash_direction.x, 0.0, _dash_direction.y) * stats.move_speed()
 	_set_state(State.MOVE)
 	event.emit(&"dash_ended", {})
