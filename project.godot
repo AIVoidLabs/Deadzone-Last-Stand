@@ -11,12 +11,15 @@ config_version=5
 [application]
 
 config/name="Deadzone Last Stand"
-config/description="3D low-poly dalga tabanlı zombi hayatta kalma oyunu."
-config/version="0.0.1"
+config/description="Dalga tabanlı 3D zombi hayatta kalma oyunu."
+config/version="1.0.0"
 run/main_scene="res://scenes/boot.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
 boot_splash/bg_color=Color(0, 0, 0, 1)
-boot_splash/show_image=false
+boot_splash/show_image=true
+boot_splash/image="res://assets/textures/ui/boot_helmet.png"
+boot_splash/stretch_mode=0
+config/icon="res://assets/icon.png"
 
 [autoload]
 

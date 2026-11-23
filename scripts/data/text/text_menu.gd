@@ -27,6 +27,7 @@ const TABLE: Dictionary = {
 	&"menu.quit.live": {"tr": "Kayıtların otomatik saklanır", "en": "Your progress is saved automatically"},
 	&"menu.credits": {"tr": "EMEĞİ GEÇENLER", "en": "CREDITS"},
 	&"menu.version": {"tr": "SÜRÜM %s", "en": "VERSION %s"},
+	&"boot.loading": {"tr": "YÜKLENİYOR", "en": "LOADING"},
 	&"menu.language": {"tr": "DİL", "en": "LANGUAGE"},
 	&"confirm.quit.title": {"tr": "OYUNDAN ÇIK", "en": "QUIT THE GAME"},
 	&"confirm.quit.body": {"tr": "Oyundan çıkmak istediğine emin misin? Kayıtların saklanır.", "en": "Are you sure you want to quit? Your progress is saved."},

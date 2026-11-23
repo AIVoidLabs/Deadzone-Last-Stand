@@ -23,6 +23,8 @@ const FEATURE_UI_MOTION: bool = true
 ## Tavandaki statlarda yanıltma yok: panel etkin değeri + MAX gösterir, kart/eşya teklifleri tavandaki statı elemeye çalışır (StatCaps).
 const FEATURE_STAT_CAP_HONESTY: bool = true
 const FEATURE_SCENE_FADE: bool = true
+## Açılış yükleme ekranı (kask + dönen halka, menü arka planda yüklenir); kapalıyken düz siyah geçiş.
+const FEATURE_BOOT_LOADER: bool = true
 const FEATURE_SEPARATION: bool = true
 const FEATURE_CAMERA_SMOOTHING: bool = true
 const FEATURE_CAMERA_LOOK_AHEAD: bool = true
