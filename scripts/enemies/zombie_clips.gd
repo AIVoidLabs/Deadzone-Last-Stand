@@ -11,6 +11,10 @@ const SOURCES: Dictionary = {
 static var _library: AnimationLibrary
 
 
+static func clear_cache() -> void:
+	_library = null
+
+
 ## "zombie/klip" biçiminde tam ad.
 static func full_name(clip: StringName) -> StringName:
 	return StringName("%s/%s" % [LIBRARY_NAME, clip])

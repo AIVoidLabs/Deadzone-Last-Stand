@@ -228,6 +228,11 @@ const TABLE: Dictionary = {
 ## Oyun sesleri + arayüz sesleri (UiSoundData) tek tabloda; ilk istekte birleştirilir.
 static var _all: Dictionary = {}
 
+
+## Kapanışta önbelleği bırakır.
+static func clear_cache() -> void:
+	_all.clear()
+
 static func all_rows() -> Dictionary:
 	if _all.is_empty():
 		_all = TABLE.merged(UiSoundData.TABLE)

@@ -11,6 +11,12 @@ static var _materials: Dictionary = {}
 static var _vc_material: ShaderMaterial
 
 
+static func clear_cache() -> void:
+	_box_meshes.clear()
+	_materials.clear()
+	_vc_material = null
+
+
 ## Satırda tint varsa (özel türler, kendi modeli yokken yürüyenin modeli) köşe renginin çarpanı olarak örneğe uygulanır.
 static func apply_tint(mesh: MeshInstance3D, row: Dictionary, own_clips: bool, variance: Vector3) -> void:
 	if not own_clips or not row.has("tint"):

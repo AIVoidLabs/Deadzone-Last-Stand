@@ -7,6 +7,10 @@ const SCENE: PackedScene = preload("res://assets/models/props/thrown_rock.glb")
 
 static var _material: StandardMaterial3D
 
+
+static func clear_cache() -> void:
+	_material = null
+
 var _prop: Node3D
 ## Görünmeye kalan süre (sn); < 0 = beklemiyor.
 var _delay: float = -1.0

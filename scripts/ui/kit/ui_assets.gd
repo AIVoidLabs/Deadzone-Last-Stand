@@ -10,6 +10,11 @@ static var _tex: Dictionary = {}
 static var _shaders: Dictionary = {}
 
 
+static func clear_cache() -> void:
+	_tex.clear()
+	_shaders.clear()
+
+
 static func tex(name: String) -> Texture2D:
 	if not _tex.has(name):
 		_tex[name] = load(TEX_DIR + name + ".png") as Texture2D

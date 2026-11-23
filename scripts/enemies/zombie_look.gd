@@ -12,6 +12,10 @@ const PALETTE_COLUMNS: int = 16
 static var _by_palette: Dictionary = {}
 
 
+static func clear_cache() -> void:
+	_by_palette.clear()
+
+
 static func variant_count(model: Node3D) -> int:
 	return ModelVariants.count(model)
 

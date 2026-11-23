@@ -18,6 +18,10 @@ static var language: StringName = &"tr"
 static var _merged: Dictionary = {}
 
 
+static func clear_cache() -> void:
+	_merged.clear()
+
+
 static func set_language(lang: StringName) -> void:
 	language = lang if LANGS.has(lang) else FALLBACK
 

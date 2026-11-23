@@ -9,6 +9,10 @@ const SLIDER_TRACK_HEIGHT: float = 8.0
 static var _theme: Theme = null
 
 
+static func clear_cache() -> void:
+	_theme = null
+
+
 static func get_theme() -> Theme:
 	if _theme == null:
 		_theme = _build()

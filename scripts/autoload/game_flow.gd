@@ -41,6 +41,9 @@ func _process(_delta: float) -> void:
 
 
 func _notification(what: int) -> void:
+	if what == NOTIFICATION_PREDELETE:
+		StaticCaches.clear_all() # kapanış: static önbellek sızıntısı
+		return
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT and _focus_pause_wanted():
 		pause()
 

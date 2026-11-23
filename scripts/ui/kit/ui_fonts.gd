@@ -17,6 +17,11 @@ static var _base: FontFile = null
 static var _cache: Dictionary = {}
 
 
+static func clear_cache() -> void:
+	_base = null
+	_cache.clear()
+
+
 static func heading() -> Font:
 	return _make(&"heading", HEADING_WEIGHT, HEADING_WIDTH, HEADING_EMBOLDEN, HEADING_SPACING)
 

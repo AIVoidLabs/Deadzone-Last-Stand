@@ -7,6 +7,16 @@ const PLACEHOLDER: String = "res://assets/textures/ui/emblem_placeholder.png"
 
 static var _cache: Dictionary = {}
 static var _warmed: bool = false
+## warm() ile başlatılıp henüz teslim alınmamış arka plan yüklemeleri (yol); alınmazsa kapanışta sızıntı sayılır.
+static var _pending: Dictionary = {}
+
+
+static func clear_cache() -> void:
+	for path: String in _pending.keys():
+		ResourceLoader.load_threaded_get(path)
+	_pending.clear()
+	_cache.clear()
+	_warmed = false
 
 
 static func tex(id: StringName) -> Texture2D:
@@ -14,7 +24,10 @@ static func tex(id: StringName) -> Texture2D:
 		return _cache[id]
 	var path: String = DIR + String(id) + ".png"
 	var t: Texture2D = null
-	if ResourceLoader.exists(path):
+	if _pending.has(path):
+		_pending.erase(path)
+		t = ResourceLoader.load_threaded_get(path) as Texture2D
+	elif ResourceLoader.exists(path):
 		t = load(path) as Texture2D
 	if t == null:
 		t = load(PLACEHOLDER) as Texture2D
@@ -37,8 +50,8 @@ static func warm() -> void:
 		ids.append(StringName("weapon_" + weapon))
 	for id: StringName in ids:
 		var path: String = DIR + String(id) + ".png"
-		if ResourceLoader.exists(path):
-			ResourceLoader.load_threaded_request(path)
+		if ResourceLoader.exists(path) and ResourceLoader.load_threaded_request(path) == OK:
+			_pending[path] = true
 
 
 static func has(id: StringName) -> bool:

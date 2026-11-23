@@ -18,6 +18,11 @@ static var _soft: GradientTexture2D = null
 static var _puff: GradientTexture2D = null
 
 
+static func clear_cache() -> void:
+	_soft = null
+	_puff = null
+
+
 ## Duman puf dokusu: geniş opak çekirdek, yumuşak kenar.
 static func puff_texture() -> GradientTexture2D:
 	if _puff == null:
