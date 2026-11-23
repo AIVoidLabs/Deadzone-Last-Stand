@@ -36,4 +36,12 @@ const TABLE: Dictionary = {
 	&"run.shop.damage_pellets": {"tr": "Hasar %d x %d", "en": "Damage %d x %d"},
 	&"run.shop.rate": {"tr": "%s atış/sn", "en": "%s shots/s"},
 	&"run.shop.range": {"tr": "Menzil %d m", "en": "Range %d m"},
+	&"run.shop.merge_damage": {"tr": "Hasar %d → %d", "en": "Damage %d → %d"},
+	&"run.shop.merge_damage_pellets": {"tr": "Hasar %d → %d  x%d", "en": "Damage %d → %d  x%d"},
+	&"run.shop.merge_rate": {"tr": "Atış hızı +%s", "en": "Fire rate +%s"},
+	&"run.shop.merge_range": {"tr": "Menzil %d → %d m", "en": "Range %d → %d m"},
+	&"run.tip.arc": {"tr": "Yay %d°", "en": "Arc %d°"},
+	&"run.tip.burn": {"tr": "Yanma %s/sn, %s sn", "en": "Burn %s/s for %ss"},
+	&"run.tip.explode": {"tr": "Patlama %s m", "en": "Blast %s m"},
+	&"run.tip.pierce": {"tr": "Deler: +%d zombi", "en": "Pierces +%d"},
 }

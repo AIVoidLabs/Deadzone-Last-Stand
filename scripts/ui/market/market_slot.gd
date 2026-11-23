@@ -38,7 +38,7 @@ func setup(slot: Dictionary, sell_value: int) -> void:
 	weapon_id = slot.get("id", &"")
 	tier = int(slot.get("tier", 0))
 	_sell = sell_value
-	tooltip_text = "" if is_empty() else Loc.weapon_name(weapon_id)
+	tooltip_text = "" if is_empty() or Tuning.FEATURE_WEAPON_TOOLTIP else Loc.weapon_name(weapon_id)
 	queue_redraw()
 
 

@@ -37,6 +37,7 @@ var _card_data: Array[Dictionary] = []
 var _entry_ids: Array[StringName] = []
 var _states: Array[String] = []
 var _slot_bar: MarketSlotBar
+var _tooltip: WeaponTooltip = null
 var _side: MarketSide
 var _reroll: GrungeButton
 var _next: GrungeButton
@@ -59,6 +60,7 @@ func close() -> void:
 	visible = false
 	_opened = false
 	_slot_bar.disarm()
+	_on_slot_unhovered()
 
 
 ## view: {wave, wave_total, crystals, entries: [{kind, id, state, price, locked, merged, tier, owned}],
@@ -84,6 +86,11 @@ func show_view(view: Dictionary) -> void:
 	if first:
 		_opened = true
 		_next.grab_focus.call_deferred()
+
+
+## Görüntü aracı: i. silah yuvasının ipucunu açar.
+func hover_slot(index: int) -> void:
+	_slot_bar.hover_for_shot(index)
 
 
 func focus_card(index: int) -> void:
@@ -120,6 +127,9 @@ func _build() -> void:
 	_stage.resized.connect(_layout)
 	center.add_child(_stage)
 	center.add_child(_build_bottom())
+	if Tuning.FEATURE_WEAPON_TOOLTIP:
+		_tooltip = WeaponTooltip.new()
+		_root.add_child(_tooltip)
 
 
 func _build_header() -> HBoxContainer:
@@ -139,6 +149,8 @@ func _build_bottom() -> HBoxContainer:
 	bottom.add_theme_constant_override("separation", BUTTON_GAP)
 	_slot_bar = MarketSlotBar.new()
 	_slot_bar.sell_pressed.connect(sell_pressed.emit)
+	_slot_bar.slot_hovered.connect(_on_slot_hovered)
+	_slot_bar.slot_unhovered.connect(_on_slot_unhovered)
 	bottom.add_child(_slot_bar)
 	_reroll = GrungeButton.create("")
 	_reroll.custom_minimum_size = REROLL_SIZE
@@ -236,6 +248,16 @@ func _on_card_pressed(index: int) -> void:
 		MarketFx.wobble(_cards[index])
 		_counter.pulse(UiPalette.BAD)
 	buy_pressed.emit(index)
+
+
+func _on_slot_hovered(slot: MarketSlot, id: StringName, tier: int) -> void:
+	if _tooltip != null:
+		_tooltip.show_for(slot, id, tier)
+
+
+func _on_slot_unhovered() -> void:
+	if _tooltip != null:
+		_tooltip.hide_tip()
 
 
 func _on_reroll_pressed() -> void:

@@ -2,6 +2,10 @@ class_name HudSlots
 extends HudGroup
 ## Sol alt: küçük silah yuvaları (amblem + kademe çizgileri), soluk. Yalnız silahlar değişince yeniden çizilir.
 
+## Silah ipucu (FEATURE_WEAPON_TOOLTIP): fare dolu yuvaya girince / çıkınca.
+signal slot_hovered(cell: Control, id: StringName, tier: int)
+signal slot_unhovered
+
 const SLOT_SIZE: float = 42.0
 const SLOT_GAP: int = 5
 const FADE: float = 0.62
@@ -23,6 +27,15 @@ func _init() -> void:
 		cell.custom_minimum_size = Vector2(SLOT_SIZE, SLOT_SIZE)
 		row.add_child(cell)
 		_cells.append(cell)
+		if Tuning.FEATURE_WEAPON_TOOLTIP:
+			cell.mouse_filter = Control.MOUSE_FILTER_STOP
+			cell.mouse_entered.connect(hover_cell.bind(i))
+			cell.mouse_exited.connect(slot_unhovered.emit)
+
+
+func hover_cell(index: int) -> void:
+	if index < _last.size():
+		slot_hovered.emit(_cells[index], _last[index]["id"], int(_last[index]["tier"]))
 
 
 ## list: [{id, tier}] (WeaponRig.slot_list). Aynıysa hiçbir şey yapmaz.
@@ -30,6 +43,7 @@ func set_slots(list: Array[Dictionary]) -> void:
 	if list == _last:
 		return
 	_last = list.duplicate(true)
+	slot_unhovered.emit()
 	for i: int in _cells.size():
 		if i < list.size():
 			_cells[i].set_weapon(list[i]["id"], int(list[i]["tier"]))

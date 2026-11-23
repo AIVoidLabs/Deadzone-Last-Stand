@@ -13,6 +13,10 @@ const FEATURE_SAVE: bool = true
 const FEATURE_NEW_CARDS: bool = true
 const FEATURE_NEW_SHOP: bool = true
 const FEATURE_NEW_HUD: bool = true
+## Mağaza kartında birleşme önizlemesi ("Hasar 10 → 15"); kapalıyken kart yeni kademenin tam sayılarını gösterir.
+const FEATURE_SHOP_MERGE_PREVIEW: bool = true
+## Silah yuvasına (mağaza + savaş HUD'ı) gelince istatistik ipucu paneli; kapalıyken yalnız ad ipucu.
+const FEATURE_WEAPON_TOOLTIP: bool = true
 const FEATURE_END_SUMMARY: bool = true
 const FEATURE_KEY_REBIND: bool = true
 const FEATURE_UI_MOTION: bool = true
