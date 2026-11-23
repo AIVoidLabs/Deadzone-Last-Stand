@@ -111,7 +111,7 @@ const TABLE: Dictionary = {
 	# Bıçak: çok hızlı, tek hedefe dürtme, kısa menzil.
 	&"knife": {
 		"id": &"knife", "name": "Bıçak", "price": 30,  # eski 35: 1. dalga sonu bir alım yetsin
-		"behavior": &"melee", "damage": 9.0, "fire_interval": 0.28, "max_range": 1.9,
+		"behavior": &"melee", "damage": 11.0, "fire_interval": 0.28, "max_range": 2.1,  # 11.4: 9/1.9 → 11/2.1, yakın dövüş kurulumu geride
 		"melee_arc_deg": 0.0, "melee_swing_time": 0.14, "knockback": 1.5,
 		"model": &"Knife", "model_scale": 2.0, "recoil": 0.0, "muzzle_offset": 0.0,
 		"sound": &"swing_light", "slash_color": Color(0.85, 0.9, 1.0),
@@ -119,17 +119,17 @@ const TABLE: Dictionary = {
 	},
 	# Katana: yay şeklinde savurma, önündeki herkese vurur.
 	&"katana": {
-		"id": &"katana", "name": "Katana", "price": 110,  # eski 90
-		"behavior": &"melee", "damage": 18.0, "fire_interval": 0.7, "max_range": 2.8,
+		"id": &"katana", "name": "Katana", "price": 90,  # 11.4: 110 → 90 (yakın dövüş kurulumu)
+		"behavior": &"melee", "damage": 22.0, "fire_interval": 0.7, "max_range": 3.0,  # 11.4: 18/2.8 → 22/3.0
 		"melee_arc_deg": 110.0, "melee_swing_time": 0.22, "knockback": 3.0,
 		"model": &"Katana", "model_scale": 1.3, "recoil": 0.0, "muzzle_offset": 0.0,
 		"sound": &"swing_medium", "slash_color": Color(0.9, 0.95, 1.0),
-		"weight": 0.7, "min_wave": 4,  # eski 3
+		"weight": 0.8, "min_wave": 3,  # 11.4: 4 → 3, ağırlık 0.7 → 0.8
 	},
 	# Işın kılıcı: geniş savurma, yüksek hasar, yakar.
 	&"lightsaber": {
 		"id": &"lightsaber", "name": "Işın Kılıcı", "price": 400,  # eski 240
-		"behavior": &"melee", "damage": 26.0, "fire_interval": 0.95, "max_range": 3.6,
+		"behavior": &"melee", "damage": 31.0, "fire_interval": 0.95, "max_range": 3.8,  # 11.4: 26/3.6 → 31/3.8
 		"melee_arc_deg": 200.0, "melee_swing_time": 0.3, "knockback": 5.0,
 		"burn_dps": 6.0, "burn_time": 2.0,
 		"model": &"Lightsaber", "model_scale": 1.3, "recoil": 0.0, "muzzle_offset": 0.0,
@@ -139,7 +139,7 @@ const TABLE: Dictionary = {
 	# Ateşli kılıç: orta yay, güçlü yanma.
 	&"flame_sword": {
 		"id": &"flame_sword", "name": "Ateşli Kılıç", "price": 300,  # eski 200
-		"behavior": &"melee", "damage": 20.0, "fire_interval": 0.8, "max_range": 3.0,
+		"behavior": &"melee", "damage": 24.0, "fire_interval": 0.8, "max_range": 3.2,  # 11.4: 20/3.0 → 24/3.2
 		"melee_arc_deg": 130.0, "melee_swing_time": 0.26, "knockback": 3.0,
 		"burn_dps": 10.0, "burn_time": 3.0,
 		"model": &"FlameSword", "model_scale": 1.3, "recoil": 0.0, "muzzle_offset": 0.0,

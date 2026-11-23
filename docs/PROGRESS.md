@@ -5,7 +5,14 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 
 ## Şu an
 
-**AŞAMA 9 BİTTİ (2026-11-23), Taha onayladı.** **AŞAMA 11 BAŞLADI (2026-11-23): içerik ve denge, hedef orta–zor, 10 dalga, ~30 eşya, 10 silah (DECISIONS 2026-11-23).** Başlangıç ölçümü (5 dalgalı oyun, bot 5 tur): 0/5 kazanma, 4× 4. dalgada, 1× 5. dalgada ölüm; 3→4. dalga sıçraması sert, 1. dalgada kristal yok. Sıra: 11.0 ölçüm aracı + 11.1 eşyalar (paralel) → 11.2 dalga eğrisi + 11.3 ekonomi → 11.4 üç kurulum.
+**AŞAMA 9 BİTTİ (2026-11-23), Taha onayladı.** **AŞAMA 11 (2026-11-23): denge ilk geçişi bitti, Taha'nın oynayıp yorumu bekleniyor.** Hedef orta–zor, 10 dalga, 30 eşya, 10 silah (DECISIONS 2026-11-23). Sonnet alt ajanlar + ayrı Opus gözden geçiren, sayılar ana döngüde botla ayarlandı.
+- 11.0 bot aracı: `autoplay_runs.ps1 -Strategy default|guns|melee|tank -Parallel N -Weapons 6`, SUMMARY (kazanma, ölüm dağılımı, dalga başına en düşük can), STUCK/CRASHED ayrı; bot para harcar (silah önce, birleştirme, yenileme).
+- 11.1 eşyalar 12 → 30 (yeni eşyalar ilk etkinin stat amblemini kullanır; kendi amblemleri sonra).
+- 11.2 10 dalga: türler kademeli (2 koşan, 3 zırhlı+sıçrayan, 4 tükürücü+şişkin, 5 tank, 6 dilci, 7 fırlatıcı+çığlıkçı, 10 boss); dalgaya göre zombi can/hasar çarpanı (`WaveScaling`, FEATURE_WAVE_ENEMY_SCALING; can ×1.0 → ×1.7, hasar ×1.0 → ×1.26).
+- 11.3 ekonomi: SHOP_PRICE_WAVE_GROWTH 0.11, geç silahlar pahalı ve geç açılır (plazma 7, bomba atar 8, ışın kılıcı 9. dalga).
+- 11.4 kurallar: zırh azalan yüzde (puan başı %3.5, FEATURE_ARMOR_PERCENT), eksi zırh en çok +%50 hasar, can tabanı 20, yenileme 0.2/puan; yakın dövüş silahları ~%20 hasar + menzil, katana 3. dalga/90.
+- Son bot ölçümü (6 yuva, 12–16 tur): silah %25–44, tank %33–44, yakın dövüş %6, dağınık alışveriş %0; ölümler çoğunlukla 7. dalgada (ort. 6.6/10). 16 turda bile ±%20 oynuyor. Yakın dövüş botu kaçarak oynadığı için yakın dövüşü olduğundan zayıf ölçüyor olabilir → Taha'nın testi belirleyici.
+- Açık: Opus gözden geçirmede kalan düşükler (bot yenileme sınırı 20, `Emblems.has` önbelleksiz); boss ve patlamanın zombilere hasarı ölçeklenmiyor.
 
 **Aşama 10 tümden iptal (Taha, 2026-11-23): kalıcı ilerleme yok; ölünce her tur baştan, ilk seviye ve ilk silahla.**  Gamepad kapsam dışı (Taha, 2026-11-22). Oyun artık ana menüyle açılır (`FEATURE_MAIN_MENU`; `--capture/--bench/--autoplay/--arena` ve elle oynama bayrakları menüyü atlar, kullanıcı ayarlarını okumaz). 412 test.
 - Görsel dil: "kanlı afiş" (referans Taha'nın kart görseli; çizimleri kopyalanmadı). UI kiti `scripts/ui/kit/` (GrungeCard/Button/Panel/Title, ScreenBackdrop, GrungeBar, ayar satırları), shader'lar `assets/shaders/ui/`, dokular `tools/blender/ui_textures.py`, yazı tipi Inter (OFL). 48 amblem Blender'da çizgi roman mürekkep hattıyla (`tools/blender/ui_ink.py`, `ui_emblems_*.py`).
