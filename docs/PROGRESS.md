@@ -6,6 +6,14 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 ## Şu an
 
 **AŞAMA 9 BİTTİ (2026-11-23), Taha onayladı.** **AŞAMA 11 — Taha'nın ilk oyun geri bildirimi (2026-11-23): oynanış beğenildi, oyun hâlâ basit. Plan aşağıda; geliştirme yeni oturumda başlar.**
+**11.5 geri bildirim A–E YAPILDI (2026-11-23, 63ed8aa…8d7aa25), Taha'nın oyun testi bekleniyor; F (boss) seçimi bekleniyor.** Kararlar: takla bekleme 8.0 sn, dokunulmazlık yalnız ilk 0.15 sn; kristal yürüyen %50 / özel %80 / boss her zaman; dalga 60→96 sn (savaş ~13 dk). 464 test.
+- A: DASH_COOLDOWN 8.0, FEATURE_DASH_EARLY_IFRAMES (geç pencerede dilci bağlarsa takla kesilir), MOVE_SPEED_BONUS_CAP +%50, kart/eşya kazançları ~yarı (10+ eksiler ×0.75), kademe hasar 1/1.32/1.76/2.4, hız 1/1.08/1.16/1.25.
+- B: XP 1.5×(L+3)^2.2, FEATURE_DROP_CHANCE, FEATURE_WAVE_END_NO_AUTOCOLLECT (yerde kalan yeni dalgada silinir, askere uçanlar sayılır, son dalgada hepsi toplanır), SHOP_PRICE_MULT 1.3 + büyüme 0.15, FEATURE_SHOP_REROLL_EXP 5→25→125.
+- C: FEATURE_ACID_POOL_SLOW_BURN (%40 yavaş, çıkışta 0.5 sn 6 dps), koşucu +%20 hız / −%30 bekleme, FEATURE_JUMPER_CHAIN (2–3 zıplama, 0.4 sn ara), dilci bekleme −%35.
+- D: dalga 60→96 sn, ilk dalgalar ~1.7× yoğun, can ×1.15→×2.1, hasar ×1.1→×1.5, boss spawn 20 sn.
+- E: FEATURE_SHOP_MERGE_PREVIEW (kartta "Hasar 8 → 11, Atış hızı +%8"), FEATURE_WEAPON_TOOLTIP (mağaza + HUD yuvasında fare ipucu); görüntü aracına --ui-hover-slot=N.
+- Opus gözden geçirme: 4 önemli + 6 düşük bulgu düzeltildi (8d7aa25). Açık: satış iadesi dalga zammını içermez; zincirleme birleşmede önizleme yalnız son kademeyi gösterir; savaşta HUD ipucu gerçek oyunda denenmedi.
+
 Çalışma biçimi (Taha): uzun bot ölçüm döngüleri YOK; oyunu Taha test eder. Ana döngü yalnız GUT + headless kontrol + (UI için) ekran görüntüsü yapar. Gruplar Sonnet alt ajanlara, ayrı git worktree'lerinde paralel (`tuning.gd` çakışmasın diye her grup kendi bölümüne yazar); ana döngü birleştirir, ayrı Opus gözden geçirir, commit eder.
 
 | Grup | Taha maddeleri | Kapsam | Ana dosyalar |

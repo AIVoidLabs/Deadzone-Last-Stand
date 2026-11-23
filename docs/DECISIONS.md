@@ -2,6 +2,12 @@
 
 Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar verilince "Açık kararlar"dan çıkarılıp tarihli bölüme yazılır.
 
+## 2026-11-23 — Aşama 11 geri bildirim kararları (Taha)
+- Takla bekleme 8.0 sn (önerilen 3–3.5 yerine; teyit edildi: takla nadir acil durum hamlesi). Dokunulmazlık yalnız taklanın ilk ~0.15 sn'si.
+- Kristal düşme: yürüyen %50, özel zombiler %80, boss her zaman (yağmur).
+- Tur süresi: dalga ~1–1.5 dk, koşu ~12–15 dk.
+- F (boss): üç seçenek sunuldu (kusmuk yağmuru / zincir hücum + yarık / parçalanma evresi; öneri 1+2); Taha'nın seçimi bekleniyor.
+
 ## 2026-11-22 — Aşama 9 arayüz (Taha)
 
 - Gamepad yapılmaz (titreşim ayarı da yok); yalnız klavye+fare. `FEATURE_GAMEPAD` kaldırıldı.
