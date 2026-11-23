@@ -9,6 +9,9 @@ const TEXT_COLOR: Color = Color(1.0, 0.22, 0.16)
 ## Yazı ekran yüksekliğinin bu oranında (HUD dalga yazısının üstünde).
 const TOP_RATIO: float = 0.14
 const LAYER_INDEX: int = 2
+## Yeni HUD'da yazı biraz aşağıda (dalga saatinin ve boss çubuğunun yerini kesmesin).
+const NEW_TOP_RATIO: float = 0.2
+const NEW_COLOR: Color = Color("D01A22")
 ## Nabız hızı (Hz) ve kenar kızarmasının en yüksek gücü.
 const PULSE_HZ: float = 1.5
 const MAX_STRENGTH: float = 0.9
@@ -34,15 +37,20 @@ func _ready() -> void:
 	add_child(_rect)
 	_banner = WaveBanner.new()
 	add_child(_banner)
-	_banner.anchor_top = TOP_RATIO
-	_banner.anchor_bottom = TOP_RATIO
+	var ratio: float = NEW_TOP_RATIO if Tuning.FEATURE_NEW_HUD else TOP_RATIO
+	_banner.anchor_top = ratio
+	_banner.anchor_bottom = ratio
 	director.boss_warning.connect(_start)
 	set_process(false)
 
 
 func _start() -> void:
 	_left = Tuning.BOSS_WARNING_TIME
-	_banner.flash(TEXT, TEXT_COLOR, maxf(Tuning.BOSS_WARNING_TIME - 0.6, 0.1))
+	var hold: float = maxf(Tuning.BOSS_WARNING_TIME - 0.6, 0.1)
+	if Tuning.FEATURE_NEW_HUD:
+		_banner.flash(Loc.t(&"hud.boss_incoming", [Loc.enemy_name(EnemyDataBoss.ID)]), NEW_COLOR, hold)
+	else:
+		_banner.flash(TEXT, TEXT_COLOR, hold)
 	_rect.visible = true
 	set_process(true)
 

@@ -87,9 +87,7 @@ func _ready() -> void:
 		vignette.setup(player)
 		add_child(vignette)
 
-	var hud: Hud = Hud.new()
-	hud.setup(player, enemies, director, loot)
-	add_child(hud)
+	_add_hud(player, enemies, director, loot, weapons)
 	if Tuning.FEATURE_BOSS:
 		var boss_bar: BossBar = BossBar.new()
 		boss_bar.enemies = enemies
@@ -120,6 +118,8 @@ func _ready() -> void:
 
 	player.died.connect(GameFlow.game_over)
 	Quality.apply_to_viewport(get_viewport())
+	if Tuning.FEATURE_PAUSE_MENU:
+		PauseMenu.attach(self, player.stats, weapons, loot)
 
 	if OS.is_debug_build():
 		_add_debug_tools(player, enemies, projectiles, camera, weapons, director, pickups, loot)
@@ -138,6 +138,20 @@ func _ready() -> void:
 			bot.weapons = weapons
 			bot.shop = shop
 			add_child(bot)
+
+
+## Savaş HUD'ı (FEATURE_NEW_HUD, yoksa eski prototip) ve tur sonu ekranı (FEATURE_END_SUMMARY).
+func _add_hud(player: Player, enemies: EnemyManager, director: SpawnDirector, loot: RunLoot, weapons: WeaponRig) -> void:
+	if Tuning.FEATURE_NEW_HUD:
+		var battle: BattleHud = BattleHud.new()
+		battle.setup(player, enemies, director, loot, weapons)
+		add_child(battle)
+	else:
+		var hud: Hud = Hud.new()
+		hud.setup(player, enemies, director, loot)
+		add_child(hud)
+	if Tuning.FEATURE_END_SUMMARY:
+		EndScreen.install(self)
 
 
 ## Tur sayaçları ve tur sonu kaydı (HUD'dan önce eklenir; GameFlow.last_summary hazır olsun).

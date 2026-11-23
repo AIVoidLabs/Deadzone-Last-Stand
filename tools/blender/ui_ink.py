@@ -474,12 +474,14 @@ def render_passes(samples_color: int = 24) -> dict:
     sc = bpy.context.scene
     objs = meshes()
     originals = {o: list(o.data.materials) for o in objs}
+    emits = {o: _obj_emit(o) for o in objs}  # özgün malzemeler değişmeden önce oku
     out: dict = {}
 
     def swap(fn) -> None:
         for i, o in enumerate(objs):
+            nm_ = fn(i, o)  # önce hesapla: temizlenince özgün malzeme (ink_emit) kaybolur
             o.data.materials.clear()
-            o.data.materials.append(fn(i, o))
+            o.data.materials.append(nm_)
 
     def restore() -> None:
         for o, ms in originals.items():
@@ -517,7 +519,7 @@ def render_passes(samples_color: int = 24) -> dict:
     except AttributeError:
         pass
     sc.render.filter_size = 1.5
-    swap(lambda i, o: _mat_flat(_obj_emit(o)))
+    swap(lambda i, o: _mat_flat(emits[o]))
     out["emit"] = _render_exr(path("emit"))[..., :3]
     restore()
     return out
@@ -684,7 +686,8 @@ def ink(p: dict, seed: int = 1, bands: tuple = (0.17, 0.42, 0.72), levels: tuple
         line_gain: float = 1.0, hatch: float = 1.0, grime: float = 1.0, blood: float = 1.0,
         contour: float = 1.0, rim: float = 1.0, glow: float = 1.0, saturation: float = 1.12,
         blood_spots: int = 3, shadow_tint: tuple = (0.12, 0.05, 0.08), warp_amp: float = 3.0,
-        tone: tuple = (1.0, 0.98, 0.94)) -> np.ndarray:
+        tone: tuple = (1.0, 0.98, 0.94), halo: float = 0.0, halo_color: tuple = (0.25, 0.55, 1.0),
+        soft_emit: bool = False) -> np.ndarray:
     """Pasaları çizgi roman afiş çizimine çevirir. Döner: (h, w, 4) float32 sRGB düz (premultiplied DEĞİL) RGBA."""
     rng = np.random.default_rng(seed)
     h, w = p["alpha"].shape
@@ -747,8 +750,8 @@ def ink(p: dict, seed: int = 1, bands: tuple = (0.17, 0.42, 0.72), levels: tuple
     if em_mask.max() > 0.01:
         em_col = lin_to_srgb(emit / np.maximum(emit.max(axis=2, keepdims=True), 1e-4))
         facing = np.clip(nrm[..., 2] * 2 - 1, 0, 1)
-        hot = em_col * (0.75 + 0.35 * facing[..., None])
-        core = smoothstep(0.62, 0.86, facing)[..., None] * 0.7
+        hot = em_col * (0.88 + 0.2 * facing[..., None])
+        core = smoothstep(0.25, 0.65, facing)[..., None] * 0.85
         hot = hot * (1 - core) + np.array([1.0, 0.97, 0.88], np.float32) * core
         rgb = rgb * (1 - em_mask[..., None]) + hot * em_mask[..., None]
 
@@ -831,7 +834,7 @@ def ink(p: dict, seed: int = 1, bands: tuple = (0.17, 0.42, 0.72), levels: tuple
                 cs.append((cx + math.cos(a) * dd, cy + math.sin(a) * dd))
                 rs.append(r * rng.uniform(0.05, 0.22))
         stamp_discs(bl, cs, rs, bn, 0.5)
-        bl = bl * (np.maximum(objm, box_blur(obj, sw(10), 1)) > 0.3)
+        bl = bl * (np.maximum(objm, box_blur(obj, sw(10), 1)) > 0.3) * (em_mask < 0.3)
         blood_col = np.array(BLOOD, np.float32) * (0.75 + 0.5 * mott[..., None])
         hi = smoothstep(0.55, 0.75, value_noise(h, w, sw(9), rng, 2))[..., None] * 0.35
         blood_col = np.clip(blood_col + np.array([0.5, 0.1, 0.1], np.float32) * hi, 0, 1)
@@ -839,6 +842,13 @@ def ink(p: dict, seed: int = 1, bands: tuple = (0.17, 0.42, 0.72), levels: tuple
         edge_bl = (dilate(bl, sw(2)) - bl) > 0.5
         lines = np.maximum(lines, edge_bl.astype(np.float32) * 0.8 * (bl.max() > 0))
 
+    # soft_emit: ışıyan nesnelerde mürekkep çizgisi/kontur yok (yalnız kabza gibi katı parçalarda)
+    if os.environ.get('INK_DEBUG'):
+        print('EMDBG', float(em_mask.max()), float(emit.max()), soft_emit, halo)
+    if soft_emit and em_mask.max() > 0.01:
+        keep = 1.0 - np.clip(dilate((em_mask > 0.3).astype(np.float32), sw(18)), 0, 1)
+        lines = lines * keep
+        outline = outline * keep
     # --- birleştirme
     ink_col = np.array(INK, np.float32)
     line_all = np.clip(np.maximum(lines, outline), 0, 1)
@@ -854,6 +864,12 @@ def ink(p: dict, seed: int = 1, bands: tuple = (0.17, 0.42, 0.72), levels: tuple
         pre_g = gl_col * gl_a[..., None]
         pre = pre + pre_g * (1 - a_out[..., None])
         a_out = a_out + gl_a * (1 - a_out)
+    if halo > 0 and em_mask.max() > 0.01:
+        hm = box_blur(dilate((em_mask > 0.3).astype(np.float32), sw(6)), sw(80), 2)
+        halo_a = np.clip(hm * 2.2 * halo, 0, 0.7) * (1 - a_out)
+        hc = np.array(halo_color, np.float32)
+        pre = pre + hc * halo_a[..., None]
+        a_out = a_out + halo_a
     a_final = np.clip(a_out, 0, 1)
     straight = np.where(a_final[..., None] > 1e-4, pre / np.maximum(a_final[..., None], 1e-4), 0.0)
     return np.dstack([np.clip(straight, 0, 1), a_final]).astype(np.float32)

@@ -16,12 +16,12 @@ const BAD: Color = Color("FF5A48")
 
 ## Kart kategorileri: hot = parlak ateş, deep = koyu ateş, band = başlık şeridi tonu.
 const CATEGORIES: Dictionary = {
-	&"combat": {"hot": Color("E0241B"), "deep": Color("4A0608"), "band": Color("7C120E")},
-	&"survival": {"hot": Color("FF8A1E"), "deep": Color("7A1E06"), "band": Color("7A3208")},
-	&"motion": {"hot": Color("5FA8E6"), "deep": Color("12325C"), "band": Color("1E4D84")},
-	&"loot": {"hot": Color("E0B43A"), "deep": Color("4A3A08"), "band": Color("5A4610")},
-	&"weapon": {"hot": Color("A8402F"), "deep": Color("2C1613"), "band": Color("4A1F1A")},
-	&"menu": {"hot": Color("FF4A1C"), "deep": Color("4A1206"), "band": Color("8A2A0C")},
+	&"combat": {"hot": Color("C52018"), "deep": Color("4A0608"), "band": Color("A5251C")},
+	&"survival": {"hot": Color("E0701A"), "deep": Color("661A06"), "band": Color("A8501A")},
+	&"motion": {"hot": Color("4A7FB5"), "deep": Color("0F2848"), "band": Color("2B5A94")},
+	&"loot": {"hot": Color("B8832A"), "deep": Color("3A2308"), "band": Color("7D6420")},
+	&"weapon": {"hot": Color("8A3430"), "deep": Color("241210"), "band": Color("6E2A2A")},
+	&"menu": {"hot": Color("FF4A1C"), "deep": Color("4A1206"), "band": Color("B8340F")},
 }
 const DEFAULT_CATEGORY: StringName = &"weapon"
 

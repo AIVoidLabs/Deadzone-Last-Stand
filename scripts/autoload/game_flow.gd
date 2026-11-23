@@ -94,6 +94,9 @@ func pause() -> void:
 
 
 func resume() -> void:
+	# Sahne geçişi sürerken devam ettirme: dünya geçiş bitene dek duraklı kalır.
+	if _transitioning:
+		return
 	_set_reason(REASON_PAUSE, false)
 
 

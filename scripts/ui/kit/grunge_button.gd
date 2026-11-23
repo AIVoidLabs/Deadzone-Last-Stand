@@ -68,7 +68,7 @@ func _apply_variant() -> void:
 		return
 	var v: Dictionary = VARIANTS.get(variant, VARIANTS[&"normal"])
 	custom_minimum_size = v["size"]
-	add_theme_font_override("font", UiFonts.heading())
+	add_theme_font_override("font", UiFonts.tight(v["font"]))
 	add_theme_font_size_override("font_size", v["font"])
 	var bm: ShaderMaterial = _base.material
 	bm.set_shader_parameter("tint", v["base"])

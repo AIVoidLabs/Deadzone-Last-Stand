@@ -34,6 +34,30 @@ def surf_y(ellipsoids: list, x: float, z: float) -> float:
     return best
 
 
+
+def ribbon(k: U.Kit, pts: list, width: float, thick: float, m: str, y: float = 0.0, pointy: float = 0.8) -> object:
+    """Yassı, sivri uçlu şerit (kâğıt kesimi alev): XZ düzleminde yol, y'de ince kalınlık."""
+    n = len(pts)
+    verts: list = []
+    faces: list = []
+    for i, (x, z) in enumerate(pts):
+        a = pts[max(0, i - 1)]
+        b = pts[min(n - 1, i + 1)]
+        dx, dz = b[0] - a[0], b[1] - a[1]
+        ln = math.hypot(dx, dz) or 1.0
+        nx, nz = -dz / ln, dx / ln
+        t = i / (n - 1)
+        w = width * (0.55 + 0.45 * math.sin(math.pi * min(1.0, t * 1.6))) * (1.0 - t) ** pointy
+        for (sgn, yy) in ((1, -thick), (-1, -thick), (-1, thick), (1, thick)):
+            verts.append((x + nx * w * sgn, y + yy, z + nz * w * sgn))
+        if i > 0:
+            p, q = (i - 1) * 4, i * 4
+            for j in range(4):
+                faces.append((p + j, q + j, q + (j + 1) % 4, p + (j + 1) % 4))
+    faces += [(0, 1, 2, 3), (4 * n - 1, 4 * n - 2, 4 * n - 3, 4 * n - 4)]
+    return k.mesh(verts, faces, m)
+
+
 # ------------------------------------------------------------------------------------------ max_hp
 
 HEART: list = [((-0.22, 0.0, 0.20), (0.34, 0.30, 0.30)), ((0.20, 0.0, 0.22), (0.32, 0.29, 0.29)),
@@ -42,27 +66,45 @@ HEART: list = [((-0.22, 0.0, 0.20), (0.34, 0.30, 0.30)), ((0.20, 0.0, 0.22), (0.
 
 
 def stat_max_hp(k: U.Kit) -> dict:
+    k.m["flesh"] = U.mat("flesh2", (0.50, 0.05, 0.07), 0.25)
+    before = {o.name for o in U.meshes()}
     k.blob([(c, r, False) for c, r in HEART], "flesh", 0.022)
-    # ana damarlar
-    k.tube([(0.04, 0.02, 0.28), (0.07, 0.0, 0.62), (-0.10, 0.0, 0.84), (-0.34, 0.0, 0.70)], 0.095, "flesh", 0.85)
-    k.tube([(-0.12, -0.08, 0.30), (-0.26, -0.12, 0.62), (-0.42, -0.10, 0.78)], 0.07, "navy", 0.9)
-    k.tube([(0.26, 0.0, 0.34), (0.40, 0.02, 0.62), (0.34, 0.0, 0.88)], 0.075, "vein", 0.9)
-    k.ball((0.0, 0.0, 0.55), (0.14, 0.12, 0.08), "fat")
-    # yüzeydeki koroner damarlar
-    for pts in ([(-0.02, 0.38), (-0.10, 0.16), (-0.12, -0.10), (-0.06, -0.32), (0.0, -0.52)],
-                [(0.20, 0.42), (0.26, 0.20), (0.22, -0.04), (0.12, -0.24)],
-                [(-0.10, 0.16), (-0.30, 0.20), (-0.44, 0.06)],
-                [(-0.12, -0.10), (-0.34, -0.12), (-0.42, -0.28)]):
-        k.tube([(x, surf_y(HEART, x, z) - 0.012, z) for x, z in pts], 0.020, "vein", 0.8, 6)
-    # dikişli yarık: yüzeyde çapraz
-    p0, p1 = (0.18, 0.02), (-0.04, -0.34)
+    # kaslı yüzey: tepeden uca inen koyu kas lifleri
+    for fx in (-0.36, -0.2, -0.04, 0.12, 0.28):
+        pts = []
+        for i in range(8):
+            t = i / 7
+            x = fx * (1 - t * 0.8) - 0.06 * t
+            z = 0.42 - t * 0.95
+            pts.append((x, surf_y(HEART, x, z) - 0.012, z))
+        k.tube(pts, 0.014, "vein", 0.6, 6)
+    # sağ/sol kulakçık ve yağ
+    k.ball((0.40, -0.02, 0.30), (0.16, 0.15, 0.20), "flesh")
+    k.ball((-0.40, -0.04, 0.34), (0.14, 0.13, 0.17), "vein")
+    k.ball((0.0, -0.12, 0.50), (0.18, 0.10, 0.07), "fat")
+    # aort kavsi + dallar, akciğer atardamarı, ana toplardamar
+    k.tube([(-0.02, 0.02, 0.35), (-0.02, 0.0, 0.70), (-0.18, 0.0, 0.92), (-0.42, 0.0, 0.78), (-0.48, 0.0, 0.50)], 0.10, "flesh", 0.8)
+    for (x0, z0, x1, z1) in ((-0.10, 0.88, -0.05, 1.15), (-0.20, 0.92, -0.28, 1.12), (-0.30, 0.88, -0.45, 1.05)):
+        k.tube([(x0, 0.0, z0), ((x0 + x1) / 2, 0.0, (z0 + z1) / 2 + 0.03), (x1, 0.0, z1)], 0.032, "flesh", 0.7)
+    k.tube([(-0.10, -0.12, 0.38), (-0.25, -0.16, 0.68), (-0.5, -0.1, 0.84)], 0.07, "navy", 0.9)
+    k.tube([(0.40, 0.0, 0.40), (0.46, 0.02, 0.75), (0.40, 0.0, 1.0)], 0.075, "vein", 0.95)
+    for (x0, z0, x1, z1) in ((0.44, 0.90, 0.62, 1.05), (0.42, 0.95, 0.30, 1.12)):
+        k.tube([(x0, 0.0, z0), (x1, 0.0, z1)], 0.025, "vein", 0.6)
+    # koroner damar ağacı
+    for pts in ([(-0.02, 0.38), (-0.10, 0.16), (-0.14, -0.10), (-0.10, -0.32), (-0.04, -0.52)],
+                [(0.20, 0.40), (0.26, 0.20), (0.22, -0.04), (0.12, -0.26)],
+                [(-0.10, 0.16), (-0.32, 0.20), (-0.46, 0.04)], [(-0.14, -0.10), (-0.36, -0.14), (-0.44, -0.30)],
+                [(0.26, 0.20), (0.44, 0.10)], [(0.22, -0.04), (0.38, -0.16)]):
+        k.tube([(x, surf_y(HEART, x, z) - 0.012, z) for x, z in pts], 0.020, "navy" if pts[0][0] > 0.1 else "vein", 0.7, 6)
+    # dikişli yarık + zımbalar
+    p0, p1 = (0.14, 0.12), (-0.02, -0.30)
     n = 9
     path = []
     for i in range(n):
         t = i / (n - 1)
         x, z = p0[0] + (p1[0] - p0[0]) * t, p0[1] + (p1[1] - p0[1]) * t
         path.append((x + 0.012 * math.sin(i * 2.0), surf_y(HEART, x, z) - 0.02, z))
-    k.tube(path, 0.026, "dark", 1.0, 8)
+    k.tube(path, 0.028, "dark", 1.0, 8)
     ang = -math.degrees(math.atan2(p1[1] - p0[1], p1[0] - p0[0]))
     for i in range(1, n - 1):
         x, y, z = path[i]
@@ -73,11 +115,11 @@ def stat_max_hp(k: U.Kit) -> dict:
                 dx = math.cos(math.radians(-ang - 90)) * 0.08 * sgn
                 dz = -math.sin(math.radians(-ang - 90)) * 0.08 * sgn
                 k.bx((x + dx, y - 0.032, z + dz), (0.012, 0.030, 0.012), "steel", bev=0.002)
-    # damlayan kan
-    for (x, z, s) in ((0.10, -0.44, 1.0), (-0.12, -0.56, 0.7), (0.20, -0.30, 0.5)):
-        k.ball((x, surf_y(HEART, x, z) - 0.02, z - 0.14 * s), (0.04 * s, 0.04 * s, 0.07 * s), "flesh")
-    return dict(az=-14, el=10, lens=55, roll=-6, fill=0.9)
-
+    for (x, z, s) in ((0.06, -0.50, 1.0), (-0.16, -0.58, 0.7), (0.20, -0.34, 0.55), (-0.30, -0.45, 0.5)):
+        k.ball((x, surf_y(HEART, x, z) - 0.02, z - 0.16 * s), (0.04 * s, 0.04 * s, 0.075 * s), "glowred")
+    objs = [o for o in U.meshes() if o.name not in before]
+    U.group_transform(objs, (0, 0, 0), (0, 22, 0), 1.0)
+    return dict(az=-10, el=10, lens=55, roll=0, fill=0.92)
 
 # ------------------------------------------------------------------------------------------ damage
 
@@ -87,52 +129,54 @@ HEAD: list = [((0.0, 0.0, 0.10), (0.44, 0.48, 0.52)), ((0.0, -0.12, -0.36), (0.3
 
 
 def stat_damage(k: U.Kit) -> dict:
-    elems = [(c, r, False) for c, r in HEAD]
-    elems += [((-0.17, -0.40, 0.04), (0.10, 0.10, 0.10), True), ((0.17, -0.40, 0.04), (0.10, 0.10, 0.10), True),
+    # sağ yarı çürük et, sol yarı kafatası
+    k.m["rot"] = U.mat("rot2", (0.40, 0.18, 0.20), 0.5)
+    flesh = [(c, r, False) for c, r in HEAD if c[0] >= -0.05]
+    flesh += [((0.0, 0.0, 0.10), (0.30, 0.46, 0.50), False), ((0.17, -0.40, 0.04), (0.10, 0.10, 0.10), True),
               ((0.0, -0.46, -0.12), (0.05, 0.08, 0.07), True)]
-    k.blob(elems, "skin", 0.022)
-    for sx in (-0.17, 0.17):
-        k.ball((sx, -0.35, 0.04), (0.075, 0.06, 0.075), "dark")
-        k.ball((sx, -0.40, 0.04), (0.035, 0.03, 0.035), "glowred" if sx > 0 else "ember")
-    # çürük kemik yamaları ve çene
-    k.ball((-0.26, -0.18, 0.48), (0.17, 0.10, 0.09), "bone", rot=(20, 0, 20))
-    k.ball((0.30, -0.14, 0.30), (0.10, 0.07, 0.12), "rot")
-    k.bx((0, -0.37, -0.36), (0.34, 0.07, 0.07), "dark", bev=0.01)
+    k.blob(flesh, "skin", 0.024)
+    bone = [((-0.20, 0.0, 0.12), (0.30, 0.47, 0.52), False), ((-0.14, -0.32, 0.14), (0.26, 0.14, 0.11), False),
+            ((-0.24, -0.20, -0.14), (0.15, 0.15, 0.15), False), ((-0.17, -0.40, 0.04), (0.11, 0.11, 0.11), True)]
+    k.blob(bone, "bone", 0.024)
+    # açık çene (aşağı sarkık) + dişler
+    k.blob([((0.0, -0.20, -0.62), (0.28, 0.26, 0.14), False), ((-0.18, -0.12, -0.52), (0.1, 0.12, 0.1), False),
+            ((0.18, -0.12, -0.52), (0.1, 0.12, 0.1), False)], "rot", 0.024)
+    k.bx((0.0, -0.40, -0.42), (0.30, 0.08, 0.16), "dark", bev=0.01)
     for i in range(7):
         x = -0.15 + i * 0.05
-        k.bx((x, -0.425, -0.31), (0.036, 0.04, 0.075), "bone", bev=0.006)
-        k.bx((x, -0.425, -0.42), (0.034, 0.04, 0.06), "bone", bev=0.006)
-    # delikler (yaralı rim + karanlık)
-    holes = [(-0.10, 0.36), (0.12, 0.30), (-0.30, 0.16), (0.30, 0.04), (0.00, 0.16), (-0.34, -0.14), (0.36, 0.34)]
-    for x, z in holes:
-        y = surf_y(HEAD, x, z)
-        k.tb((x, y - 0.004, z), 0.080, 0.03, "dark", axis="Y", segs=14)
-        k.ring((x, y - 0.012, z), 0.086, 0.022, "flesh", rot=(90, 0, 0))
-        for a in (30, 110, 200, 290):
-            ra = math.radians(a)
-            k.bx((x + math.cos(ra) * 0.10, y - 0.014, z + math.sin(ra) * 0.10), (0.10, 0.008, 0.010), "dark",
-                 rot=(0, -a, 0), bev=0.001)
-    # çıkan mermi (alından sağ-yukarı fırlıyor)
-    d = (1.0, 0.1, 0.9)
-    base = (0.36, -0.12, 0.50)
-    sc = 1.7
-    prof_j = [(0.0, 0.0), (0.085, 0.0), (0.088, 0.14), (0.078, 0.30), (0.05, 0.44), (0.0, 0.52)]
-    prof_c = [(0.0, -0.30), (0.095, -0.30), (0.100, -0.28), (0.092, -0.20), (0.088, 0.0)]
-    jacket = k.lathe([(r * sc, z * sc) for r, z in prof_j], (0, 0, 0), "copper", segs=24)
-    casing = k.lathe([(r * sc, z * sc) for r, z in prof_c], (0, 0, 0), "brass", segs=24)
-    groove = k.ring((0, 0, -0.26 * sc), 0.092 * sc, 0.012 * sc, "dark", rot=(0, 0, 0))
-    for o in (jacket, casing, groove):
-        aim(o, d)
-        o.location = base
-    # çıkış izleri: kemik ve kan parçaları, hız çizgileri
-    for i, (dx, dy, dz, m, s) in enumerate([(0.10, 0.1, 0.2, "bone", 0.05), (0.2, -0.1, 0.4, "flesh", 0.04),
-                                           (0.05, 0.2, 0.0, "flesh", 0.035), (0.3, 0.1, 0.1, "bone", 0.04),
-                                           (-0.05, 0.25, 0.3, "flesh", 0.03), (0.22, 0.0, 0.62, "flesh", 0.03)]):
-        k.bx((0.30 + dx, 0.20 + dy, 0.20 + dz), (s * 2, s, s * 1.4), m, rot=(30 * i, 20 * i, 10 * i), bev=0.004)
-    for off in (-0.1, 0.0, 0.1):
-        k.tube([(0.1 + off, 0.3, -0.1 + off), (0.45, 0.32, 0.12 + off), (0.62, 0.3, 0.2 + off)], 0.012, "white", 0.2, 6)
-    return dict(az=-36, el=12, lens=55, roll=-4, fill=0.92)
-
+        k.bx((x, -0.47, -0.34), (0.036, 0.04, 0.085), "bone", bev=0.006)
+        k.bx((x, -0.45, -0.50), (0.034, 0.04, 0.07), "bone", bev=0.006)
+        k.bx((x, -0.38, -0.50), (0.034, 0.04, 0.07), "bone", bev=0.006)
+    # gözler: sol boş yuva, sağ parlayan
+    k.ball((-0.18, -0.45, 0.04), (0.11, 0.07, 0.11), "dark")
+    k.ball((0.17, -0.43, 0.04), (0.085, 0.06, 0.085), "dark")
+    k.ball((0.17, -0.47, 0.04), (0.05, 0.04, 0.05), "glowred")
+    # alında tek kurşun deliği
+    hx, hz = 0.0, 0.38
+    hy = surf_y(HEAD, hx, hz)
+    k.tb((hx, hy - 0.004, hz), 0.085, 0.03, "dark", axis="Y", segs=16)
+    k.ring((hx, hy - 0.014, hz), 0.092, 0.024, "glowred", rot=(90, 0, 0))
+    for a in (20, 100, 190, 280, 330):
+        ra = math.radians(a)
+        k.bx((hx + math.cos(ra) * 0.15, hy - 0.016, hz + math.sin(ra) * 0.15), (0.14, 0.008, 0.012), "dark", rot=(0, -a, 0), bev=0.001)
+    # arkadan fışkıran kan ve kemik
+    for i, (dx, dy, dz, m, s) in enumerate([(0.1, 0.1, 0.2, "bone", 0.06), (0.3, 0.3, 0.45, "glowred", 0.05), (0.5, 0.15, 0.1, "bone", 0.05),
+                                           (0.2, 0.5, -0.1, "flesh", 0.06), (0.6, 0.35, 0.35, "flesh", 0.045), (0.0, 0.6, 0.5, "bone", 0.045)]):
+        k.bx((0.1 + dx, 0.42 + dy, 0.30 + dz), (s * 2, s * 1.4, s * 1.3), m, rot=(30 * i, 20 * i, 10 * i), bev=0.004)
+    for (a, r, ln) in ((0, 0.12, 0.9), (25, 0.08, 0.7), (-25, 0.09, 0.8), (50, 0.06, 0.6)):
+        sp = k.lathe([(0.0, 0.0), (r, 0.05), (r * 0.5, ln * 0.6), (0.0, ln)], (0, 0, 0), "flesh", segs=8)
+        aim(sp, (0.5 + 0.4 * math.sin(math.radians(a)), 1.0, 0.45 + 0.4 * math.cos(math.radians(a))))
+        sp.location = (0.08, 0.42, 0.32)
+    # yanda uçan mermi
+    sc = 1.5
+    for prof, m in (([(0.0, 0.0), (0.085, 0.0), (0.088, 0.14), (0.078, 0.30), (0.05, 0.44), (0.0, 0.52)], "copper"),
+                    ([(0.0, -0.30), (0.095, -0.30), (0.100, -0.28), (0.092, -0.20), (0.088, 0.0)], "brass")):
+        o = k.lathe([(r * sc, z * sc) for r, z in prof], (0, 0, 0), m, segs=24)
+        aim(o, (0.05, 1.0, 0.15))
+        o.location = (0.0, 1.25, 0.45)
+    for off in (-0.12, 0.0, 0.12):
+        k.tube([(off, 0.75, 0.40 + off), (off * 0.8, 1.0, 0.42 + off), (0.0, 1.15, 0.45 + off)], 0.012, "white", 0.2, 6)
+    return dict(az=-45, el=8, lens=52, roll=0, fill=0.92)
 
 # ------------------------------------------------------------------------------------------ fire_rate
 
@@ -146,28 +190,30 @@ def stat_fire_rate(k: U.Kit) -> dict:
     for i in range(6):
         a = math.radians(i * 60 + 10)
         x, z = math.cos(a) * 0.36, math.sin(a) * 0.36
-        k.tb((x, -0.60, z), 0.12, 1.1, "metal", axis="Y", segs=16)
-        k.tb((x, -0.90, z), 0.13, 0.50, "ember", axis="Y", segs=16)
-        k.tb((x, -1.18, z), 0.115, 0.06, "yellow", axis="Y", segs=16)
-        k.tb((x, -1.215, z), 0.065, 0.01, "dark", axis="Y", segs=12)
-    for y, r in ((-0.30, 0.60), (-0.62, 0.60), (-0.92, 0.57)):
+        k.tb((x, -0.50, z), 0.12, 0.85, "metal", axis="Y", segs=16)
+        k.tb((x, -0.95, z), 0.125, 0.40, "orange", axis="Y", segs=16)
+        k.tb((x, -1.17, z), 0.13, 0.28, "glowred", axis="Y", segs=16)
+        k.tb((x, -1.32, z), 0.14, 0.03, "ember", axis="Y", segs=16)
+        k.tb((x, -1.34, z), 0.07, 0.01, "dark", axis="Y", segs=12)
+    for y, r in ((-0.30, 0.60), (-0.62, 0.60), (-0.88, 0.57)):
         k.tb((0, y, 0), r, 0.08, "steel", axis="Y", segs=32)
         k.tb((0, y, 0), r + 0.015, 0.035, "dark", axis="Y", segs=32)
     k.tb((0, 0.0, 0), 0.14, 1.0, "dark", axis="Y", segs=12)
-    for i in range(9):
-        a = math.radians(i * 40)
-        ln = 0.9 if i % 2 == 0 else 0.55
-        sp = k.lathe([(0.0, 0.0), (0.09, 0.03), (0.0, ln)], (0, 0, 0), "yellow" if i % 2 == 0 else "ember", segs=6)
-        aim(sp, (0.55 * math.cos(a), -1.0, 0.55 * math.sin(a)))
-        sp.location = (0, -1.24, 0)
-    k.ball((0, -1.28, 0), (0.30, 0.14, 0.30), "yellow")
-    k.ball((0, -1.30, 0), (0.17, 0.10, 0.17), "white")
+    # yıldız biçimli namlu alevi
+    for i in range(12):
+        a = math.radians(i * 30)
+        ln = 1.1 if i % 2 == 0 else 0.65
+        sp = k.lathe([(0.0, 0.0), (0.10, 0.03), (0.0, ln)], (0, 0, 0), "yellow" if i % 2 == 0 else "ember", segs=6)
+        aim(sp, (0.8 * math.cos(a), -0.9, 0.8 * math.sin(a)))
+        sp.location = (0, -1.38, 0)
+    k.ball((0, -1.42, 0), (0.34, 0.12, 0.34), "yellow")
+    k.ball((0, -1.45, 0), (0.18, 0.09, 0.18), "white")
+    # sarı parlak kovanlar
     for i, (x, y, z, rx, rz) in enumerate([(0.95, 0.10, 0.95, 20, 30), (1.25, 0.45, 0.45, 70, 10), (0.80, 0.55, 1.45, 110, 40),
-                                          (1.45, -0.10, 1.2, 40, 70)]):
-        k.tb((x, y, z), 0.10, 0.34, "brass", axis="Y", rot=(rx, 0, rz), segs=12)
+                                          (1.45, -0.10, 1.2, 40, 70), (1.15, 0.25, 1.65, 80, 120)]):
+        k.tb((x, y, z), 0.10, 0.34, "yellow", axis="Y", rot=(rx, 0, rz), segs=12)
         k.tb((x, y, z), 0.08, 0.08, "dark", axis="Y", rot=(rx, 0, rz), segs=10)
     return dict(az=-62, el=18, lens=45, roll=10, fill=0.93)
-
 
 # ------------------------------------------------------------------------------------------ range
 
@@ -214,37 +260,40 @@ def stat_range(k: U.Kit) -> dict:
 # ------------------------------------------------------------------------------------------ move_speed
 
 def stat_move_speed(k: U.Kit) -> dict:
+    k.m["leather"] = U.mat("leather2", (0.55, 0.34, 0.18), 0.7)
+    k.m["dark"] = U.mat("dark2", (0.22, 0.22, 0.24), 0.55, 0.2)
     before = {o.name for o in U.meshes()}
     k.blob([((-0.05, 0.0, 0.05), (0.26, 0.20, 0.34), False), ((-0.32, 0.0, -0.28), (0.22, 0.19, 0.20), False),
             ((0.36, 0.0, -0.34), (0.38, 0.20, 0.17), False), ((-0.05, 0.0, 0.62), (0.26, 0.20, 0.40), False),
             ((0.08, 0.0, -0.20), (0.34, 0.19, 0.24), False)], "leather", 0.022)
-    k.bx((0.05, 0.0, -0.52), (1.20, 0.38, 0.11), "dark", bev=0.03)  # taban
+    k.bx((0.05, 0.0, -0.52), (1.20, 0.38, 0.11), "dark", bev=0.03)
     for i in range(7):
-        k.bx((-0.5 + i * 0.17, 0.0, -0.595), (0.09, 0.40, 0.07), "metal", bev=0.012)  # tırnaklar
-    k.bx((-0.45, 0.0, -0.40), (0.30, 0.38, 0.17), "metal", bev=0.02)  # topuk
-    k.bx((0.60, 0.0, -0.31), (0.34, 0.37, 0.24), "steel", rot=(0, 18, 0), bev=0.03)  # burun zırhı
+        k.bx((-0.5 + i * 0.17, 0.0, -0.595), (0.09, 0.40, 0.07), "metal", bev=0.012)
+    k.bx((-0.45, 0.0, -0.40), (0.30, 0.38, 0.17), "metal", bev=0.02)
+    k.bx((0.60, 0.0, -0.31), (0.34, 0.37, 0.24), "steel", rot=(0, 18, 0), bev=0.03)
     k.bx((0.38, 0.0, -0.18), (0.40, 0.37, 0.07), "steel", rot=(0, 32, 0), bev=0.02)
-    k.bx((0.22, -0.20, 0.10), (0.22, 0.04, 0.46), "steel", rot=(0, -12, 0), bev=0.015)  # ayak üstü plaka çizgisi yok -> yan
     k.bx((0.22, -0.205, -0.05), (0.62, 0.035, 0.20), "steel", rot=(0, 18, 0), bev=0.015)
-    k.bx((0.12, 0.0, 0.62), (0.40, 0.42, 0.46), "steel", rot=(0, -6, 0), bev=0.03)  # kaval zırhı
+    k.bx((0.12, 0.0, 0.62), (0.40, 0.42, 0.46), "steel", rot=(0, -6, 0), bev=0.03)
     k.bx((0.12, -0.22, 0.62), (0.34, 0.03, 0.12), "orange", rot=(0, -6, 0), bev=0.006)
-    k.bx((-0.20, 0.0, 0.82), (0.16, 0.44, 0.34), "metal", bev=0.02)  # arka plaka
+    k.bx((-0.20, 0.0, 0.82), (0.16, 0.44, 0.34), "metal", bev=0.02)
     for z in (0.18, 0.50, 0.82):
         k.bx((-0.05, 0.0, z), (0.56, 0.44, 0.07), "leather", bev=0.01)
         k.bx((0.18, -0.225, z), (0.09, 0.03, 0.10), "gold", bev=0.006)
-    for (x, z) in ((0.70, -0.30), (0.56, -0.38), (0.30, 0.30), (0.06, 0.52), (0.04, 0.78)):
-        k.ball((x, -0.22, z), (0.03, 0.025, 0.03), "steel")
     objs = [o for o in U.meshes() if o.name not in before]
-    U.group_transform(objs, (0, 0, 0), (0, 24, 0), 1.0)  # koşu eğimi: burun aşağı
-    # toz bulutu ve kıvılcım
-    for (x, z, r) in ((-0.95, -0.70, 0.30), (-1.35, -0.62, 0.42), (-1.0, -0.30, 0.28), (-1.75, -0.40, 0.30)):
-        k.ball((x, 0.10, z), (r * 1.2, r * 0.8, r * 0.9), "dust")
-    for i, (x, z) in enumerate([(-0.55, -0.82), (-0.75, -0.40), (-0.45, -0.95), (-0.95, -0.15), (-0.62, -0.60)]):
-        k.bx((x, -0.20, z), (0.14, 0.02, 0.025), "yellow" if i % 2 else "ember", rot=(0, -25 - 12 * i, 0), bev=0.002)
-    for z, ln in ((0.9, 0.9), (0.55, 1.2), (0.2, 0.8)):
-        k.bx((-1.4, 0.2, z), (ln, 0.02, 0.025), "bone", bev=0.002)
-    return dict(az=-6, el=6, lens=55, roll=-4, fill=0.92)
-
+    U.group_transform(objs, (0, 0, 0), (0, 24, 0), 1.0)
+    # topuktan geriye 3 kalın turuncu alev şeridi (eğri, sivri)
+    for (dz, bend, ym) in ((0.12, 0.30, "ember"), (-0.10, 0.10, "ember"), (-0.34, -0.12, "ember")):
+        path = []
+        for i in range(14):
+            t = i / 13
+            path.append((-0.66 - t * 1.25, -0.16 + dz - t * 0.20 + bend * math.sin(t * math.pi) * 0.8))
+        ribbon(k, path, 0.15, 0.02, ym, y=-0.12)
+        ribbon(k, path[:10], 0.07, 0.02, "yellow", y=-0.16)
+    # altta köşeli asfalt parçaları
+    for (x, z, r, sg, rx, ry) in ((0.10, -1.12, 0.34, 5, 14, 8), (0.72, -1.22, 0.16, 4, 20, 30), (-0.42, -1.30, 0.14, 5, 25, 60)):
+        k.tb((x, -0.05, z), r, 0.14, "dark", axis="Z", rot=(rx, ry, 20), segs=sg, bev=0.01)
+        k.tb((x, -0.05, z + 0.075), r * 0.9, 0.025, "metal", axis="Z", rot=(rx, ry, 20), segs=sg)
+    return dict(az=-4, el=4, lens=55, roll=0, fill=0.94)
 
 # ------------------------------------------------------------------------------------------ armor
 
@@ -500,49 +549,34 @@ def stat_dash_cooldown(k: U.Kit) -> dict:
 # ------------------------------------------------------------------------------------------ dash_distance
 
 def stat_dash_distance(k: U.Kit) -> dict:
-    before = {o.name for o in U.meshes()}
-    # ayak: kalın taban, burun zırhı
-    k.bx((0.50, 0.0, -0.62), (1.10, 0.60, 0.16), "dark", bev=0.04)
-    for i in range(6):
-        k.bx((0.05 + i * 0.19, 0.0, -0.72), (0.10, 0.62, 0.06), "metal", bev=0.012)
-    k.bx((0.78, 0.0, -0.42), (0.52, 0.56, 0.30), "steel", rot=(0, 14, 0), bev=0.04)
-    k.bx((0.40, 0.0, -0.40), (0.62, 0.52, 0.28), "navy", bev=0.04)
-    k.bx((0.02, 0.0, -0.46), (0.30, 0.52, 0.34), "metal", bev=0.04)
-    # kaval zırhı: geniş, turuncu şeritli
-    k.bx((0.18, 0.0, 0.10), (0.55, 0.56, 1.05), "steel", rot=(0, -12, 0), bev=0.05)
-    k.bx((0.42, -0.29, 0.10), (0.10, 0.03, 0.90), "orange", rot=(0, -12, 0), bev=0.006)
-    k.bx((0.30, -0.29, -0.15), (0.34, 0.03, 0.10), "dark", rot=(0, -12, 0), bev=0.006)
-    # diz mafsalı
-    k.tb((-0.06, 0.0, 0.74), 0.34, 0.66, "metal", axis="Y", segs=28)
-    k.tb((-0.06, -0.34, 0.74), 0.17, 0.05, "steel", axis="Y", segs=20)
-    k.tb((-0.06, -0.37, 0.74), 0.06, 0.03, "orange", axis="Y", segs=12)
-    # yaylı piston (kalın bobin)
-    pts = []
-    n, turns = 80, 6
-    for i in range(n):
-        t = i / (n - 1)
-        a = t * turns * 2 * math.pi
-        pts.append((-0.46 + math.cos(a) * 0.14, math.sin(a) * 0.14, 0.62 - t * 1.05))
-    k.tube(pts, 0.035, "steel", 1.0, 8)
-    k.tb((-0.46, 0.0, 0.1), 0.06, 1.15, "dark", axis="Z", segs=12)
-    k.tb((-0.46, 0.0, 0.72), 0.16, 0.14, "metal", axis="Z", segs=18)
-    k.tb((-0.46, 0.0, -0.50), 0.16, 0.14, "metal", axis="Z", segs=18)
-    # roket itici
-    k.tb((-0.34, 0.0, -0.36), 0.22, 0.34, "dark", axis="X", segs=24)
-    k.tb((-0.58, 0.0, -0.36), 0.32, 0.22, "metal", axis="X", segs=24, r2=0.22)
-    k.tb((-0.71, 0.0, -0.36), 0.33, 0.05, "ember", axis="X", segs=24)
-    objs = [o for o in U.meshes() if o.name not in before]
-    U.group_transform(objs, (0, 0, 0), (0, -8, 0), 1.0)
-    # alev: üç dilli, dalgalı
-    flame = [(0.0, 0.0), (0.30, 0.05), (0.40, 0.25), (0.24, 0.5), (0.30, 0.78), (0.14, 1.05), (0.17, 1.3), (0.0, 1.75)]
-    for (dy, dz, rz, sc, m) in ((0.0, -0.36, 0, 1.0, "ember"), (0.03, -0.36, 0, 0.72, "yellow"), (0.0, -0.36, 0, 0.42, "white"),
-                                (0.0, -0.20, 14, 0.5, "ember"), (0.0, -0.52, -14, 0.5, "ember")):
-        k.lathe([(r * sc, z * sc) for r, z in flame], (-0.82, dy, dz), m, rot=(0, -90 + rz, 0), segs=14)
-    for i, (x, z) in enumerate([(-2.1, -0.65), (-2.3, -0.1), (-1.9, 0.12), (-2.5, -0.35), (-1.6, -0.85)]):
-        k.bx((x, 0.0, z), (0.10, 0.03, 0.03), "yellow" if i % 2 else "ember", rot=(0, 20 * i, 0), bev=0.002)
-    for z, ln in ((0.75, 1.1), (1.05, 0.8), (0.45, 0.9)):
-        k.bx((-1.2 - ln * 0.5, 0.35, z), (ln, 0.02, 0.03), "bone", bev=0.002)
-    return dict(az=-26, el=12, lens=55, roll=-2, fill=0.93)
+    k.m["steel"] = U.mat("steel2", (0.66, 0.72, 0.82), 0.3, 0.4)
+    k.m["navy"] = U.mat("navy2", (0.34, 0.42, 0.56), 0.45, 0.2)
+    # sırt roketi: zırhlı plaka + iki silindir + nozul + katmanlı alev
+    k.bx((0.0, 0.10, 0.0), (1.00, 0.22, 1.30), "navy", bev=0.04)
+    k.bx((0.0, 0.10, 0.62), (1.00, 0.24, 0.10), "metal", bev=0.02)
+    for sx in (-1, 1):
+        x = 0.38 * sx
+        k.tb((x, -0.20, 0.0), 0.28, 1.35, "steel", axis="Z", segs=32)
+        for z in (0.45, -0.05, -0.50):
+            k.tb((x, -0.20, z), 0.295, 0.14, "orange", axis="Z", segs=32)
+        k.tb((x, -0.20, 0.72), 0.30, 0.08, "dark", axis="Z", segs=32)
+        k.ball((x, -0.20, 0.78), (0.24, 0.24, 0.12), "metal")
+        k.tb((x, -0.20, -0.80), 0.24, 0.30, "metal", axis="Z", segs=32, r2=0.32)
+        k.tb((x, -0.20, -0.96), 0.33, 0.05, "ember", axis="Z", segs=32)
+        k.tb((x, -0.20, -0.98), 0.20, 0.03, "dark", axis="Z", segs=24)
+        for z in (0.2, -0.3):
+            k.bx((x, -0.49, z), (0.10, 0.02, 0.10), "gold", bev=0.004)
+    for sx in (-1, 1):
+        k.bx((0.18 * sx, -0.20, 0.0), (0.08, 0.50, 1.15), "leather", bev=0.01)
+    k.bx((0.0, -0.46, 0.15), (0.34, 0.04, 0.12), "dark", bev=0.006)
+    for (xx, ph) in ((-0.38, 0.0), (0.38, 1.8)):
+        for (wd, ln, m, yo) in ((0.26, 1.7, "ember", 0.0), (0.17, 1.3, "yellow", -0.03), (0.08, 0.85, "white", -0.06)):
+            path = []
+            for i in range(16):
+                t = i / 15
+                path.append((xx + 0.09 * math.sin(t * 7.0 + ph) * (0.4 + t), -1.02 - t * ln))
+            ribbon(k, path, wd, 0.015, m, y=-0.20 + yo, pointy=0.7)
+    return dict(az=-18, el=6, lens=55, roll=0, fill=0.93)
 
 
 STATS: dict = {
@@ -550,13 +584,13 @@ STATS: dict = {
     "damage": (stat_damage, 102, {}),
     "fire_rate": (stat_fire_rate, 103, {}),
     "range": (stat_range, 104, {}),
-    "move_speed": (stat_move_speed, 105, {}),
+    "move_speed": (stat_move_speed, 105, {"levels": (0.12, 0.38, 0.70, 1.0), "hatch": 0.6}),
     "armor": (stat_armor, 106, {}),
     "luck": (stat_luck, 107, {"blood_spots": 8}),
     "hp_regen": (stat_hp_regen, 108, {}),
     "pickup_range": (stat_pickup_range, 109, {}),
     "dash_cooldown": (stat_dash_cooldown, 110, {}),
-    "dash_distance": (stat_dash_distance, 111, {}),
+    "dash_distance": (stat_dash_distance, 111, {"levels": (0.12, 0.38, 0.70, 1.0), "hatch": 0.6}),
 }
 
 

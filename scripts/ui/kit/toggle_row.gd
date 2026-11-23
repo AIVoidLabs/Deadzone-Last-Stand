@@ -2,12 +2,20 @@ class_name ToggleRow
 extends SettingRowBase
 ## Aç/kapa satırı. value_changed(value: bool). Sol/sağ, Enter ve tıklama değiştirir.
 
-const SWITCH_SIZE: Vector2 = Vector2(58, 26)
+const SWITCH_SIZE: Vector2 = Vector2(58, 30)
+const TRACK_H: float = 14.0
+const KNOB_SIZE: Vector2 = Vector2(16, 30)
+const SWITCH_PAD: float = 12.0
+const KNOB_TIME: float = 0.12
 
 var _value: bool = false
 var _on_text: String = ""
 var _off_text: String = ""
 var _text_label: Label = null
+var _switch: Control = null
+var _track: TextureRect = null
+var _fill: TextureRect = null
+var _knob: Control = null
 
 
 func _init() -> void:
@@ -22,10 +30,23 @@ func _init() -> void:
 	_text_label.add_theme_font_override("font", UiFonts.bold())
 	_text_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_holder.add_child(_text_label)
-	var spacer: Control = Control.new()
-	spacer.custom_minimum_size = Vector2(SWITCH_SIZE.x + 12.0, 0)
-	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_holder.add_child(spacer)
+	_switch = Control.new()
+	_switch.custom_minimum_size = SWITCH_SIZE + Vector2(12.0, 0)
+	_switch.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_switch.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_holder.add_child(_switch)
+	_track = UiAssets.brush_rect("btn_stroke_b", Color(0.24, 0.2, 0.17), 0.4)
+	_fill = UiAssets.brush_rect("btn_stroke_a", UiPalette.EMBER, 0.6)
+	for r: TextureRect in [_track, _fill]:
+		r.position = Vector2(SWITCH_PAD, (SWITCH_SIZE.y - TRACK_H) * 0.5)
+		r.size = Vector2(SWITCH_SIZE.x, TRACK_H)
+		_switch.add_child(r)
+	_knob = Control.new()
+	_knob.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_knob.size = KNOB_SIZE
+	_knob.draw.connect(func() -> void: BrushSlider.draw_knob(_knob, Rect2(Vector2.ZERO, KNOB_SIZE), has_focus() or _value))
+	_switch.add_child(_knob)
+	_knob.position.x = SWITCH_PAD
 	focus_entered.connect(_refresh)
 	focus_exited.connect(_refresh)
 
@@ -40,7 +61,17 @@ func setup(label_text: String, value: bool, on_text: String = "", off_text: Stri
 func set_value(v: bool) -> void:
 	_value = v
 	_text_label.text = _on_text if v else _off_text
-	queue_redraw()
+	if _knob == null:
+		return
+	var x: float = SWITCH_PAD + (SWITCH_SIZE.x - KNOB_SIZE.x if v else 0.0)
+	(_fill.material as ShaderMaterial).set_shader_parameter("cut", 1.0 if v else 0.0)
+	_knob.queue_redraw()
+	if Tuning.FEATURE_UI_MOTION and is_inside_tree():
+		var t: Tween = create_tween()
+		t.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+		t.tween_property(_knob, "position:x", x, KNOB_TIME)
+	else:
+		_knob.position.x = x
 
 
 func get_value() -> bool:
@@ -62,12 +93,8 @@ func _gui_input(event: InputEvent) -> void:
 		accept_event()
 
 
-func _draw() -> void:
-	super._draw()
-	var r: Rect2 = Rect2(Vector2(size.x - SettingRowBase.SIDE_PAD - SWITCH_SIZE.x, (size.y - SWITCH_SIZE.y) * 0.5), SWITCH_SIZE)
-	draw_rect(r, Color(0.03, 0.025, 0.022, 0.95))
-	draw_rect(r, Color(UiPalette.ASH, 0.55), false, 1.5)
-	var knob_w: float = SWITCH_SIZE.x * 0.46
-	var kx: float = r.position.x + (SWITCH_SIZE.x - knob_w - 3.0 if _value else 3.0)
-	var knob: Rect2 = Rect2(kx, r.position.y + 3.0, knob_w, SWITCH_SIZE.y - 6.0)
-	draw_rect(knob, UiPalette.EMBER if _value else UiPalette.ASH.darkened(0.35))
+
+func _set_active(a: bool) -> void:
+	super._set_active(a)
+	if _knob != null:
+		_knob.queue_redraw()

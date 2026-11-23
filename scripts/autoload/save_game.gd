@@ -55,7 +55,9 @@ func _load() -> void:
 	if not FileAccess.file_exists(PATH):
 		return
 	var text: String = FileAccess.get_file_as_string(PATH)
-	var raw: Variant = JSON.parse_string(text)
+	# JSON.new().parse sessizce hata kodu döner (parse_string bozuk dosyada motor hatası basar).
+	var json: JSON = JSON.new()
+	var raw: Variant = json.data if json.parse(text) == OK else null
 	if not RunRecord.is_readable(raw):
 		push_warning("Kayıt okunamadı, yedeğe alındı: %s" % PATH)
 		DirAccess.copy_absolute(PATH, BACKUP_PATH)

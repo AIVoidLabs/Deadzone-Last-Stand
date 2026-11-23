@@ -16,9 +16,9 @@ const CARDS: Array = [
 	{"category_id": &"loot", "category": "GANİMET", "title": "ŞANS", "emblem": &"stat_luck", "tier": 2, "tier_name": "DESTANSI", "lines": [{"text": "Şans", "bold": true}, {"text": "+15"}]},
 	{"category_id": &"loot", "category": "GANİMET", "title": "MIKNATIS", "emblem": &"stat_pickup_range", "tier": 0, "tier_name": "SIRADAN", "lines": [{"text": "Toplama alanı", "bold": true}, {"text": "%0 > %30"}]},
 	{"category_id": &"weapon", "category": "SİLAH", "title": "POMPALI", "emblem": &"weapon_shotgun", "price": 120, "hint": "5", "lines": [{"text": "Yakın mesafede yıkıcı", "bold": true}, {"text": "Hasar 8x6   Menzil kısa"}]},
-	{"category_id": &"weapon", "category": "SİLAH", "title": "KESKİN NİŞANCI TÜFEĞİ", "emblem": &"weapon_sniper", "price": 480, "state": &"poor", "state_text": "YETERSİZ", "lines": [{"text": "Delici mermi", "bold": true}, {"text": "Hasar 60  Yavaş ateş"}]},
-	{"category_id": &"loot", "category": "GANİMET", "title": "KRİSTAL PAYI", "emblem": &"item_crystal", "price": 75, "price_color": UiPalette.GOLD, "tier": 1, "tier_name": "NADİR", "lines": [{"text": "Her kristal %10 fazla", "bold": true}, {"text": "Yalnız bu tur", "color": UiPalette.ASH}]},
-	{"category_id": &"survival", "category": "DİRENİŞ", "title": "ZIRHLI YELEK", "emblem": &"item_vest", "price": 90, "state": &"sold", "state_text": "SATILDI", "lines": [{"text": "Zırh +3", "bold": true}]},
+	{"category_id": &"weapon", "category": "SİLAH", "title": "KESKİN NİŞANCI TÜFEĞİ", "emblem": &"weapon_smg", "price": 480, "state": &"poor", "state_text": "YETERSİZ", "lines": [{"text": "Delici mermi", "bold": true}, {"text": "Hasar 60  Yavaş ateş"}]},
+	{"category_id": &"loot", "category": "GANİMET", "title": "KRİSTAL PAYI", "emblem": &"weapon_plasma_rifle", "price": 75, "price_color": UiPalette.GOLD, "tier": 1, "tier_name": "NADİR", "lines": [{"text": "Her kristal %10 fazla", "bold": true}, {"text": "Yalnız bu tur", "color": UiPalette.ASH}]},
+	{"category_id": &"survival", "category": "DİRENİŞ", "title": "ZIRHLI YELEK", "emblem": &"stat_armor", "price": 90, "state": &"sold", "state_text": "SATILDI", "lines": [{"text": "Zırh +3", "bold": true}]},
 ]
 
 var _capture_path: String = ""

@@ -4,6 +4,7 @@ extends Node
 ## [--capture-spawn=150] [--autopilot] [--debug-panel] [--capture-dash=0.15]`. Yalnız debug yapıda eklenir.
 ## --capture-dash=S: görüntüden S saniye önce dash attırır.
 ## --capture-kill=S: görüntüden S saniye önce askeri öldürür (ölüm animasyonu denetimi).
+## --capture-pause=S: görüntüden S saniye önce duraklatma menüsünü açar (gerçek GameFlow.pause).
 ## --capture-focus: kamera ilk canlı zombiyi izler (arena ile yakın görüntü).
 ## --camera-fov=DEG: kamera görüş açısını dener (lens karşılaştırması).
 ## --camera-distance=M: kamera uzaklığını dener (karşılaştırma görüntüleri için).
@@ -36,6 +37,7 @@ var _dash_lead: float = -1.0
 var _kill_lead: float = -1.0
 var _wave_end_lead: float = -1.0
 var _merge_lead: float = -1.0
+var _pause_lead: float = -1.0
 var _auto_pick: bool = false
 ## --capture-pick-key=Enter gibi: otomatik basılan tuş (varsayılan 1).
 var _pick_key: Key = KEY_1
@@ -137,6 +139,8 @@ func _ready() -> void:
 			_pick_key = OS.find_keycode_from_string(arg.trim_prefix("--capture-pick-key=")) as Key
 		elif arg.begins_with("--crystals="):
 			loot.crystals += arg.trim_prefix("--crystals=").to_int()
+		elif arg.begins_with("--capture-pause="):
+			_pause_lead = arg.trim_prefix("--capture-pause=").to_float()
 		elif arg.begins_with("--capture-merge="):
 			_merge_lead = arg.trim_prefix("--capture-merge=").to_float()
 		elif arg.begins_with("--capture-wave-end="):
@@ -183,6 +187,9 @@ func _process(delta: float) -> void:
 	if _kill_lead >= 0.0 and _time >= _seconds - _kill_lead:
 		_kill_lead = -1.0
 		player.take_hit(Tuning.PLAYER_MAX_HP * 1000.0)
+	if _pause_lead >= 0.0 and _time >= _seconds - _pause_lead:
+		_pause_lead = -1.0
+		GameFlow.pause()
 	if _merge_lead >= 0.0 and _time >= _seconds - _merge_lead:
 		_merge_lead = -1.0
 		weapons.add_weapon(WeaponData.PISTOL)

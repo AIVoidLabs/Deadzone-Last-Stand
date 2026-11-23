@@ -37,8 +37,12 @@ func regen_per_second() -> float:
 
 
 func dash_cooldown() -> float:
-	var cut: float = minf(bonus(StatData.DASH_COOLDOWN), Tuning.DASH_COOLDOWN_CUT_CAP)
-	return Tuning.DASH_COOLDOWN * (1.0 - cut / 100.0)
+	return dash_cooldown_for(bonus(StatData.DASH_COOLDOWN))
+
+
+## Takla beklemesi (sn): bonus yüzde kısaltma (üst sınırlı), eksi bonus uzatır. Ekranlar da bunu gösterir.
+static func dash_cooldown_for(cut_percent: float) -> float:
+	return Tuning.DASH_COOLDOWN * (1.0 - minf(cut_percent, Tuning.DASH_COOLDOWN_CUT_CAP) / 100.0)
 
 
 ## Dash hızı (süre sabit, mesafe buna bağlı).

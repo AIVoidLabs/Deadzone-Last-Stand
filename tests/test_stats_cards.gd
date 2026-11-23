@@ -105,8 +105,8 @@ func test_offer_has_distinct_stats_with_tier_values() -> void:
 
 
 func test_describe_formats() -> void:
-	assert_eq(StatData.describe(StatData.DAMAGE, 12.0), "+12% hasar")
+	assert_eq(StatData.describe(StatData.DAMAGE, 12.0), "+%12 hasar")
 	assert_eq(StatData.describe(StatData.MAX_HP, 10.0), "+10 can")
-	assert_eq(StatData.describe(StatData.DASH_COOLDOWN, 7.5), "-7.5% dash bekleme")
-	assert_eq(StatData.short_value(StatData.DAMAGE, 12.0), "+12%")
+	assert_eq(StatData.describe(StatData.DASH_COOLDOWN, 7.5), "-%7,5 takla bekleme")
+	assert_eq(StatData.short_value(StatData.DAMAGE, 12.0), "+%12")
 	assert_eq(StatData.short_value(StatData.ARMOR, 2.0), "+2")

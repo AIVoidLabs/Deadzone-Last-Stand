@@ -231,10 +231,17 @@ def parts_gravity() -> None:
     # tabak: konik huni
     tb((0, -0.200, 0.020), 0.075, 0.075, "navy", axis="Y", r2=0.038, segs=28)
     tb((0, -0.2425, 0.020), 0.0785, 0.010, "steel", axis="Y", segs=28)
-    tb((0, -0.2475, 0.020), 0.055, 0.004, "violet", axis="Y", segs=28)
-    tb((0, -0.2495, 0.020), 0.030, 0.004, "white", axis="Y", segs=24)
-    ring((0, -0.2515, 0.020), 0.045, 0.004, "white")
-    ring((0, -0.2515, 0.020), 0.065, 0.003, "violet")
+    tb((0, -0.2475, 0.020), 0.066, 0.006, "dark", axis="Y", segs=28)
+    ball((0, -0.236, 0.020), (0.046, 0.030, 0.046), "violet")
+    ball((0, -0.232, 0.020), (0.022, 0.018, 0.022), "white")
+    for k0 in range(4):
+        pts = []
+        for i in range(14):
+            t = i / 13
+            a = math.radians(k0 * 90 + t * 420)
+            r = 0.068 * (1 - t) + 0.012
+            pts.append((math.cos(a) * r * T, -0.247 + t * 0.012, 0.020 * T + math.sin(a) * r * T))
+        U.tube(_n("sw"), pts, 0.0072 * T, M["violet"], 0.5, 6, False)
     for k in range(6):
         a = math.radians(k * 60 + 15)
         x, z = math.cos(a) * 0.066, math.sin(a) * 0.066 + 0.020
@@ -323,10 +330,28 @@ def parts_knife() -> None:
         screw((0.0, 0.0, 0.016 * sd), 0.005)
 
 
+def hamon(y0: float, y1: float, width: float, thick: float, curve: float) -> None:
+    """Hamon: ağız boyunca dalgalı parlak çizgi (üst yüzeyde ince şerit)."""
+    segs = 90
+    verts, faces = [], []
+    for i in range(segs + 1):
+        s = i / segs
+        y = y0 + (y1 - y0) * s
+        wv = width * (1.0 if s < 0.93 else max(0.04, (1.0 - s) / 0.07))
+        ex = curve * s * s - wv * 0.5
+        hw = (0.011 + 0.006 * math.sin(s * 70.0) + 0.004 * math.sin(s * 23.0)) * (1.0 if s < 0.93 else 0.3)
+        z = (thick + 0.0007) * T
+        verts += [(ex * T + 0.002 * T, y, z), ((ex + hw) * T + 0.002 * T, y, z)]
+        if i > 0:
+            a, b = (i - 1) * 2, i * 2
+            faces.append((a, a + 1, b + 1, b))
+    U.mesh_from(_n("hm"), verts, faces, (0, 0, 0), (0, 0, 0), M["edge"])
+
+
 def parts_katana() -> None:
     blade("bl", -0.005, -0.960, 0.044, 0.0045, 0.075, "steel", tip=0.07)
     blade("edge", -0.008, -0.955, 0.013, 0.0055, 0.075, "edge", tip=0.07)
-    bx((0.0, -0.200, 0.0045), (0.003, 0.30, 0.0016), "dark", bev=0.0003)
+    hamon(-0.012, -0.95, 0.044, 0.0045, 0.075)
     # tsuba (siper): yuvarlak plaka
     tb((0, -0.010, 0.0), 0.052, 0.014, "gold", axis="Y", segs=32)
     tb((0, -0.010, 0.0), 0.040, 0.018, "dark", axis="Y", segs=32)
@@ -346,24 +371,28 @@ def parts_katana() -> None:
 
 
 def parts_lightsaber() -> None:
-    tb((0, 0.130, 0.0), 0.024, 0.310, "metal", axis="Y", segs=28)
-    for y in (0.230, 0.200, 0.170, 0.108, 0.082):
-        tb((0, y, 0.0), 0.0275, 0.016, "dark", axis="Y", segs=28)
-    for i in range(6):
-        bx((0.0, 0.140 + (i % 2) * 0.0, 0.0), (0.0, 0.0, 0.0), "dark") if False else None
-    bx((0.0, 0.150, 0.026), (0.018, 0.044, 0.010), "ember", bev=0.002)
-    bx((0.0, 0.118, 0.026), (0.010, 0.010, 0.008), "steel", bev=0.001)
-    tb((0, 0.2475, 0.0), 0.030, 0.026, "steel", axis="Y", segs=28)
-    tb((0, -0.025, 0.0), 0.033, 0.045, "steel", axis="Y", segs=28)
-    tb((0, -0.055, 0.0), 0.0345, 0.016, "dark", axis="Y", segs=28)
-    tb((0, -0.037, 0.0), 0.0355, 0.012, "gold", axis="Y", segs=28)
-    for k in range(4):
-        a = math.radians(k * 90 + 45)
-        tb((math.cos(a) * 0.030, -0.058, math.sin(a) * 0.030), 0.0045, 0.012, "steel", axis="Y", segs=8)
-    tb((0, -0.570, 0.0), 0.028, 1.020, "cyan", axis="Y", segs=28)
-    tb((0, -0.570, 0.0), 0.016, 1.030, "white", axis="Y", segs=24)
-    ball((0, -1.080, 0.0), (0.028, 0.026, 0.028), "cyan")
-    ball((0, -1.084, 0.0), (0.016, 0.018, 0.016), "white")
+    tb((0, 0.150, 0.0), 0.024, 0.360, "metal", axis="Y", segs=28)
+    for i in range(9):  # tırtıklı tutuş
+        tb((0, 0.060 + i * 0.026, 0.0), 0.0285, 0.012, "dark", axis="Y", segs=28)
+    for y in (0.250, 0.290):
+        tb((0, y, 0.0), 0.030, 0.014, "steel", axis="Y", segs=28)
+    tb((0, 0.318, 0.0), 0.034, 0.040, "metal", axis="Y", segs=28)  # kabza başı
+    ball((0, 0.340, 0.0), (0.030, 0.018, 0.030), "steel")
+    ring((0.0, 0.352, 0.0), 0.016, 0.004, "gold", rot=(90, 0, 0))
+    bx((0.0, 0.200, 0.026), (0.020, 0.050, 0.010), "ember", bev=0.002)
+    bx((0.0, 0.140, 0.026), (0.012, 0.012, 0.008), "steel", bev=0.001)
+    for sd in (1, -1):
+        bx((0.026 * sd, 0.185, 0.0), (0.004, 0.090, 0.012), "gold", bev=0.001)
+        screw((0.0265 * sd, 0.112, 0.012), 0.005, sd)
+    U.tube(_n("wire"), [(0.0, 0.01, 0.026 * T), (0.02 * T, 0.05, 0.034 * T), (0.0, 0.09, 0.026 * T)], 0.004 * T, M["dark"], 1.0, 6)
+    tb((0, 0.000, 0.0), 0.034, 0.060, "steel", axis="Y", segs=28)  # yayıcı
+    tb((0, -0.036, 0.0), 0.038, 0.014, "gold", axis="Y", segs=28)
+    for k0 in range(4):
+        a = math.radians(k0 * 90 + 45)
+        bx((math.cos(a) * 0.036, -0.05, math.sin(a) * 0.036), (0.008, 0.030, 0.008), "steel", rot=(0, 0, 0), bev=0.001)
+    # ince, uzun bıçak: çap kabzanın ~%55'i
+    tb((0, -0.60, 0.0), 0.017, 1.12, "white", axis="Y", segs=20)
+    ball((0, -1.16, 0.0), (0.017, 0.017, 0.017), "white")
 
 
 def flame_strip(name: str, y0: float, y1: float, width: float, thick: float, phase: float, m: str,
@@ -414,11 +443,11 @@ WEAPONS: dict = {
     "shotgun": (parts_shotgun, 2.4, -75, 16, 46, 30, 0.9, (0, 0), 12, {}),
     "smg": (parts_smg, 2.0, -70, 16, 48, 10, 0.88, (0, 0), 13, {}),
     "plasma_rifle": (parts_plasma, 2.0, -68, 18, 48, 12, 0.9, (0, 0), 14, {}),
-    "gravity_gun": (parts_gravity, 1.8, -62, 20, 46, 0, 0.88, (0, 0), 15, {}),
+    "gravity_gun": (parts_gravity, 1.8, -50, 18, 46, 0, 0.88, (0, 0), 15, {}),
     "grenade_launcher": (parts_grenade, 1.8, -62, 18, 48, 6, 0.9, (0, 0), 16, {}),
     "knife": (parts_knife, 3.6, -55, 60, 56, 40, 0.9, (0, 0), 17, {}),
-    "katana": (parts_katana, 3.6, -55, 62, 50, 38, 0.92, (0, 0), 18, {}),
-    "lightsaber": (parts_lightsaber, 3.6, -82, 14, 52, 36, 0.92, (0, 0), 19, {}),
+    "katana": (parts_katana, 2.6, -55, 62, 50, 38, 0.92, (0, 0), 18, {}),
+    "lightsaber": (parts_lightsaber, 2.6, -72, 10, 52, 230, 0.88, (0, 0), 19, {"glow": 1.0, "rim": 0.1, "halo": 1.6, "soft_emit": True, "levels": (0.14, 0.40, 0.72, 1.0), "hatch": 0.6}),
     "flame_sword": (parts_flame, 3.2, -55, 62, 50, 38, 0.92, (0, 0), 20, {}),
 }
 
@@ -433,7 +462,9 @@ def build(wid: str) -> str:
     objs = U.meshes()
     cam = U.fit_camera(objs, az=az, el=el, lens=lens, fill=fill, roll=roll, shift=shift)
     U.add_lights(cam)
-    return U.make("weapon_" + wid, seed=seed, **extra)
+    args = {"blood_spots": 2, "blood": 0.85}
+    args.update(extra)
+    return U.make("weapon_" + wid, seed=seed, **args)
 
 
 def main() -> None:

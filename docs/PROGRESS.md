@@ -5,7 +5,13 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 
 ## Şu an
 
-**AŞAMA 8 BİTTİ (2026-11-22).** Taha 8.4'ü onayladı, 8.5: müzik yok. Kullanılmayan asset temizliği: silah v2 seti ve 5 ortam yer tutucusu silindi (GLB'lerin dış dokuları kullanımda; silinmez). Sıradaki ana aşama: 9 — Arayüz ve akış; Taha'nın "devam" demesi bekleniyor.
+**AŞAMA 9 KODU BİTTİ (2026-11-23), Taha'nın oynayıp onayı bekleniyor.** Gamepad kapsam dışı (Taha, 2026-11-22). Oyun artık ana menüyle açılır (`FEATURE_MAIN_MENU`; `--capture/--bench/--autoplay/--arena` ve elle oynama bayrakları menüyü atlar, kullanıcı ayarlarını okumaz). 412 test.
+- Görsel dil: "kanlı afiş" (referans Taha'nın kart görseli; çizimleri kopyalanmadı). UI kiti `scripts/ui/kit/` (GrungeCard/Button/Panel/Title, ScreenBackdrop, GrungeBar, ayar satırları), shader'lar `assets/shaders/ui/`, dokular `tools/blender/ui_textures.py`, yazı tipi Inter (OFL). 48 amblem Blender'da çizgi roman mürekkep hattıyla (`tools/blender/ui_ink.py`, `ui_emblems_*.py`).
+- Ekranlar: ana menü (canlı 3B şehir arka planı), ayarlar (görüntü/ses/oyun/kontroller + tuş atama, "koru?" geri sayımı), duraklatma + tur özeti, kart (perk) ekranı, mağaza, savaş HUD'ı + boss çubuğu/bannerlar, tur sonu özeti (REKOR damgaları), rekorlar, emeği geçenler, onay penceresi.
+- Altyapı: `Settings` + `SettingsSchema`, `Loc` (TR/EN, `scripts/data/text/`), `SaveGame` + `RunRecord` + `RunStats` (user://save.json, bozuksa .bak), `GameFlow` duraklatma nedenleri kümesi, `SceneFade`. Her ekran `FEATURE_*` ile kapanır, eski kart/mağaza/HUD dosyaları duruyor. Görüntü aracı: `-- --ui-shot=x.png --ui-screen=main|settings|pause|records|credits|perk|shop|end_win|end_lose|hud [--ui-lang=en --ui-size=1600x900 --ui-tab=N]`; `--capture-pause=S`.
+- Açıklar: ayar kaydırıcılarında Türkçede "100%" (kit `slider_row.gd`, %100 olmalı); silah başına hasar toplanmıyor (yalnız toplam); zayıf amblemler: stat_dash_distance, item_light_boots, weapon_lightsaber; ekran modu/çözünürlük geri sayımı gerçek tam ekranda elle denenmeli; "Takla bekleme süresi" satırı sol panelde kesiliyor; kapanışta eskisi gibi "ObjectDB leaked" (c3cac8d'de de var).
+
+**Aşama 8 bitti (2026-11-22).** Taha 8.4'ü onayladı, 8.5: müzik yok. Kullanılmayan asset temizliği: silah v2 seti ve 5 ortam yer tutucusu silindi (GLB'lerin dış dokuları kullanımda; silinmez). Sıradaki ana aşama: 9 — Arayüz ve akış; Taha'nın "devam" demesi bekleniyor.
 
 **Oturum 15 (2026-11-22): 8.4 ses başladı; Taha'nın dinlemesi bekleniyor.** Kararlar DECISIONS 2026-11-22 (karma kaynak; sıra ortam → zombi → silah → arayüz). Sonnet alt ajanlar + ayrı gözden geçiren, ana döngü doğruladı.
 - Zırhlı takla sesi (`d1cc2ab`, FEATURE_SFX_DASH_ARMORED; eski ses dosyaları aynen duruyor).

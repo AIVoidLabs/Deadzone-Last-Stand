@@ -66,11 +66,16 @@ func test_card_titles_from_brief() -> void:
 
 
 func test_stat_describe_follows_language() -> void:
-	assert_eq(StatData.describe(&"damage", 8.0), "+8% hasar")
+	assert_eq(StatData.describe(&"damage", 8.0), "+%8 hasar")
 	assert_eq(StatData.short_value(&"max_hp", 10.0), "+10")
 	assert_eq(StatData.describe(&"max_hp", -5.0), "-5 can")
-	assert_eq(StatData.describe(&"dash_cooldown", 12.0), "-12% dash bekleme")
-	assert_eq(StatData.describe(&"dash_cooldown", -12.0), "+12% dash bekleme")
+	assert_eq(StatData.describe(&"dash_cooldown", 12.0), "-%12 takla bekleme")
+	assert_eq(StatData.describe(&"dash_cooldown", -12.0), "+%12 takla bekleme")
+	assert_eq(StatData.describe(&"move_speed", -3.0), "-%3 hareket hızı")
+	assert_eq(StatData.describe(&"damage", 7.5), "+%7,5 hasar", "ondalık ayracı virgül")
+	assert_eq(StatData.short_value(&"damage", 12.0), "+%12")
 	Loc.set_language(&"en")
 	assert_eq(StatData.describe(&"damage", 8.0), "+8% damage")
+	assert_eq(StatData.describe(&"dash_cooldown", 12.0), "-12% dash cooldown", "İngilizcede Dash kalır")
+	assert_eq(StatData.describe(&"damage", 7.5), "+7.5% damage")
 	assert_eq(StatData.display_name(&"armor"), "Armor")

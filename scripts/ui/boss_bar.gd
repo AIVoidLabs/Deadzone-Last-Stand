@@ -28,11 +28,15 @@ var _flash: ColorRect
 var _notch: ColorRect
 var _flash_left: float = 0.0
 var _last_hp: float = -1.0
+var _view: HudBossView = null
 
 
 func _ready() -> void:
 	name = "BossBar"
 	layer = LAYER_INDEX
+	if Tuning.FEATURE_NEW_HUD:
+		_build_new_view()
+		return
 	_root = Control.new()
 	_root.anchor_left = LEFT_RATIO
 	_root.anchor_right = RIGHT_RATIO
@@ -78,8 +82,29 @@ func _ready() -> void:
 	holder.add_child(_notch)
 
 
+## Yeni görünüm (FEATURE_NEW_HUD): kit çubuğu; eski kurulum atlanır.
+func _build_new_view() -> void:
+	_view = HudBossView.new()
+	_view.set_name_text(Loc.enemy_name(EnemyDataBoss.ID))
+	add_child(_view)
+	_view.apply_scale(float(Settings.get_value(&"game/hud_scale")))
+	Settings.changed.connect(_on_setting_changed)
+
+
+func _on_setting_changed(key: StringName, _value: Variant) -> void:
+	if key == &"game/hud_scale":
+		_view.apply_scale(float(Settings.get_value(&"game/hud_scale")))
+	elif key == &"game/language":
+		_view.set_name_text(Loc.enemy_name(EnemyDataBoss.ID))
+
+
 func _process(delta: float) -> void:
 	var status: Dictionary = enemies.boss().status()
+	if _view != null:
+		_view.visible = status["alive"]
+		if status["alive"]:
+			_view.set_status(float(status["hp"]) / maxf(float(status["max_hp"]), 1.0), status["raged"], float(status["threshold"]))
+		return
 	_root.visible = status["alive"]
 	if not status["alive"]:
 		_last_hp = -1.0

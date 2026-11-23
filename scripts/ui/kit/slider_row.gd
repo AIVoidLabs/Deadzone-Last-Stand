@@ -5,14 +5,14 @@ extends SettingRowBase
 const SLIDER_MIN_WIDTH: float = 170.0
 const VALUE_WIDTH: float = 62.0
 
-var _slider: HSlider = null
+var _slider: BrushSlider = null
 var _value_label: Label = null
 var _format: StringName = &"percent"
 
 
 func _init() -> void:
 	super._init()
-	_slider = HSlider.new()
+	_slider = BrushSlider.new()
 	_slider.custom_minimum_size = Vector2(SLIDER_MIN_WIDTH, 0)
 	_slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_slider.size_flags_vertical = Control.SIZE_SHRINK_CENTER

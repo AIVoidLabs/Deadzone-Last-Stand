@@ -74,7 +74,7 @@ def grid(h, w):
 
 
 # ---------------------------------------------------------------- fırça şeridi
-def brush_stroke(h, w, rng, pad_y=0.12, wobble=0.07, dry=0.9, tear=0.07, fray_rows=1.0):
+def brush_stroke(h, w, rng, pad_y=0.12, wobble=0.07, dry=0.9, tear=0.07, fray_rows=1.0, frag=1.0):
     """Yatay fırça darbesi: R kaplama, G kıl çizgisi parlaklığı. Uçlar kuru ve kılcal."""
     yy, xx = grid(h, w)
     # üst/alt kenar: düşük frekanslı dalga + kıl tırtığı
@@ -86,14 +86,15 @@ def brush_stroke(h, w, rng, pad_y=0.12, wobble=0.07, dry=0.9, tear=0.07, fray_ro
     bristle = 0.6 * streak + 0.4 * streak2
     # kenar bristle'a göre kayar: kıl uzunluğu farkı
     edge_push = (bristle - 0.5) * h * 0.10
-    inside = sstep(0.0, 2.2, yy - top - edge_push * 0.7) * sstep(0.0, 2.2, bot + edge_push * 0.7 - yy)
+    top_e = top + edge_push * 0.7
+    inside = sstep(0.0, 2.2, yy - top_e) * sstep(0.0, 2.2, bot + edge_push * 0.7 - yy)
     # uçlar: her satırın bittiği yer farklı (kılcal), uca doğru kuruma
-    endL = w * 0.035 + (noise1d(h, h // 2, rng, 3) - 0.5) * w * tear * 2 + np.abs(noise1d(h, h // 5, rng) - 0.5) * w * 0.12
-    endR = w * 0.035 + (noise1d(h, h // 2, rng, 3) - 0.5) * w * tear * 2 + np.abs(noise1d(h, h // 5, rng) - 0.5) * w * 0.12
+    endL = w * 0.035 + (noise1d(h, h // 2, rng, 3) - 0.5) * w * tear * 2 * frag + np.abs(noise1d(h, h // 5, rng) - 0.5) * w * 0.12 * frag + rng.random(h) * w * 0.05 * (frag - 1.0)
+    endR = w * 0.035 + (noise1d(h, h // 2, rng, 3) - 0.5) * w * tear * 2 * frag + np.abs(noise1d(h, h // 5, rng) - 0.5) * w * 0.12 * frag + rng.random(h) * w * 0.05 * (frag - 1.0)
     cutL = sstep(0.0, 3.0, xx - endL[:, None])
     cutR = sstep(0.0, 3.0, (w - endR[:, None]) - xx)
     nx = np.abs(xx / w - 0.5) * 2.0
-    dryness = sstep(0.55, 1.0, nx) * dry
+    dryness = sstep(0.55 - 0.12 * (frag - 1.0), 1.0, nx) * dry
     cover = sstep(dryness - 0.04, dryness + 0.14, bristle * 1.05 + 0.05) if dry > 0 else 1.0
     # sertlik: iç boşluklar (kuru fırça damarları) az
     cover = np.maximum(cover, 0.0)
@@ -107,13 +108,15 @@ def brush_stroke(h, w, rng, pad_y=0.12, wobble=0.07, dry=0.9, tear=0.07, fray_ro
         r = 0.8 + rng.random() ** 3 * 4.5
         cov = np.maximum(cov, sstep(r, r - 1.2, np.sqrt((xx - cx) ** 2 + (yy - cy) ** 2)))
     detail = np.clip(0.55 + 0.7 * (bristle - 0.5) + 0.25 * (streak2 - 0.5), 0.0, 1.0)
-    return np.clip(cov, 0, 1), detail
+    # kenarda açık boya çizgisi: üst kenar boyunca, kıl çizgisiyle kesikli
+    rim = cov * (1.0 - sstep(0.0, 11.0, yy - top_e)) * sstep(0.22, 0.45, streak)
+    return np.clip(cov, 0, 1), detail, np.clip(rim, 0, 1)
 
 
 def band(h, w, seed, **kw):
     rng = np.random.default_rng(seed)
-    cov, det = brush_stroke(h, w, rng, **kw)
-    return stack(cov, det, cov * 0.0)
+    cov, det, rim = brush_stroke(h, w, rng, **kw)
+    return stack(cov, det, rim)
 
 
 def stack(r, g, b):
@@ -194,6 +197,61 @@ def splat(sz, seed, spikes=14, drops=70):
     return np.clip(cov, 0, 1)
 
 
+# ---------------------------------------------------------------- yönlü serpinti
+def stamp(out, cx, cy, rx, ry, ang):
+    """Elips damla (rx yönlü eksen)."""
+    h, w = out.shape
+    m = int(max(rx, ry) + 3)
+    x0, x1 = max(int(cx) - m, 0), min(int(cx) + m + 1, w)
+    y0, y1 = max(int(cy) - m, 0), min(int(cy) + m + 1, h)
+    if x1 <= x0 or y1 <= y0:
+        return
+    yy, xx = np.mgrid[y0:y1, x0:x1].astype(np.float32)
+    dx, dy = xx - cx, yy - cy
+    c, s = np.cos(ang), np.sin(ang)
+    lx = dx * c + dy * s
+    ly = -dx * s + dy * c
+    d = np.sqrt((lx / max(rx, 0.5)) ** 2 + (ly / max(ry, 0.5)) ** 2)
+    out[y0:y1, x0:x1] = np.maximum(out[y0:y1, x0:x1], sstep(1.0, 0.55, d))
+
+
+def spatter(sz, seed, drops=260, threads=7, core=0.07, spread=0.42):
+    """Gerçek sıçrama: yoğun çekirdek, yönlü serpinti, ince iplikler. Radyal diken yok."""
+    rng = np.random.default_rng(seed)
+    out = np.zeros((sz, sz), np.float32)
+    c = sz * 0.5
+    base = rng.random() * 6.2832
+    for _ in range(90):
+        a = rng.random() * 6.2832
+        r = abs(rng.normal(0, core * sz * 0.55))
+        stamp(out, c + np.cos(a) * r, c + np.sin(a) * r, sz * (0.012 + rng.random() * 0.03), sz * (0.012 + rng.random() * 0.03), rng.random() * 3)
+    for _ in range(drops):
+        a = base + rng.normal(0, 0.75)
+        if rng.random() < 0.18:
+            a = rng.random() * 6.2832
+        dist = core * sz + (rng.random() ** 1.5) * sz * spread
+        t = min(dist / (sz * 0.5), 0.98)
+        r = max(0.8, (1.0 - t) ** 1.2 * sz * 0.02 * (0.3 + rng.random() ** 2 * 2.0))
+        el = 1.0 + 2.4 * t * rng.random()
+        cx, cy = c + np.cos(a) * dist, c + np.sin(a) * dist
+        stamp(out, cx, cy, r * el, r, a)
+        if rng.random() < 0.3:
+            for _ in range(3):
+                stamp(out, cx + rng.normal(0, r * 3), cy + rng.normal(0, r * 3), r * 0.4 + 0.5, r * 0.4 + 0.5, a)
+    for _ in range(threads):
+        a = base + rng.normal(0, 0.55)
+        ln = sz * (0.12 + rng.random() * 0.3)
+        wd = 0.9 + rng.random() * 1.3
+        n = int(ln / 1.5)
+        for k in range(n):
+            u = k / n
+            p = core * sz * 0.5 + u * ln
+            stamp(out, c + np.cos(a) * p, c + np.sin(a) * p, 1.6, max(0.5, wd * (1 - u * 0.8)), a)
+        e = core * sz * 0.5 + ln
+        stamp(out, c + np.cos(a) * e, c + np.sin(a) * e, wd * 3.2, wd * 2.2, a)
+    return np.clip(out, 0, 1)
+
+
 # ---------------------------------------------------------------- kart maskesi
 def card_mask(h, w, seed):
     """R: kart silueti (yırtık kenar). G: kir (üst/yan kenar siyahı, kuru fırça). B: sıçrama."""
@@ -234,7 +292,7 @@ def card_mask(h, w, seed):
         x1, y1 = min(cx + sz * 2, w), min(cy + sz * 2, h)
         if x1 > x0 and y1 > y0:
             B[y0:y1, x0:x1] = np.maximum(B[y0:y1, x0:x1], s[y0 - cy:y1 - cy, x0 - cx:x1 - cx])
-    return stack(R, G, B)
+    return stack(R, G, B * 0.0)
 
 
 # ---------------------------------------------------------------- tebeşir çerçeve
@@ -325,9 +383,9 @@ def save(name, arr):
 
 if __name__ == "__main__":
     save("card_mask", card_mask(1136, 768, 7))
-    save("band_a", band(192, 1024, 11))
-    save("band_b", band(192, 1024, 12, wobble=0.10, dry=1.0, pad_y=0.16))
-    save("band_c", band(192, 1024, 13, wobble=0.05, dry=0.8, pad_y=0.09))
+        save("band_a", band(192, 1024, 11, dry=0.95, tear=0.09, frag=1.8, pad_y=0.07))
+    save("band_b", band(192, 1024, 12, wobble=0.09, dry=1.0, pad_y=0.09, tear=0.1, frag=2.0))
+    save("band_c", band(192, 1024, 13, wobble=0.05, dry=0.9, pad_y=0.06, tear=0.09, frag=1.8))
     save("btn_stroke_a", band(128, 512, 21, pad_y=0.10, wobble=0.06, dry=0.85))
     save("btn_stroke_b", band(128, 512, 22, pad_y=0.14, wobble=0.08, dry=0.95))
     save("desc_blot", blot(512, 1024, 5))
@@ -337,4 +395,9 @@ if __name__ == "__main__":
         save("splat_%d" % i, stack(s, s * 0, s * 0))
     save("noise_tile", noise_tile(512, 9))
     save("scratches", scratches(512, 4))
+    for i in range(4):
+        s = spatter(512, 70 + i, 230 + i * 20, 5 + i)
+        save("spatter_%d" % i, stack(s, s * 0, s * 0))
+    s = spatter(1024, 99, 520, 26, 0.035, 0.48)
+    save("splash_big", stack(s, s * 0, s * 0))
     save("emblem_placeholder", emblem_placeholder(256, 2))

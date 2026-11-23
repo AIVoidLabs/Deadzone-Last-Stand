@@ -49,10 +49,7 @@ func _on_player_event(event_name: StringName, data: Dictionary) -> void:
 
 func _finish(won: bool) -> void:
 	stats.set_level(loot.level)
-	var ids: Array[StringName] = []
-	for slot: Dictionary in weapons.slot_list():
-		ids.append(slot["id"])
-	stats.set_weapons(ids)
+	stats.set_weapons(weapons.slot_list())
 	stats.finish(won)
 	GameFlow.last_summary = stats.summary()
 	GameFlow.last_new_records = SaveGame.record(GameFlow.last_summary)

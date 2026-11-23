@@ -14,7 +14,8 @@ var pickups: Pickups
 ## Kart ekranı açıkken mağaza beklesin diye.
 var level_up: LevelUpFlow
 
-var _screen: ShopScreen
+## MarketScreen (FEATURE_NEW_SHOP) ya da eski ShopScreen; ikisi de aynı sinyalleri sunar.
+var _screen: Variant
 var _offer: Array[Dictionary] = []
 var _rerolls: int = 0
 var _owned: Dictionary = {}
@@ -27,7 +28,7 @@ var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 func _ready() -> void:
 	name = "ShopFlow"
 	_rng.randomize()
-	_screen = ShopScreen.new()
+	_screen = MarketScreen.new() if Tuning.FEATURE_NEW_SHOP else ShopScreen.new()
 	add_child(_screen)
 	_screen.buy_pressed.connect(_on_buy)
 	_screen.lock_pressed.connect(_on_lock)
@@ -138,6 +139,7 @@ func _apply_item(id: StringName) -> void:
 	for effect: Dictionary in ItemData.get_row(id)["effects"]:
 		stats.add(effect["stat"], effect["value"])
 	_owned[id] = int(_owned.get(id, 0)) + 1
+	GameFlow.run_stats.add_item(id)
 
 
 func _on_lock(index: int) -> void:
@@ -201,6 +203,8 @@ func _refresh() -> void:
 			"color": WeaponData.tier_row(slot["tier"])["tint"],
 			"sell": _sell_value(slot),
 			"sellable": slots.size() > 1,
+			"id": slot["id"],
+			"tier": slot["tier"],
 		})
 	var cost: int = _reroll_cost()
 	_screen.show_view({
@@ -210,12 +214,17 @@ func _refresh() -> void:
 		"reroll_text": "Yenile  %d kristal  [R]" % cost,
 		"can_reroll": loot.crystals >= cost,
 		"weapons": weapon_views,
+		"wave": run.index + 1,
+		"wave_total": run.wave_count(),
+		"reroll_cost": cost,
+		"owned": _owned.duplicate(),
+		"stats": stats,
 		"owned_text": "%s\n%s" % [_owned_text(), CardScreen.stats_text(stats)],
 	})
 
 
 func _entry_view(entry: Dictionary) -> Dictionary:
-	var view: Dictionary = {"state": _state_of(entry), "locked": entry["locked"], "price": _price(entry), "lines": []}
+	var view: Dictionary = {"state": _state_of(entry), "locked": entry["locked"], "price": _price(entry), "lines": [], "kind": entry["kind"], "id": entry["id"], "merged": false, "tier": 1, "owned": int(_owned.get(entry["id"], 0))}
 	if entry["kind"] == ShopRules.ITEM:
 		var row: Dictionary = ItemData.get_row(entry["id"])
 		view["title"] = row["name"]
@@ -228,6 +237,8 @@ func _entry_view(entry: Dictionary) -> Dictionary:
 	var weapon: Dictionary = WeaponData.get_row(entry["id"])
 	var plan: Dictionary = weapons.preview_add(entry["id"])
 	var tier: int = _new_tier(plan, entry["id"])
+	view["merged"] = plan["merged"]
+	view["tier"] = tier
 	view["title"] = weapon["name"]
 	view["color"] = WeaponData.tier_row(tier)["tint"]
 	view["subtitle"] = "SİLAH" if not plan["merged"] else "SİLAH  ·  BİRLEŞİR → K%d" % tier

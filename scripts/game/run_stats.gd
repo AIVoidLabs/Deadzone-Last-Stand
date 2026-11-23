@@ -19,7 +19,8 @@ var wave: int = 1
 var cards: Array[Dictionary] = []
 ## Eşya kimliği -> adet
 var items: Dictionary = {}
-var weapons: Array[StringName] = []
+## Tur sonundaki silahlar: [{id, tier}]
+var weapons: Array[Dictionary] = []
 var won: bool = false
 var finished: bool = false
 
@@ -70,10 +71,14 @@ func add_item(id: StringName) -> void:
 	items[id] = int(items.get(id, 0)) + 1
 
 
-func set_weapons(ids: Array) -> void:
+## Silah yuvaları ([{id, tier}] ya da yalnız kimlikler; kimlikte kademe 1 sayılır).
+func set_weapons(slots: Array) -> void:
 	weapons.clear()
-	for id: Variant in ids:
-		weapons.append(StringName(id))
+	for slot: Variant in slots:
+		if slot is Dictionary:
+			weapons.append({"id": StringName(slot.get("id", &"")), "tier": int(slot.get("tier", 1))})
+		else:
+			weapons.append({"id": StringName(slot), "tier": 1})
 
 
 func finish(did_win: bool) -> void:
@@ -87,5 +92,5 @@ func summary() -> Dictionary:
 		"won": won, "time": time, "kills": kills, "kills_by_kind": kills_by_kind.duplicate(),
 		"crystals": crystals, "damage_taken": damage_taken, "damage_dealt": damage_dealt,
 		"dashes": dashes, "shots": shots, "level": level, "wave": wave,
-		"cards": cards.duplicate(true), "items": items.duplicate(), "weapons": weapons.duplicate(),
+		"cards": cards.duplicate(true), "items": items.duplicate(), "weapons": weapons.duplicate(true),
 	}

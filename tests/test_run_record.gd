@@ -55,8 +55,7 @@ func test_apply_run_totals_and_records() -> void:
 	assert_eq(save["totals"][&"kills"], 50)
 	assert_eq(save["records"][&"best_wave"], 4)
 	assert_eq(save["records"][&"fastest_win"], 0.0, "yenilgi hızlı galibiyet sayılmaz")
-	assert_true(result["new_records"].has(&"best_wave"))
-	assert_false(result["new_records"].has(&"fastest_win"))
+	assert_eq(result["new_records"].size(), 0, "ilk tur kıyaslanacak bir şey yok: REKOR damgası yok")
 	var second: Dictionary = RunRecord.apply_run(save, _run_of(true, 10, 40, 500.0, 2))
 	assert_eq(second["save"]["records"][&"most_kills"], 50, "düşük değer rekoru bozmaz")
 	assert_eq(second["save"]["records"][&"fastest_win"], 500.0)
@@ -65,6 +64,17 @@ func test_apply_run_totals_and_records() -> void:
 	assert_false(second["new_records"].has(&"most_kills"))
 	var third: Dictionary = RunRecord.apply_run(second["save"], _run_of(true, 10, 40, 700.0))
 	assert_eq(third["save"]["records"][&"fastest_win"], 500.0, "daha yavaş galibiyet rekoru bozmaz")
+
+
+func test_first_run_stores_records_but_reports_none() -> void:
+	var result: Dictionary = RunRecord.apply_run(RunRecord.empty(), _run_of(true, 5, 300, 400.0, 6))
+	assert_eq(result["new_records"], [] as Array[StringName])
+	assert_eq(result["save"]["records"][&"best_wave"], 5, "rekor yine de kaydedilir")
+	assert_eq(result["save"]["records"][&"fastest_win"], 400.0)
+	var second: Dictionary = RunRecord.apply_run(result["save"], _run_of(false, 6, 350, 100.0, 7))
+	assert_true(second["new_records"].has(&"best_wave"), "ikinci turda rekor kırılabilir")
+	assert_true(second["new_records"].has(&"most_kills"))
+	assert_true(second["new_records"].has(&"best_level"))
 
 
 func test_history_is_newest_first_and_capped() -> void:

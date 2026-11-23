@@ -55,5 +55,7 @@ static func display_name(stat: StringName) -> String:
 	return Loc.stat_name(stat)
 
 
+## Dile göre ondalık ayracıyla ("7,5" / "7.5").
 static func _number(value: float) -> String:
-	return str(int(value)) if is_equal_approx(value, roundf(value)) else "%.1f" % value
+	var text: String = str(int(value)) if is_equal_approx(value, roundf(value)) else "%.1f" % value
+	return text.replace(".", Loc.t(&"run.fmt.decimal"))

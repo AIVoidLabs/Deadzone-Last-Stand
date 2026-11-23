@@ -74,6 +74,8 @@ static func apply_run(save: Dictionary, summary: Dictionary) -> Dictionary:
 	var entry: Dictionary = _entry(summary)
 	var won: bool = entry["won"]
 	var totals: Dictionary = out["totals"]
+	# İlk turda kıyaslanacak bir şey yok: rekor kaydedilir ama "yeni rekor" sayılmaz.
+	var first_run: bool = int(totals[&"runs"]) == 0
 	totals[&"runs"] += 1
 	totals[&"wins"] += 1 if won else 0
 	totals[&"kills"] += entry["kills"]
@@ -92,7 +94,10 @@ static func apply_run(save: Dictionary, summary: Dictionary) -> Dictionary:
 	history.push_front(entry)
 	while history.size() > HISTORY_MAX:
 		history.pop_back()
-	return {"save": out, "new_records": broken}
+	var reported: Array[StringName] = []
+	if not first_run:
+		reported = broken
+	return {"save": out, "new_records": reported}
 
 
 static func _raise(records: Dictionary, key: StringName, value: int, broken: Array[StringName]) -> void:

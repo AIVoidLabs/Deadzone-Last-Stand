@@ -9,7 +9,8 @@ var director: SpawnDirector
 ## Kristaller kapalıyken null.
 var pickups: Pickups
 
-var _screen: CardScreen
+## PerkScreen (FEATURE_NEW_CARDS) ya da eski CardScreen; ikisi de aynı arayüzü sunar.
+var _screen: Variant
 var _offer: Array[Dictionary] = []
 var _open: bool = false
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
@@ -18,7 +19,7 @@ var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 func _ready() -> void:
 	name = "LevelUpFlow"
 	_rng.randomize()
-	_screen = CardScreen.new()
+	_screen = PerkScreen.new() if Tuning.FEATURE_NEW_CARDS else CardScreen.new()
 	add_child(_screen)
 	_screen.chosen.connect(_on_chosen)
 
@@ -58,6 +59,7 @@ func _on_chosen(index: int) -> void:
 	UiSounds.play(UiSoundData.CARD_PICK)
 	var card: Dictionary = _offer[index]
 	stats.add(card["stat"], card["value"])
+	GameFlow.run_stats.add_card(card["stat"], card["tier"])
 	loot.pending_levels -= 1
 	if loot.pending_levels > 0:
 		_show_next()

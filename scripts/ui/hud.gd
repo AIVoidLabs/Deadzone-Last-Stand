@@ -192,6 +192,8 @@ func _build_game_over() -> void:
 
 ## won: son dalga temizlendi; değilse asker öldü.
 func _show_end(won: bool) -> void:
+	if Tuning.FEATURE_END_SUMMARY:
+		return
 	_over_title.text = "HAYATTA KALDIN" if won else "ÖLDÜN"
 	var lines: PackedStringArray = PackedStringArray()
 	var run: WaveRun = _director.run

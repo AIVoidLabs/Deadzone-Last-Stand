@@ -15,8 +15,9 @@ func _ready() -> void:
 		return
 	director.phase_changed.connect(_on_phase)
 	player.died.connect(func() -> void: UiSounds.play(UiSoundData.PLAYER_DEATH))
-	GameFlow.game_over_started.connect(func() -> void: UiSounds.play(UiSoundData.GAME_OVER))
-	GameFlow.victory_started.connect(func() -> void: UiSounds.play(UiSoundData.VICTORY))
+	# Yöntem olarak bağlanır: self'e dayanmayan lambda düğüm silinince kopmaz (her turda bir bağlantı birikirdi).
+	GameFlow.game_over_started.connect(_on_game_over)
+	GameFlow.victory_started.connect(_on_victory)
 	set_process(Tuning.FEATURE_SFX_LOW_HEALTH)
 
 
@@ -25,6 +26,14 @@ func _process(delta: float) -> void:
 	var ratio: float = player.health.ratio() if GameFlow.state == GameFlow.State.PLAYING else 0.0
 	if _low_health.tick(delta, ratio, Tuning.LOW_HEALTH_THRESHOLD, Tuning.LOW_HEALTH_BEAT_INTERVAL):
 		UiSounds.play(UiSoundData.LOW_HEALTH)
+
+
+func _on_game_over() -> void:
+	UiSounds.play(UiSoundData.GAME_OVER)
+
+
+func _on_victory() -> void:
+	UiSounds.play(UiSoundData.VICTORY)
 
 
 func _on_phase(phase: WaveRun.Phase, _wave_index: int) -> void:

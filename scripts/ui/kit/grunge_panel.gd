@@ -10,6 +10,7 @@ var _mat: ShaderMaterial = null
 
 func _init() -> void:
 	_mat = UiAssets.mat("grunge_panel")
+	_mat.set_shader_parameter("scratch_tex", UiAssets.tex("scratches"))
 	material = _mat
 	var sb: StyleBoxFlat = StyleBoxFlat.new()
 	sb.bg_color = Color.WHITE

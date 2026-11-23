@@ -9,14 +9,21 @@ const REF_HEIGHT: float = 430.0
 const MIN_FONT: int = 12
 # Yerleşim (kart boyutunun kesirleri)
 const CAT_RECT: Rect2 = Rect2(0.15, 0.03, 0.70, 0.075)
-const EMBLEM_RECT: Rect2 = Rect2(0.13, 0.10, 0.74, 0.41)
-const BAND_RECT: Rect2 = Rect2(0.025, 0.545, 0.95, 0.135)
-const BLOT_RECT: Rect2 = Rect2(0.03, 0.685, 0.94, 0.295)
-const LINES_RECT: Rect2 = Rect2(0.10, 0.705, 0.80, 0.19)
+const EMBLEM_RECT: Rect2 = Rect2(0.085, 0.07, 0.83, 0.46)
+## Boya damlaları: en çok 2, küçük; kenar boşluğu (px) kart dışına taşma sınırı.
+const DROP_COUNT: int = 2
+const DROP_OVERHANG_PX: float = 8.0
+const DROP_Y: Array[float] = [0.2, 0.29, 0.38, 0.46]
+const DROP_SIZE_MIN: float = 0.13
+const DROP_SIZE_VAR: float = 0.08
+const BAND_RECT: Rect2 = Rect2(0.04, 0.525, 0.92, 0.125)
+const BAND_SHADOW_OFFSET: Vector2 = Vector2(0.0, 0.016)
+const BLOT_RECT: Rect2 = Rect2(0.03, 0.705, 0.94, 0.275)
+const LINES_RECT: Rect2 = Rect2(0.10, 0.722, 0.80, 0.175)
 const STATE_RECT: Rect2 = Rect2(0.03, 0.385, 0.94, 0.125)
 const HALO_CENTER: Vector2 = Vector2(0.5, 0.30)
 const BAND_MASKS: Array[String] = ["band_a", "band_b", "band_c"]
-const SPLAT_MASKS: Array[String] = ["splat_0", "splat_1", "splat_2", "splat_3"]
+const SPATTER_MASKS: Array[String] = ["spatter_0", "spatter_1", "spatter_2", "spatter_3"]
 const TIER_INTENSITY: Array[float] = [0.82, 0.95, 1.08, 1.22]
 const TIER_RIM: Array[float] = [0.3, 0.55, 0.75, 0.95]
 const HOVER_LIFT: float = 16.0
@@ -28,6 +35,10 @@ const INTRO_OFFSET: float = 240.0
 const INTRO_TIME: float = 0.46
 const PRESS_DROP: float = 0.04
 const STATE_TILT_DEG: float = -5.0
+const BAND_TILT_DEG: float = -1.3
+const BAND_EDGE_LIGHT: float = 0.9
+const BAND_BOTTOM_SHADE: float = 0.4
+const BAND_GAIN: float = 1.45
 const TITLE_SIZE: int = 24
 const CATEGORY_SIZE: int = 15
 const BODY_SIZE: int = 14
@@ -43,7 +54,9 @@ var _visual: Control = null
 var _shadow: TextureRect = null
 var _bg: ColorRect = null
 var _bg_mat: ShaderMaterial = null
-var _splat: TextureRect = null
+var _band_box: Control = null
+var _band_shadow: TextureRect = null
+var _drops: Array[TextureRect] = []
 var _emblem_shadow: TextureRect = null
 var _emblem: TextureRect = null
 var _category: Label = null
@@ -107,19 +120,36 @@ func _build() -> void:
 	_bg.material = _bg_mat
 	_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_visual.add_child(_bg)
-	_splat = _add_brush("splat_0", Color.WHITE, 0.0)
+	for i: int in DROP_COUNT:
+		_drops.append(_add_brush("spatter_0", Color.WHITE, 0.0))
 	_emblem_shadow = _add_emblem(Color(0, 0, 0, 0.6))
 	_emblem = _add_emblem(Color.WHITE)
 	_category = _add_label(UiFonts.heading(), UiPalette.BONE, 2)
 	_category.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_place(_category, CAT_RECT)
-	_band = _add_brush("band_a", Color.WHITE, 0.7)
-	_place(_band, BAND_RECT)
+	_band_box = Control.new()
+	_band_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_place(_band_box, BAND_RECT)
+	_band_box.rotation_degrees = BAND_TILT_DEG
+	_band_box.resized.connect(func() -> void: _band_box.pivot_offset = _band_box.size * 0.5)
+	_visual.add_child(_band_box)
+	_band_shadow = _add_brush("band_a", Color(0, 0, 0, 0.7), 0.0)
+	_visual.remove_child(_band_shadow)
+	_band_box.add_child(_band_shadow)
+	_place(_band_shadow, Rect2(BAND_SHADOW_OFFSET.x, BAND_SHADOW_OFFSET.y, 1.0, 1.0))
+	_band = _add_brush("band_a", Color.WHITE, 0.25)
+	(_band.material as ShaderMaterial).set_shader_parameter("edge_light", BAND_EDGE_LIGHT)
+	(_band.material as ShaderMaterial).set_shader_parameter("bottom_shade", BAND_BOTTOM_SHADE)
+	(_band.material as ShaderMaterial).set_shader_parameter("gain", BAND_GAIN)
+	_visual.remove_child(_band)
+	_band_box.add_child(_band)
 	_title = _add_label(UiFonts.heading(), UiPalette.BONE, 3)
 	_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_place(_title, Rect2(BAND_RECT.position.x + 0.04, BAND_RECT.position.y, BAND_RECT.size.x - 0.08, BAND_RECT.size.y))
+	_visual.remove_child(_title)
+	_band_box.add_child(_title)
+	_place(_title, Rect2(0.08, 0.0, 0.84, 1.0))
 	_blot = _add_brush("desc_blot", Color(0.02, 0.015, 0.012, 0.97), 0.25)
 	_place(_blot, BLOT_RECT)
 	_lines = VBoxContainer.new()
@@ -239,17 +269,47 @@ func _style_decor(cat: Dictionary, seed_val: int) -> void:
 	var bm: ShaderMaterial = _band.material
 	bm.set_shader_parameter("mask_tex", UiAssets.tex(band_mask))
 	_band.texture = UiAssets.tex(band_mask)
+	_band_shadow.texture = _band.texture
+	(_band_shadow.material as ShaderMaterial).set_shader_parameter("mask_tex", _band.texture)
 	var band_col: Color = cat["band"]
-	bm.set_shader_parameter("tint", Color(band_col, 0.96))
+	bm.set_shader_parameter("tint", Color(band_col, 1.0))
 	bm.set_shader_parameter("tint_dark", band_col.darkened(0.6))
-	var sm: ShaderMaterial = _splat.material
-	var mask: String = SPLAT_MASKS[(seed_val >> 3) % SPLAT_MASKS.size()]
-	sm.set_shader_parameter("mask_tex", UiAssets.tex(mask))
-	_splat.texture = UiAssets.tex(mask)
-	sm.set_shader_parameter("tint", Color((cat["deep"] as Color).darkened(0.5), 0.9))
-	var fx: float = 0.38 + float((seed_val >> 6) % 30) * 0.01
-	var fy: float = 0.44 + float((seed_val >> 9) % 14) * 0.01
-	_place(_splat, Rect2(fx, fy, 0.62, 0.62 * card_size.x / card_size.y))
+	_style_drops(cat["hot"], seed_val)
+	_bg_mat.set_shader_parameter("splat_tex", UiAssets.tex(SPATTER_MASKS[(seed_val >> 3) % SPATTER_MASKS.size()]))
+	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
+	rng.seed = seed_val
+	_bg_mat.set_shader_parameter("splat_a", Vector4(rng.randf_range(0.25, 0.9), rng.randf_range(0.5, 0.95), rng.randf_range(0.0, TAU), rng.randf_range(0.55, 0.9)))
+	_bg_mat.set_shader_parameter("splat_b", Vector4(rng.randf_range(0.1, 0.8), rng.randf_range(0.35, 0.7), rng.randf_range(0.0, TAU), rng.randf_range(0.4, 0.65)))
+
+
+func _style_drops(hot: Color, seed_val: int) -> void:
+	var tint: Color = Color(hot.lightened(0.05), 0.95)
+	for i: int in _drops.size():
+		var d: TextureRect = _drops[i]
+		var mask: String = SPATTER_MASKS[((seed_val >> 2) + i * 3) % SPATTER_MASKS.size()]
+		d.texture = UiAssets.tex(mask)
+		var m: ShaderMaterial = d.material
+		m.set_shader_parameter("mask_tex", d.texture)
+		m.set_shader_parameter("tint", tint)
+		if d.get_meta("pv", false) == false:
+			d.set_meta("pv", true)
+			d.resized.connect(func() -> void: d.pivot_offset = d.size * 0.5)
+		d.rotation = float(((seed_val >> (i * 3)) % 70)) * 0.01 - 0.35
+	_place_drops(seed_val)
+
+
+func _place_drops(seed_val: int) -> void:
+	var w: float = card_size_now().x
+	var asp: float = w / card_size_now().y
+	var over: float = DROP_OVERHANG_PX / w
+	for i: int in _drops.size():
+		var sx: float = DROP_SIZE_MIN + float((seed_val >> (i * 5 + 1)) % 100) * 0.01 * DROP_SIZE_VAR
+		var flat: float = 0.5 + float((seed_val >> (i * 4 + 7)) % 100) * 0.005
+		var sy: float = sx * asp * flat
+		var right: bool = ((seed_val >> (i + 4)) & 1) == (i & 1)
+		var cy: float = DROP_Y[(seed_val >> (i * 2 + 3)) % DROP_Y.size()] + float(i) * 0.04
+		var x0: float = (1.0 + over - sx) if right else -over
+		_place(_drops[i], Rect2(x0, cy - sy * 0.5, sx, sy))
 
 
 func _build_lines(lines: Array) -> void:
@@ -283,12 +343,13 @@ func _apply_state() -> void:
 		&"sold":
 			dim = 0.75
 			col = UiPalette.BONE
-	if locked:
-		dim = maxf(dim, 0.6)
+	_footer.locked = locked
+	_footer.queue_redraw()
+	if locked and txt != "":
 		col = UiPalette.ASH
 	_bg_mat.set_shader_parameter("dim", dim)
 	_visual.modulate = Color(1, 1, 1) if dim <= 0.0 else Color(0.82, 0.78, 0.78)
-	_state.visible = txt != "" and (st != &"ok" or locked)
+	_state.visible = txt != "" and st != &"ok"
 	_state_label.text = txt
 	_state_label.add_theme_color_override("font_color", col)
 
@@ -299,7 +360,7 @@ func _scale_k() -> float:
 
 
 func card_size_now() -> Vector2:
-	return size if size.x > 1.0 else card_size
+	return size if size.x > 1.0 and size.y > 1.0 else card_size
 
 
 func _fs(base: int, k: float) -> int:
@@ -311,26 +372,32 @@ func _on_resized() -> void:
 		return
 	pivot_offset = size * 0.5
 	var k: float = _scale_k()
-	_category.add_theme_font_size_override("font_size", _fs(CATEGORY_SIZE, k))
+	_set_font(_category, _fs(CATEGORY_SIZE, k))
 	_footer.scale_k = k
 	_footer.queue_redraw()
 	_fit_title(k)
 	_fit_lines(k)
 	var h: float = card_size_now().y
 	var w: float = card_size_now().x
-	(_state_label).add_theme_font_size_override("font_size", _fs(22, k))
-	_place(_splat, Rect2(_splat.anchor_left, _splat.anchor_top, 0.62, 0.62 * w / h))
+	_set_font(_state_label, _fs(22, k))
+	_bg_mat.set_shader_parameter("card_aspect", w / h)
+	if not _drops.is_empty():
+		_place_drops(hash(String(_data.get("title", "")) + String(_data.get("category_id", &""))))
+
+
+func _set_font(l: Label, fs: int) -> void:
+	l.add_theme_font_override("font", UiFonts.tight(fs))
+	l.add_theme_font_size_override("font_size", fs)
 
 
 ## Başlık bantta tek satıra sığacak kadar küçülür; sığmazsa iki satır.
 func _fit_title(k: float) -> void:
 	var avail: float = card_size_now().x * (BAND_RECT.size.x - 0.12)
-	var f: Font = UiFonts.heading()
 	var fs: int = _fs(TITLE_SIZE, k)
 	var min_fs: int = maxi(MIN_FONT, roundi(fs * 0.72))
-	while fs > min_fs and f.get_string_size(_title.text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > avail:
+	while fs > min_fs and UiFonts.tight(fs).get_string_size(_title.text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > avail:
 		fs -= 1
-	_title.add_theme_font_size_override("font_size", fs)
+	_set_font(_title, fs)
 
 
 ## Açıklama satırları lekeye sığacak kadar küçülür (el ile ölçülür).
@@ -414,6 +481,13 @@ func _on_down() -> void:
 	var t: Tween = create_tween()
 	t.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	t.tween_method(_set_press, 1.0, 0.0, 0.2).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+
+## Damga (durum levhası): pazar efekti büyüterek oturtur.
+func state_plate() -> Control:
+	if not _built:
+		_build()
+	return _state
 
 
 ## Aşağıdan savrularak gelir.

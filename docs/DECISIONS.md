@@ -2,6 +2,12 @@
 
 Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar verilince "Açık kararlar"dan çıkarılıp tarihli bölüme yazılır.
 
+## 2026-11-22 — Aşama 9 arayüz (Taha)
+
+- Gamepad yapılmaz (titreşim ayarı da yok); yalnız klavye+fare. `FEATURE_GAMEPAD` kaldırıldı.
+- Görsel dil: kanlı afiş kartları (Taha'nın verdiği referansın ruhu; referanstaki çizimler kopyalanmaz, amblemler oyunun kendi dünyasından). Menü ve tüm ekranlar aynı kit.
+- Claude'un kararları: Türkçede oyuncuya görünen "Dash" = "Takla" (İngilizcede Dash); yüzde biçimi "%12"; kart adları (Kemik Kıran, Kızgın Namlu, Kalın Deri…); ilk turda REKOR damgası basılmaz; tur sonu başlıkları "SON NEFES" / "HAYATTA KALDIN".
+
 ## 2026-11-22 — 8.5 müzik yok; 8.4 onayı (Taha)
 
 - **Oyunda müzik olmayacak** (8.5 kararı). Atmosferi ortam sesleri taşır; Music veri yolu boş kalır.
