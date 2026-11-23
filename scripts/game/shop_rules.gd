@@ -17,6 +17,11 @@ static func reroll_cost(done: int, base: int, step: int) -> int:
 	return base + step * done
 
 
+## Üstel yenileme: base x factor^done (5, 25, 125, 625), max_cost'ta kesilir.
+static func reroll_cost_exp(done: int, base: int, factor: int, max_cost: int) -> int:
+	return roundi(minf(float(max_cost), float(base) * pow(float(factor), float(maxi(done, 0)))))
+
+
 ## Kademe başına bedel ikiye katlanır (iki parça birleşti), geri ödeme bunun fraction'ı.
 static func sell_value(base_price: int, tier: int, fraction: float) -> int:
 	return floori(float(base_price) * pow(2.0, float(tier - 1)) * fraction)

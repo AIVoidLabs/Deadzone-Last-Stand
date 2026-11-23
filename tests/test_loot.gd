@@ -3,7 +3,7 @@ extends GutTest
 
 func test_xp_needed_grows() -> void:
 	var first: int = RunLoot.xp_needed(1)
-	assert_eq(first, (1 + Tuning.XP_LEVEL_OFFSET) * (1 + Tuning.XP_LEVEL_OFFSET))
+	assert_eq(first, roundi(Tuning.XP_LEVEL_SCALE * pow(float(1 + Tuning.XP_LEVEL_OFFSET), Tuning.XP_LEVEL_POWER)))
 	assert_gt(RunLoot.xp_needed(2), first)
 
 

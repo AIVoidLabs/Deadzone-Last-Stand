@@ -47,6 +47,21 @@ func count() -> int:
 	return _pos.size()
 
 
+## Akışlar (kart/mağaza) yerdeki kristali beklemeli mi? Otomatik toplama kapalıyken yerde kalan beklemez.
+func is_settled() -> bool:
+	return Tuning.FEATURE_WAVE_END_NO_AUTOCOLLECT or _pos.size() == 0
+
+
+## Yeni dalga: yerde kalan kristaller silinir (havuza döner).
+func clear_all() -> void:
+	_pos.resize(0)
+	_from.resize(0)
+	_value.resize(0)
+	_state.resize(0)
+	_t.resize(0)
+	_mm.visible_instance_count = 0
+
+
 ## Boss ölümü: toplam değer pieces parçaya bölünüp geniş bir alana yağar (kalan ilk parçaya eklenir).
 func rain(at: Vector3, total: int, pieces: int) -> void:
 	var each: int = total / maxi(pieces, 1)

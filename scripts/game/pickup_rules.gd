@@ -21,6 +21,13 @@ static func hop_height(t: float, duration: float, height: float) -> float:
 	return 4.0 * height * k * (1.0 - k)
 
 
+## Ölen zombi kristal bırakır mı? chance 0..1; rastgelelik rng'den (test edilebilir).
+static func should_drop(chance: float, rng: RandomNumberGenerator) -> bool:
+	if chance >= 1.0:
+		return true
+	return rng.randf() < chance
+
+
 ## Askerin çekim menzilinde mi?
 static func in_magnet(pos: Vector2, player: Vector2, radius: float) -> bool:
 	return pos.distance_squared_to(player) <= radius * radius

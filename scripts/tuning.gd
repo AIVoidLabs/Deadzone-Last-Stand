@@ -201,10 +201,17 @@ const FEATURE_SHOP: bool = true
 const SHOP_OFFER_COUNT: int = 4
 const SHOP_WEAPON_CHANCE: float = 0.4
 ## Fiyat artışı: her dalgada temel fiyatın bu kesri kadar.
-const SHOP_PRICE_WAVE_GROWTH: float = 0.11  # 11.4: 0.07 bolluk (bot dalga başına ~30 eşya), 0.2 kıtlık (bot %0); son mağaza x1.88
+const SHOP_PRICE_WAVE_GROWTH: float = 0.15  # 11.5B: 0.11 → 0.15 (Taha: mağaza ucuz)
+## Tüm mağaza fiyatlarının genel çarpanı (11.5B: Taha'ya göre ucuz; tablolar değişmeden ~%30).
+const SHOP_PRICE_MULT: float = 1.3
 ## Yenileme: ilk bedel ve her yenilemede artış (kristal); dalga başında sıfırlanır.
 const SHOP_REROLL_BASE: int = 5
 const SHOP_REROLL_STEP: int = 2
+## Üstel yenileme (FEATURE_SHOP_REROLL_EXP): bedel = BASE x FACTOR^yapılan → 5, 25, 125, 625; dalga başında BASE'e döner.
+const FEATURE_SHOP_REROLL_EXP: bool = true
+const SHOP_REROLL_FACTOR: int = 5
+## Üstel bedelin üst sınırı (taşmayı önler).
+const SHOP_REROLL_MAX_COST: int = 100000
 ## Silah satışında geri ödenen kesir.
 const SHOP_SELL_FRACTION: float = 0.5
 ## Yakın dövüş silahları (7.1): savurma/dürtme görseli (kesik izi) ve yanma etkisi (zombide turuncu parlama).
@@ -631,8 +638,18 @@ const PICKUP_VALUE_SCALE: float = 0.12
 const PICKUP_MAX_SCALE: float = 2.0
 ## Beyazımsı, çok hafif buz mavisi.
 const PICKUP_COLOR: Color = Color(0.86, 0.95, 1.0)
-## Seviye için gereken XP: (seviye + bu)². 1→2: 16 kristal.
+## Seviye için gereken XP: XP_LEVEL_SCALE x (seviye + XP_LEVEL_OFFSET)^XP_LEVEL_POWER. 11.5B: eski eğri ölçek 1.0, üs 2.0 (1→2: 16 kristal).
 const XP_LEVEL_OFFSET: int = 3
+const XP_LEVEL_SCALE: float = 1.5
+const XP_LEVEL_POWER: float = 2.2
+## Ölen zombinin kristal bırakma olasılığı (satırda drop_chance yoksa DROP_CHANCE_DEFAULT). Boss yağmuru her zaman düşer.
+const FEATURE_DROP_CHANCE: bool = true
+const DROP_CHANCE_WALKER: float = 0.5
+const DROP_CHANCE_SPECIAL: float = 0.8
+const DROP_CHANCE_BOSS: float = 1.0
+const DROP_CHANCE_DEFAULT: float = 1.0
+## Dalga sonunda yerdeki kristaller otomatik toplanmaz; yeni dalga başlayınca silinir (kapalıyken eski otomatik toplama).
+const FEATURE_WAVE_END_NO_AUTOCOLLECT: bool = true
 
 # --- İstatistikler ve kartlar (satırlar StatData / CardData'da) ---
 const CARD_OFFER_COUNT: int = 3
