@@ -667,10 +667,13 @@ const PICKUP_COLOR: Color = Color(0.86, 0.95, 1.0)
 const XP_LEVEL_OFFSET: int = 3
 const XP_LEVEL_SCALE: float = 1.5
 const XP_LEVEL_POWER: float = 2.2
+## Tüm silahların temel hasar çarpanı (denge düğmesi; tablodaki değerler × bu). 1.0 = tablo aynen.
+const WEAPON_DAMAGE_MULT: float = 1.3
+
 ## Ölen zombinin kristal bırakma olasılığı (satırda drop_chance yoksa DROP_CHANCE_DEFAULT). Boss yağmuru her zaman düşer.
 const FEATURE_DROP_CHANCE: bool = true
-const DROP_CHANCE_WALKER: float = 0.5
-const DROP_CHANCE_SPECIAL: float = 0.8
+const DROP_CHANCE_WALKER: float = 0.65
+const DROP_CHANCE_SPECIAL: float = 0.9
 const DROP_CHANCE_DEFAULT: float = 1.0
 ## Dalga sonunda yerdeki kristaller otomatik toplanmaz; yeni dalga başlayınca silinir (kapalıyken eski otomatik toplama).
 const FEATURE_WAVE_END_NO_AUTOCOLLECT: bool = true

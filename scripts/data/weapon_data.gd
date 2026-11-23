@@ -191,4 +191,6 @@ static func get_row(id: StringName) -> Dictionary:
 	row.merge(DEFAULTS)
 	if row.has("projectile_speed"):
 		row["projectile_speed"] = float(row["projectile_speed"]) * Tuning.GAME_PACE
+	if row.has("damage"):
+		row["damage"] = float(row["damage"]) * Tuning.WEAPON_DAMAGE_MULT
 	return row
