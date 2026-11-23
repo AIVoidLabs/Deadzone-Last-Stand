@@ -5,7 +5,22 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 
 ## Şu an
 
-**AŞAMA 9 BİTTİ (2026-11-23), Taha onayladı.** **AŞAMA 11 (2026-11-23): denge ilk geçişi bitti, Taha'nın oynayıp yorumu bekleniyor.** Hedef orta–zor, 10 dalga, 30 eşya, 10 silah (DECISIONS 2026-11-23). Sonnet alt ajanlar + ayrı Opus gözden geçiren, sayılar ana döngüde botla ayarlandı.
+**AŞAMA 9 BİTTİ (2026-11-23), Taha onayladı.** **AŞAMA 11 — Taha'nın ilk oyun geri bildirimi (2026-11-23): oynanış beğenildi, oyun hâlâ basit. Plan aşağıda; geliştirme yeni oturumda başlar.**
+Çalışma biçimi (Taha): uzun bot ölçüm döngüleri YOK; oyunu Taha test eder. Ana döngü yalnız GUT + headless kontrol + (UI için) ekran görüntüsü yapar. Gruplar Sonnet alt ajanlara, ayrı git worktree'lerinde paralel (`tuning.gd` çakışmasın diye her grup kendi bölümüne yazar); ana döngü birleştirir, ayrı Opus gözden geçirir, commit eder.
+
+| Grup | Taha maddeleri | Kapsam | Ana dosyalar |
+|---|---|---|---|
+| A — Asker gücü | 2, 3 (takla), 3b (statlar), 5 sonu (yüksek kademe silah) | Hız artışına tavan, kart/eşya stat değerleri ~yarıya, takla bekleme 1.4 sn → ~3–3.5 sn ve dokunulmazlık yalnız taklanın başında (çıkış dokunulmazlığı kalkar), silah kademe çarpanları (3.2× → ~2.4×) | tuning (asker/takla), card_data, item_data, player_stats, weapon_data TIERS |
+| B — Ekonomi ve seviye | 1, 6, 7, 8 | XP eğrisi dikleşir; her zombiden kristal düşmez (türe göre düşme olasılığı); dalga sonunda otomatik toplama kalkar, yerde kalan kristal yeni dalgada silinir; mağaza fiyatları artar; yenileme 5 → 25 → 125 (×5 üstel) | tuning (xp/mağaza), run_loot, pickups, shop rules, enemy_data drop alanları |
+| C — Zombi ince ayarı | 5 | Tükürük gölü: üstünde yavaşlama + yanma; koşan: daha hızlı, daha sık hamle/vuruş; zıplayan: kısa aralıklı seri zıplama (çekirge); dilci: daha sık dil atışı; diğerleri tek tek gözden geçirilir. Her yeni etki FEATURE_* ile kapanır | enemy_data*, enemies/ (acid, lunge, jump, tongue) |
+| D — Tur yapısı | 4, 10, 5 (genel can/hasar) | Dalga süreleri uzar (tur ~6 dk → ~12–15 dk), ilk dalgalar yoğunlaşır (1. dalgadan baskı), genel zombi can/hasar çarpanları yukarı | wave_data |
+| E — Arayüz açıklığı | 9 | Mağaza kartında birleştirme/kademe atlamada "hasar 10 → 15, hız +%12" gibi önce→sonra; envanterde silaha fareyle gelince istatistikler (hasar, hız, menzil, kademe) | ui/market, HUD envanter, text_* |
+| F — Boss | 11 | Önce tasarım: 2–3 seçenek (ör. uzak saldırı/şok dalgası, daha uzun ve hızlı hücum, can eşiğinde öfke evresi, çağırma). Taha seçer, sonra yapılır; yeni imza hareket gerekirse Blender'da elle anahtarlanır (kural 9) | enemy_data_boss, boss betikleri |
+
+Sıra: A, B, C, D, E paralel (birbirinden bağımsız); F önce seçenek sunumu, Taha'nın seçiminden sonra. Hepsi bitince Taha tek seferde oynar; geri bildirimle ikinci ince ayar.
+Yeni oturumda Taha'ya sorulacak (önerilen varsayılanla): takla bekleme 3.0 mı 3.5 sn mi; dokunulmazlık tamamen kalksın mı yoksa yalnız ilk ~0.15 sn mi; kristal düşme olasılığı (öneri: yürüyen %50, özel zombiler %100); hedef tur süresi (öneri ~12 dk).
+
+**AŞAMA 11 (2026-11-23): denge ilk geçişi bitti; Taha oynadı (yukarıdaki geri bildirim).** Hedef orta–zor, 10 dalga, 30 eşya, 10 silah (DECISIONS 2026-11-23). Sonnet alt ajanlar + ayrı Opus gözden geçiren, sayılar ana döngüde botla ayarlandı.
 - 11.0 bot aracı: `autoplay_runs.ps1 -Strategy default|guns|melee|tank -Parallel N -Weapons 6`, SUMMARY (kazanma, ölüm dağılımı, dalga başına en düşük can), STUCK/CRASHED ayrı; bot para harcar (silah önce, birleştirme, yenileme).
 - 11.1 eşyalar 12 → 30 (yeni eşyalar ilk etkinin stat amblemini kullanır; kendi amblemleri sonra).
 - 11.2 10 dalga: türler kademeli (2 koşan, 3 zırhlı+sıçrayan, 4 tükürücü+şişkin, 5 tank, 6 dilci, 7 fırlatıcı+çığlıkçı, 10 boss); dalgaya göre zombi can/hasar çarpanı (`WaveScaling`, FEATURE_WAVE_ENEMY_SCALING; can ×1.0 → ×1.7, hasar ×1.0 → ×1.26).
