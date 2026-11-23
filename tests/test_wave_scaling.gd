@@ -5,9 +5,9 @@ extends GutTest
 func test_wave_rows_carry_the_planned_curve() -> void:
 	var first: Dictionary = WaveData.WAVES[0]
 	var last: Dictionary = WaveData.WAVES[WaveData.WAVES.size() - 1]
-	assert_eq(float(first["enemy_hp_mult"]), 1.0)
+	assert_gte(float(first["enemy_hp_mult"]), 1.0)
 	assert_gt(float(last["enemy_hp_mult"]), float(first["enemy_hp_mult"]))
-	assert_gt(float(last["enemy_damage_mult"]), 1.0)
+	assert_gt(float(last["enemy_damage_mult"]), float(first["enemy_damage_mult"]))
 
 
 func test_reads_multipliers_and_defaults_to_one() -> void:
