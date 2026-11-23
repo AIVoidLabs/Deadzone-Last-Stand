@@ -304,8 +304,8 @@ func _place_drops(seed_val: int) -> void:
 	var over: float = DROP_OVERHANG_PX / w
 	for i: int in _drops.size():
 		var sx: float = DROP_SIZE_MIN + float((seed_val >> (i * 5 + 1)) % 100) * 0.01 * DROP_SIZE_VAR
-		var flat: float = 0.5 + float((seed_val >> (i * 4 + 7)) % 100) * 0.005
-		var sy: float = sx * asp * flat
+		var squash: float = 0.5 + float((seed_val >> (i * 4 + 7)) % 100) * 0.005
+		var sy: float = sx * asp * squash
 		var right: bool = ((seed_val >> (i + 4)) & 1) == (i & 1)
 		var cy: float = DROP_Y[(seed_val >> (i * 2 + 3)) % DROP_Y.size()] + float(i) * 0.04
 		var x0: float = (1.0 + over - sx) if right else -over

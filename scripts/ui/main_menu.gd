@@ -212,9 +212,9 @@ func _on_setting_changed(key: StringName, _value: Variant) -> void:
 ## Metinler yeniden kurulur (dil ya da canlı bilgi değişti); odak aynı kontrole döner.
 func _rebuild() -> void:
 	var focus_id: StringName = &""
-	var owner: Control = get_viewport().gui_get_focus_owner()
-	if owner != null and owner.has_meta(&"fid"):
-		focus_id = owner.get_meta(&"fid")
+	var focused: Control = get_viewport().gui_get_focus_owner()
+	if focused != null and focused.has_meta(&"fid"):
+		focus_id = focused.get_meta(&"fid")
 	_ui.queue_free()
 	remove_child(_ui)
 	_intro = false

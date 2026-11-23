@@ -165,14 +165,14 @@ func fill_buffers(pts: PackedVector3Array, length: float) -> void:
 		ref = Vector3.RIGHT
 	var nrm: Vector3 = (ref - tan0 * tan0.dot(ref)).normalized()
 	for i: int in rings:
-		var tan: Vector3 = tan0
+		var tangent: Vector3 = tan0
 		if i > 0 and i < rings - 1:
-			tan = (_centers[i + 1] - _centers[i - 1]).normalized()
+			tangent = (_centers[i + 1] - _centers[i - 1]).normalized()
 		elif i == rings - 1:
-			tan = (_centers[i] - _centers[i - 1]).normalized()
+			tangent = (_centers[i] - _centers[i - 1]).normalized()
 		# Yansıtmalı taşıma: önceki çerçeveyi yeni teğete diker (küçük açılarda paralel taşımaya eşdeğer).
-		nrm = (nrm - tan * tan.dot(nrm)).normalized()
-		var bin: Vector3 = tan.cross(nrm)
+		nrm = (nrm - tangent * tangent.dot(nrm)).normalized()
+		var bin: Vector3 = tangent.cross(nrm)
 		var rad: float
 		var cc: float = 1.0
 		var ss: float = 0.0
@@ -182,7 +182,7 @@ func fill_buffers(pts: PackedVector3Array, length: float) -> void:
 			cc = _cap_cos[i - samples]
 			ss = _cap_sin[i - samples]
 			rad = maxf(cc * r_tip, 0.0005)
-		_write_ring(i, _centers[i], nrm, bin, tan, rad, cc, ss)
+		_write_ring(i, _centers[i], nrm, bin, tangent, rad, cc, ss)
 
 
 func _fill_centers(pts: PackedVector3Array) -> void:
@@ -191,9 +191,9 @@ func _fill_centers(pts: PackedVector3Array) -> void:
 		_centers[k] = pts[_ci[b]] * _cw[b] + pts[_ci[b + 1]] * _cw[b + 1] + pts[_ci[b + 2]] * _cw[b + 2] + pts[_ci[b + 3]] * _cw[b + 3]
 
 
-func _write_ring(i: int, c: Vector3, nrm: Vector3, bin: Vector3, tan: Vector3, rad: float, cc: float, ss: float) -> void:
+func _write_ring(i: int, c: Vector3, nrm: Vector3, bin: Vector3, tangent: Vector3, rad: float, cc: float, ss: float) -> void:
 	var base: int = i * (radial + 1)
-	var tan_ss: Vector3 = tan * ss
+	var tan_ss: Vector3 = tangent * ss
 	for j: int in radial + 1:
 		var dir: Vector3 = nrm * _cos[j] + bin * _sin[j]
 		var v: int = base + j

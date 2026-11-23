@@ -5,6 +5,7 @@ extends Node3D
 
 signal state_changed(new_state: int, old_state: int)
 signal event(event_name: StringName, data: Dictionary)
+@warning_ignore("unused_signal")
 ## Kovalarken gerçek yatay hız (m/sn); yalnız walk_ref_speed olan türlerde, yürüme klibi hızı için.
 signal ground_speed(speed: float)
 

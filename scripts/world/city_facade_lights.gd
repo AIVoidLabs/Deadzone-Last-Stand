@@ -64,7 +64,7 @@ func _face(center: Vector3, yaw: Basis, normal_local: Vector3, tangent_local: Ve
 	var normal: Vector3 = yaw * normal_local
 	var tangent: Vector3 = yaw * tangent_local
 	var origin: Vector3 = center + normal * (Tuning.CITY_FACADE_HALF + Tuning.CITY_FACADE_OFFSET)
-	var basis: Basis = Basis(tangent, Vector3.UP, normal)
+	var xform_basis: Basis = Basis(tangent, Vector3.UP, normal)
 	for r: int in rows.size():
 		for col: int in rows[r].length():
 			var state: String = rows[r][col]
@@ -82,7 +82,7 @@ func _face(center: Vector3, yaw: Basis, normal_local: Vector3, tangent_local: Ve
 			var along: float = Tuning.CITY_FACADE_WINDOW_U[col]
 			var pos: Vector3 = origin + tangent * along + Vector3(0.0, Tuning.CITY_FACADE_WINDOW_Z[r], 0.0)
 			var g: Dictionary = _windows[0 if _rng.randf() < 0.7 else 1]
-			g["xfs"].append(Transform3D(basis * Basis.from_scale(Vector3(Tuning.CITY_FACADE_WINDOW_SIZE.x, Tuning.CITY_FACADE_WINDOW_SIZE.y, 1.0)), pos))
+			g["xfs"].append(Transform3D(xform_basis * Basis.from_scale(Vector3(Tuning.CITY_FACADE_WINDOW_SIZE.x, Tuning.CITY_FACADE_WINDOW_SIZE.y, 1.0)), pos))
 			g["colors"].append(color)
 			g["customs"].append(Color(_rng.randf(), tv, 0.0, 0.0))
 
@@ -93,11 +93,11 @@ func _lamps(center: Vector3, yaw: Basis) -> void:
 		var normal: Vector3 = yaw * (Vector3.RIGHT if face == 0 else Vector3.BACK)
 		var tangent: Vector3 = yaw * (Vector3.FORWARD if face == 0 else Vector3.RIGHT)
 		var origin: Vector3 = center + normal * (Tuning.CITY_FACADE_HALF + Tuning.CITY_FACADE_OFFSET)
-		var basis: Basis = Basis(tangent, Vector3.UP, normal)
+		var xform_basis: Basis = Basis(tangent, Vector3.UP, normal)
 		for k: int in Tuning.CITY_FACADE_LAMPS_PER_FACE:
 			var span: float = Tuning.CITY_FACADE_HALF - 2.5
 			var along: float = (float(k) + 0.5) / float(Tuning.CITY_FACADE_LAMPS_PER_FACE) * span * 2.0 - span + _rng.randf_range(-0.8, 0.8)
-			_lamp(origin + tangent * along, normal, basis, k == 0 and face == 0)
+			_lamp(origin + tangent * along, normal, xform_basis, k == 0 and face == 0)
 
 
 ## Bina modelinin köşe dönüşü (city_greybox._place_building ile aynı).
@@ -136,7 +136,7 @@ func _flush_windows() -> void:
 
 
 ## Duvar lambası: koyu braket + ampul; cephede ve altındaki kaldırımda sahte ışık lekesi.
-func _lamp(wall: Vector3, normal: Vector3, basis: Basis, flickers: bool) -> void:
+func _lamp(wall: Vector3, normal: Vector3, xform_basis: Basis, flickers: bool) -> void:
 	var pos: Vector3 = Vector3(wall.x, Tuning.CITY_FACADE_LAMP_HEIGHT, wall.z)
 	var color: Color = Tuning.CITY_FACADE_LAMP_COLOR
 	var bracket: MeshInstance3D = MeshInstance3D.new()
@@ -144,7 +144,7 @@ func _lamp(wall: Vector3, normal: Vector3, basis: Basis, flickers: bool) -> void
 	box.size = Vector3(0.14, 0.14, 0.3)
 	bracket.mesh = box
 	bracket.material_override = CityFxAssets.emissive(BRACKET, 0.0)
-	bracket.transform = Transform3D(basis, pos + normal * 0.15)
+	bracket.transform = Transform3D(xform_basis, pos + normal * 0.15)
 	add_child(bracket)
 	var bulb: MeshInstance3D = MeshInstance3D.new()
 	var sphere: SphereMesh = SphereMesh.new()
@@ -163,7 +163,7 @@ func _lamp(wall: Vector3, normal: Vector3, basis: Basis, flickers: bool) -> void
 	wall_quad.size = Vector2.ONE * Tuning.CITY_FACADE_LAMP_RADIUS * 2.0
 	on_wall.mesh = wall_quad
 	on_wall.material_override = CityFxAssets.glow_material(color, Tuning.CITY_FACADE_LAMP_WALL_ENERGY, flicker, pos.x + pos.z)
-	on_wall.transform = Transform3D(basis, pos + normal * 0.05 - Vector3(0.0, 0.8, 0.0))
+	on_wall.transform = Transform3D(xform_basis, pos + normal * 0.05 - Vector3(0.0, 0.8, 0.0))
 	on_wall.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(on_wall)
 	var ground: MeshInstance3D = CityFxAssets.glow_quad(pos + normal * 2.0, Tuning.CITY_FACADE_LAMP_RADIUS * 1.1, color, Tuning.CITY_FACADE_LAMP_GROUND_ENERGY, flicker)

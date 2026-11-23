@@ -384,7 +384,7 @@ func test_boss_death_cancels_only_boss_balls_in_flight() -> void:
 	lob._lob_row.append(spit)
 	assert_eq(lob.cancel_boss_balls(), 2)
 	assert_eq(lob._lob_left.size(), 1, "tükürücü topu kalır")
-	assert_false(lob._is_boss_ball(lob._lob_row[0]))
+	assert_false(LobAttack._is_boss_ball(lob._lob_row[0]))
 	assert_eq(lob.cancel_boss_balls(), 0)
 	m.free()
 

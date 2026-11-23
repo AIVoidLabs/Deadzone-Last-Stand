@@ -38,7 +38,7 @@ static func full_name(clip: StringName) -> StringName:
 
 
 static func library(skeleton: Skeleton3D) -> AnimationLibrary:
-	var library: AnimationLibrary = AnimationLibrary.new()
+	var lib: AnimationLibrary = AnimationLibrary.new()
 	for clip: StringName in TABLE:
-		library.add_animation(clip, ZombieClips.derive(TABLE[clip], skeleton))
-	return library
+		lib.add_animation(clip, ZombieClips.derive(TABLE[clip], skeleton))
+	return lib

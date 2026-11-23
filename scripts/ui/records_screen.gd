@@ -225,6 +225,7 @@ static func sample_save() -> Dictionary:
 	for i: int in SAMPLE_RUNS:
 		var won: bool = i % 5 == 3
 		var wave: int = 20 if won else 6 + (i * 7) % 13
+		@warning_ignore("integer_division")
 		save = RunRecord.apply_run(save, {
 			"won": won, "wave": wave, "kills": 120 + wave * 38 + (i * 53) % 90, "crystals": 400 + wave * 25,
 			"level": 5 + wave / 2, "time": 150.0 + wave * 31.0 + i * 9.0, "stamp": now - i * 7300,

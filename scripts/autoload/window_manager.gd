@@ -71,6 +71,7 @@ func _apply_windowed_size() -> void:
 	DisplayServer.window_set_size(wanted)
 	var screen: int = DisplayServer.window_get_current_screen()
 	var area: Rect2i = DisplayServer.screen_get_usable_rect(screen)
+	@warning_ignore("integer_division")
 	DisplayServer.window_set_position(area.position + (area.size - wanted) / 2)
 
 

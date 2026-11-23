@@ -26,9 +26,9 @@ var _tween: Tween = null
 var _lit: bool = false
 
 
-static func create(text: String, variant_id: StringName = &"normal") -> GrungeButton:
+static func create(label_text: String, variant_id: StringName = &"normal") -> GrungeButton:
 	var b: GrungeButton = GrungeButton.new()
-	b.text = text
+	b.text = label_text
 	b.variant = variant_id
 	return b
 

@@ -238,9 +238,9 @@ func _process(delta: float) -> void:
 
 
 ## --boss-attack=slam|charge|summon|spew: boss saldırı seçimini kilitler (--boss-rage: öfkeyi zorlar; hücum zinciri için).
-func _boss_attack_arg(name: String) -> BossRules.Attack:
+func _boss_attack_arg(attack_name_arg: String) -> BossRules.Attack:
 	for a: int in BossRules.Attack.values():
-		if BossRules.attack_name(a as BossRules.Attack) == StringName(name):
+		if BossRules.attack_name(a as BossRules.Attack) == StringName(attack_name_arg):
 			return a as BossRules.Attack
 	return BossRules.Attack.NONE
 

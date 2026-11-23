@@ -55,7 +55,7 @@ static func _number(value: Variant, as_float: bool) -> Variant:
 	var n: float = float(value) if (value is int or value is float) else 0.0
 	if is_nan(n) or is_inf(n) or n < 0.0:
 		n = 0.0
-	return n if as_float else int(n)
+	return (n as Variant) if as_float else int(n)
 
 
 static func _entry(source: Dictionary) -> Dictionary:

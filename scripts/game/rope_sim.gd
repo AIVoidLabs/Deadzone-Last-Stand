@@ -24,9 +24,9 @@ var _wave_len: float = 1.0
 var _wave_phase: float = 0.0
 
 
-func setup(anchor: Vector3, count: int = DEFAULT_COUNT) -> void:
+func setup(anchor: Vector3, point_count: int = DEFAULT_COUNT) -> void:
 	_anchor = anchor
-	_pos.resize(maxi(count, 2))
+	_pos.resize(maxi(point_count, 2))
 	_prev.resize(_pos.size())
 	_out.resize(_pos.size())
 	for i: int in _pos.size():

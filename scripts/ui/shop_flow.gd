@@ -28,7 +28,7 @@ var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 func _ready() -> void:
 	name = "ShopFlow"
 	_rng.randomize()
-	_screen = MarketScreen.new() if Tuning.FEATURE_NEW_SHOP else ShopScreen.new()
+	_screen = MarketScreen.new() as Variant if Tuning.FEATURE_NEW_SHOP else ShopScreen.new()
 	add_child(_screen)
 	_screen.buy_pressed.connect(_on_buy)
 	_screen.lock_pressed.connect(_on_lock)

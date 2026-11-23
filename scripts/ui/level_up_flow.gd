@@ -20,7 +20,7 @@ var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 func _ready() -> void:
 	name = "LevelUpFlow"
 	_rng.randomize()
-	_screen = PerkScreen.new() if Tuning.FEATURE_NEW_CARDS else CardScreen.new()
+	_screen = PerkScreen.new() as Variant if Tuning.FEATURE_NEW_CARDS else CardScreen.new()
 	add_child(_screen)
 	_screen.chosen.connect(_on_chosen)
 

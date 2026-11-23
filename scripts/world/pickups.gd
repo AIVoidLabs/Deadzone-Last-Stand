@@ -79,6 +79,7 @@ func _reset() -> void:
 
 ## Boss ölümü: toplam değer pieces parçaya bölünüp geniş bir alana yağar (kalan ilk parçaya eklenir).
 func rain(at: Vector3, total: int, pieces: int) -> void:
+	@warning_ignore("integer_division")
 	var each: int = total / maxi(pieces, 1)
 	for k in pieces:
 		drop(at, each + (total - each * pieces if k == 0 else 0), Tuning.BOSS_RAIN_SPREAD)
@@ -91,9 +92,9 @@ func drop(at: Vector3, value: int, spread: float = 1.0) -> void:
 	var origin: Vector2 = Vector2(at.x, at.z)
 	if _pos.size() >= Tuning.PICKUP_MAX:
 		# Üst sınır: değeri rastgele bir kristale ekle (o kristal büyür).
-		var index: int = randi() % _pos.size()
-		_value[index] += value
-		_write(index, 0.0)
+		var merge_index: int = randi() % _pos.size()
+		_value[merge_index] += value
+		_write(merge_index, 0.0)
 		return
 	var offset: Vector2 = Vector2.from_angle(randf() * TAU) * randf() * Tuning.PICKUP_HOP_DISTANCE * spread
 	_pos.append(origin + offset)
@@ -189,8 +190,8 @@ func _write(i: int, lift: float) -> void:
 
 func _write_at(i: int, p: Vector2, lift: float) -> void:
 	var s: float = Tuning.PICKUP_SIZE * PickupRules.value_scale(_value[i], Tuning.PICKUP_VALUE_SCALE, Tuning.PICKUP_MAX_SCALE)
-	var basis: Basis = Basis.from_scale(Vector3(s, s, s))
-	_mm.set_instance_transform(i, Transform3D(basis, Vector3(p.x, Tuning.PICKUP_HEIGHT + lift, p.y)))
+	var xform_basis: Basis = Basis.from_scale(Vector3(s, s, s))
+	_mm.set_instance_transform(i, Transform3D(xform_basis, Vector3(p.x, Tuning.PICKUP_HEIGHT + lift, p.y)))
 
 
 ## Taş kesimi çift piramit: üst ucu uzun, alt ucu kısa; düz yüzler (yüz başına normal).

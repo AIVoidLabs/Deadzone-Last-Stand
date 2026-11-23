@@ -126,20 +126,20 @@ func _build_legacy(pts: PackedVector3Array, length: float) -> void:
 	var nrm: Vector3 = (normal_ref - tan0 * tan0.dot(normal_ref)).normalized()
 	var prev_tan: Vector3 = tan0
 	for i: int in rings:
-		var tan: Vector3 = tan0
+		var tangent: Vector3 = tan0
 		if i > 0 and i < rings - 1:
-			tan = (centers[i + 1] - centers[i - 1]).normalized()
+			tangent = (centers[i + 1] - centers[i - 1]).normalized()
 		elif i == rings - 1:
-			tan = (centers[i] - centers[i - 1]).normalized()
+			tangent = (centers[i] - centers[i - 1]).normalized()
 		# Paralel taşıma: önceki tanjant -> yeni tanjant dönüşü.
-		var axis: Vector3 = prev_tan.cross(tan)
+		var axis: Vector3 = prev_tan.cross(tangent)
 		if axis.length() > 0.00001:
-			nrm = nrm.rotated(axis.normalized(), prev_tan.angle_to(tan))
-		nrm = (nrm - tan * tan.dot(nrm)).normalized()
-		prev_tan = tan
+			nrm = nrm.rotated(axis.normalized(), prev_tan.angle_to(tangent))
+		nrm = (nrm - tangent * tangent.dot(nrm)).normalized()
+		prev_tan = tangent
 		if i > 0:
 			arc += centers[i].distance_to(centers[i - 1])
-		var bin: Vector3 = tan.cross(nrm)
+		var bin: Vector3 = tangent.cross(nrm)
 		var v: float = minf(float(i) / float(SAMPLES - 1), 1.0)
 		var cap: float = 0.0
 		if i >= SAMPLES:
@@ -148,7 +148,7 @@ func _build_legacy(pts: PackedVector3Array, length: float) -> void:
 			var ang: float = float(j) / float(RADIAL) * TAU
 			var radial: Vector3 = nrm * cos(ang) + bin * sin(ang)
 			verts.append(centers[i] + radial * radii[i])
-			norms.append((radial * cos(cap) + tan * sin(cap)).normalized())
+			norms.append((radial * cos(cap) + tangent * sin(cap)).normalized())
 			uvs.append(Vector2(float(j) / float(RADIAL), v))
 			uv2s.append(Vector2(arc, 0.0))
 	for i: int in rings - 1:

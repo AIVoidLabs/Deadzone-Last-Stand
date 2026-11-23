@@ -43,9 +43,9 @@ func _check_mannequin() -> Skeleton3D:
 	if scene == null:
 		_fail("manken yüklenemedi")
 		return null
-	var root: Node = scene.instantiate()
-	_mannequin_root = root
-	var skeleton: Skeleton3D = root.find_child(SKELETON_NAME, true, false) as Skeleton3D
+	var inst: Node = scene.instantiate()
+	_mannequin_root = inst
+	var skeleton: Skeleton3D = inst.find_child(SKELETON_NAME, true, false) as Skeleton3D
 	if skeleton == null:
 		_fail("%s bulunamadı" % SKELETON_NAME)
 		return null
@@ -53,7 +53,7 @@ func _check_mannequin() -> Skeleton3D:
 		if skeleton.find_bone(bone) < 0:
 			_fail("kemik eksik: %s" % bone)
 	var aabb: AABB = AABB()
-	for mesh: MeshInstance3D in root.find_children("*", "MeshInstance3D", true, false):
+	for mesh: MeshInstance3D in inst.find_children("*", "MeshInstance3D", true, false):
 		aabb = aabb.merge(mesh.get_aabb())
 	print("MANKEN: %d kemik, boyut %.2f x %.2f x %.2f m" % [skeleton.get_bone_count(), aabb.size.x, aabb.size.y, aabb.size.z])
 	return skeleton
@@ -94,17 +94,17 @@ func _check_zombies() -> void:
 		var scenes: Array = source if source is Array else [source]
 		for scene: PackedScene in scenes:
 			count += 1
-			var root: Node = scene.instantiate()
+			var inst: Node = scene.instantiate()
 			var label: String = "%s (%s)" % [key, scene.resource_path.get_file()]
-			var skeleton: Skeleton3D = root.find_child(SKELETON_NAME, true, false) as Skeleton3D
+			var skeleton: Skeleton3D = inst.find_child(SKELETON_NAME, true, false) as Skeleton3D
 			if skeleton == null:
 				_fail("%s: %s yok" % [label, SKELETON_NAME])
 			else:
 				for bone: StringName in REQUIRED_BONES:
 					if skeleton.find_bone(bone) < 0:
 						_fail("%s: kemik eksik %s" % [label, bone])
-			var player: AnimationPlayer = root.find_child("AnimationPlayer", true, false) as AnimationPlayer
+			var player: AnimationPlayer = inst.find_child("AnimationPlayer", true, false) as AnimationPlayer
 			if player == null or player.get_animation_list().is_empty():
 				_fail("%s: klip yok" % label)
-			root.free()
+			inst.free()
 	print("ZOMBI GLB: %d dosya tarandi" % count)

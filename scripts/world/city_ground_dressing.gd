@@ -90,14 +90,14 @@ func _build_debris() -> void:
 		var p: Vector3 = _debris_point()
 		var k: Array = kinds[_rng.randi() % kinds.size()]
 		var s: float = clampf(_rng.randf_range(0.6, 1.4) * (size.x + size.y) * 0.5 * _rng.randf_range(0.5, 1.3), size.x, size.y)
-		var basis: Basis = _flat_basis(_rng.randf() * TAU, s * k[0] / 0.3, s * k[1] / 0.3)
+		var xform_basis: Basis = _flat_basis(_rng.randf() * TAU, s * k[0] / 0.3, s * k[1] / 0.3)
 		p.y = 0.034 + _rng.randf() * 0.004
 		var tint: Color
 		if k[2] == 1 and _rng.randf() < 0.4:
 			tint = Color(0.07, 0.07, 0.08) * _rng.randf_range(0.8, 1.4)
 		else:
 			tint = PAPER_COLORS[_rng.randi() % PAPER_COLORS.size()] * _rng.randf_range(Tuning.CITY_PAPER_VALUE.x, Tuning.CITY_PAPER_VALUE.y)
-		xfs.append(Transform3D(basis, p))
+		xfs.append(Transform3D(xform_basis, p))
 		colors.append(tint)
 		customs.append(Color(_rng.randf(), k[2], 0.0, 0.0))
 	var quad: QuadMesh = QuadMesh.new()
@@ -144,8 +144,8 @@ func _build_signs() -> void:
 	var colors: Array[Color] = []
 	for i: int in Tuning.DRESS_SIGNS:
 		var p: Vector3 = _free_point(2.0)
-		var basis: Basis = Basis(Vector3.UP, _rng.randf() * TAU) * Basis(Vector3.BACK, _rng.randf_range(-0.08, 0.08))
-		xfs.append(Transform3D(basis * Basis(Vector3.FORWARD, PI * 0.5) * Basis(Vector3.UP, 0.0), Vector3(p.x, 0.05, p.z)))
+		var xform_basis: Basis = Basis(Vector3.UP, _rng.randf() * TAU) * Basis(Vector3.BACK, _rng.randf_range(-0.08, 0.08))
+		xfs.append(Transform3D(xform_basis * Basis(Vector3.FORWARD, PI * 0.5) * Basis(Vector3.UP, 0.0), Vector3(p.x, 0.05, p.z)))
 		colors.append(SIGN_COLORS[i % SIGN_COLORS.size()] * 2.0)
 	_add_group(mesh, xfs, colors, 0.7)
 

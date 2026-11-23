@@ -86,13 +86,13 @@ func add(at: Vector2) -> int:
 
 
 ## Parçanın parlaklığı: yaşam boyu 1, son fade sn'de 0'a söner.
-static func intensity(age: float, life: float, fade: float) -> float:
-	return clampf((life - age) / maxf(fade, 0.001), 0.0, 1.0)
+static func intensity(age: float, lifetime: float, fade: float) -> float:
+	return clampf((lifetime - age) / maxf(fade, 0.001), 0.0, 1.0)
 
 
 ## Asker parçanın yarıçapı içinde mi (gövde merkezi, parça dairesi).
-static func touching(part: Vector2, target: Vector2, radius: float) -> bool:
-	return part.distance_to(target) <= radius
+static func touching(part: Vector2, target: Vector2, hit_radius: float) -> bool:
+	return part.distance_to(target) <= hit_radius
 
 
 ## Bir kare: parçalar yaşlanır, ömrü dolan gider. exposed ise ve asker bir parçadaysa tik birikir; dönüş: bu karede vurulacak hasar.

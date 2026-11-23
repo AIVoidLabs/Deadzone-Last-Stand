@@ -40,6 +40,7 @@ func _init() -> void:
 		push_error("Kare yok: " + dir)
 		quit(1)
 		return
+	@warning_ignore("integer_division")
 	var cell_w: int = (width - GAP * (cols - 1)) / cols
 	var sample: Image = Image.load_from_file(root_path.path_join(dir).path_join(files[0]))
 	var cell_h: int = int(cell_w * float(sample.get_height()) / sample.get_width())
@@ -51,6 +52,7 @@ func _init() -> void:
 		var img: Image = Image.load_from_file(root_path.path_join(dir).path_join(files[idx]))
 		img.convert(Image.FORMAT_RGB8)
 		img.resize(cell_w, cell_h, Image.INTERPOLATE_LANCZOS)
+		@warning_ignore("integer_division")
 		sheet.blit_rect(img, Rect2i(0, 0, cell_w, cell_h), Vector2i((i % cols) * (cell_w + GAP), (i / cols) * (cell_h + GAP)))
 	var out_abs: String = root_path.path_join(out)
 	DirAccess.make_dir_recursive_absolute(out_abs.get_base_dir())

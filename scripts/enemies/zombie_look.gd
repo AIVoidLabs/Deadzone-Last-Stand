@@ -37,7 +37,9 @@ static func apply_random(model: Node3D) -> MeshInstance3D:
 static func _entry(mesh: MeshInstance3D) -> Dictionary:
 	var source: BaseMaterial3D = mesh.mesh.surface_get_material(0) as BaseMaterial3D
 	var palette: Texture2D = source.albedo_texture if source != null else null
-	var key: Variant = palette if palette != null else mesh.mesh
+	var key: Variant = mesh.mesh
+	if palette != null:
+		key = palette
 	if _by_palette.has(key):
 		return _by_palette[key]
 	var material: ShaderMaterial = ShaderMaterial.new()

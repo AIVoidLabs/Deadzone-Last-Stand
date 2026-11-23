@@ -6,28 +6,40 @@ extends Node3D
 ## (böylece aynı kare içinde indeksler kaymaz).
 
 ## Öldürülen zombi (dalga sonu devrilmeleri hariç). row: tür satırı (drop_value vb.).
+@warning_ignore("unused_signal")
 signal enemy_killed(at: Vector3, row: Dictionary)
 ## Her isabette (öldüren dahil). at: zombinin yerdeki konumu; direction: vuruş yönü.
+@warning_ignore("unused_signal")
 signal enemy_damaged(at: Vector3, direction: Vector2, amount: float, killed: bool)
 ## Zıplayan indi (şok dalgası efekti ve kamera sarsıntısı için). at: yerde, radius: iniş yarıçapı.
+@warning_ignore("unused_signal")
 signal jump_landed(at: Vector3, radius: float)
 ## Yay atışı (LobAttack): kind &"spit" / &"throw"; from/dest dünya konumu (from bırakış yüksekliğinde), flight sn,
 ## arc tepe yüksekliği, radius iniş yarıçapı (gölge işareti). İnince lob_landed; asit topu havuz bırakınca acid_pool_started.
+@warning_ignore("unused_signal")
 signal lob_launched(kind: StringName, from: Vector3, dest: Vector3, flight: float, arc: float, radius: float, boss: bool)
+@warning_ignore("unused_signal")
 signal lob_landed(kind: StringName, at: Vector3, radius: float)
+@warning_ignore("unused_signal")
 signal acid_pool_started(at: Vector3, radius: float, time: float)
 ## Patlayıcı patladı (BloatAttack): at yerde, radius patlama yarıçapı (fx, sarsıntı ve ses için).
+@warning_ignore("unused_signal")
 signal bloat_exploded(at: Vector3, radius: float)
 ## Çığlıkçı ses dalgası yaydı (fx ve sarsıntı); radius çağrı halkasının yarıçapı.
+@warning_ignore("unused_signal")
 signal scream_emitted(at: Vector3, radius: float)
 ## Boss olayı (BossFx): slam / charge_marker / charge_start / charge_dust / stun / summon / roar; veri olaya göre (bkz. BossAttack).
+@warning_ignore("unused_signal")
 signal boss_event(event_name: StringName, data: Dictionary)
 ## Zırhlıya önden gelen (azaltılmış) isabet; öldürmeyen vuruşlarda enemy_damaged yerine (kan yok: gri kıvılcım, küçük sayı).
+@warning_ignore("unused_signal")
 signal enemy_blocked(at: Vector3, direction: Vector2, amount: float)
 
 ## Özel saldırı başladı (ses için): kind &"runner" / &"jump"; phase &"sprint" / &"lunge" / &"takeoff"; at yerde.
+@warning_ignore("unused_signal")
 signal special_started(kind: StringName, phase: StringName, at: Vector3)
 ## Dilci olayı (ses için): kind &"shoot" / &"attach" / &"melee"; at dilcinin yerdeki konumu.
+@warning_ignore("unused_signal")
 signal tongue_event(kind: StringName, at: Vector3)
 
 const PHYSICS_PRIORITY: int = -10
@@ -78,11 +90,14 @@ var _half: float
 ## Şehir bloklarının XZ dikdörtgenleri (FEATURE_CITY_GREYBOX); zombiler içine girmez, kenarda kayar.
 var _blocks: Array[Rect2] = CityLayout.solid_rects(Tuning.ARENA_SIZE, Tuning.CITY_STREET_WIDTH, Tuning.FEATURE_CITY_PROPS)
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
+@warning_ignore("unused_private_class_variable")
 var _max_radius: float = 0.0
 
 var _pos: PackedVector2Array = PackedVector2Array()
+@warning_ignore("unused_private_class_variable")
 var _hp: PackedFloat32Array = PackedFloat32Array()
 var _speed: PackedFloat32Array = PackedFloat32Array()
+@warning_ignore("unused_private_class_variable")
 var _damage: PackedFloat32Array = PackedFloat32Array()
 ## Doğan zombinin dalga hasar çarpanı (özel saldırı hasarları için) ve dalga çarpanları (yönetmen ayarlar).
 var _dmg_mult: PackedFloat32Array = PackedFloat32Array()
@@ -92,17 +107,24 @@ var _alive: PackedByteArray = PackedByteArray()
 var _state: PackedByteArray = PackedByteArray()
 ## Süreli durumda kalan süre (sn).
 var _timer: PackedFloat32Array = PackedFloat32Array()
+@warning_ignore("unused_private_class_variable")
 var _rows: Array[Dictionary] = []
 ## İtilme hızı (m/sn); kendiliğinden söner.
+@warning_ignore("unused_private_class_variable")
 var _knock: PackedVector2Array = PackedVector2Array()
 ## Yanma: kalan süre (sn), saniye başına hasar, son vuruştan beri biriken süre.
+@warning_ignore("unused_private_class_variable")
 var _burn_left: PackedFloat32Array = PackedFloat32Array()
+@warning_ignore("unused_private_class_variable")
 var _burn_dps: PackedFloat32Array = PackedFloat32Array()
+@warning_ignore("unused_private_class_variable")
 var _burn_acc: PackedFloat32Array = PackedFloat32Array()
 var _burning: int = 0
 ## Özel saldırılarda nişan: atılış / dil yönü (birim vektör) ya da zıplamanın iniş noktası.
+@warning_ignore("unused_private_class_variable")
 var _aim: PackedVector2Array = PackedVector2Array()
 ## Silahların hedef alabildiği (1) ya da alamadığı (0: ölü, havadaki) zombiler.
+@warning_ignore("unused_private_class_variable")
 var _targetable: PackedByteArray = PackedByteArray()
 var _special: SpecialAttacks
 var _steer: ChaseSteer

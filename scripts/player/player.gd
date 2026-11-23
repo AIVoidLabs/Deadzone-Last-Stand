@@ -230,7 +230,7 @@ func _end_dash() -> void:
 	event.emit(&"dash_ended", {})
 
 
-func _on_stat_changed(stat: StringName, amount: float) -> void:
+func _on_stat_changed(stat: StringName, _amount: float) -> void:
 	match stat:
 		StatData.MAX_HP:
 			health.raise_maximum(stats.max_hp() - health.maximum)  # taban dahil: Health ile stats ayrışmaz

@@ -79,9 +79,9 @@ func _add_decal(at: Vector3, direction: Vector2, size_range: Vector2, reach: flo
 	_next_decal = (_next_decal + 1) % count
 	var offset: Vector2 = direction * randf_range(0.1, reach)
 	var size: float = randf_range(size_range.x, size_range.y)
-	var basis: Basis = Basis(Vector3.UP, randf() * TAU).scaled(Vector3(size, 1.0, size))
+	var xform_basis: Basis = Basis(Vector3.UP, randf() * TAU).scaled(Vector3(size, 1.0, size))
 	var y: float = DECAL_Y + DECAL_LAYER_STEP * float(index % DECAL_LAYERS)
-	_decals.multimesh.set_instance_transform(index, Transform3D(basis, Vector3(at.x + offset.x, y, at.z + offset.y)))
+	_decals.multimesh.set_instance_transform(index, Transform3D(xform_basis, Vector3(at.x + offset.x, y, at.z + offset.y)))
 	_decals.multimesh.set_instance_custom_data(index, Color(randf(), 0.0, 0.0, 0.0))
 	_decals.multimesh.set_instance_color(index, BLOOD_COLOR)
 	_decal_born[index] = _time

@@ -65,6 +65,7 @@ func _ready() -> void:
 	if _grid:
 		for i: int in CLIPS.size():
 			var column: int = i % PER_ROW
+			@warning_ignore("integer_division")
 			var row: int = i / PER_ROW
 			# arka sıra yarım aralık kaydırılır: öndekilerin arkasında kalmasın
 			var at: Vector3 = Vector3((column - (PER_ROW - 1) * 0.5 + row * 0.5) * 1.5, 0.0, -row * ROW_GAP)
@@ -126,6 +127,7 @@ func _report(variant: String, model: Node3D) -> void:
 		var mesh: Mesh = mesh_instance.mesh
 		for surface: int in mesh.get_surface_count():
 			var indices: PackedInt32Array = mesh.surface_get_arrays(surface)[Mesh.ARRAY_INDEX]
+			@warning_ignore("integer_division")
 			tris += indices.size() / 3
 		height = maxf(height, mesh_instance.get_aabb().end.y)
 	var head: int = skeleton.find_bone(&"Head") if skeleton != null else -1

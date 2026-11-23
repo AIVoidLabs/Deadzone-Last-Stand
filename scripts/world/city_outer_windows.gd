@@ -49,11 +49,11 @@ func _ready() -> void:
 func _add_face(face: Dictionary, rng: RandomNumberGenerator, xfs: Array[Transform3D], colors: Array[Color]) -> void:
 	var normal: Vector3 = face["normal"]
 	var tangent: Vector3 = Vector3.UP.cross(normal)
-	var basis: Basis = Basis(tangent, Vector3.UP, normal) * Basis.from_scale(Vector3(Tuning.CITY_FACADE_WINDOW_SIZE.x, Tuning.CITY_FACADE_WINDOW_SIZE.y, 1.0))
+	var xform_basis: Basis = Basis(tangent, Vector3.UP, normal) * Basis.from_scale(Vector3(Tuning.CITY_FACADE_WINDOW_SIZE.x, Tuning.CITY_FACADE_WINDOW_SIZE.y, 1.0))
 	var mid: Vector3 = face["mid"] + normal * Tuning.CITY_FACADE_OFFSET
 	for p: Vector2 in face_positions(face["length"], face["height"]):
 		var pos: Vector3 = mid + tangent * p.x + Vector3(0.0, p.y, 0.0)
-		xfs.append(Transform3D(basis, pos))
+		xfs.append(Transform3D(xform_basis, pos))
 		colors.append(Tuning.CITY_OUTER_WINDOW_LIT_COLOR if rng.randf() < Tuning.CITY_OUTER_WINDOW_LIT_CHANCE else Tuning.CITY_OUTER_WINDOW_DARK_COLOR)
 
 

@@ -22,4 +22,5 @@ static func load_stream(file: String, looping: bool) -> AudioStream:
 static func _sample_count(wav: AudioStreamWAV) -> int:
 	var bytes_per_sample: int = 2 if wav.format == AudioStreamWAV.FORMAT_16_BITS else 1
 	var channels: int = 2 if wav.stereo else 1
+	@warning_ignore("integer_division")
 	return wav.data.size() / (bytes_per_sample * channels)

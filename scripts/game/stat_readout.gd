@@ -44,24 +44,24 @@ static func number_fine(value: float, decimal: String) -> String:
 	return text.replace(".", decimal)
 
 
-static func format(stat: StringName, bonus: float, style: Dictionary = DEFAULT_STYLE, caps: bool = Tuning.FEATURE_STAT_CAP_HONESTY) -> String:
+static func format(stat: StringName, bonus: float, fmt: Dictionary = DEFAULT_STYLE, caps: bool = Tuning.FEATURE_STAT_CAP_HONESTY) -> String:
 	if stat == StatData.DASH_COOLDOWN:
 		# Yüzde yerine gerçek süre: "1,4 sn".
-		return number_fine(PlayerStats.dash_cooldown_for(bonus), style["decimal"]) + String(style.get("seconds", "s"))
+		return number_fine(PlayerStats.dash_cooldown_for(bonus), fmt["decimal"]) + String(fmt.get("seconds", "s"))
 	var value: float = raw_value(stat, bonus, caps)
 	var minus: bool = value < 0.0
-	var body: String = number(absf(value), style["decimal"])
+	var body: String = number(absf(value), fmt["decimal"])
 	var sign_text: String = "-" if minus and not is_zero_approx(snappedf(value, 0.1)) else ""
 	if is_percent(stat):
-		return sign_text + ("%" + body if style["percent_prefix"] else body + "%")
+		return sign_text + ("%" + body if fmt["percent_prefix"] else body + "%")
 	if stat == StatData.HP_REGEN:
-		return sign_text + body + String(style["per_second"])
+		return sign_text + body + String(fmt["per_second"])
 	return sign_text + body
 
 
 ## Tavandaysa değerin yanına etiket ("12 MAX"); değilse yalnız değer. tag: yerelleştirilmiş "MAX".
-static func tagged(stat: StringName, bonus: float, tag: String, style: Dictionary = DEFAULT_STYLE, caps: bool = Tuning.FEATURE_STAT_CAP_HONESTY) -> String:
-	var text: String = format(stat, bonus, style, caps)
+static func tagged(stat: StringName, bonus: float, tag: String, fmt: Dictionary = DEFAULT_STYLE, caps: bool = Tuning.FEATURE_STAT_CAP_HONESTY) -> String:
+	var text: String = format(stat, bonus, fmt, caps)
 	return text + " " + tag if caps and StatCaps.is_capped(stat, bonus) else text
 
 

@@ -30,13 +30,13 @@ var _marker: Node3D
 
 
 ## Düğümü host'a ekler (+ ekran dışı ok); ana bayrak kapalıyken ya da 1v1 arenada null döner.
-static func install(host: Node, player: Player, director: SpawnDirector, loot: RunLoot) -> RewardBags:
+static func install(host: Node, target: Player, spawn_director: SpawnDirector, run_loot: RunLoot) -> RewardBags:
 	if not Tuning.FEATURE_REWARD_BAGS or DebugArena.active:
 		return null
 	var bags: RewardBags = RewardBags.new()
-	bags.player = player
-	bags.director = director
-	bags.loot = loot
+	bags.player = target
+	bags.director = spawn_director
+	bags.loot = run_loot
 	host.add_child(bags)
 	if Tuning.FEATURE_BAG_ARROW:
 		var arrow: BagArrow = BagArrow.new()

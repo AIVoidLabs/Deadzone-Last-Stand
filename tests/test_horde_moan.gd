@@ -20,6 +20,7 @@ func test_interval_sparse_at_min_and_dense_at_full() -> void:
 
 
 func test_interval_shrinks_as_horde_grows() -> void:
+	@warning_ignore("integer_division")
 	var mid: int = (Tuning.HORDE_MOAN_MIN_COUNT + Tuning.HORDE_GROAN_FULL_COUNT) / 2
 	assert_lt(_interval(mid, 0.5), _interval(Tuning.HORDE_MOAN_MIN_COUNT, 0.5))
 	assert_gt(_interval(mid, 0.5), _interval(Tuning.HORDE_GROAN_FULL_COUNT, 0.5))

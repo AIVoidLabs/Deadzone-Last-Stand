@@ -62,6 +62,7 @@ func _lowest_y(mesh: MeshInstance3D, skeleton: Skeleton3D) -> float:
 	var skin: Skin = mesh.skin
 	if skin == null or skeleton == null or bones.is_empty():
 		return 0.0
+	@warning_ignore("integer_division")
 	var per_vertex: int = bones.size() / verts.size()
 	var palette: Array[Transform3D] = []
 	for b: int in skin.get_bind_count():

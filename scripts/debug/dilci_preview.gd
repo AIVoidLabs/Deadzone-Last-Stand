@@ -44,6 +44,7 @@ func _ready() -> void:
 	# iki sıra: üstte hareket, altta saldırı ve tepkiler
 	for i: int in CLIPS.size():
 		var column: int = i % PER_ROW
+		@warning_ignore("integer_division")
 		var row: int = i / PER_ROW
 		_add_model(i, Vector3((column - (PER_ROW - 1) * 0.5) * SPACING, 0.0, -row * ROW_GAP))
 	_add_environment()

@@ -177,7 +177,7 @@ static func clip_shot(a: Vector2, b: Vector2, r: float, margin: float, rects: Ar
 	var hit: Vector3 = first_hit(a, b, r, rects)
 	if hit.x < 0.0:
 		return Vector3(b.x, b.y, 1.0)
-	var len: float = a.distance_to(b)
-	var t: float = maxf(hit.x - margin / maxf(len, 0.0001), 0.0)
+	var seg_len: float = a.distance_to(b)
+	var t: float = maxf(hit.x - margin / maxf(seg_len, 0.0001), 0.0)
 	var q: Vector2 = a.lerp(b, t)
 	return Vector3(q.x, q.y, t)

@@ -88,11 +88,11 @@ func _ready() -> void:
 	_no.grab_focus.call_deferred()
 
 
-func _label(font: Font, size: int, color: Color) -> Label:
+func _label(font: Font, font_px: int, color: Color) -> Label:
 	var l: Label = Label.new()
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.add_theme_font_override("font", font)
-	l.add_theme_font_size_override("font_size", size)
+	l.add_theme_font_size_override("font_size", font_px)
 	l.add_theme_color_override("font_color", color)
 	l.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.85))
 	l.add_theme_constant_override("outline_size", 4)

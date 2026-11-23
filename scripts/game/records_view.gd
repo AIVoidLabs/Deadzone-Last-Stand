@@ -9,6 +9,7 @@ const MINUTE: int = 60
 ## Saniyeyi {h, m, s} parçalarına böler (negatif 0 sayılır).
 static func time_parts(seconds: float) -> Dictionary:
 	var total: int = maxi(0, int(seconds))
+	@warning_ignore("integer_division")
 	return {"h": total / HOUR, "m": (total % HOUR) / MINUTE, "s": total % MINUTE}
 
 

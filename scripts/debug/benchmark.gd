@@ -32,8 +32,8 @@ static func requested() -> bool:
 
 
 ## Ölçüm bayrağı: `--bench --bench-no-tongue` dil düğümü hiç oluşmaz; `--bench-no-tongue-mesh` halat çalışır ama ağ kurulmaz.
-static func flag(name: String) -> bool:
-	return OS.is_debug_build() and OS.get_cmdline_user_args().has(name)
+static func flag(flag_name: String) -> bool:
+	return OS.is_debug_build() and OS.get_cmdline_user_args().has(flag_name)
 
 
 func _ready() -> void:

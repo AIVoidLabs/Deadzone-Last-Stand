@@ -91,9 +91,9 @@ func _put(kind: StringName, p: Vector3, yaw: float, size: Vector2, alpha: float,
 	if not _buckets.has(kind):
 		_buckets[kind] = {"xfs": [] as Array[Transform3D], "colors": [] as Array[Color], "seeds": [] as Array[float]}
 	var level: float = y if y >= 0.0 else (Y_RAISED if _raised(p) else Y_BLOOD)
-	var basis: Basis = Basis(Vector3.UP, yaw) * Basis.from_scale(Vector3(size.x, 1.0, size.y))
+	var xform_basis: Basis = Basis(Vector3.UP, yaw) * Basis.from_scale(Vector3(size.x, 1.0, size.y))
 	var b: Dictionary = _buckets[kind]
-	b["xfs"].append(Transform3D(basis, Vector3(p.x, level, p.z)))
+	b["xfs"].append(Transform3D(xform_basis, Vector3(p.x, level, p.z)))
 	b["colors"].append(Color(_rng.randf_range(0.8, 1.15), _rng.randf_range(0.8, 1.15), _rng.randf_range(0.8, 1.15), alpha))
 	b["seeds"].append(_rng.randf())
 

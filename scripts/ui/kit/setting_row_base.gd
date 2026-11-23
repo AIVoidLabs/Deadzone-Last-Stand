@@ -3,6 +3,7 @@ extends PanelContainer
 ## Ayar satırı tabanı: solda etiket, sağda değer. Odak / üzerine gelince ember vurgusu.
 ## Alt sınıflar: SliderRow, ToggleRow, ChoiceRow (hepsi signal value_changed(value)).
 
+@warning_ignore("unused_signal")
 signal value_changed(value: Variant)
 
 const ROW_HEIGHT: float = 50.0

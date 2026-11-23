@@ -96,4 +96,5 @@ static func enemy_name(id: StringName) -> String:
 ## Saniye -> "m:ss" (dile bağlı değil).
 static func clock(seconds: float) -> String:
 	var total: int = maxi(0, int(seconds))
+	@warning_ignore("integer_division")
 	return "%d:%02d" % [total / 60, total % 60]

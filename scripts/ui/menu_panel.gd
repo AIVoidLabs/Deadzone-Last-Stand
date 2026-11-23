@@ -111,11 +111,11 @@ func close() -> void:
 
 
 ## Ortak yardımcılar.
-static func make_label(text: String, font: Font, size: int, color: Color) -> Label:
+static func make_label(text: String, font: Font, font_px: int, color: Color) -> Label:
 	var l: Label = Label.new()
 	l.text = text
 	l.add_theme_font_override("font", font)
-	l.add_theme_font_size_override("font_size", size)
+	l.add_theme_font_size_override("font_size", font_px)
 	l.add_theme_color_override("font_color", color)
 	l.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.85))
 	l.add_theme_constant_override("outline_size", 3)
