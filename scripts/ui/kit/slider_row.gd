@@ -13,7 +13,8 @@ var _format: StringName = &"percent"
 func _init() -> void:
 	super._init()
 	_slider = BrushSlider.new()
-	_slider.custom_minimum_size = Vector2(SLIDER_MIN_WIDTH, 0)
+	# Yükseklik tutamak kadar: 0 olursa kaydırıcı çizilir ama fareyle tutulamaz.
+	_slider.custom_minimum_size = Vector2(SLIDER_MIN_WIDTH, BrushSlider.KNOB_SIZE.y)
 	_slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_slider.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_slider.focus_mode = Control.FOCUS_ALL
@@ -66,7 +67,8 @@ func _update_text() -> void:
 	var v: float = _slider.value
 	match _format:
 		&"percent":
-			_value_label.text = "%d%%" % roundi(v * 100.0)
+			# Türkçede yüzde işareti başta (%100), İngilizcede sonda (100%).
+			_value_label.text = ("%%%d" if Loc.language == &"tr" else "%d%%") % roundi(v * 100.0)
 		&"fixed2":
 			_value_label.text = "%.2f" % v
 		_:

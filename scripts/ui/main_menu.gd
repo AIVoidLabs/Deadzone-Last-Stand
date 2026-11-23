@@ -205,6 +205,9 @@ func _set_menu_focus(enabled: bool) -> void:
 
 
 func _on_setting_changed(key: StringName, _value: Variant) -> void:
+	# Alt ekran (ayarlar) açıkken yeniden kurma: kapanınca zaten kurulur; aksi hâlde menü ekranın üstüne çıkıp fareyi yakalar.
+	if _overlay_open:
+		return
 	if key == &"game/language" or key == &"graphics/quality":
 		_rebuild()
 
@@ -215,10 +218,13 @@ func _rebuild() -> void:
 	var focused: Control = get_viewport().gui_get_focus_owner()
 	if focused != null and focused.has_meta(&"fid"):
 		focus_id = focused.get_meta(&"fid")
+	var index: int = _ui.get_index()
 	_ui.queue_free()
 	remove_child(_ui)
 	_intro = false
 	_build_ui()
+	# Eski sırasına: sonradan eklenen alt ekranların altında kalsın.
+	move_child(_ui, index)
 	if _overlay_open:
 		_set_menu_focus(false)
 		return
