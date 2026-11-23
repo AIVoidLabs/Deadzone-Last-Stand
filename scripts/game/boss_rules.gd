@@ -4,9 +4,9 @@ extends RefCounted
 ## ağırlık, tekrarsız kural, çağrı bekleme süresi), şok halkası ve merkez isabeti, hücum yolunda isabet, duvara çarpma,
 ## öfke eşiği ve çarpanları. Rastgelelik `roll` (0..1) parametresiyle gelir.
 
-enum Attack { NONE, SLAM, CHARGE, SUMMON }
+enum Attack { NONE, SLAM, CHARGE, SUMMON, SPEW }
 
-const _NAMES: Dictionary = {Attack.SLAM: &"slam", Attack.CHARGE: &"charge", Attack.SUMMON: &"summon"}
+const _NAMES: Dictionary = {Attack.SLAM: &"slam", Attack.CHARGE: &"charge", Attack.SUMMON: &"summon", Attack.SPEW: &"spew"}
 
 
 static func attack_name(attack: Attack) -> StringName:
@@ -22,6 +22,8 @@ static func available(dist: float, summon_cooldown_left: float, row: Dictionary)
 		out.append(Attack.CHARGE)
 	if summon_cooldown_left <= 0.0:
 		out.append(Attack.SUMMON)
+	if row.has("spew_min") and SpewRules.in_band(dist, row):
+		out.append(Attack.SPEW)
 	return out
 
 
@@ -37,21 +39,36 @@ static func pick(dist: float, last: Attack, summon_cooldown_left: float, row: Di
 		options = fresh
 	if options.is_empty():
 		return Attack.NONE
-	var weights: Dictionary = row["attack_weights"]
 	var total: float = 0.0
 	for a: int in options:
-		total += float(weights[attack_name(a as Attack)])
+		total += _weight(a as Attack, dist, row)
 	var at: float = clampf(roll, 0.0, 0.999999) * total
 	for a: int in options:
-		at -= float(weights[attack_name(a as Attack)])
+		at -= _weight(a as Attack, dist, row)
 		if at < 0.0:
 			return a as Attack
 	return options[options.size() - 1] as Attack
 
 
+## Seçim ağırlığı (satırdaki attack_weights; uzaktan kusmuk ağırlığı SpewRules'ta artar).
+static func _weight(attack: Attack, dist: float, row: Dictionary) -> float:
+	var base: float = float((row["attack_weights"] as Dictionary)[attack_name(attack)])
+	return SpewRules.weight(dist, base, row) if attack == Attack.SPEW else base
+
+
 ## Hazırlık süresi: öfkedeyse rage_windup_factor ile kısalır.
 static func windup(base: float, raged: bool, row: Dictionary) -> float:
 	return base * float(row["rage_windup_factor"]) if raged else base
+
+
+## Öfkede arka arkaya hücum sayısı (zincir kapalıysa ya da öfke dışıysa 1).
+static func chain_total(raged: bool, row: Dictionary) -> int:
+	return maxi(int(row.get("charge_chain_rage", 1)), 1) if raged else 1
+
+
+## done hücum yapıldıysa zincir yeni hücumla sürer mi.
+static func chain_continues(done: int, raged: bool, row: Dictionary) -> bool:
+	return done < chain_total(raged, row)
 
 
 ## Yer dövmesinde halka sayısı: öfkede iki.

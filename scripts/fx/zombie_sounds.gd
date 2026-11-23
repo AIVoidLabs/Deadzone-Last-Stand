@@ -14,7 +14,7 @@ static func wire(enemies: EnemyManager, director: SpawnDirector) -> void:
 		Audio.play_at(SoundData.Z_SHIELD_THUNK, at))
 	enemies.scream_emitted.connect(func(at: Vector3, _radius: float) -> void:
 		Audio.play_at(SoundData.Z_SCREAMER_SCREAM, at))
-	enemies.lob_launched.connect(func(kind: StringName, from: Vector3, _dest: Vector3, _flight: float, _arc: float, _radius: float) -> void:
+	enemies.lob_launched.connect(func(kind: StringName, from: Vector3, _dest: Vector3, _flight: float, _arc: float, _radius: float, _boss: bool) -> void:
 		Audio.play_at(SoundData.Z_SPIT if kind == &"spit" else SoundData.Z_THROWER_GRUNT, from))
 	enemies.lob_landed.connect(func(kind: StringName, at: Vector3, _radius: float) -> void:
 		Audio.play_at(SoundData.Z_ACID_SPLASH if kind == &"spit" else SoundData.Z_ROCK_IMPACT, at))

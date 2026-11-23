@@ -194,6 +194,7 @@ func _add_lob_fx(enemies: EnemyManager, camera: FollowCamera) -> void:
 		var lobs: LobProjectiles = LobProjectiles.new()
 		add_child(lobs)
 		enemies.lob_launched.connect(lobs.launch)
+		enemies.boss_event.connect(lobs.on_boss_event)
 	if Tuning.FEATURE_ZOMBIE_SPIT:
 		var pools: AcidPools = AcidPools.new()
 		add_child(pools)

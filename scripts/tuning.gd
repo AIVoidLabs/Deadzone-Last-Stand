@@ -109,6 +109,15 @@ const FEATURE_BOSS: bool = true
 const FEATURE_BOSS_MODEL: bool = true
 ## Boss ölümünde kısa vuruş duraksaması (FEATURE_HIT_STOP kapalı olsa da yalnız burada).
 const FEATURE_BOSS_HITSTOP: bool = true
+## 11.F boss yeni saldırıları (sayılar EnemyDataBoss SPEW_ROW / CHAIN_ROW / TRAIL_ROW). Kapalıyken boss bugünkü gibi.
+## Kusmuk yağmuru: asker 10-30 m arasındayken asit topları yelpazesi (tükürücünün yay atışı + havuzu).
+const FEATURE_BOSS_SPEW: bool = true
+## Modelde "spew" klibi hazır olunca açılır; kapalıyken kusmuk "roar" klibiyle oynar.
+const FEATURE_BOSS_SPEW_CLIP: bool = true
+## Öfkede hücum zinciri (toplam 3 hücum, aralarında kısa yeniden nişan).
+const FEATURE_BOSS_CHAIN_CHARGE: bool = true
+## Hücumun arkasında bıraktığı yanan yarık izi.
+const FEATURE_BOSS_CHARGE_TRAIL: bool = true
 const BOSS_HITSTOP_TIME: float = 0.18
 ## Boss uyarısı (yazı + kırmızı kenar nabzı) süresi (sn); boss uyarının bitiminde doğar.
 const BOSS_WARNING_TIME: float = 2.0

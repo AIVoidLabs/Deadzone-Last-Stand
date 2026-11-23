@@ -6,6 +6,8 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 ## Şu an
 
 **AŞAMA 9 BİTTİ (2026-11-23), Taha onayladı.** **AŞAMA 11 — Taha'nın ilk oyun geri bildirimi (2026-11-23): oynanış beğenildi, oyun hâlâ basit. Plan aşağıda; geliştirme yeni oturumda başlar.**
+**11.F boss yeni saldırıları (2026-11-23, Taha seçenek 1+2):** kusmuk yağmuru (asker 10–30 m, >14 m'de ağırlık ×2; 1.3 sn hazırlık, 5/öfkede 7 asit topu yelpaze, kaçış boşluğu engel/arena/havuz hesaplı; tükürücü havuzu), öfkede zincir hücum (3 hücum, 0.45 sn yeniden nişan, duvara çarpınca biter + sersem), hücumda yanan yarık izi (3.5 sn, 10 dps; Voronoi çatlak shader). Boss ölünce uçan topları iptal, iz hasarı durur. `spew` klibi Blender'da elle anahtarlandı (`boss_moves.py`, kusma anı 0.85 sn). FEATURE_BOSS_SPEW / _SPEW_CLIP / _CHAIN_CHARGE / _CHARGE_TRAIL; debug `--boss-attack=slam|charge|summon|spew --boss-rage`. Opus gözden geçirme bulguları düzeltildi. 512 test. Taha'nın oyunda denemesi bekleniyor.
+
 **11.7 dalga sonu nefes payı (2026-11-23, Taha): dalga bitince (CLEAR) kalan can 2 katına çıkar, üst sınırı geçmez (FEATURE_WAVE_END_HEAL, WAVE_END_HEAL_FACTOR 2.0, saf `WaveHealRules`). 480 test.**
 
 **11.6 ödül çantaları (2026-11-23): takla 8 → 6 sn (Taha). Haritada süzülen PARA (yalnız para) ve XP (yalnız XP) çantaları: dalgada 15. sn + 25 sn'de bir, en çok 3, 15 sn ömür (son 3 sn yanıp söner), değer 15 + 5×dalga, askere 12–24 m; ekran dışı ok; model `tools/blender/build_reward_bag.py` → `assets/models/props/reward_bag.glb` (kristaller BagTint, tür rengi). FEATURE_REWARD_BAGS / _BAG_ARROW / _BAG_MODEL; ışık kalite profilinde `bag_light`. 477 test. Taha'nın modeli ve oyunda hissi onaylaması bekleniyor.**

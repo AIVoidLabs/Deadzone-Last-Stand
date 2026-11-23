@@ -25,7 +25,8 @@ func test_available_attacks_follow_distance_bands() -> void:
 	var mid: float = (float(_row["charge_min"]) + float(_row["charge_max"])) * 0.5
 	assert_true(BossRules.available(mid, 5.0, _row).has(A.CHARGE))
 	assert_false(BossRules.available(mid, 5.0, _row).has(A.SLAM))
-	assert_true(BossRules.available(float(_row["charge_max"]) + 1.0, 5.0, _row).is_empty(), "çok uzakta bekleme sürerken saldırı yok")
+	var far: float = float(_row.get("spew_max", float(_row["charge_max"]))) + 1.0
+	assert_true(BossRules.available(far, 5.0, _row).is_empty(), "çok uzakta bekleme sürerken saldırı yok")
 
 
 func test_summon_waits_for_cooldown_at_any_distance() -> void:
@@ -44,7 +45,7 @@ func test_pick_never_repeats_when_an_alternative_exists() -> void:
 func test_pick_allows_repeat_only_without_alternative_and_none_when_nothing() -> void:
 	var near: float = float(_row["slam_range"]) - 0.5
 	assert_eq(BossRules.pick(near, A.SLAM, 5.0, _row, 0.5), A.SLAM, "tek seçenek: tekrar serbest")
-	assert_eq(BossRules.pick(float(_row["charge_max"]) + 3.0, A.NONE, 5.0, _row, 0.5), A.NONE)
+	assert_eq(BossRules.pick(float(_row.get("spew_max", float(_row["charge_max"]))) + 3.0, A.NONE, 5.0, _row, 0.5), A.NONE)
 
 
 func test_pick_follows_weights() -> void:

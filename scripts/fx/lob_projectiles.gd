@@ -32,7 +32,7 @@ func _ready() -> void:
 
 
 ## kind: &"spit" / &"throw". from/dest: dünya konumu (from bırakış yüksekliğinde); radius: iniş gölgesi yarıçapı.
-func launch(kind: StringName, from: Vector3, dest: Vector3, flight: float, arc: float, radius: float) -> void:
+func launch(kind: StringName, from: Vector3, dest: Vector3, flight: float, arc: float, radius: float, boss: bool = false) -> void:
 	var slot: Dictionary = _slots[_next]
 	_next = (_next + 1) % _slots.size()
 	slot["kind"] = kind
@@ -43,6 +43,7 @@ func launch(kind: StringName, from: Vector3, dest: Vector3, flight: float, arc: 
 	slot["arc"] = arc
 	slot["age"] = 0.0
 	slot["active"] = true
+	slot["boss"] = boss
 	var spit: bool = kind == &"spit"
 	(slot["ball"] as Node3D).visible = spit
 	(slot["rock"] as Node3D).visible = not spit
@@ -56,6 +57,23 @@ func launch(kind: StringName, from: Vector3, dest: Vector3, flight: float, arc: 
 	(shadow.material_override as ShaderMaterial).set_shader_parameter(&"urgency", 0.0)
 	_place(slot, 0.0)
 	set_process(true)
+
+
+## Boss öldü (boss_event "spew_cancel"): uçmakta olan boss kusmuk topları sessizce söner (iniş / patlama yok).
+func on_boss_event(event_name: StringName, _data: Dictionary) -> void:
+	if event_name != &"spew_cancel":
+		return
+	for slot: Dictionary in _slots:
+		if slot["active"] and slot["boss"]:
+			_hide_slot(slot)
+
+
+func _hide_slot(slot: Dictionary) -> void:
+	slot["active"] = false
+	(slot["shadow"] as Node3D).visible = false
+	(slot["ball"] as Node3D).visible = false
+	for trail: Node3D in slot["trail"]:
+		trail.visible = false
 
 
 func _process(delta: float) -> void:
@@ -117,7 +135,7 @@ func _place(slot: Dictionary, age: float) -> void:
 
 
 func _make_slot() -> Dictionary:
-	var slot: Dictionary = {"active": false, "kind": &"spit", "age": 0.0, "flight": 1.0, "arc": 1.0, "from": Vector2.ZERO, "height": Tuning.LOB_RELEASE_HEIGHT, "dest": Vector2.ZERO}
+	var slot: Dictionary = {"active": false, "boss": false, "kind": &"spit", "age": 0.0, "flight": 1.0, "arc": 1.0, "from": Vector2.ZERO, "height": Tuning.LOB_RELEASE_HEIGHT, "dest": Vector2.ZERO}
 	var trail: Array[Node3D] = []
 	for factor: float in TRAIL_SCALES:
 		trail.append(_make_ball(factor))

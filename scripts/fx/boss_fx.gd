@@ -3,7 +3,7 @@ extends Node3D
 ## Boss Yığın'ın dünya efektleri (yalnız görüntü ve sarsıntı; kurallar BossAttack'te). EnemyManager.boss_event'i dinler:
 ## yer dövmesi -> havuzlu şok halkası + çatlak izi (boss_ring shader) + toz + sarsıntı; hücum hazırlığı -> yerde kırmızı şerit
 ## (son 0.3 sn kilitli parlak); hücum -> toz izi; duvara çarpma / çağrı -> toz + sarsıntı; kükreme -> büyük ses dalgası halkası.
-## Boss ölümü (enemy_killed, satırda boss): kristal yağmuru, sarsıntı, kısa vuruş duraksaması, çöküşte ikinci toz.
+## Hücumun yanan yarık izi BossTrailFx'te (boss_event "trail"). Boss ölümü (enemy_killed, satırda boss): kristal yağmuru, sarsıntı, kısa vuruş duraksaması, çöküşte ikinci toz.
 
 const RING_SHADER: Shader = preload("res://assets/shaders/boss_ring.gdshader")
 const STRIP_SHADER: Shader = preload("res://assets/shaders/boss_strip.gdshader")
@@ -66,6 +66,10 @@ func _ready() -> void:
 	add_child(_strip)
 	_wave = ScreamWave.new()
 	add_child(_wave)
+	if Tuning.FEATURE_BOSS_CHARGE_TRAIL:
+		var trail: BossTrailFx = BossTrailFx.new()
+		add_child(trail)
+		trail.setup(_enemies)
 	_enemies.boss_event.connect(_on_boss_event)
 	_enemies.enemy_killed.connect(_on_enemy_killed)
 	set_process(false)

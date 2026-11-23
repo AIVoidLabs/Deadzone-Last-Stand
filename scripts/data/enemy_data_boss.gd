@@ -96,6 +96,65 @@ const ROW: Dictionary = {
 	"recover_finishes_attack": true,
 }
 
+# 11.F kusmuk yağmuru (FEATURE_BOSS_SPEW): yalnız bayrak açıkken ROW'un üstüne yazılır. Asker spew_min..spew_max arasında;
+# spew_far_dist'ten uzaktaysa ağırlık spew_far_mult katı. Hazırlıkta askere döner; atış anı (klibin kusma anı) spew_anim_hit_time.
+# spew_count top (öfkede spew_count_rage), spew_spread derecelik yelpaze; top askere uzaklığın [spew_dist_lo, spew_dist_hi] katına iner.
+# Toplar tükürücünün yay atışı + asit havuzu yolunu kullanır (spew_pool_*, spew_acid_*); doğrudan isabet spew_damage.
+# Yedek klip: roar (modelde spew klibi yokken / FEATURE_BOSS_SPEW_CLIP kapalıyken), kusma anı spew_fallback_hit_time.
+## Kusmuğun seçim ağırlığı; ROW'daki attack_weights'e eklenir (diğerleri korunur).
+const SPEW_WEIGHT: float = 4.0
+const SPEW_ROW: Dictionary = {
+	"spew_min": 10.0,
+	"spew_max": 30.0,
+	"spew_far_dist": 14.0,
+	"spew_far_mult": 2.0,
+	"spew_windup": 1.3,
+	"spew_recover": 1.0,
+	"spew_count": 5,
+	"spew_count_rage": 7,
+	"spew_spread": 50.0,
+	"spew_dist_lo": 0.7,
+	"spew_dist_hi": 1.15,
+	"spew_ball_speed": 16.0,
+	"spew_flight_min": 0.7,
+	"spew_flight_max": 1.8,
+	"spew_arc_per_sec": 2.8,
+	"spew_release_height": 2.6,
+	"spew_escape_len": 3.0,
+	"spew_pool_radius": 1.6,
+	"spew_pool_life": 5.0,
+	"spew_acid_tick": 0.5,
+	"spew_acid_damage": 4.0,
+	"spew_damage": 14.0,
+	"anim_spew": [&"roar"],
+	"spew_anim_hit_time": 0.9,
+	"spew_fallback_hit_time": 0.9,
+}
+
+# 11.F zincir hücum (FEATURE_BOSS_CHAIN_CHARGE): öfkede hücum bitince (duvara çarpmadıysa) toplam charge_chain_rage hücum;
+# aralarında charge_chain_windup sn yeniden nişan (şerit askere döner, son charge_lock_time sn kilitli).
+const CHAIN_ROW: Dictionary = {
+	"charge_chain_rage": 3,
+	"charge_chain_windup": 0.45,
+}
+
+# 11.F yanan yarık izi (FEATURE_BOSS_CHARGE_TRAIL): hücumda trail_step aralıkla parça; trail_life sn yanar (son trail_fade sn söner).
+const TRAIL_ROW: Dictionary = {
+	"trail_step": 1.2,
+	"trail_life": 3.5,
+	"trail_fade": 0.8,
+	"trail_radius": 0.9,
+	"trail_burn_dps": 10.0,
+	"trail_burn_tick": 0.25,
+	"trail_max": 40,
+}
+
+# Modelde spew klibi hazır olunca (FEATURE_BOSS_SPEW_CLIP) kusmuk klibi ve anı.
+const LOOK_V_SPEW: Dictionary = {
+	"anim_spew": [&"spew"],
+	"spew_anim_hit_time": 0.85,
+}
+
 # Blender modeli (assets/models/characters/boss_heap.glb) bağlanınca: modelin kendi klipleri, birebir adlar (s74_boss.md).
 const LOOK_V: Dictionary = {
 	"model": &"boss_heap_v",
@@ -116,9 +175,22 @@ const LOOK_V: Dictionary = {
 
 
 ## Boss satırı: yürüyenin üstüne ROW (+ model hazırsa LOOK_V).
-static func build(walker: Dictionary) -> Dictionary:
+## Bayraklar parametreyle (testler kapalı hâli de kurabilsin); varsayılan Tuning'den. Kapalı bayrağın anahtarları satırda olmaz.
+static func build(walker: Dictionary, spew: bool = Tuning.FEATURE_BOSS_SPEW, chain: bool = Tuning.FEATURE_BOSS_CHAIN_CHARGE,
+		trail: bool = Tuning.FEATURE_BOSS_CHARGE_TRAIL, spew_clip: bool = Tuning.FEATURE_BOSS_SPEW_CLIP) -> Dictionary:
 	var row: Dictionary = walker.duplicate()
 	row.merge(ROW, true)
+	if spew:
+		var weights: Dictionary = (row["attack_weights"] as Dictionary).duplicate()
+		weights[&"spew"] = SPEW_WEIGHT
+		row.merge(SPEW_ROW, true)
+		row["attack_weights"] = weights
+	if chain:
+		row.merge(CHAIN_ROW, true)
+	if trail:
+		row.merge(TRAIL_ROW, true)
 	if Tuning.FEATURE_BOSS_MODEL:
 		row.merge(LOOK_V, true)
+		if spew and spew_clip:
+			row.merge(LOOK_V_SPEW, true)
 	return row

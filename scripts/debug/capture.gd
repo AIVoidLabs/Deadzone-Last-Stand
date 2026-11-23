@@ -15,6 +15,7 @@ extends Node
 ## --capture-kind=<tür id> (runner, tank, spitter, thrower ...): --capture-spawn ile bu türden doğurur (varsayılan walker).
 ## --capture-root=S: görüntüden S saniye önce askeri 1 sn bağlar (S<1: çırpınma, S 1.1–1.4: kurtulma karesi).
 ## --capture-near=M: --capture-spawn zombilerini askerin M metre çevresine dizer (özel saldırıları hızlı görmek için).
+## --boss-attack=slam|charge|summon|spew, --boss-rage: boss saldırısını kilitler / öfkeyi zorlar.
 ## --capture-boss=S: S sn sonra boss Yığın'ı hemen doğurur (--capture-near ile o mesafede). Sonda BOSS satırı sayaçları.
 ## --circle: asker (ölümsüz değil) daire çizerek yürür. --zigzag=S: S saniyede bir yön değiştirerek yürür.
 ## --capture-bag=money|xp: o türden ödül çantası askerin ~6 m önünde hemen belirir (ömrü dolmaz; RewardBags okur).
@@ -120,6 +121,10 @@ func _ready() -> void:
 			camera.target = _focus
 		elif arg == "--circle":
 			_circle = true
+		elif arg.begins_with("--boss-attack="):
+			enemies.boss().debug_attack = _boss_attack_arg(arg.trim_prefix("--boss-attack="))
+		elif arg == "--boss-rage":
+			enemies.boss().debug_rage = true
 		elif arg.begins_with("--capture-boss="):
 			_boss_at = arg.trim_prefix("--capture-boss=").to_float()
 		elif arg.begins_with("--zigzag="):
@@ -212,8 +217,8 @@ func _process(delta: float) -> void:
 	print("SCREAM screams=%d summoned=%d" % [enemies.screams, enemies.summoned])
 	var boss: BossAttack = enemies.boss()
 	var status: Dictionary = boss.status()
-	print("BOSS slams=%d ring_hits=%d center_hits=%d charges=%d charge_hits=%d stuns=%d summons=%d rage=%d alive=%s hp=%d died_at=%.1f" % [
-		boss.slams, boss.ring_hits, boss.center_hits, boss.charges, boss.charge_hits, boss.stuns, boss.summons, boss.rage_count,
+	print("BOSS slams=%d ring_hits=%d center_hits=%d charges=%d charge_hits=%d stuns=%d summons=%d spews=%d balls=%d spew_hits=%d spew_pools=%d spew_ticks=%d rage=%d alive=%s hp=%d died_at=%.1f" % [
+		boss.slams, boss.ring_hits, boss.center_hits, boss.charges, boss.charge_hits, boss.stuns, boss.summons, boss.spews, boss.spew_balls, boss.spew_hits, boss.spew_pools, boss.spew_ticks, boss.rage_count,
 		status["alive"], int(status.get("hp", 0.0)), _boss_died_at])
 	if director.run != null:
 		print("RUN wave=%d phase=%s boss_stage=%s phase_left=%.1f kills=%d" % [director.run.index + 1, WaveRun.Phase.keys()[director.run.phase],
@@ -230,6 +235,14 @@ func _process(delta: float) -> void:
 		image.save_png(path)
 		print("CAPTURE ", _out)
 	get_tree().quit()
+
+
+## --boss-attack=slam|charge|summon|spew: boss saldırı seçimini kilitler (--boss-rage: öfkeyi zorlar; hücum zinciri için).
+func _boss_attack_arg(name: String) -> BossRules.Attack:
+	for a: int in BossRules.Attack.values():
+		if BossRules.attack_name(a as BossRules.Attack) == StringName(name):
+			return a as BossRules.Attack
+	return BossRules.Attack.NONE
 
 
 func _spawn_boss() -> void:

@@ -2,7 +2,7 @@ class_name AcidPools
 extends Node3D
 ## Tükürücünün asit havuzları (yalnız görüntü): havuzdan gelen yer daireleri (Tuning.ACID_POOL_MAX), kabarcıklı
 ## yeşil shader, son ACID_FADE_TIME sn'de söner. Gerçek alan hasarı LobAttack'ta; sıra (en eski önce yerini verir)
-## orada da aynı olduğundan ikisi birlikte yürür. `EnemyManager.acid_pool_started` buraya bağlanır.
+## orada da aynı olduğundan ikisi birlikte yürür (en az ömrü kalan havuz yerini verir). `EnemyManager.acid_pool_started` buraya bağlanır.
 
 const SHADER: Shader = preload("res://assets/shaders/acid_pool.gdshader")
 const HEIGHT: float = 0.025
@@ -10,7 +10,6 @@ const HEIGHT: float = 0.025
 var _planes: Array[MeshInstance3D] = []
 ## Havuz başına kalan süre (sn); <= 0 boş.
 var _left: PackedFloat32Array = PackedFloat32Array()
-var _next: int = 0
 
 
 func _ready() -> void:
@@ -31,10 +30,13 @@ func _ready() -> void:
 	set_process(false)
 
 
-## Yeni havuz: en eski yerini verir (halka tampon).
+## Yeni havuz: boş yuva, yoksa kalan süresi en az olan yuva yerini verir. LobAttack aynı kuralla (en çabuk sönecek havuz)
+## aynı time değerleriyle havuz atar; görüntü ile gerçek alan karışık ömürlerde de aynı havuzu bırakır.
 func add_pool(at: Vector3, radius: float, time: float) -> void:
-	var index: int = _next
-	_next = (_next + 1) % _planes.size()
+	var index: int = 0
+	for k in _planes.size():
+		if _left[k] < _left[index]:
+			index = k
 	var plane: MeshInstance3D = _planes[index]
 	plane.global_position = Vector3(at.x, HEIGHT + 0.0004 * index, at.z)
 	plane.scale = Vector3(radius, 1.0, radius)

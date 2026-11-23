@@ -7,6 +7,7 @@ roar (1.5)  : kükreme; 0.3 nefes, 0.5–1.2 doruk (kollar iki yana açık, gö�
               kadar açık, titreyerek), 1.5 duruş.
 summon (1.3): çağrı; çöker, gövdesini silker (sık anahtarlar: omurga ve kambur kemiği ileri-geri, yana),
               sırttaki bedenler kambur kemiğiyle kıpırdar, 1.05 doğrulur, 1.3 duruş.
+spew (1.8)  : kusma (11.F); ayrıntı dosyanın sonunda, kusma anı 0.85 sn.
 stun (1.4)  : duvara çarpma; 0.08 sarsılma (kafa geri, kollar öne savrulur), 0.3 geri sendeler,
               0.6–0.9 sersem (kafa sallanır), 1.1 kafasını silker, 1.4 duruş.
 Kol hedefleri bilek konumuyla (world_hands, iskelet uzayı), değerler boss_check.py ölçümüyle seçildi.
@@ -198,5 +199,50 @@ def stun(t, rig):
                      (0.30, stagger), (0.58, daze(14.0)), (0.84, daze(-12.0))] + shake + [(STUN_TIME, base_pose(rig))])
 
 
+# --- kusma (11.F) ---------------------------------------------------------------------------
+# spew (1.8): 0–0.4 geriye gerilip nefes alır (göğüs ve kambur kabarır, kafa yukarı, kollar iki yana açılır)
+#   → 0.4–0.85 öne savrulur → KUSMA 0.85 sn (= spew_anim_hit_time; gövde öne katlanmış, kafa ileri-aşağı,
+#   çene sonuna kadar açık, kollar alçakta öne dayanmış) → 0.95–1.35 üç öğürme (kambur ve omurga sarsılır)
+#   → 1.55 doğrulur → 1.8 duruş.
+SPEW_TIME = 1.8
+SPEW_HIT = 0.85
+
+
+def _spew_draw(rig, k=1.0):
+    pose = merge(stand(rig, 0.06, 0.14, -10.0 * k), {
+        "pelvis": {"loc": (0.0, 0.10 * k, -0.06), "rot": (-10.0 * k, 0.0, 0.0)},
+        "spine_01": {"rot": (-8.0 * k, 0.0, 0.0)}, "spine_02": {"rot": (-10.0 * k, 0.0, 0.0)},
+        "spine_03": {"rot": (-6.0 * k, 0.0, 0.0)}, "hump": {"rot": (-14.0 * k, 0.0, 0.0)},
+        "neck_01": {"rot": (-10.0 * k, 0.0, 0.0)}, "Head": {"rot": (-20.0 * k, 0.0, 0.0)},
+        "jaw": {"rot": (14.0 * k, 0.0, 0.0)}, "claw_r": {"rot": (20.0 * k, 0.0, 0.0)},
+    })
+    side(pose, "clavicle", (0.0, -8.0 * k, 0.0))
+    side(pose, "upperarm", (-20.0 * k, -50.0 * k, 0.0))
+    side(pose, "lowerarm", (-24.0 * k, 0.0, 0.0))
+    return pose
+
+
+def _spew_out(rig, heave=0.0, k=1.0):
+    pose = merge(stand(rig, 0.24 * k, 0.16, 16.0 * k), {
+        "pelvis": {"loc": (0.0, -0.10 * k, -0.24 * k), "rot": (16.0 * k, 0.0, 0.3 * heave)},
+        "spine_01": {"rot": (10.0 * k + heave, 0.0, 0.0)}, "spine_02": {"rot": (10.0 * k - 0.5 * heave, 0.0, 0.0)},
+        "spine_03": {"rot": (4.0 * k, 0.0, 0.0)}, "hump": {"rot": (6.0 * k + 1.5 * heave, 0.0, 0.0)},
+        "neck_01": {"rot": (2.0 * k, 0.0, 0.0)}, "Head": {"rot": (-14.0 * k - heave, 0.0, 0.0)},
+        "jaw": {"rot": (52.0 * k + abs(heave), 0.0, 0.0)}, "claw_r": {"rot": (-14.0 * k, 0.0, 0.0)},
+    })
+    side(pose, "upperarm", (-30.0 * k, -16.0 * k, 0.0))
+    side(pose, "lowerarm", (-30.0 * k, 0.0, 0.0))
+    side(pose, "hand", (-10.0 * k, 0.0, 0.0))
+    return pose
+
+
+def spew(t, rig):
+    keys = [(0.0, base_pose(rig)), (0.22, _spew_draw(rig, 0.7)), (0.40, _spew_draw(rig)),
+            (0.62, _spew_draw(rig, -0.4)), (SPEW_HIT, _spew_out(rig)),
+            (0.98, _spew_out(rig, 7.0)), (1.12, _spew_out(rig, -5.0)), (1.26, _spew_out(rig, 6.0)),
+            (1.38, _spew_out(rig, 0.0, 0.8)), (1.55, _spew_out(rig, 0.0, 0.35)), (SPEW_TIME, base_pose(rig))]
+    return track(t, keys)
+
+
 CLIPS = [("slam", slam, SLAM_TIME), ("roar", roar, ROAR_TIME), ("summon", summon, SUMMON_TIME),
-         ("stun", stun, STUN_TIME)]
+         ("stun", stun, STUN_TIME), ("spew", spew, SPEW_TIME)]

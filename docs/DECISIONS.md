@@ -6,7 +6,8 @@ Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar v
 - Takla bekleme 8.0 sn (önerilen 3–3.5 yerine; teyit edildi: takla nadir acil durum hamlesi). Dokunulmazlık yalnız taklanın ilk ~0.15 sn'si.
 - Kristal düşme: yürüyen %50, özel zombiler %80, boss her zaman (yağmur).
 - Tur süresi: dalga ~1–1.5 dk, koşu ~12–15 dk.
-- F (boss): üç seçenek sunuldu (kusmuk yağmuru / zincir hücum + yarık / parçalanma evresi; öneri 1+2); Taha'nın seçimi bekleniyor.
+- F (boss): üç seçenek sunuldu; Taha öneriyi seçti: 1+2 (uzaktayken kusmuk yağmuru, öfkede zincir hücum + yanan yarık izi).
+- Takla bekleme 8 → 6 sn (Taha, "oyun zorlaşmış"). Haritada süzülen para ve XP çantaları (iki ayrı tür, 15 sn ömür). Dalga sonu kalan can ×2 (üst sınıra kadar).
 
 ## 2026-11-22 — Aşama 9 arayüz (Taha)
 

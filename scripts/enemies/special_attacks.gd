@@ -29,7 +29,7 @@ func _init(manager: EnemyManager) -> void:
 	_bloat = BloatAttack.new(manager)
 	_scream = ScreamAttack.new(manager)
 	_jump = JumpAttack.new(manager)
-	boss = BossAttack.new(manager)
+	boss = BossAttack.new(manager, _lob)
 
 
 ## Bu türün özel saldırısı açık mı (kapalıysa yürüyen gibi yaklaşıp vurur).

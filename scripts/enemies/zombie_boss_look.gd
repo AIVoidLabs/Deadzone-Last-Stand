@@ -35,12 +35,31 @@ func on_event(event_name: StringName, data: Dictionary) -> bool:
 	return true
 
 
+## Kusmuk hazırlığı: anim_spew klibi modelde varsa o (anı spew_anim_hit_time), yoksa yedek roar klibi (anı spew_fallback_hit_time).
+func _play_spew(duration: float) -> void:
+	if _has_clip(&"anim_spew"):
+		_clips.play_timed(&"anim_spew", float(_clips.row.get("spew_anim_hit_time", 0.0)), duration)
+	else:
+		_clips.play_timed(&"anim_roar", float(_clips.row.get("spew_fallback_hit_time", 0.0)), duration)
+
+
+func _has_clip(row_key: StringName) -> bool:
+	if _clips.animation == null:
+		return false
+	for clip: StringName in _clips.row.get(row_key, []):
+		if _clips.animation.has_animation(clip if _clips.own_clips else ZombieClips.full_name(clip)):
+			return true
+	return false
+
+
 ## Durum girişi. Dönüş: bu durumu boss görüntüsü oynattı mı (false ise ZombieVisual kendi akışını sürdürür).
 func on_state(state: int, duration: float) -> bool:
 	match state:
 		S.WINDUP:
 			if _attack == &"slam":
 				_clips.play_timed(&"anim_slam", float(_clips.row.get("slam_anim_hit_time", 0.0)), duration)
+			elif _attack == &"spew":
+				_play_spew(duration)
 			else:
 				_clips.play_timed(&"anim_charge_windup" if _attack == &"charge" else &"anim_summon", 0.0, duration)
 		S.CHARGE:
@@ -50,8 +69,8 @@ func on_state(state: int, duration: float) -> bool:
 		S.ROAR:
 			_clips.play_timed(&"anim_roar", 0.0, duration)
 		S.RECOVER:
-			# Yer dövmesinin klibi toparlanmayı da içerir (sonuna dek oynar); hücum ve çağrıdan sonra bekleme duruşu.
-			if _attack == &"slam" and _clips.animation != null:
+			# Yer dövmesinin ve kusmuğun klibi toparlanmayı da içerir (sonuna dek oynar); hücum ve çağrıdan sonra bekleme duruşu.
+			if (_attack == &"slam" or _attack == &"spew") and _clips.animation != null:
 				_clips.animation.speed_scale = 1.0
 			else:
 				_clips.play_loop(&"anim_idle", 1.0)

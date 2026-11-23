@@ -13,7 +13,7 @@ signal enemy_damaged(at: Vector3, direction: Vector2, amount: float, killed: boo
 signal jump_landed(at: Vector3, radius: float)
 ## Yay atışı (LobAttack): kind &"spit" / &"throw"; from/dest dünya konumu (from bırakış yüksekliğinde), flight sn,
 ## arc tepe yüksekliği, radius iniş yarıçapı (gölge işareti). İnince lob_landed; asit topu havuz bırakınca acid_pool_started.
-signal lob_launched(kind: StringName, from: Vector3, dest: Vector3, flight: float, arc: float, radius: float)
+signal lob_launched(kind: StringName, from: Vector3, dest: Vector3, flight: float, arc: float, radius: float, boss: bool)
 signal lob_landed(kind: StringName, at: Vector3, radius: float)
 signal acid_pool_started(at: Vector3, radius: float, time: float)
 ## Patlayıcı patladı (BloatAttack): at yerde, radius patlama yarıçapı (fx, sarsıntı ve ses için).

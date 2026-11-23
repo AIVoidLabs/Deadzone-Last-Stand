@@ -8,6 +8,8 @@ extends RefCounted
 ## olaylarıyla haber verilir.
 
 const S = ZombieRules.State
+## Engelle kısalan atışta uçuş süresi en çok bu orana (kalan yol oranı alt sınırı) kadar kısalır.
+const CLIP_FLIGHT_MIN: float = 0.25
 
 var _m: EnemyManager
 ## Örnek başına: bu taş fırlatan hazırlığı yakın vuruş (1) mu, atış (0) mı.
@@ -17,6 +19,10 @@ var _lob_from: PackedVector2Array = PackedVector2Array()
 var _lob_dest: PackedVector2Array = PackedVector2Array()
 var _lob_left: PackedFloat32Array = PackedFloat32Array()
 var _lob_row: Array[Dictionary] = []
+## Boss kusmuğu sayaçları (tükürücü sayaçlarından ayrı): doğrudan isabet, düşen havuz, havuz tiki.
+var spew_hits: int = 0
+var spew_pools: int = 0
+var spew_ticks: int = 0
 ## Asit havuzları: merkez, kalan süre, tik birikimi, satır.
 var _pool_pos: PackedVector2Array = PackedVector2Array()
 var _pool_left: PackedFloat32Array = PackedFloat32Array()
@@ -128,7 +134,7 @@ func _launch(i: int, row: Dictionary) -> void:
 		# Bina ya da engel araya girerse top/kaya engelin kenarına iner (kısalan yolla orantılı süre).
 		var shot: Vector3 = CityLayout.clip_shot(from, dest, Tuning.OBSTACLE_SHOT_RADIUS, Tuning.OBSTACLE_SHOT_MARGIN, _m._blocks)
 		dest = Vector2(shot.x, shot.y)
-		flight *= maxf(shot.z, 0.25)
+		flight *= maxf(shot.z, CLIP_FLIGHT_MIN)
 	_lob_from.append(from)
 	_lob_dest.append(dest)
 	_lob_left.append(flight)
@@ -141,8 +147,34 @@ func _launch(i: int, row: Dictionary) -> void:
 	var origin: Vector3 = Vector3(from.x, Tuning.LOB_RELEASE_HEIGHT, from.y)
 	if kind == &"spit" and row.has("spit_mouth"):
 		origin = _m._nodes[i].mouth_position()
-	_m.lob_launched.emit(kind, origin, Vector3(dest.x, 0.0, dest.y), flight, _f(row, "arc"), radius)
+	_m.lob_launched.emit(kind, origin, Vector3(dest.x, 0.0, dest.y), flight, _f(row, "arc"), radius, false)
 	_m._nodes[i].event.emit(&"lob", {"kind": kind})
+
+
+## Boss kusmuğu (BossSpew): verilen asit topu satırıyla from'dan dest'e uçan top. dest BossSpew'de engele kırpılmış gelir
+## (kırpma boşluk hesabından önce yapılır; burada tekrar kırpılmaz), flight ona göre hesaplanmıştır.
+## row: SpewRules.acid_row; origin: bırakış noktası (dünya); flight/arc uçuşun süresi ve tepe yüksekliği.
+func launch_ball(row: Dictionary, origin: Vector3, from: Vector2, dest: Vector2, flight: float, arc: float) -> void:
+	_lob_from.append(from)
+	_lob_dest.append(dest)
+	_lob_left.append(flight)
+	_lob_row.append(row)
+	_m.lob_launched.emit(&"spit", origin, Vector3(dest.x, 0.0, dest.y), flight, arc, float(row["acid_radius"]), true)
+
+
+## Boss öldü: henüz inmemiş boss kusmuk topları iptal edilir (iniş, hasar, havuz yok); görsel boss_event "spew_cancel" ile söner.
+## Tükürücü topları ve inmiş havuzlar kalır. Dönüş: iptal edilen top sayısı.
+func cancel_boss_balls() -> int:
+	var cancelled: int = 0
+	var k: int = _lob_left.size() - 1
+	while k >= 0:
+		if _is_boss_ball(_lob_row[k]):
+			_remove_lob(k)
+			cancelled += 1
+		k -= 1
+	if cancelled > 0:
+		_m.boss_event.emit(&"spew_cancel", {})
+	return cancelled
 
 
 ## İniş: kaya askeri kapsıyorsa vurur; asit topu havuz bırakır.
@@ -152,6 +184,9 @@ func _land(k: int, target: Vector2) -> void:
 	var at: Vector3 = Vector3(dest.x, 0.1, dest.y)
 	if row["attack_kind"] == &"spit":
 		_m.lob_landed.emit(&"spit", at, float(row["acid_radius"]))
+		if _is_boss_ball(row) and _m.player.is_exposed() and LobRules.in_pool(target, dest, float(row["acid_radius"])):
+			spew_hits += 1
+			_m.player.take_hit(float(row["spew_hit_damage"]), target - dest)
 		_add_pool(dest, row)
 		return
 	var radius: float = row["throw_radius"]
@@ -161,14 +196,20 @@ func _land(k: int, target: Vector2) -> void:
 		_m.player.take_hit(float(row["contact_damage"]), target - dest)
 
 
+## Havuz tamponu dolunca en az ömrü kalan (en çabuk sönecek) havuz yerini verir. AcidPools (görüntü) aynı kuralı aynı
+## süre değerleriyle (acid_pool_started'ın time parametresi = buradaki _pool_left başlangıcı) uygular; böylece karışık
+## ömürlü (tükürücü / boss kusmuğu) havuzlarda da görüntü ile gerçek alan aynı havuzu bırakır.
 func _add_pool(at: Vector2, row: Dictionary) -> void:
 	if _pool_left.size() >= Tuning.ACID_POOL_MAX:
-		_remove_pool(0)
+		_remove_pool(_soonest_pool())
 	_pool_pos.append(at)
 	_pool_left.append(row["acid_time"])
 	_pool_acc.append(0.0)
 	_pool_row.append(row)
-	_m.spit_pools += 1
+	if _is_boss_ball(row):
+		spew_pools += 1
+	else:
+		_m.spit_pools += 1
 	_m.acid_pool_started.emit(Vector3(at.x, 0.0, at.y), row["acid_radius"], row["acid_time"])
 
 
@@ -183,7 +224,10 @@ func _pool_tick(k: int, delta: float, target: Vector2) -> void:
 	var step: Vector2 = LobRules.advance_tick(_pool_acc[k], delta, float(row["acid_tick"]))
 	_pool_acc[k] = step.x
 	for _t in int(step.y):
-		_m.spit_ticks += 1
+		if _is_boss_ball(row):
+			spew_ticks += 1
+		else:
+			_m.spit_ticks += 1
 		_m.player.take_dot(float(row["acid_damage"]))
 
 
@@ -199,6 +243,19 @@ func _remove_pool(k: int) -> void:
 	_pool_left.remove_at(k)
 	_pool_acc.remove_at(k)
 	_pool_row.remove_at(k)
+
+
+## Kalan ömrü en az olan havuzun indeksi (eşitlikte en eskisi).
+func _soonest_pool() -> int:
+	var best: int = 0
+	for k in _pool_left.size():
+		if _pool_left[k] < _pool_left[best]:
+			best = k
+	return best
+
+
+static func _is_boss_ball(row: Dictionary) -> bool:
+	return row.has(SpewRules.BOSS_BALL_KEY)
 
 
 func _is_melee(i: int) -> bool:
