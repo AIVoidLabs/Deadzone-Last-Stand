@@ -271,6 +271,8 @@ Aşama 1 geri bildirimi (Taha): vuruş hissi yok, hareket cansız, zombiler tehd
 - Gerçek para yok; her şey oyunda kazanılan parayla.
 - Oyun tam ekran açılır (F11 / Alt+Enter ile pencere).
 
+- 2026-11-23: Aşama 10 (kalıcı ilerleme) tümden iptal. Kalıcı para, asker sınıfı, silah açılımı ve yükseltme yok; ölen oyuncu her seferinde ilk seviye ve ilk silahla baştan başlar. Zorluk "zora yakın" hedeflenir (Aşama 11).
+
 ## Açık kararlar
 
 | Karar | Ne zaman |
@@ -278,6 +280,5 @@ Aşama 1 geri bildirimi (Taha): vuruş hissi yok, hareket cansız, zombiler tehd
 | İçerik hedefi sayıları | 6 ve 11 |
 | Müzik | 8.5 |
 | Gamepad, oyun dili | 9.7 |
-| Kalıcı ilerleme kapsamı | 10 |
 | Kod lisansı (MIT?), Linux deneme ortamı | 12'den önce |
 

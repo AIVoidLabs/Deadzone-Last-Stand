@@ -97,8 +97,8 @@ Amaç: düz low-poly zombiden, askerle uyumlu stilize-gerçekçi dokulu modeller
 ### 9 — Arayüz ve akış ✔ bitti (2026-11-23, Taha onayladı; gamepad/9.7 iptal)
 9.1 Ana menü ve duraklatma · 9.2 Ayarlar (ses, tam ekran, kalite profili, dinamik kamera aç/kapa) · 9.3 HUD son hali · 9.4 Mağaza ve kart ekranları son hali (6.3 kart ekranı yalnız işlevsel; Taha görünümü yeniden istedi) · 9.5 Tur sonu özeti · 9.6 Kayıt dosyası · 9.7 Gamepad ve oyun dili (karara göre). — Taha: gamepad ve dil kararı.
 
-### 10 — Kalıcı ilerleme
-10.1 Kalıcı para ve kayıt · 10.2 Asker sınıfları (Tripo modelleri) · 10.3 Başlangıç silahı açılımları · 10.4 Kalıcı yükseltmeler. Gerçek para yok. — Taha: kapsam onayı, diğer asker modelleri.
+### 10 — Kalıcı ilerleme ✘ iptal (Taha, 2026-11-23: kalıcı ilerleme yok; her tur baştan başlar)
+(Aşağıdaki alt aşamalar yapılmayacak, kayıt için duruyor.) 10.1 Kalıcı para ve kayıt · 10.2 Asker sınıfları (Tripo modelleri) · 10.3 Başlangıç silahı açılımları · 10.4 Kalıcı yükseltmeler. Gerçek para yok. — Taha: kapsam onayı, diğer asker modelleri.
 
 ### 11 — İçerik ve denge
 11.1 Silah ve eşya sayısı hedefe · 11.2 Dalga sayısı ve zorluk eğrisi · 11.3 Fiyatlar ve düşme oranları · 11.4 En az üç farklı kurulum işe yarıyor. İçerik hedefi (öneri, bu aşamada kesinleşir): 20 dalga, 12 silah × 4 kademe, ~30 eşya, 6 zombi türü + 1 boss, 3 asker sınıfı, 1 arena. — Taha: oynayış geri bildirimi.

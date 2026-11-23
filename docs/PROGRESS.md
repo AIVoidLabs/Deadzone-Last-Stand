@@ -5,7 +5,7 @@ Plan: `ROADMAP.md` · Kararlar: `DECISIONS.md` · Teknik yapı: `TECH.md`
 
 ## Şu an
 
-**AŞAMA 9 BİTTİ (2026-11-23), Taha onayladı.** Sıradaki: Aşama 10 (kapsam revize ediliyor). Gamepad kapsam dışı (Taha, 2026-11-22). Oyun artık ana menüyle açılır (`FEATURE_MAIN_MENU`; `--capture/--bench/--autoplay/--arena` ve elle oynama bayrakları menüyü atlar, kullanıcı ayarlarını okumaz). 412 test.
+**AŞAMA 9 BİTTİ (2026-11-23), Taha onayladı.** **Aşama 10 tümden iptal (Taha, 2026-11-23): kalıcı ilerleme yok; ölünce her tur baştan, ilk seviye ve ilk silahla.** Sıradaki ana aşama: 11 — İçerik ve denge; Taha'nın "devam" demesi bekleniyor. Gamepad kapsam dışı (Taha, 2026-11-22). Oyun artık ana menüyle açılır (`FEATURE_MAIN_MENU`; `--capture/--bench/--autoplay/--arena` ve elle oynama bayrakları menüyü atlar, kullanıcı ayarlarını okumaz). 412 test.
 - Görsel dil: "kanlı afiş" (referans Taha'nın kart görseli; çizimleri kopyalanmadı). UI kiti `scripts/ui/kit/` (GrungeCard/Button/Panel/Title, ScreenBackdrop, GrungeBar, ayar satırları), shader'lar `assets/shaders/ui/`, dokular `tools/blender/ui_textures.py`, yazı tipi Inter (OFL). 48 amblem Blender'da çizgi roman mürekkep hattıyla (`tools/blender/ui_ink.py`, `ui_emblems_*.py`).
 - Ekranlar: ana menü (canlı 3B şehir arka planı), ayarlar (görüntü/ses/oyun/kontroller + tuş atama, "koru?" geri sayımı), duraklatma + tur özeti, kart (perk) ekranı, mağaza, savaş HUD'ı + boss çubuğu/bannerlar, tur sonu özeti (REKOR damgaları), rekorlar, emeği geçenler, onay penceresi.
 - Altyapı: `Settings` + `SettingsSchema`, `Loc` (TR/EN, `scripts/data/text/`), `SaveGame` + `RunRecord` + `RunStats` (user://save.json, bozuksa .bak), `GameFlow` duraklatma nedenleri kümesi, `SceneFade`. Her ekran `FEATURE_*` ile kapanır, eski kart/mağaza/HUD dosyaları duruyor. Görüntü aracı: `-- --ui-shot=x.png --ui-screen=main|settings|pause|records|credits|perk|shop|end_win|end_lose|hud [--ui-lang=en --ui-size=1600x900 --ui-tab=N]`; `--capture-pause=S`.
@@ -251,10 +251,10 @@ Bitiş ölçütleri `ROADMAP.md`'de. Biten kutunun yanına tarih ve commit yazı
 - [x] 9.7 Gamepad ve oyun dili — iptal (Taha, 2026-11-22)
 
 ### 10 — Kalıcı ilerleme
-- [ ] 10.1 Kalıcı para ve kayıt
-- [ ] 10.2 Asker sınıfları
-- [ ] 10.3 Başlangıç silahı açılımları
-- [ ] 10.4 Kalıcı yükseltmeler
+- [x] 10.1 Kalıcı para ve kayıt — iptal (Taha, 2026-11-23)
+- [x] 10.2 Asker sınıfları — iptal (Taha, 2026-11-23)
+- [x] 10.3 Başlangıç silahı açılımları — iptal (Taha, 2026-11-23)
+- [x] 10.4 Kalıcı yükseltmeler — iptal (Taha, 2026-11-23)
 
 ### 11 — İçerik ve denge
 - [ ] 11.1 Silah ve eşya sayısı
