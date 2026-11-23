@@ -2,6 +2,9 @@
 
 Tarihli kararlar ve açık kararlar. Yeni karar en üste eklenir; açık karar verilince "Açık kararlar"dan çıkarılıp tarihli bölüme yazılır.
 
+## 2026-11-23 — Web yok (Taha)
+- Oyun yalnız Windows + Linux için yayınlanır; web sürümü yapılmaz (12.4 iptal).
+
 ## 2026-11-23 — Aşama 11 geri bildirim kararları (Taha)
 - Takla bekleme 8.0 sn (önerilen 3–3.5 yerine; teyit edildi: takla nadir acil durum hamlesi). Dokunulmazlık yalnız taklanın ilk ~0.15 sn'si.
 - Kristal düşme: yürüyen %50, özel zombiler %80, boss her zaman (yağmur).
